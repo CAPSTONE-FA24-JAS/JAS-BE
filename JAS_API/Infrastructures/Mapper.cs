@@ -1,6 +1,7 @@
 ﻿using Application.Commons;
 using AutoMapper;
 
+
 namespace Infrastructures
 {
     public class Mapper : Profile

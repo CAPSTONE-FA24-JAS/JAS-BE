@@ -5,6 +5,8 @@ using FluentValidation;
 using Infrastructures;
 using System.Diagnostics;
 using WebAPI.Middlewares;
+using WebAPI.Service;
+using Application.Interfaces;
 
 namespace WebAPI
 {
@@ -21,7 +23,7 @@ namespace WebAPI
             services.AddSingleton<PerformanceMiddleware>();
             services.AddSingleton<Stopwatch>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            //services.AddScoped<IClaimsService, ClaimsService>();
+            services.AddScoped<IClaimsService, ClaimsService>();
 
 
             services.AddHttpContextAccessor();

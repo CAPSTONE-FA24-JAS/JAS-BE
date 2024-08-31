@@ -31,7 +31,6 @@
 
 
 	<ItemGroup>
-	  <Folder Include="FluentAPIs\" />
 	  <Folder Include="Repositories\" />
 	</ItemGroup>
 </Project>
