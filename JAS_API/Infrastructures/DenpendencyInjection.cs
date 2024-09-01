@@ -18,7 +18,7 @@ namespace Infrastructures
 
             services.AddDbContext<AppDbContext>(option =>
             {
-                option.UseSqlServer(databaseConnection);
+                option.UseNpgsql(databaseConnection);
             });
 
             services.AddAutoMapper(typeof(Mapper).Assembly);
