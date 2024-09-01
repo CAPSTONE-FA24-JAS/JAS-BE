@@ -1,4 +1,5 @@
 ﻿using Application.Commons;
+using Domain.Entity;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -16,26 +17,25 @@ namespace Application.Utils
 
 
 
-        //public static string GenerateJsonWebToken(this Account user, AppConfiguration appSettingConfiguration, string secretKey, DateTime now)
-        //{
-        //    var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-        //    var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-        //    var claims = new[]
-        //    {
-        //        new Claim("Id", user.Id.ToString()),
-        //        new Claim("Email" ,user.Email),
-        //        new Claim(ClaimTypes.Role ,user.RoleName),
-        //    };
-        //    var token = new JwtSecurityToken(
-        //        issuer: appSettingConfiguration.JWTSection.Issuer,
-        //        audience: appSettingConfiguration.JWTSection.Audience,
-        //        claims: claims,
-        //        expires: now.AddMinutes(15),
-        //        signingCredentials: credentials);
+        public static string GenerateJsonWebToken(this Account user, AppConfiguration appSettingConfiguration, string SecretKey, DateTime now, string rolename)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var claims = new[]
+            {
+                new Claim("Id", user.Id.ToString()),
+                new Claim("Email" ,user.Email),
+                new Claim(ClaimTypes.Role ,rolename),
+            };
+            var token = new JwtSecurityToken(
+                issuer: appSettingConfiguration.JWTSection.Issuer,
+                audience: appSettingConfiguration.JWTSection.Audience,
+                claims: claims,
+                expires: now.AddMinutes(15),
+                signingCredentials: credentials);
 
-
-        //    return new JwtSecurityTokenHandler().WriteToken(token);
-        //}
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 
 }

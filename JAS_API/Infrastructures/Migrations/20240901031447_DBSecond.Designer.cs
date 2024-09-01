@@ -4,6 +4,7 @@ using Infrastructures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructures.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240901031447_DBSecond")]
+    partial class DBSecond
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,9 +91,11 @@ namespace Infrastructures.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VNPayAccountName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VNPayBankCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -486,11 +491,13 @@ namespace Infrastructures.Migrations
 
             modelBuilder.Entity("Domain.Entity.Account", b =>
                 {
-                    b.Navigation("BidLimit");
+                    b.Navigation("BidLimit")
+                        .IsRequired();
 
                     b.Navigation("Blogs");
 
-                    b.Navigation("Wallet");
+                    b.Navigation("Wallet")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entity.Blog", b =>
