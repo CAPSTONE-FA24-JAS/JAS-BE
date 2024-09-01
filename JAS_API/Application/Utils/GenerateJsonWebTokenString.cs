@@ -25,7 +25,7 @@ namespace Application.Utils
             {
                 new Claim("Id", user.Id.ToString()),
                 new Claim("Email" ,user.Email),
-                new Claim(ClaimTypes.Role ,user.Role.ToString()),
+                new Claim(ClaimTypes.Role ,user.RoleId.ToString()),
             };
             var token = new JwtSecurityToken(
                 issuer: appSettingConfiguration.JWTSection.Issuer,

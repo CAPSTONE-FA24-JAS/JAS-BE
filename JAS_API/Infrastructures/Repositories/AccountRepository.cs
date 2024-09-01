@@ -62,8 +62,8 @@ namespace Infrastructures.Repositories
 
         public async Task<Account> GetUserByEmailAndPasswordHash(string email, string passwordHash)
         {
-            var account = _dbContext.Accounts.Where(a => a.Email == email 
-                                                    && a.PasswordHash == passwordHash).FirstOrDefault();
+            var account = await _dbContext.Accounts.Where(a => a.Email == email 
+                                                    && a.PasswordHash == passwordHash).FirstOrDefaultAsync();
             if (account == null)
             {
                 throw new KeyNotFoundException("No user found with email or pass");
