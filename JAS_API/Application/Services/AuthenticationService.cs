@@ -14,12 +14,53 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly AppConfiguration _configuration;
         private readonly IMapper _mapper;
+        private readonly ICurrentTime _currentTime;
 
-        public AuthenticationService(IUnitOfWork unitOfWork, AppConfiguration configuration, IMapper mapper)
+        public AuthenticationService(IUnitOfWork unitOfWork, AppConfiguration configuration, IMapper mapper, ICurrentTime currentTime)
         {
             _unitOfWork = unitOfWork;
             _configuration = configuration;
             _mapper = mapper;
+            _currentTime = currentTime;
+        }
+
+        public async Task<APIResponseModel> LoginAsync(LoginAccountDTO loginAccountDTO)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+              //  var hashPassword = Utils.HashPassword.HashWithSHA256(loginAccountDTO.Password);
+                var account = await _unitOfWork.AccountRepository.GetUserByEmailAndPasswordHash(loginAccountDTO.Email, loginAccountDTO.Password);
+                if (account == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Email or password is invalid!";
+                    return response;
+                }
+                var token = account.GenerateJsonWebToken(
+                    _configuration,
+                    _configuration.JWTSection.SecretKey,
+                    _currentTime.GetCurrentTime()
+                    );
+
+                var accountDTO = _mapper.Map<AccountDTO>( account );
+                var authResponse = new LoginResponseDTO
+                {
+                    Account = accountDTO,
+                    AccessToken = token
+                };
+                response.IsSuccess = true;
+                response.Message = "Login successfully.";
+                response.Data = authResponse;
+            }
+            catch (Exception ex) 
+            {
+                response.IsSuccess = false;
+                response.Message = "Error";
+                response.ErrorMessages = new List<string> { ex.Message };
+
+            }
+            return response;
         }
 
         public async Task<APIResponseModel> RegisterAsync(RegisterAccountDTO registerAccountDTO)

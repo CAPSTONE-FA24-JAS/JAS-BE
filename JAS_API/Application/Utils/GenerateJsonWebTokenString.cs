@@ -17,7 +17,7 @@ namespace Application.Utils
 
 
 
-        public static string GenerateJsonWebToken(this Account user, AppConfiguration appSettingConfiguration, string SecretKey, DateTime now, string rolename)
+        public static string GenerateJsonWebToken(this Account user, AppConfiguration appSettingConfiguration, string SecretKey, DateTime now)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -25,7 +25,7 @@ namespace Application.Utils
             {
                 new Claim("Id", user.Id.ToString()),
                 new Claim("Email" ,user.Email),
-                new Claim(ClaimTypes.Role ,rolename),
+                new Claim(ClaimTypes.Role ,user.RoleId.ToString()),
             };
             var token = new JwtSecurityToken(
                 issuer: appSettingConfiguration.JWTSection.Issuer,
