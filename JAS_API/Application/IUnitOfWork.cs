@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace Application
 {
     public interface IUnitOfWork
     {
+        public IAccountRepository AccountRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

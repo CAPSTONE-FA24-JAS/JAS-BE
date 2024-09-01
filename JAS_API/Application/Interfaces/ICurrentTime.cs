@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
-    public interface IClaimsService
+    public interface ICurrentTime
     {
-        public int GetCurrentUserId { get; }
+        public DateTime GetCurrentTime();
     }
 }

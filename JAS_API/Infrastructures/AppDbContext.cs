@@ -21,7 +21,16 @@ namespace Infrastructures
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            #region insert data
+            //Role
+            modelBuilder.Entity<Role>().HasData(
+                new Role { Id = 1, Name = "Customer", IsDeleted = false },
+                new Role { Id = 2, Name = "Admin", IsDeleted = false }
+                );
+            #endregion
         }
+
+
 
     }
 }

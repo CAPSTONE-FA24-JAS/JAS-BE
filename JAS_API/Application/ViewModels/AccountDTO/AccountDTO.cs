@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entity
+namespace Application.ViewModels.AccountDTO
 {
-    public class Account : BaseEntity
+    public class AccountDTO
     {
         public string? FullName { get; set; }
         public string? ProfilePicture { get; set; }
@@ -22,12 +22,5 @@ namespace Domain.Entity
         public string? VNPayBankCode { get; set; }
         public string? VNPayAccountName { get; set; }
         public int? RoleId { get; set; }
-         
-        //Enity Relationship
-        public virtual Role? Role { get; set; }
-        public virtual IEnumerable<Blog>? Blogs { get; set; }
-        public virtual BidLimit? BidLimit { get; set; }
-        public virtual Wallet? Wallet { get; set; }
-
     }
 }
