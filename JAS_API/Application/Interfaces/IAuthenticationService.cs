@@ -13,5 +13,6 @@ namespace Application.Interfaces
     {
         public Task<APIResponseModel> RegisterAsync(RegisterAccountDTO registerAccountDTO);
         public Task<APIResponseModel> ConfirmTokenAsync(string email, string token);
+        public Task<APIResponseModel> LoginAsync(LoginAccountDTO loginAccountDTO);
     }
 }

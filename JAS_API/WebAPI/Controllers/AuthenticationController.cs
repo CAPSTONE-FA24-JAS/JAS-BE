@@ -43,5 +43,20 @@ namespace WebAPI.Controllers
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> LoginAsync(LoginAccountDTO loginObject)
+        {
+            var result = await _authenticationService.LoginAsync(loginObject);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            else
+            {
+                return Ok(result);
+            }
+        }
+
     }
 }
