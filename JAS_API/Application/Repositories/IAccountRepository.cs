@@ -13,7 +13,7 @@ namespace Application.Repositories
 
         Task<bool> CheckEmailNameExisted(string email);
         Task<bool> CheckPhoneNumberExisted(string phonenumber);
-
+        Task<bool> CheckConfirmToken(string email, string token);
         Task<Account> GetUserByConfirmationToken(string token);
         Task<IEnumerable<Account>> SearchAccountByNameAsync(string name);
         Task<IEnumerable<Account>> GetAccountsAsync();
