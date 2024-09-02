@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Application.ViewModels.AccountDTO
+﻿namespace Application.ViewModels.AccountDTO
 {
     public class AccountDTO
     {
-        public string? FullName { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }   
         public string? ProfilePicture { get; set; }
         public string? Email { get; set; }
         public string? Gender { get; set; }
@@ -22,5 +17,6 @@ namespace Application.ViewModels.AccountDTO
         public string? VNPayBankCode { get; set; }
         public string? VNPayAccountName { get; set; }
         public int? RoleId { get; set; }
+        public string? RoleName { get; set; }
     }
 }

@@ -13,6 +13,7 @@ namespace Infrastructures
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<ICurrentTime, CurrentTime>();
 

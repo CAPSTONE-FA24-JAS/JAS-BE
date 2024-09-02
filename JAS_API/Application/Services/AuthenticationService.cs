@@ -5,6 +5,8 @@ using Application.Utils;
 using Application.ViewModels.AccountDTO;
 using AutoMapper;
 using Domain.Entity;
+using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json.Linq;
 using System.Data.Common;
 
 namespace Application.Services
@@ -22,6 +24,59 @@ namespace Application.Services
             _mapper = mapper;
         }
 
+        public async Task<APIResponseModel> ConfirmTokenAsync(string email, string tokenconfirm)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var emailChecked = await _unitOfWork.AccountRepository.CheckEmailNameExisted(email);
+                if (!emailChecked)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Email does not exist.";
+                    return response;
+                }
+
+                var users= await _unitOfWork.AccountRepository.GetAllAsync();
+                var user = users.FirstOrDefault(x => x.Email == email);
+                if (user == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "User not found.";
+                    return response;
+                }
+
+                var result = await _unitOfWork.AccountRepository.CheckConfirmToken(user.Email, tokenconfirm);
+                if (!result)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Token failed, not confirmed.";
+                }
+                else
+                {
+                    user.IsConfirmed = true;
+                    _unitOfWork.AccountRepository.Update(user);
+                    if(await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        response.IsSuccess = true;
+                        response.Message = "Confirm successful.";
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = "Update faild, not confirmed.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+
         public async Task<APIResponseModel> RegisterAsync(RegisterAccountDTO registerAccountDTO)
         {
             var response = new APIResponseModel();
@@ -36,18 +91,16 @@ namespace Application.Services
                 }
                 
                     var user = _mapper.Map<Account>(registerAccountDTO);
-                    // Tạo token ngẫu nhiên
                     user.ConfirmationToken = Guid.NewGuid().ToString();
-
                     user.RoleId = 1;
+                    user.Status = true;
+                    user.PasswordHash = HashPassword.HashWithSHA256(registerAccountDTO.PasswordHash);
                     await _unitOfWork.AccountRepository.AddAsync(user);
-                    var confirmationLink = $"https://localhost:7251/swagger/confirm?token={user.ConfirmationToken}";
-
-                    // Gửi email xác nhận
+                    var confirmationLink = $"https://localhost:7251/api/Authentication/ConfirmEmail/confirm?token={user.ConfirmationToken}&email={user.Email}";
+                
                     var emailSent = await SendEmail.SendConfirmationEmail(user.Email, confirmationLink);
                     if (!emailSent)
                     {
-                        // Xử lý khi gửi email không thành công
                         response.IsSuccess = false;
                         response.Message = "Error sending confirmation email.";
                         return response;

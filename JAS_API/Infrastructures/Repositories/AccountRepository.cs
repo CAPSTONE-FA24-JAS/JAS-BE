@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Repositories;
+using Application.Utils;
 using Domain.Entity;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +26,9 @@ namespace Infrastructures.Repositories
 
         public Task<bool> CheckPhoneNumberExisted(string phonenumber) =>
                                                 _dbContext.Accounts.AnyAsync(u => u.PhoneNumber == phonenumber);
+
+        public Task<bool> CheckConfirmToken(string email, string token) =>
+            _dbContext.Accounts.AnyAsync(x => x.Email == email && x.ConfirmationToken == token);
 
         public async Task<IEnumerable<Account>> GetAccountsAsync()
         {
