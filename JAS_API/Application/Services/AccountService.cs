@@ -330,7 +330,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.IsConfirmed == true,x => x.Role);
+                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.IsConfirmed == true, includes :x => x.Role);
                 var DTOs = new List<AccountDTO>();
                 if (accounts == null)
                 {
