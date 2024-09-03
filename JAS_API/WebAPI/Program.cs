@@ -14,13 +14,17 @@ builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
 builder.Services.AddSingleton(configuration);
 builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.WithOrigins("https://localhost:7251");
-                      });
-});
+        {
+            options.AddPolicy(name: "AllowedCorsOrigins",
+                builder =>
+                {
+                    builder
+                        .SetIsOriginAllowed(IsOriginAllowed)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+        });
 builder.WebHost.UseUrls("https://localhost:7251");
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -81,7 +85,7 @@ app.UseMiddleware<PerformanceMiddleware>();
 app.UseMiddleware<ConfirmationTokenMiddleware>();
 app.MapHealthChecks("/healthchecks");
 app.UseHttpsRedirection();
-app.UseCors(MyAllowSpecificOrigins);
+app.UseCors("AllowedCorsOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();
