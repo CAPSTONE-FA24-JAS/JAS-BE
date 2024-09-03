@@ -32,7 +32,7 @@ namespace Application.Services
             try
             {
                 var hashPassword = Utils.HashPassword.HashWithSHA256(loginAccountDTO.Password);
-                var account = await _unitOfWork.AccountRepository.GetUserByEmailAndPasswordHash(loginAccountDTO.Email, loginAccountDTO.Password);
+                var account = await _unitOfWork.AccountRepository.GetUserByEmailAndPasswordHash(loginAccountDTO.Email, hashPassword);
                 if (account == null)
                 {
                     response.IsSuccess = false;
