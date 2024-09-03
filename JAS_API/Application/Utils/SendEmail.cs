@@ -14,7 +14,7 @@ namespace Application.Utils
             var userName = "JAS";
             var emailFrom = "danhdcss160060@fpt.edu.vn";
             var password = "iiws nica yiuu irnk";
-            string emailTemplate = 
+            string emailTemplate =
                 @"
 <html>
     <head>
@@ -85,7 +85,7 @@ namespace Application.Utils
     <body>
         <div class='container'>
             <div class='header'>
-                <img src='https://example.com/golden-diamond.png' alt='Diamond Icon'>
+                <img src='https://clipartcraft.com/images/diamond-clipart-gold-8.png' alt='Diamond Icon'>
                 <h1>Confirm Your Email</h1>
             </div>
             <div class='content'>

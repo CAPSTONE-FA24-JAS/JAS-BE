@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Application.Utils
 {
-    public class HashPassword
+    public static class HashPassword
     {
         public static string HashWithSHA256(string input)
         {

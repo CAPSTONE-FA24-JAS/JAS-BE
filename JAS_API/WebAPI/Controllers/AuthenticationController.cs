@@ -27,6 +27,22 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpGet("confirm")]
+        public async Task<IActionResult> ConfirmEmail(string token, string email)
+        {
+            
+            var isConfirmed = await _authenticationService.ConfirmTokenAsync(email,token);
+            if (isConfirmed.IsSuccess)
+            {
+                return Ok("Email confirmed successfully.");
+            }
+            else
+            {
+                return BadRequest(isConfirmed);
+            }
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> LoginAsync(LoginAccountDTO loginObject)
         {
