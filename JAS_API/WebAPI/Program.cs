@@ -8,11 +8,19 @@ using System.Text;
 using WebAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var MyAllowSpecificOrigins = "JASCORS";
 var configuration = builder.Configuration.Get<AppConfiguration>() ?? new AppConfiguration();
 builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
 builder.Services.AddSingleton(configuration);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("https://localhost:7251");
+                      });
+});
 builder.WebHost.UseUrls("https://localhost:7251");
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -73,7 +81,7 @@ app.UseMiddleware<PerformanceMiddleware>();
 app.UseMiddleware<ConfirmationTokenMiddleware>();
 app.MapHealthChecks("/healthchecks");
 app.UseHttpsRedirection();
-
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();
