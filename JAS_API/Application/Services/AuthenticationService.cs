@@ -31,7 +31,7 @@ namespace Application.Services
             var response = new APIResponseModel();
             try
             {
-              //  var hashPassword = Utils.HashPassword.HashWithSHA256(loginAccountDTO.Password);
+                var hashPassword = Utils.HashPassword.HashWithSHA256(loginAccountDTO.Password);
                 var account = await _unitOfWork.AccountRepository.GetUserByEmailAndPasswordHash(loginAccountDTO.Email, loginAccountDTO.Password);
                 if (account == null)
                 {
