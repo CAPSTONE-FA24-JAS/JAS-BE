@@ -137,7 +137,7 @@ namespace Application.Services
                     user.Status = true;
                     user.PasswordHash = HashPassword.HashWithSHA256(registerAccountDTO.PasswordHash);
                     await _unitOfWork.AccountRepository.AddAsync(user);
-                    var confirmationLink = $"https://localhost:7251/api/Authentication/ConfirmEmail/confirm?token={user.ConfirmationToken}&email={user.Email}";
+                    var confirmationLink = $"http://localhost:7251/api/Authentication/ConfirmEmail/confirm?token={user.ConfirmationToken}&email={user.Email}";
                 
                     var emailSent = await SendEmail.SendConfirmationEmail(user.Email, confirmationLink);
                     if (!emailSent)

@@ -13,22 +13,10 @@ var configuration = builder.Configuration.Get<AppConfiguration>() ?? new AppConf
 builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
 builder.Services.AddSingleton(configuration);
-builder.Services.AddCors(options =>
+builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, build =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.WithOrigins("https://localhost:8081",  
-                                             "http://localhost:8081",
-                                             "http://localhost:5173",
-                                             "http://localhost:8082",
-                                             "https://localhost:7251",
-                                             "https://localhost:3000")
-                                .AllowAnyHeader()
-                                .AllowAnyMethod()
-                                .AllowCredentials();
-                      });
-});
+    build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+}));
 //builder.WebHost.UseUrls("https://localhost:7251");
 builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
