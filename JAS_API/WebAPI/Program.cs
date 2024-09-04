@@ -29,6 +29,7 @@ builder.Services.AddCors(options =>
                                 .AllowCredentials();
                       });
 });
+//builder.WebHost.UseUrls("https://localhost:7251");
 builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
