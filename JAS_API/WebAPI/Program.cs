@@ -18,12 +18,18 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("https://localhost:7251", 
+                          policy.WithOrigins("https://localhost:8081",  
                                              "http://localhost:8081",
-                                             "http://localhost:5173");
+                                             "http://localhost:5173",
+                                             "http://localhost:8082",
+                                             "https://localhost:7251",
+                                             "https://localhost:3000")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowCredentials();
                       });
 });
-builder.WebHost.UseUrls("https://localhost:7251");
+builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
