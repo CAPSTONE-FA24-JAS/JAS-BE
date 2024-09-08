@@ -3,14 +3,11 @@ using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.AccountDTO;
 using AutoMapper;
-using Azure;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Domain.Entity;
 using Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
 
 namespace Application.Services
 {
@@ -18,11 +15,14 @@ namespace Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly Cloudinary _cloudinary;
+        private const string Tags = "Backend_ImageProfile";
 
-        public AccountService(IUnitOfWork unitOfWork, IMapper mapper)
+        public AccountService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _cloudinary = cloudinary;
         }
 
         public async Task<APIResponseModel> BanAccount(int Id)
@@ -66,7 +66,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var account = _mapper.Map<Account>(createDTO);
+                var account = _mapper.Map<Domain.Entity.Account>(createDTO);
                 if (account == null)
                 {
                     reponse.IsSuccess = false;
@@ -320,9 +320,54 @@ namespace Application.Services
             return reponse;
         }
 
-        public Task<APIResponseModel> UpdateProfile(int Id, UpdateProfileDTO updateDTO)
+        public async Task<APIResponseModel> UpdateProfile(int Id, UpdateProfileDTO updateDTO)
         {
-            throw new NotImplementedException();
+            var reponse = new APIResponseModel();
+            try
+            {
+                Domain.Entity.Account account = await _unitOfWork.AccountRepository.GetByIdAsync(Id, includes: x => x.Role);
+                if (account == null)
+                {
+                    reponse.Message = $"Not Found Account By Id:"+Id+".";
+                    reponse.Code = 400;
+                    reponse.IsSuccess = false;
+                }
+                else
+                {
+                    var uploadResult = await _cloudinary.UploadAsync(new ImageUploadParams
+                    {
+                        File = new FileDescription(updateDTO.ProfileImage.FileName,
+                                                   updateDTO.ProfileImage.OpenReadStream()),
+                        Tags = Tags
+                    }).ConfigureAwait(false);
+
+                    if (uploadResult == null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        reponse.Message = $"Image upload failed."+ uploadResult.Error.Message+ "";
+                        reponse.Code = (int)uploadResult.StatusCode;
+                        reponse.IsSuccess = false;
+                    }
+                    else
+                    {
+                        var enity = _mapper.Map(updateDTO, account);
+                        enity.ProfilePicture = uploadResult.SecureUrl.AbsoluteUri;
+                        _unitOfWork.AccountRepository.Update(enity);
+                        if (await _unitOfWork.SaveChangeAsync() > 0)
+                        {
+                            reponse.Message = $"Image upload Successfull";
+                            reponse.Code = 200;
+                            reponse.IsSuccess = false;
+                        }
+                    }
+                }
+            }
+            catch(Exception ex) {
+                reponse.ErrorMessages = ex.Message.Split(',').ToList();
+                reponse.Message = "Exception";
+                reponse.Code = 500;
+                reponse.IsSuccess = false;
+            }
+            return reponse;
         }
 
         public async Task<APIResponseModel> ViewListAccounts()
