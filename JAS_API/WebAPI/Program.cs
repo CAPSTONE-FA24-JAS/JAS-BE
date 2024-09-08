@@ -25,19 +25,12 @@ var cloudinary = new Cloudinary(new Account(
 builder.Services.AddSingleton(cloudinary);
 
 builder.Services.AddSingleton(configuration);
-builder.Services.AddCors(options =>
+builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, build =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.WithOrigins("https://localhost:8081")
-                                .AllowAnyHeader()
-                                .AllowAnyMethod()
-                                .AllowCredentials();
-                      });
-});
-
-builder.WebHost.UseUrls("https://localhost:7251");
+    build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+}));
+//builder.WebHost.UseUrls("https://localhost:7251");
+builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
