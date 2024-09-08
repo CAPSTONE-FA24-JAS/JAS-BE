@@ -20,4 +20,12 @@ namespace Application.Commons
             public JWTSection JWTSection { get; set; }
             public string DatabaseConnections { get; set; }
         }
+
+        public class CloudinarySettings
+    {
+            public string CloudName { get; set; }
+            public string ApiKey { get; set; }
+            public string ApiSecret { get; set; }
+        }
+
 }

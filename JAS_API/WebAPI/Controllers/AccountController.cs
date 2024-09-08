@@ -139,5 +139,19 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateProfile(int Id, [FromForm] UpdateProfileDTO updateDTO)
+        {
+            var result = await _accountService.UpdateProfile(Id,updateDTO);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }
