@@ -22,7 +22,10 @@ namespace Infrastructures.Repositories
             _timeService = timeService;
             _claimsService = claimsService;
         }
-        public Task<List<TEntity>> GetAllAsync(params Expression<Func<TEntity, object>>[] includes)
+        public Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? condition = null,
+                                                Expression<Func<TEntity, object>>? sort = null,
+                                                 bool ascending = true,
+                                                params Expression<Func<TEntity, object>>[] includes)
         {
             IQueryable<TEntity> query = _dbSet;
 
@@ -30,19 +33,36 @@ namespace Infrastructures.Repositories
             {
                 query = query.Include(include);
             }
-
+            if(condition != null)
+            {
+                query = query.Where(condition);
+            }
+            if(sort != null) 
+            {
+                query = ascending ? query.OrderBy(sort) : query.OrderByDescending(sort);
+            }
             return query.ToListAsync();
         }
 
-        public async Task<TEntity?> GetByIdAsync(int id, params Expression<Func<TEntity, object>>[] includes)
+        public async Task<TEntity?> GetByIdAsync(int id, Expression<Func<TEntity, bool>>? condition = null,
+                                                Expression<Func<TEntity, object>>? sort = null,
+                                                 bool ascending = true,
+                                                params Expression<Func<TEntity, object>>[] includes)
         {
             IQueryable<TEntity> query = _dbSet;
             foreach (var include in includes)
             {
                 query = query.Include(include);
             }
+            if (condition != null)
+            {
+                query = query.Where(condition);
+            }
+            if (sort != null)
+            {
+                query = ascending ? query.OrderBy(sort) : query.OrderByDescending(sort);
+            }
             var result = await query.FirstOrDefaultAsync(x => x.Id == id);
-            // todo should throw exception when not found
             return result;
         }
 

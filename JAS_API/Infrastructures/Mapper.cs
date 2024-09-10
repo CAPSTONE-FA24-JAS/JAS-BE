@@ -13,6 +13,7 @@ namespace Infrastructures
             CreateMap(typeof(Pagination<>), typeof(Pagination<>));
             CreateMap<Account, RegisterAccountDTO>().ReverseMap();
             CreateMap<Account, AccountDTO>().ReverseMap();
+            CreateMap<Account, UpdateProfileDTO>().ReverseMap();
         }
     }
 }

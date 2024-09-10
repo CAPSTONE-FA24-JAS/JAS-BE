@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Repositories;
+using Application.Utils;
 using Domain.Entity;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +26,9 @@ namespace Infrastructures.Repositories
 
         public Task<bool> CheckPhoneNumberExisted(string phonenumber) =>
                                                 _dbContext.Accounts.AnyAsync(u => u.PhoneNumber == phonenumber);
+
+        public Task<bool> CheckConfirmToken(string email, string token) =>
+            _dbContext.Accounts.AnyAsync(x => x.Email == email && x.ConfirmationToken == token);
 
         public async Task<IEnumerable<Account>> GetAccountsAsync()
         {
@@ -63,7 +67,7 @@ namespace Infrastructures.Repositories
         public async Task<Account> GetUserByEmailAndPasswordHash(string email, string passwordHash)
         {
             var account = await _dbContext.Accounts.Where(a => a.Email == email 
-                                                    && a.PasswordHash == passwordHash).FirstOrDefaultAsync();
+                                                    && a.PasswordHash == passwordHash && a.IsConfirmed == true).FirstOrDefaultAsync();
             if (account == null)
             {
                 throw new KeyNotFoundException("No user found with email or pass");

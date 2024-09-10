@@ -13,12 +13,13 @@ namespace Infrastructures
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<ICurrentTime, CurrentTime>();
 
             services.AddDbContext<AppDbContext>(option =>
             {
-                option.UseSqlServer(databaseConnection);
+                option.UseNpgsql(databaseConnection);
             });
 
             services.AddAutoMapper(typeof(Mapper).Assembly);
