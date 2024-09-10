@@ -98,7 +98,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpDelete]
         public async Task<IActionResult> DeleteAccount(int Id)
         {
             var result = await _accountService.DeleteAccount(Id);
@@ -145,6 +145,19 @@ namespace WebAPI.Controllers
         {
             var result = await _accountService.UpdateProfile(Id,updateDTO);
             if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> FilterAccountByRole(int roleID)
+        {
+            var result = await _accountService.FilterAccountByRole(roleID);
+            if (result.IsSuccess == true)
             {
                 return Ok(result);
             }

@@ -1,5 +1,6 @@
 ﻿using Application.Commons;
 using Application.ViewModels.AccountDTO;
+using Application.ViewModels.RoleDTO;
 using AutoMapper;
 using Domain.Entity;
 
@@ -14,6 +15,7 @@ namespace Infrastructures
             CreateMap<Account, RegisterAccountDTO>().ReverseMap();
             CreateMap<Account, AccountDTO>().ReverseMap();
             CreateMap<Account, UpdateProfileDTO>().ReverseMap();
+            CreateMap<Role, RoleDTO>().ReverseMap();
         }
     }
 }

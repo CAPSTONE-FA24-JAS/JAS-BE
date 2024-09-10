@@ -106,6 +106,43 @@ namespace Infrastructures.Migrations
                     b.ToTable("Accounts");
                 });
 
+            modelBuilder.Entity("Domain.Entity.Artist", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Artists");
+                });
+
             modelBuilder.Entity("Domain.Entity.BidLimit", b =>
                 {
                     b.Property<int>("Id")
@@ -129,6 +166,9 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("ExpireDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("File")
                         .HasColumnType("text");
 
@@ -144,10 +184,12 @@ namespace Infrastructures.Migrations
                     b.Property<float?>("PriceLimit")
                         .HasColumnType("real");
 
+                    b.Property<string>("Status")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId")
-                        .IsUnique();
+                    b.HasIndex("AccountId");
 
                     b.ToTable("BidLimits");
                 });
@@ -200,6 +242,80 @@ namespace Infrastructures.Migrations
                     b.ToTable("Blogs");
                 });
 
+            modelBuilder.Entity("Domain.Entity.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Gender", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Genders");
+                });
+
             modelBuilder.Entity("Domain.Entity.ImageBlog", b =>
                 {
                     b.Property<int>("Id")
@@ -240,6 +356,326 @@ namespace Infrastructures.Migrations
                     b.HasIndex("BlogId");
 
                     b.ToTable("ImageBlogs");
+                });
+
+            modelBuilder.Entity("Domain.Entity.ImageJewelry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("File")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("JewelryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JewelryId");
+
+                    b.ToTable("ImageJewelry");
+                });
+
+            modelBuilder.Entity("Domain.Entity.ImageValuation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ImageLink")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ValuationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ValuationId");
+
+                    b.ToTable("ImageValuations");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Jewelry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ArtistId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Condition")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileVideo")
+                        .HasColumnType("text");
+
+                    b.Property<float?>("FinalPrice")
+                        .HasColumnType("real");
+
+                    b.Property<int?>("GenderId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<float?>("ReserverPrice")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArtistId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("GenderId");
+
+                    b.ToTable("Jewelries");
+                });
+
+            modelBuilder.Entity("Domain.Entity.KeyCharacteristic", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KeyCharacteristics");
+                });
+
+            modelBuilder.Entity("Domain.Entity.KeyCharacteristicDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("JewelryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("KeyCharacteristicId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JewelryId");
+
+                    b.HasIndex("KeyCharacteristicId");
+
+                    b.ToTable("KeyCharacteristicDetails");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Proof", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("JewelryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ProofTypeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JewelryId")
+                        .IsUnique();
+
+                    b.HasIndex("ProofTypeId");
+
+                    b.ToTable("Proofs");
+                });
+
+            modelBuilder.Entity("Domain.Entity.ProofType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProofTypes");
                 });
 
             modelBuilder.Entity("Domain.Entity.Role", b =>
@@ -385,6 +821,158 @@ namespace Infrastructures.Migrations
                     b.ToTable("TransactionTypes");
                 });
 
+            modelBuilder.Entity("Domain.Entity.Valuation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<float?>("Depth")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<float?>("DesiredPrice")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("Height")
+                        .HasColumnType("real");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PricingTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("SellerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("StaffId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("text");
+
+                    b.Property<float?>("Width")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SellerId");
+
+                    b.HasIndex("StaffId");
+
+                    b.ToTable("Valuations");
+                });
+
+            modelBuilder.Entity("Domain.Entity.ValuationDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FileDocument")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ValuationDocumentTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ValuationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ValuationDocumentTypeId");
+
+                    b.HasIndex("ValuationId");
+
+                    b.ToTable("ValuationDocuments");
+                });
+
+            modelBuilder.Entity("Domain.Entity.ValuationDocumentType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ValuationDocumentTypes");
+                });
+
             modelBuilder.Entity("Domain.Entity.Wallet", b =>
                 {
                     b.Property<int>("Id")
@@ -440,8 +1028,8 @@ namespace Infrastructures.Migrations
             modelBuilder.Entity("Domain.Entity.BidLimit", b =>
                 {
                     b.HasOne("Domain.Entity.Account", "Account")
-                        .WithOne("BidLimit")
-                        .HasForeignKey("Domain.Entity.BidLimit", "AccountId");
+                        .WithMany("BidLimits")
+                        .HasForeignKey("AccountId");
 
                     b.Navigation("Account");
                 });
@@ -464,6 +1052,75 @@ namespace Infrastructures.Migrations
                     b.Navigation("Blog");
                 });
 
+            modelBuilder.Entity("Domain.Entity.ImageJewelry", b =>
+                {
+                    b.HasOne("Domain.Entity.Jewelry", "Jewelry")
+                        .WithMany("ImageJewelries")
+                        .HasForeignKey("JewelryId");
+
+                    b.Navigation("Jewelry");
+                });
+
+            modelBuilder.Entity("Domain.Entity.ImageValuation", b =>
+                {
+                    b.HasOne("Domain.Entity.Valuation", "Valuation")
+                        .WithMany("ImageValuations")
+                        .HasForeignKey("ValuationId");
+
+                    b.Navigation("Valuation");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Jewelry", b =>
+                {
+                    b.HasOne("Domain.Entity.Artist", "Artist")
+                        .WithMany("Jewelries")
+                        .HasForeignKey("ArtistId");
+
+                    b.HasOne("Domain.Entity.Category", "Category")
+                        .WithMany("Jewelries")
+                        .HasForeignKey("CategoryId");
+
+                    b.HasOne("Domain.Entity.Gender", "Gender")
+                        .WithMany("Jewelries")
+                        .HasForeignKey("GenderId");
+
+                    b.Navigation("Artist");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Gender");
+                });
+
+            modelBuilder.Entity("Domain.Entity.KeyCharacteristicDetail", b =>
+                {
+                    b.HasOne("Domain.Entity.Jewelry", "Jewelry")
+                        .WithMany("KeyCharacteristicDetails")
+                        .HasForeignKey("JewelryId");
+
+                    b.HasOne("Domain.Entity.KeyCharacteristic", "KeyCharacteristic")
+                        .WithMany("KeyCharacteristicDetails")
+                        .HasForeignKey("KeyCharacteristicId");
+
+                    b.Navigation("Jewelry");
+
+                    b.Navigation("KeyCharacteristic");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Proof", b =>
+                {
+                    b.HasOne("Domain.Entity.Jewelry", "Jewelry")
+                        .WithOne("Proof")
+                        .HasForeignKey("Domain.Entity.Proof", "JewelryId");
+
+                    b.HasOne("Domain.Entity.ProofType", "ProofType")
+                        .WithMany("Proofs")
+                        .HasForeignKey("ProofTypeId");
+
+                    b.Navigation("Jewelry");
+
+                    b.Navigation("ProofType");
+                });
+
             modelBuilder.Entity("Domain.Entity.Transaction", b =>
                 {
                     b.HasOne("Domain.Entity.TransactionType", "TransactionType")
@@ -479,6 +1136,36 @@ namespace Infrastructures.Migrations
                     b.Navigation("Wallet");
                 });
 
+            modelBuilder.Entity("Domain.Entity.Valuation", b =>
+                {
+                    b.HasOne("Domain.Entity.Account", "Seller")
+                        .WithMany("SellerValuations")
+                        .HasForeignKey("SellerId");
+
+                    b.HasOne("Domain.Entity.Account", "Staff")
+                        .WithMany("StaffValuations")
+                        .HasForeignKey("StaffId");
+
+                    b.Navigation("Seller");
+
+                    b.Navigation("Staff");
+                });
+
+            modelBuilder.Entity("Domain.Entity.ValuationDocument", b =>
+                {
+                    b.HasOne("Domain.Entity.ValuationDocumentType", "ValuationDocumentType")
+                        .WithMany("ValuationDocuments")
+                        .HasForeignKey("ValuationDocumentTypeId");
+
+                    b.HasOne("Domain.Entity.Valuation", "Valuation")
+                        .WithMany("ValuationDocuments")
+                        .HasForeignKey("ValuationId");
+
+                    b.Navigation("Valuation");
+
+                    b.Navigation("ValuationDocumentType");
+                });
+
             modelBuilder.Entity("Domain.Entity.Wallet", b =>
                 {
                     b.HasOne("Domain.Entity.Account", "Account")
@@ -490,16 +1177,54 @@ namespace Infrastructures.Migrations
 
             modelBuilder.Entity("Domain.Entity.Account", b =>
                 {
-                    b.Navigation("BidLimit");
+                    b.Navigation("BidLimits");
 
                     b.Navigation("Blogs");
 
+                    b.Navigation("SellerValuations");
+
+                    b.Navigation("StaffValuations");
+
                     b.Navigation("Wallet");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Artist", b =>
+                {
+                    b.Navigation("Jewelries");
                 });
 
             modelBuilder.Entity("Domain.Entity.Blog", b =>
                 {
                     b.Navigation("ImageBlogs");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Category", b =>
+                {
+                    b.Navigation("Jewelries");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Gender", b =>
+                {
+                    b.Navigation("Jewelries");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Jewelry", b =>
+                {
+                    b.Navigation("ImageJewelries");
+
+                    b.Navigation("KeyCharacteristicDetails");
+
+                    b.Navigation("Proof");
+                });
+
+            modelBuilder.Entity("Domain.Entity.KeyCharacteristic", b =>
+                {
+                    b.Navigation("KeyCharacteristicDetails");
+                });
+
+            modelBuilder.Entity("Domain.Entity.ProofType", b =>
+                {
+                    b.Navigation("Proofs");
                 });
 
             modelBuilder.Entity("Domain.Entity.Role", b =>
@@ -510,6 +1235,18 @@ namespace Infrastructures.Migrations
             modelBuilder.Entity("Domain.Entity.TransactionType", b =>
                 {
                     b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Valuation", b =>
+                {
+                    b.Navigation("ImageValuations");
+
+                    b.Navigation("ValuationDocuments");
+                });
+
+            modelBuilder.Entity("Domain.Entity.ValuationDocumentType", b =>
+                {
+                    b.Navigation("ValuationDocuments");
                 });
 
             modelBuilder.Entity("Domain.Entity.Wallet", b =>

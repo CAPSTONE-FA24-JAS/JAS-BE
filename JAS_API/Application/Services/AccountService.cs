@@ -403,5 +403,36 @@ namespace Application.Services
             }
             return reponse;
         }
+
+        public async Task<APIResponseModel> FilterAccountByRole(int role)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(condition: x => x.RoleId == role, includes: x => x.Role);
+                List<AccountDTO> DTOs = new List<AccountDTO>();
+                if(accounts == null || accounts.Count == 0)
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Message = "List account is null";
+                    reponse.Code = 400;
+                }
+                foreach(var account in accounts)
+                {
+                    var mapper = _mapper.Map<AccountDTO>(account);
+                    mapper.RoleName = account.Role.Name;
+                    DTOs.Add(mapper);
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Received list account successfull";
+                    reponse.Code = 200;
+                    reponse.Data = DTOs;
+                }
+            }catch(Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.InnerException.Message.ToString() };
+            }
+            return reponse;
+        }
     }
 }

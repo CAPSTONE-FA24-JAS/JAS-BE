@@ -28,8 +28,10 @@ namespace Domain.Entity
         //Enity Relationship
         public virtual Role? Role { get; set; }
         public virtual IEnumerable<Blog>? Blogs { get; set; }
-        public virtual BidLimit? BidLimit { get; set; }
+        public virtual IEnumerable<BidLimit>? BidLimits { get; set; }
         public virtual Wallet? Wallet { get; set; }
+        public virtual IEnumerable<Valuation>? SellerValuations { get; set; }
+        public virtual IEnumerable<Valuation>? StaffValuations { get; set; }
 
     }
 }

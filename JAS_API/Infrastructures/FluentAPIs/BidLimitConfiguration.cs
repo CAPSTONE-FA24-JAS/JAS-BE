@@ -10,8 +10,8 @@ namespace Infrastructures.FluentAPIs
         {
             builder.HasKey(x => x.Id);
             builder.HasOne(x => x.Account)
-                .WithOne(x => x.BidLimit)
-                .HasForeignKey<BidLimit>(x => x.AccountId);
+                .WithMany(x => x.BidLimits)
+                .HasForeignKey(x => x.AccountId);
         }
     }
 }
