@@ -48,7 +48,7 @@ namespace Application.Services
                 var accountDTO = _mapper.Map<AccountDTO>( account );
                 var authResponse = new LoginResponseDTO
                 {
-                    Account = accountDTO,
+                    User = account,
                     AccessToken = token
                 };
                 response.IsSuccess = true;
