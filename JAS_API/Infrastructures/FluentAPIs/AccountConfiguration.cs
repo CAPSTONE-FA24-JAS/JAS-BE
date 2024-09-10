@@ -14,10 +14,11 @@ namespace Infrastructures.FluentAPIs
             builder.HasOne(x => x.Role)
                 .WithMany(x => x.Accounts)
                 .HasForeignKey(x => x.RoleId);
-            builder.HasOne(x => x.BidLimit)
+            builder.HasMany(x => x.BidLimits)
                 .WithOne(x => x.Account);
             builder.HasOne(x => x.Wallet)
                 .WithOne(x => x.Account);
+
         }
     }
 }

@@ -18,9 +18,22 @@ namespace Infrastructures
         public DbSet<TransactionType> TransactionTypes { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<ImageBlog> ImageBlogs { get; set; }
+        public DbSet<Valuation> Valuations { get; set; }
+        public DbSet<ImageValuation> ImageValuations { get; set; }
+        public DbSet<ValuationDocument> ValuationDocuments { get; set; }
+        public DbSet<ValuationDocumentType> ValuationDocumentTypes { get; set; }
+        public DbSet<Proof> Proofs { get; set; }
+        public DbSet<ProofType> ProofTypes { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Gender> Genders { get; set; }
+        public DbSet<Artist> Artists { get; set; }
+        public DbSet<KeyCharacteristic> KeyCharacteristics { get; set; }
+        public DbSet<KeyCharacteristicDetail> KeyCharacteristicDetails { get; set; }
+        public DbSet<Jewelry> Jewelries { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfiguration(new ValuationConfiguration());
             #region insert data
             //Role
             modelBuilder.Entity<Role>().HasData(

@@ -21,6 +21,8 @@ namespace Application.Interfaces
         public Task<APIResponseModel> DeleteAccount(int Id);
         public Task<APIResponseModel> GetFilter();
         public Task<APIResponseModel> FilterAccount(int filter);
+        public Task<APIResponseModel> FilterAccountByRole(int role);
+
 
     }
 }
