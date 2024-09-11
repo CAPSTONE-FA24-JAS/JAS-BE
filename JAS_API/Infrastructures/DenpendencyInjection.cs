@@ -17,6 +17,9 @@ namespace Infrastructures
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IImageValuationRepository, ImageValuationRepository>();
+            services.AddScoped<IValuationRepository, ValuationRepository>();
+            services.AddScoped<IValuationService, ValuationService>();
             services.AddScoped<ICurrentTime, CurrentTime>();
 
             services.AddDbContext<AppDbContext>(option =>
