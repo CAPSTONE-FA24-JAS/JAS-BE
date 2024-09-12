@@ -1,5 +1,5 @@
 ﻿using Application.Commons;
-using Application.ViewModels.AccountDTO;
+using Application.ViewModels.AccountDTOs;
 using Application.ViewModels.RoleDTO;
 using Application.ViewModels.ValuationDTOs;
 using AutoMapper;
@@ -20,6 +20,8 @@ namespace Infrastructures
             CreateMap<ConsignAnItemDTO, Valuation>()
                 .ForMember(dest => dest.ImageValuations, opt => opt.Ignore());
             CreateMap<ImageValuation, ImageValuationDTO>().ReverseMap();
+            CreateMap<Valuation, ValuationDTO>()
+                .ForMember(dest => dest.Seller, opt => opt.MapFrom(src => src.Seller));
         }
     }
 }

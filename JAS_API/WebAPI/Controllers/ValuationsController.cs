@@ -21,5 +21,23 @@ namespace WebAPI.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> getValuationsAsync()
+        {
+            var result = await _valuationService.GetAllAsync();
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> updateStatusConsignItem(int id, int staffId, string status)
+        {
+            var result = await _valuationService.UpdateStatusAsync(id, staffId, status);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
     }
 }

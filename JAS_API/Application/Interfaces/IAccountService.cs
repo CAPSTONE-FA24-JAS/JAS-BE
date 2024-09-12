@@ -1,5 +1,5 @@
 ﻿using Application.ServiceReponse;
-using Application.ViewModels.AccountDTO;
+using Application.ViewModels.AccountDTOs;
 using AutoMapper;
 using System;
 using System.Collections.Generic;

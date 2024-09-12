@@ -10,6 +10,7 @@ using CloudinaryDotNet.Core;
 using Domain.Entity;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -92,6 +93,91 @@ namespace Application.Services
                 
             }
             catch (Exception ex) 
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> GetAllAsync()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: null,
+                                                                             orderBy: null,
+                                                                             includeProperties: "Seller",
+                                                                             pageIndex: 1,
+                                                                             pageSize: 1);
+                List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
+                if (valuations.totalItems > 0 )
+                {
+                    foreach(var item in valuations.data)
+                    {
+                        var valuationsResponse = _mapper.Map<ValuationDTO>(item);
+                        listValuationDTO.Add(valuationsResponse);
+                    };
+                    
+                    
+                    var dataresponse = new
+                    {
+                        DataResponse = listValuationDTO,
+                        totalItemRepsone = valuations.totalItems
+                    };
+                    response.Message = $"List consign items Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have valuations";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> UpdateStatusAsync(int id, int staffId, string status)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var valuationById = await _unitOfWork.ValuationRepository.GetByIdAsync(id);
+                if(valuationById != null)
+                {
+                    valuationById.StaffId = staffId;
+                    valuationById.Status = status;
+
+                    _unitOfWork.ValuationRepository.Update(valuationById);
+                    
+
+                    response.Message = $"Update status Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationById;
+                }
+                else
+                {
+                    response.Message = $"Not found valuation";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
             {
                 response.ErrorMessages = ex.Message.Split(',').ToList();
                 response.Message = "Exception";

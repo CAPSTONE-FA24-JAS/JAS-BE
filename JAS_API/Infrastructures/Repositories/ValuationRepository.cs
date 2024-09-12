@@ -17,10 +17,13 @@ namespace Infrastructures.Repositories
            AppDbContext context,
            ICurrentTime timeService,
            IClaimsService claimsService
-       )
+        )
            : base(context, timeService, claimsService)
         {
             _dbContext = context;
         }
+
+
+      
     }
 }

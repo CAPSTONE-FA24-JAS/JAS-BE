@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Application.ViewModels.AccountDTO;
+using Application.ViewModels.AccountDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -166,5 +166,7 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+        
     }
 }
