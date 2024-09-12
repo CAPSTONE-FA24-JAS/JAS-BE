@@ -11,6 +11,7 @@ namespace Application
     {
         public IAccountRepository AccountRepository { get; }
         public IRoleRepository RoleRepository { get; }
+        public IBidLimitRepository BidLimitRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

@@ -13,17 +13,21 @@ namespace Infrastructures
         private readonly AppDbContext _dbContext;
         private readonly IAccountRepository _accountRepository;
         private readonly IRoleRepository _roleRepository;
+        private readonly IBidLimitRepository _bidLimitRepository;
 
-        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository)
+        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, IBidLimitRepository bidLimitRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
             _roleRepository = roleRepository;
+            _bidLimitRepository = bidLimitRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
 
         public IRoleRepository RoleRepository => _roleRepository;
+
+        public IBidLimitRepository BidLimitRepository => _bidLimitRepository;
 
         public async Task<int> SaveChangeAsync()
         {

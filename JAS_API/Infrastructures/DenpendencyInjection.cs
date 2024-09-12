@@ -16,6 +16,8 @@ namespace Infrastructures
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IBidLimitRepository, BidLimitRepository>();
+            services.AddScoped<IBidLimitService, BidLimitService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<ICurrentTime, CurrentTime>();
 
