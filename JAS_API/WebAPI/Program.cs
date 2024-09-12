@@ -30,8 +30,9 @@ builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, buil
     build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
 }));
 //builder.WebHost.UseUrls("https://localhost:7251");
-builder.WebHost.UseUrls("http://0.0.0.0:7251");
+builder.WebHost.UseUrls("https://0.0.0.0:7251");
 builder.Services.AddControllers();
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
