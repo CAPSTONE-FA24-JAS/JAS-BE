@@ -1,7 +1,7 @@
 ﻿using Application.Commons;
-using Application.ViewModels.AccountDTO;
-using Application.ViewModels.BidLimitDTO;
-using Application.ViewModels.RoleDTO;
+using Application.ViewModels.AccountDTOs;
+using Application.ViewModels.BidLimitDTOs;
+using Application.ViewModels.RoleDTOs;
 using Application.ViewModels.ValuationDTOs;
 using AutoMapper;
 using Domain.Entity;
@@ -15,6 +15,7 @@ namespace Infrastructures
         {
             CreateMap(typeof(Pagination<>), typeof(Pagination<>));
             CreateMap<Account, RegisterAccountDTO>().ReverseMap();
+            CreateMap<Account, CreateAccountDTO>().ReverseMap();
             CreateMap<Account, AccountDTO>().ReverseMap()
                 .ForPath(x => x.Role.Name, y => y.MapFrom(x => x.RoleName))
                 .ReverseMap();

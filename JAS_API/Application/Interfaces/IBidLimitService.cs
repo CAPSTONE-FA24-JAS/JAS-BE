@@ -1,5 +1,5 @@
 ﻿using Application.ServiceReponse;
-using Application.ViewModels.BidLimitDTO;
+using Application.ViewModels.BidLimitDTOs;
 using Domain.Enums;
 using System;
 using System.Collections.Generic;

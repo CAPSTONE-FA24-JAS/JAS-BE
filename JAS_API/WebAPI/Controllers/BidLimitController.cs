@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Application.ViewModels.BidLimitDTO;
+using Application.ViewModels.BidLimitDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

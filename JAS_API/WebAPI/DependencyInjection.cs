@@ -1,4 +1,4 @@
-﻿using Application.ViewModels.AccountDTO;
+﻿using Application.ViewModels.AccountDTOs;
 using Application;
 using FluentValidation.AspNetCore;
 using FluentValidation;
