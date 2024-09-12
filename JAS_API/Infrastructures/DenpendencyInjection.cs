@@ -19,6 +19,9 @@ namespace Infrastructures
             services.AddScoped<IBidLimitRepository, BidLimitRepository>();
             services.AddScoped<IBidLimitService, BidLimitService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IImageValuationRepository, ImageValuationRepository>();
+            services.AddScoped<IValuationRepository, ValuationRepository>();
+            services.AddScoped<IValuationService, ValuationService>();
             services.AddScoped<ICurrentTime, CurrentTime>();
 
             services.AddDbContext<AppDbContext>(option =>

@@ -12,6 +12,8 @@ namespace Application
         public IAccountRepository AccountRepository { get; }
         public IRoleRepository RoleRepository { get; }
         public IBidLimitRepository BidLimitRepository { get; }
+        public IImageValuationRepository ImageValuationRepository { get; }
+        public IValuationRepository ValuationRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
