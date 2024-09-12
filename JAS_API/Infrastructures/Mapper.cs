@@ -1,7 +1,7 @@
 ﻿using Application.Commons;
-using Application.ViewModels.AccountDTO;
-using Application.ViewModels.BidLimitDTO;
-using Application.ViewModels.RoleDTO;
+using Application.ViewModels.AccountDTOs;
+using Application.ViewModels.BidLimitDTOs;
+using Application.ViewModels.RoleDTOs;
 using Application.ViewModels.ValuationDTOs;
 using AutoMapper;
 using Domain.Entity;

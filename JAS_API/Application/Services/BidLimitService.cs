@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
-using Application.ViewModels.BidLimitDTO;
+using Application.ViewModels.BidLimitDTOs;
 using AutoMapper;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;

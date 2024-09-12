@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
-using Application.ViewModels.AccountDTO;
-using Application.ViewModels.RoleDTO;
+using Application.ViewModels.AccountDTOs;
+using Application.ViewModels.RoleDTOs;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
