@@ -15,7 +15,9 @@ namespace Application.ViewModels.AccountDTOs
         public string? Gender { get; set; }
         public string? PasswordHash { get; set; }
         public string? PhoneNumber { get; set; }
-
+        public string? CitizenIdentificationCard { get; set; }
+        public DateTime? IDIssuanceDate { get; set; }
+        public DateTime? IDExpirationDate { get; set; }
     }
 }
 
