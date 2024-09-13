@@ -9,6 +9,6 @@ namespace Application.Repositories
 {
     public interface IValuationRepository : IGenericRepository<Valuation>
     {
-        
+  //      Task<IEnumerable<Valuation>> GetAllAynsc();
     }
 }

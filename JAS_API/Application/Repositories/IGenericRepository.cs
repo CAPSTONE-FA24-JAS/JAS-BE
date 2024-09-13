@@ -29,5 +29,12 @@ namespace Application.Repositories
 
         Task<Pagination<TEntity>> ToPagination(int pageNumber = 0, int pageSize = 10);
 
+        Task<(IEnumerable<TEntity> data, int totalItems)> GetAllPaging(
+        Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+        string includeProperties = "",
+        int? pageIndex = null,
+        int? pageSize = null);
+
     }
 }
