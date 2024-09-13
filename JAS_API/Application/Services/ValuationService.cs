@@ -108,28 +108,28 @@ namespace Application.Services
             try
             {
                 var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: null,
-                                                                             orderBy: null,
+                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
                                                                              includeProperties: "Seller",
-                                                                             pageIndex: 1,
-                                                                             pageSize: 1);
+                                                                             pageIndex: null,
+                                                                             pageSize: null);
                 List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
                 if (valuations.totalItems > 0 )
                 {
-                    foreach(var item in valuations.data)
+                    response.Message = $"List consign items Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    foreach (var item in valuations.data)
                     {
                         var valuationsResponse = _mapper.Map<ValuationDTO>(item);
                         listValuationDTO.Add(valuationsResponse);
-                    };
-                    
+                    };                   
                     
                     var dataresponse = new
                     {
                         DataResponse = listValuationDTO,
                         totalItemRepsone = valuations.totalItems
                     };
-                    response.Message = $"List consign items Successfully";
-                    response.Code = 200;
-                    response.IsSuccess = true;
+                    
                     response.Data = dataresponse;
                 }
                 else
@@ -162,7 +162,210 @@ namespace Application.Services
                     valuationById.Status = status;
 
                     _unitOfWork.ValuationRepository.Update(valuationById);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    response.Message = $"Update status Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationById;
+                }
+                else
+                {
+                    response.Message = $"Not found valuation";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> CreatePreliminaryValuationAsync(int id, string status, float preliminaryPrice)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var valuationById = await _unitOfWork.ValuationRepository.GetByIdAsync(id);
+                if (valuationById != null)
+                {
+                    valuationById.DesiredPrice = preliminaryPrice;
+                    valuationById.PricingTime = DateTime.Now;
+                    valuationById.Status = status;
                     
+
+                    _unitOfWork.ValuationRepository.Update(valuationById);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    response.Message = $"Update status Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationById;
+                }
+                else
+                {
+                    response.Message = $"Not found valuation";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> getPreliminaryValuationByIdAsync(int id)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var valuationById = await _unitOfWork.ValuationRepository.GetByIdAsync(id);
+                if (valuationById != null)
+                {
+                    var valuation = _mapper.Map<ValuationDTO>(valuationById);
+                    response.Message = $"Update status Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationById;
+                }
+                else
+                {
+                    response.Message = $"Not found valuation";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string status)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: x => x.SellerId == sellerId && status.Equals(x.Status),
+                                                                             orderBy: x => x.OrderByDescending( t => t.CreationDate),
+                                                                             includeProperties: "Seller",
+                                                                             pageIndex: null,
+                                                                             pageSize: null);
+                List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
+                if (valuations.totalItems > 0)
+                {
+                    foreach (var item in valuations.data)
+                    {
+                        var valuationsResponse = _mapper.Map<ValuationDTO>(item);
+                        listValuationDTO.Add(valuationsResponse);
+                    };
+
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listValuationDTO,
+                        totalItemRepsone = valuations.totalItems
+                    };
+                    response.Message = $"List consign items Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have valuations";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> getPreliminaryValuationsOfSellerAsync(int sellerId)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: x => x.SellerId == sellerId,
+                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                                                                             includeProperties: "Seller",
+                                                                             pageIndex: null,
+                                                                             pageSize: null);
+                List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
+                if (valuations.totalItems > 0)
+                {
+                    foreach (var item in valuations.data)
+                    {
+                        var valuationsResponse = _mapper.Map<ValuationDTO>(item);
+                        listValuationDTO.Add(valuationsResponse);
+                    };
+
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listValuationDTO,
+                        totalItemRepsone = valuations.totalItems
+                    };
+                    response.Message = $"List consign items Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have valuations";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> UpdateStatusBySellerAsync(int id, string status)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var valuationById = await _unitOfWork.ValuationRepository.GetByIdAsync(id);
+                if (valuationById != null)
+                {                    
+                    valuationById.Status = status;
+
+                    _unitOfWork.ValuationRepository.Update(valuationById);
+                    await _unitOfWork.SaveChangeAsync();
 
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
