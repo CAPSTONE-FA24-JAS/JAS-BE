@@ -32,9 +32,55 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> updateStatusConsignItem(int id, int staffId, string status)
+        public async Task<IActionResult> updateStatusConsignItemAsync(int id, int staffId, string status)
         {
             var result = await _valuationService.UpdateStatusAsync(id, staffId, status);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> createPreliminaryPriceAsync(int id, string status, float preliminaryPrice)
+        {
+            var result = await _valuationService.CreatePreliminaryValuationAsync(id, status, preliminaryPrice);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> getValuationByIdAsync(int valuationId)
+        {
+            var result = await _valuationService.getPreliminaryValuationByIdAsync(valuationId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> getPreliminaryValuationsOfSellerAsync(int sellerId)
+        {
+            var result = await _valuationService.getPreliminaryValuationsOfSellerAsync(sellerId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string status)
+        {
+            var result = await _valuationService.getPreliminaryValuationByStatusOfSellerAsync(sellerId, status);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateStatusBySellerAsync(int id, string status)
+        {
+            var result = await _valuationService.UpdateStatusBySellerAsync(id, status);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
