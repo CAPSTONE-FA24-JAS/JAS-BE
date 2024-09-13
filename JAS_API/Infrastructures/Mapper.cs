@@ -25,6 +25,7 @@ namespace Infrastructures
                 .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.CreationDate))
                 .ReverseMap();
             CreateMap<BidLimit, CreateBidLimitDTO>().ReverseMap();
+            CreateMap<BidLimit, UpdateBidLimitDTO>().ReverseMap();
             CreateMap<ConsignAnItemDTO, Valuation>()
                 .ForMember(dest => dest.ImageValuations, opt => opt.Ignore());
             CreateMap<ImageValuation, ImageValuationDTO>().ReverseMap();

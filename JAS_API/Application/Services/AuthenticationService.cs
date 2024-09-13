@@ -6,6 +6,7 @@ using Application.ViewModels.AccountDTOs;
 using AutoMapper;
 using Domain.Entity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Data.Common;
 
@@ -117,7 +118,6 @@ namespace Application.Services
             return response;
         }
 
-
         public async Task<APIResponseModel> RegisterAsync(RegisterAccountDTO registerAccountDTO)
         {
             var response = new APIResponseModel();
@@ -137,7 +137,7 @@ namespace Application.Services
                     user.Status = true;
                     user.PasswordHash = HashPassword.HashWithSHA256(registerAccountDTO.PasswordHash);
                     await _unitOfWork.AccountRepository.AddAsync(user);
-                    var confirmationLink = $"http://localhost:7251/api/Authentication/ConfirmEmail/confirm?token={user.ConfirmationToken}&email={user.Email}";
+                    var confirmationLink = $"https://localhost:7251/api/Authentication/ConfirmEmail/confirm?token={user.ConfirmationToken}&email={user.Email}";
                 
                     var emailSent = await SendEmail.SendConfirmationEmail(user.Email, confirmationLink);
                     if (!emailSent)
@@ -174,6 +174,62 @@ namespace Application.Services
                 response.Message = "Error";
             }
             return response;
+        }
+
+        public async Task<APIResponseModel> ForgetPassword(int userId, string email, string newPassword, string otp)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var user = await _unitOfWork.AccountRepository.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "user is existed";
+                    return response;
+                }
+                var emailSent = await SendEmail.SendEmailOTP(user.Email, otp);
+                if (!emailSent)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Error sending OTP email.";
+                    return response;
+                }
+                else
+                {
+                    user.PasswordHash = HashPassword.HashWithSHA256(newPassword);
+                    _unitOfWork.AccountRepository.Update(user);
+                    var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                    if (isSuccess)
+                    {
+                        var userDTO = _mapper.Map<AccountDTO>(user);
+                        response.Data = userDTO;
+                        response.IsSuccess = true;
+                        response.Message = "update password successfully.";
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = "Error saving the account.";
+                    }
+                }
+            }
+            catch (DbException ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "Database error occurred.";
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "Error";
+            }
+            return response;
+        }
+
+        public Task<APIResponseModel> VerifyPassword(string OTP)
+        {
+            throw new NotImplementedException();
         }
     }
 }

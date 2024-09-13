@@ -2,7 +2,10 @@
 using Application.Interfaces;
 using Application.Repositories;
 using Application.Services;
+using Domain.Entity;
+using Google;
 using Infrastructures.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 namespace Infrastructures
@@ -30,7 +33,7 @@ namespace Infrastructures
             });
 
             services.AddAutoMapper(typeof(Mapper).Assembly);
-
+            //services.AddSingleton<UserManager<Account>>();
             return services;
 
         }

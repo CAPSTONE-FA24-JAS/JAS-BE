@@ -1,15 +1,19 @@
 ﻿using Application.Interfaces;
 using Application.ViewModels.AccountDTOs;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Service;
 
 namespace WebAPI.Controllers
 {
     public class AuthenticationController : BaseController
     {
         private readonly IAuthenticationService _authenticationService;
-        public AuthenticationController(IAuthenticationService authenticationService)
+        private readonly OtpService _otpService;
+
+        public AuthenticationController(IAuthenticationService authenticationService, OtpService otpService)
         {
             _authenticationService = authenticationService;
+            _otpService = otpService;
         }
 
         [HttpPost]
@@ -47,6 +51,21 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> LoginAsync(LoginAccountDTO loginObject)
         {
             var result = await _authenticationService.LoginAsync(loginObject);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            else
+            {
+                return Ok(result);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgetPassword(int userId, string email,string newPassword)
+        {
+            var result = await _authenticationService.ForgetPassword(userId, email, newPassword,_otpService.GenerateOtp());
 
             if (!result.IsSuccess)
             {

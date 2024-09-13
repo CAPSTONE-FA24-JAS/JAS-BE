@@ -148,12 +148,12 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<APIResponseModel> UpdateStatus(int statusValue, int Id)
+        public async Task<APIResponseModel> UpdateStatus(UpdateBidLimitDTO updateBidLimitDTO)
         {
             var reponse = new APIResponseModel();
             try
             {
-                var bidLimit = await _unitOfWork.BidLimitRepository.GetByIdAsync(Id);
+                var bidLimit = await _unitOfWork.BidLimitRepository.GetByIdAsync(updateBidLimitDTO.Id);
                 if (bidLimit == null)
                 {
                     reponse.Code = 400;
@@ -162,10 +162,11 @@ namespace Application.Services
                 }
                 else
                 {
-                    var status = EnumHelper.GetEnums<EnumStatusBidLimit>().FirstOrDefault(x => x.Value == statusValue).Name;
+                    var status = EnumHelper.GetEnums<EnumStatusBidLimit>().FirstOrDefault(x => x.Value == updateBidLimitDTO.Status).Name;
                     if(status != null)
                     {
                         bidLimit.Status = status;
+                        bidLimit.PriceLimit = updateBidLimitDTO.PriceLimit;
                         _unitOfWork.BidLimitRepository.Update(bidLimit);
                         if(await _unitOfWork.SaveChangeAsync() > 0)
                         {

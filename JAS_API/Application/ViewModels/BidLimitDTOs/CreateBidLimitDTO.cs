@@ -10,7 +10,6 @@ namespace Application.ViewModels.BidLimitDTOs
     public class CreateBidLimitDTO
     {
         public IFormFile? File { get; set; }
-        public float? PriceLimit { get; set; }
         public int? AccountId { get; set; }
     }
 }
