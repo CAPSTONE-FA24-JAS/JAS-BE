@@ -12,5 +12,9 @@ namespace Application.Interfaces
     public interface IValuationService
     {
         public Task<APIResponseModel> ConsignAnItem(ConsignAnItemDTO consignAnItem);
+
+        public Task<APIResponseModel> GetAllAsync();
+
+        public Task<APIResponseModel> UpdateStatusAsync(int id, int staffId, string status);
     }
 }
