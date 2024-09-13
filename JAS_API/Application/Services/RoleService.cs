@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.ViewModels.AccountDTOs;
-using Application.ViewModels.RoleDTO;
+using Application.ViewModels.RoleDTOs;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -35,9 +35,12 @@ namespace Application.Services
                     reponse.Code = 200;
                     reponse.Data = _mapper.Map<IEnumerable<RoleDTO>>(roles);
                 }
-                reponse.IsSuccess = false;
-                reponse.Message = "Received list role faild";
-                reponse.Code = 400;
+                else
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Received list role faild";
+                    reponse.Code = 400;
+                }
             }
             catch (Exception ex)
             {

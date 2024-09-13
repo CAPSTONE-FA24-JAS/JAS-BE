@@ -146,35 +146,35 @@ namespace Application.Services
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.CreationDate, ascending: true));
+                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.CreationDate, ascending: true, includes: x => x.Role));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Active):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == true));
+                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == true, includes: x => x.Role));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Inactive):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == false));
+                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == false, includes: x => x.Role));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.A_Z):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.FirstName, ascending: true));
+                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.FirstName, ascending: true, includes: x => x.Role));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Z_A):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.FirstName, ascending: false));
+                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.FirstName, ascending: false, includes: x => x.Role));
                         reponse.Data = accounts;
                         break;
                     default:
@@ -225,7 +225,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var account = await _unitOfWork.AccountRepository.GetByIdAsync(Id, x => x.IsConfirmed == true);
+                var account = await _unitOfWork.AccountRepository.GetByIdAsync(Id, x => x.IsConfirmed == true, includes: x => x.Role);
                 if(account == null)
                 {
                     reponse.IsSuccess = false;
@@ -254,8 +254,7 @@ namespace Application.Services
             {
                 var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.FirstName.Contains(Name) 
                                                                        || x.LastName.Contains(Name) 
-                                                                       &&  x.IsConfirmed == true,
-                                                                       x => x.Role);
+                                                                       &&  x.IsConfirmed == true, includes: x => x.Role);
                 var DTOs = new List<AccountDTO>();
                 if (accounts == null)
                 {
@@ -356,7 +355,7 @@ namespace Application.Services
                         {
                             reponse.Message = $"Image upload Successfull";
                             reponse.Code = 200;
-                            reponse.IsSuccess = false;
+                            reponse.IsSuccess = true;
                         }
                     }
                 }

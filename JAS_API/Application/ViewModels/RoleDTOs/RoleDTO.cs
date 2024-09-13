@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.ViewModels.RoleDTO
+namespace Application.ViewModels.RoleDTOs
 {
     public class RoleDTO
     {

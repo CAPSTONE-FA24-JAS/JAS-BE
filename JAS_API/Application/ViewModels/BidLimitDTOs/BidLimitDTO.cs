@@ -4,16 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entity
+namespace Application.ViewModels.BidLimitDTOs
 {
-    public class BidLimit : BaseEntity
+    public class BidLimitDTO
     {
+        public int? Id { get; set; }
         public string? File { get; set; }
         public float? PriceLimit { get; set; }
         public int? AccountId { get; set; }
+        public string? AccountName { get; set; }
+        public DateTime? StartDate { get; set; }
         public DateTime? ExpireDate { get; set; }
         public string? Status { get; set; }
-        //
-        public virtual Account Account { get; set; }
     }
 }
