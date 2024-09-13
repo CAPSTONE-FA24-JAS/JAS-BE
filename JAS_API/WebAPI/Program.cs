@@ -7,6 +7,9 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using WebAPI.Middlewares;
 using CloudinaryDotNet;
+using Google;
+using Microsoft.AspNetCore.Identity;
+using WebAPI.Service;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -75,7 +78,8 @@ builder.Services.AddSwaggerGen(setup =>
         { jwtSecurityScheme, Array.Empty<string>() }
     });
 });
-builder.Services.AddSingleton(configuration);
+var otpSecret = builder.Configuration["Otp:Secret"];
+builder.Services.AddSingleton(new OtpService(otpSecret));
 
 var app = builder.Build();
 
@@ -92,6 +96,7 @@ app.UseMiddleware<ConfirmationTokenMiddleware>();
 app.MapHealthChecks("/healthchecks");
 app.UseHttpsRedirection();
 
+Console.WriteLine("Current server time: " + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
 
 app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
@@ -101,3 +106,5 @@ app.MapControllers();
 
 app.Run();
 public partial class Program { }
+
+

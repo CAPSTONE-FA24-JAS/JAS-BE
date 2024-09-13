@@ -16,6 +16,9 @@ namespace Domain.Entity
         public float? Depth { get; set; }
         public string? Description { get; set; }
         public string? Status { get; set; }
+        public string? ImageOfReceip { get; set;}
+        public string? ActualStatusOfJewelry { get; set; }
+        public int? Quantity { get; set; }
         public int? SellerId { get; set; }
         public int? StaffId { get; set; }
 

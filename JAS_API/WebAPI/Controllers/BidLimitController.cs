@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces;
 using Application.ViewModels.BidLimitDTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -79,10 +78,12 @@ namespace WebAPI.Controllers
                 return Ok(result);
             }
         }
+        public float? PriceLimit { get; set; }
+
         [HttpPut]
-        public async Task<IActionResult> UpdateStatusBidLimit(int status, int Id)
+        public async Task<IActionResult> UpdateStatusBidLimit(UpdateBidLimitDTO updateBidLimitDTO)
         {
-            var result = await _bidLimitService.UpdateStatus(status, Id);
+            var result = await _bidLimitService.UpdateStatus(updateBidLimitDTO);
             if (result.IsSuccess != true)
             {
                 return BadRequest(result);

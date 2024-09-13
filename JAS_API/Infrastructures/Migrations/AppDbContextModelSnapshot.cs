@@ -17,7 +17,7 @@ namespace Infrastructures.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.5")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -33,6 +33,9 @@ namespace Infrastructures.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("text");
 
+                    b.Property<string>("CitizenIdentificationCard")
+                        .HasColumnType("text");
+
                     b.Property<string>("ConfirmationToken")
                         .HasColumnType("text");
 
@@ -40,16 +43,16 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Email")
                         .HasColumnType("text");
@@ -59,6 +62,12 @@ namespace Infrastructures.Migrations
 
                     b.Property<string>("Gender")
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("IDExpirationDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("IDIssuanceDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsConfirmed")
                         .HasColumnType("boolean");
@@ -73,7 +82,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
@@ -118,13 +127,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -133,7 +142,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -158,16 +167,16 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("ExpireDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("File")
                         .HasColumnType("text");
@@ -179,7 +188,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<float?>("PriceLimit")
                         .HasColumnType("real");
@@ -212,13 +221,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ImageBlogId")
                         .HasColumnType("integer");
@@ -230,7 +239,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Title")
                         .HasColumnType("text");
@@ -254,13 +263,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -269,7 +278,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -291,13 +300,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -306,7 +315,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -331,13 +340,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ImageLink")
                         .HasColumnType("text");
@@ -349,7 +358,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -370,13 +379,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("File")
                         .HasColumnType("text");
@@ -391,7 +400,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -412,13 +421,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ImageLink")
                         .HasColumnType("text");
@@ -430,7 +439,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ValuationId")
                         .HasColumnType("integer");
@@ -463,13 +472,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -490,7 +499,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -521,13 +530,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -536,7 +545,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -558,13 +567,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -582,7 +591,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -605,13 +614,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -623,7 +632,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -653,13 +662,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -668,7 +677,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -690,13 +699,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -705,7 +714,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -746,13 +755,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -761,13 +770,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Status")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("TransactionTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("TransactionTypeId")
                         .HasColumnType("integer");
@@ -796,13 +805,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -811,7 +820,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -829,17 +838,20 @@ namespace Infrastructures.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ActualStatusOfJewelry")
+                        .HasColumnType("text");
+
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<float?>("Depth")
                         .HasColumnType("real");
@@ -853,6 +865,9 @@ namespace Infrastructures.Migrations
                     b.Property<float?>("Height")
                         .HasColumnType("real");
 
+                    b.Property<string>("ImageOfReceip")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -860,13 +875,16 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("PricingTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("integer");
 
                     b.Property<int?>("SellerId")
                         .HasColumnType("integer");
@@ -901,13 +919,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("FileDocument")
                         .HasColumnType("text");
@@ -919,7 +937,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ValuationDocumentTypeId")
                         .HasColumnType("integer");
@@ -948,13 +966,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -963,7 +981,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -991,13 +1009,13 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -1006,7 +1024,7 @@ namespace Infrastructures.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 

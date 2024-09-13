@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Entity
+﻿namespace Domain.Entity
 {
     public class Account : BaseEntity
     {
@@ -23,8 +17,11 @@ namespace Domain.Entity
         public string? VNPayAccount { get; set; }
         public string? VNPayBankCode { get; set; }
         public string? VNPayAccountName { get; set; }
+        public string? CitizenIdentificationCard { get; set; }
+        public DateTime? IDIssuanceDate { get; set; }
+        public DateTime? IDExpirationDate { get; set; }
         public int? RoleId { get; set; }
-         
+
         //Enity Relationship
         public virtual Role? Role { get; set; }
         public virtual IEnumerable<Blog>? Blogs { get; set; }

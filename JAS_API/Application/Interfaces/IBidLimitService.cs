@@ -15,7 +15,7 @@ namespace Application.Interfaces
         public Task<APIResponseModel> ViewListBidLimit();
         public Task<APIResponseModel> ViewBidLimitByAccount(int accountId);
         public Task<APIResponseModel> ViewBidLimitById(int Id);
-        public Task<APIResponseModel> UpdateStatus(int statusValue, int Id);
+        public Task<APIResponseModel> UpdateStatus(UpdateBidLimitDTO updateBidLimitDTO);
         public Task<APIResponseModel> GetStatusBidLimt();
     }
 }

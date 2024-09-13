@@ -14,5 +14,7 @@ namespace Application.Interfaces
         public Task<APIResponseModel> RegisterAsync(RegisterAccountDTO registerAccountDTO);
         public Task<APIResponseModel> ConfirmTokenAsync(string email, string token);
         public Task<APIResponseModel> LoginAsync(LoginAccountDTO loginAccountDTO);
+        public Task<APIResponseModel> ForgetPassword(int userId,string email, string newPassword, string otp);
+        public Task<APIResponseModel> VerifyPassword(string OTP);
     }
 }
