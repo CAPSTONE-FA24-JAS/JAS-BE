@@ -30,7 +30,8 @@ namespace Infrastructures
                 .ForMember(dest => dest.ImageValuations, opt => opt.Ignore());
             CreateMap<ImageValuation, ImageValuationDTO>().ReverseMap();
             CreateMap<Valuation, ValuationDTO>()
-                .ForMember(dest => dest.Seller, opt => opt.MapFrom(src => src.Seller));
+                .ForMember(dest => dest.Seller, opt => opt.MapFrom(src => src.Seller))
+                .ForMember(dest => dest.ImageValuations, opt => opt.MapFrom(src => src.ImageValuations));
         }
     }
 }
