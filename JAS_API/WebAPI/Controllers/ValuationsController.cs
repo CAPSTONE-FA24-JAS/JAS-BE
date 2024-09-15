@@ -23,9 +23,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> getValuationsAsync()
+        public async Task<IActionResult> getValuationsAsync(int? pageSize, int? pageIndex)
         {
-            var result = await _valuationService.GetAllAsync();
+            var result = await _valuationService.GetAllAsync(pageSize, pageIndex);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
@@ -67,9 +67,9 @@ namespace WebAPI.Controllers
 
         //staff xem all consign item, all dinh gia so bo.Neu status null thi hien thi het consign item
         [HttpGet]
-        public async Task<IActionResult> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, string? status)
+        public async Task<IActionResult> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, string? status, int? pageSize, int? pageIndex)
         {
-            var result = await _valuationService.getPreliminaryValuationsByStatusOfStaffAsync(staffId, status);
+            var result = await _valuationService.getPreliminaryValuationsByStatusOfStaffAsync(staffId, status, pageSize, pageIndex);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
@@ -79,9 +79,9 @@ namespace WebAPI.Controllers
         //seller xem all consign item, all dinh gia so bo.Neu status null thi hien thi het consign item
 
         [HttpGet]
-        public async Task<IActionResult> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string? status)
+        public async Task<IActionResult> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string? status, int? pageSize, int? pageIndex)
         {
-            var result = await _valuationService.getPreliminaryValuationByStatusOfSellerAsync(sellerId, status);
+            var result = await _valuationService.getPreliminaryValuationByStatusOfSellerAsync(sellerId, status, pageSize, pageIndex);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);

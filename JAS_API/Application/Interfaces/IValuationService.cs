@@ -13,7 +13,7 @@ namespace Application.Interfaces
     {
         public Task<APIResponseModel> ConsignAnItem(ConsignAnItemDTO consignAnItem);
 
-        public Task<APIResponseModel> GetAllAsync();
+        public Task<APIResponseModel> GetAllAsync(int? pageSize, int? pageIndex);
 
         public Task<APIResponseModel> AssignStaffForValuationAsync(int id, int staffId, string? status);
 
@@ -22,10 +22,10 @@ namespace Application.Interfaces
         public Task<APIResponseModel> getPreliminaryValuationByIdAsync(int id);
 
         //seller xem all consign item, all dinh gia so bo
-        public Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string? status);
+        public Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string? status, int? pageSize, int? pageIndex);
 
         //staff xem all consign item, all dinh gia so bo
-        public Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, string? status);
+        public Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, string? status, int? pageSize, int? pageIndex);
 
         //dung chung cho ca staff, seller update status
         public Task<APIResponseModel> UpdateStatusForValuationsAsync(int id, string status);
