@@ -15,17 +15,21 @@ namespace Application.Interfaces
 
         public Task<APIResponseModel> GetAllAsync();
 
-        public Task<APIResponseModel> UpdateStatusAsync(int id, int staffId, string status);
+        public Task<APIResponseModel> AssignStaffForValuationAsync(int id, int staffId, string? status);
 
         public Task<APIResponseModel> CreatePreliminaryValuationAsync(int id, string status, float preliminaryPrice);
 
         public Task<APIResponseModel> getPreliminaryValuationByIdAsync(int id);
 
-        public Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string status);
+        //seller xem all consign item, all dinh gia so bo
+        public Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string? status);
 
-        public Task<APIResponseModel> getPreliminaryValuationsOfSellerAsync(int sellerId);
+        //staff xem all consign item, all dinh gia so bo
+        public Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, string? status);
 
-        public Task<APIResponseModel> UpdateStatusBySellerAsync(int id, string status);
+        //dung chung cho ca staff, seller update status
+        public Task<APIResponseModel> UpdateStatusForValuationsAsync(int id, string status);
+
 
     }
 }
