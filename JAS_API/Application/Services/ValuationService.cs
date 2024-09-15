@@ -103,7 +103,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> GetAllAsync()
+        public async Task<APIResponseModel> GetAllAsync(int? pageSize, int? pageIndex)
         {
             var response = new APIResponseModel();
             try
@@ -111,8 +111,8 @@ namespace Application.Services
                 var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: null,
                                                                              orderBy: x => x.OrderByDescending(t => t.CreationDate),
                                                                              includeProperties: "Seller",
-                                                                             pageIndex: null,
-                                                                             pageSize: null);
+                                                                             pageIndex: pageIndex,
+                                                                             pageSize: pageSize);
                 List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
                 if (valuations.totalItems > 0 )
                 {
@@ -259,7 +259,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string? status)
+        public async Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string? status, int? pageSize, int? pageIndex)
         {
             var response = new APIResponseModel();
             
@@ -279,8 +279,8 @@ namespace Application.Services
                 var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
                                                                              orderBy: x => x.OrderByDescending( t => t.CreationDate),
                                                                              includeProperties: "Seller",
-                                                                             pageIndex: null,
-                                                                             pageSize: null);
+                                                                             pageIndex: pageIndex,
+                                                                             pageSize: pageSize);
                 List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
                 if (valuations.totalItems > 0)
                 {
@@ -319,7 +319,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, string? status)
+        public async Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, string? status, int? pageSize, int? pageIndex)
         {
             var response = new APIResponseModel();
             try
@@ -338,8 +338,8 @@ namespace Application.Services
                 var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
                                                                              orderBy: x => x.OrderByDescending(t => t.CreationDate),
                                                                              includeProperties: "Seller",
-                                                                             pageIndex: null,
-                                                                             pageSize: null);
+                                                                             pageIndex: pageIndex,
+                                                                             pageSize: pageSize);
                 List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
                 if (valuations.totalItems > 0)
                 {
