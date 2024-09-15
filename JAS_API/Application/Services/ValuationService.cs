@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -150,7 +151,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> UpdateStatusAsync(int id, int staffId, string status)
+        public async Task<APIResponseModel> AssignStaffForValuationAsync(int id, int staffId, string? status)
         {
             var response = new APIResponseModel();
             try
@@ -258,12 +259,24 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string status)
+        public async Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string? status)
         {
             var response = new APIResponseModel();
+            
             try
             {
-                var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: x => x.SellerId == sellerId && status.Equals(x.Status),
+                Expression<Func<Valuation, bool>> filter;
+
+                if (status != null)
+                {
+                    filter = x => x.SellerId == sellerId && status.Equals(x.Status);
+                }
+                else
+                {
+                    filter = x => x.SellerId == sellerId;
+                }   
+
+                var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
                                                                              orderBy: x => x.OrderByDescending( t => t.CreationDate),
                                                                              includeProperties: "Seller",
                                                                              pageIndex: null,
@@ -306,12 +319,23 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> getPreliminaryValuationsOfSellerAsync(int sellerId)
+        public async Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, string? status)
         {
             var response = new APIResponseModel();
             try
             {
-                var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: x => x.SellerId == sellerId,
+                Expression<Func<Valuation, bool>> filter;
+
+                if (status != null)
+                {
+                    filter = x => x.StaffId == staffId && status.Equals(x.Status);
+                }
+                else
+                {
+                    filter = x => x.StaffId == staffId;
+                }
+
+                var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
                                                                              orderBy: x => x.OrderByDescending(t => t.CreationDate),
                                                                              includeProperties: "Seller",
                                                                              pageIndex: null,
@@ -354,7 +378,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> UpdateStatusBySellerAsync(int id, string status)
+        public async Task<APIResponseModel> UpdateStatusForValuationsAsync(int id, string status)
         {
             var response = new APIResponseModel();
             try
