@@ -414,5 +414,42 @@ namespace Application.Services
             }
             return response;
         }
+
+        public async Task<APIResponseModel> CreateRecieptAsync(int id, string statusOfJewerly)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var valuationById = await _unitOfWork.ValuationRepository.GetByIdAsync(id);
+                if (valuationById != null)
+                {
+                    valuationById.ActualStatusOfJewelry = statusOfJewerly;
+
+                    _unitOfWork.ValuationRepository.Update(valuationById);
+                    await _unitOfWork.SaveChangeAsync();
+
+
+                    response.Message = $"Create Reciept Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationById;
+                }
+                else
+                {
+                    response.Message = $"Not found valuation";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
     }
 }
