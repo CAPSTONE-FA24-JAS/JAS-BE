@@ -8,7 +8,9 @@ using Domain.Entity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
+using static System.Net.WebRequestMethods;
 
 namespace Application.Services
 {
@@ -176,7 +178,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> ForgetPassword(int userId, string email, string newPassword, string otp)
+        public async Task<APIResponseModel> SendOTPForgetPassword(int userId)
         {
             var response = new APIResponseModel();
             try
@@ -185,9 +187,10 @@ namespace Application.Services
                 if (user == null)
                 {
                     response.IsSuccess = false;
-                    response.Message = "user is existed";
+                    response.Message = "user not found";
                     return response;
                 }
+                var otp = OtpService.GenerateOtp(user.ConfirmationToken);
                 var emailSent = await SendEmail.SendEmailOTP(user.Email, otp);
                 if (!emailSent)
                 {
@@ -197,15 +200,12 @@ namespace Application.Services
                 }
                 else
                 {
-                    user.PasswordHash = HashPassword.HashWithSHA256(newPassword);
                     _unitOfWork.AccountRepository.Update(user);
                     var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
                     if (isSuccess)
                     {
-                        var userDTO = _mapper.Map<AccountDTO>(user);
-                        response.Data = userDTO;
                         response.IsSuccess = true;
-                        response.Message = "update password successfully.";
+                        response.Message = "Send OTP successfully, Please check email.";
                     }
                     else
                     {
@@ -223,13 +223,63 @@ namespace Application.Services
             {
                 response.IsSuccess = false;
                 response.Message = "Error";
+                response.ErrorMessages = new List<string> { ex.Message };
             }
             return response;
         }
 
-        public Task<APIResponseModel> VerifyPassword(string OTP)
+        public async Task<APIResponseModel> VerifyPassword(VerifyPassword verifyPassword)
         {
-            throw new NotImplementedException();
+            var response = new APIResponseModel();
+            try
+            {
+                if (verifyPassword.NewPassword != verifyPassword.ConfirmNewPassword)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Password must same confirm password.";
+                }
+                else
+                {
+                    var user = await _unitOfWork.AccountRepository.GetByIdAsync(verifyPassword.UserId);
+                    var statusResult = OtpService.ValidateOtp(user.ConfirmationToken, verifyPassword.Otp);
+                    dynamic validationResult = statusResult;
+                    if (!validationResult.status)
+                    {
+                        response.IsSuccess = false;
+                        response.Message = validationResult.msg + validationResult.timeStepMatched;
+                        return response;
+                    }
+                    else
+                    {
+                        user.PasswordHash = HashPassword.HashWithSHA256(verifyPassword.NewPassword);
+                        _unitOfWork.AccountRepository.Update(user);
+                        var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                        if (isSuccess)
+                        {
+                            var userDTO = _mapper.Map<AccountDTO>(user);
+                            response.Data = userDTO;
+                            response.IsSuccess = true;
+                            response.Message = "update password successfully.";
+                        }
+                        else
+                        {
+                            response.IsSuccess = false;
+                            response.Message = "Error saving the account.";
+                        }
+                    }
+                }
+            }
+            catch (DbException ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "Database error occurred.";
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "Error";
+            }
+            return response;
         }
     }
 }

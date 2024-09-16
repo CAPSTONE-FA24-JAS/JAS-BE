@@ -78,8 +78,7 @@ builder.Services.AddSwaggerGen(setup =>
         { jwtSecurityScheme, Array.Empty<string>() }
     });
 });
-var otpSecret = builder.Configuration["Otp:Secret"];
-builder.Services.AddSingleton(new OtpService(otpSecret));
+
 
 var app = builder.Build();
 
