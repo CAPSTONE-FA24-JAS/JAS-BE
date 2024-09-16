@@ -18,6 +18,7 @@ namespace Domain.Entity
         public string? Status { get; set; }
         public string? ImageOfReceip { get; set;}
         public string? ActualStatusOfJewelry { get; set; }
+        public DateTime? DeliveryDate { get; set; }
         public int? Quantity { get; set; }
         public int? SellerId { get; set; }
         public int? StaffId { get; set; }

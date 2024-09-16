@@ -50,13 +50,15 @@ namespace Application.Services
                     var enity = _mapper.Map<BidLimit>(createBidLimitDTO);
                     enity.File = uploadResult.SecureUrl.AbsoluteUri;
                     enity.ExpireDate = DateTime.Now.AddMonths(3);
-                    enity.Status = null;
+                    enity.Status = EnumStatusBidLimit.Pending.ToString();
+                    enity.Reason = null;
                      await _unitOfWork.BidLimitRepository.AddAsync(enity);
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         reponse.Message = $"File upload Successfull";
                         reponse.Code = 200;
                         reponse.IsSuccess = true;
+                        reponse.Data = _mapper.Map<BidLimitDTO>(enity);
                     }
                 }
             }
@@ -165,20 +167,31 @@ namespace Application.Services
                     var status = EnumHelper.GetEnums<EnumStatusBidLimit>().FirstOrDefault(x => x.Value == updateBidLimitDTO.Status).Name;
                     if(status != null)
                     {
-                        bidLimit.Status = status;
-                        bidLimit.PriceLimit = updateBidLimitDTO.PriceLimit;
-                        _unitOfWork.BidLimitRepository.Update(bidLimit);
-                        if(await _unitOfWork.SaveChangeAsync() > 0)
+                        if(bidLimit.Status == EnumStatusBidLimit.Pending.ToString())
                         {
-                            reponse.Code = 200;
-                            reponse.IsSuccess = true;
-                            reponse.Message = $"Update Status : {status} Successfull";
+                            bidLimit.Status = status;
+                            bidLimit.PriceLimit = updateBidLimitDTO.PriceLimit;
+                            bidLimit.Reason = updateBidLimitDTO.Reason;
+                            _unitOfWork.BidLimitRepository.Update(bidLimit);
+                            if (await _unitOfWork.SaveChangeAsync() > 0)
+                            {
+                                reponse.Code = 200;
+                                reponse.IsSuccess = true;
+                                reponse.Message = $"Update Status : {status} Successfull";
+                            }
+                            else
+                            {
+                                reponse.IsSuccess = false;
+                                reponse.Message = $"Errer when saving.";
+                            }
                         }
                         else
                         {
                             reponse.IsSuccess = false;
-                            reponse.Message = $"Errer when saving.";
+                            reponse.Message = $"Bid Limit was rejected or approved cant update";
+
                         }
+                        
                     }
                     else
                     {

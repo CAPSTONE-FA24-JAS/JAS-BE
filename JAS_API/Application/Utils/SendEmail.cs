@@ -236,7 +236,7 @@ namespace Application.Utils
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(userName, emailFrom));
             message.To.Add(new MailboxAddress("", toEmail));
-            message.Subject = "Send Email";
+            message.Subject = "Verify OTP";
             message.Body = new TextPart("html")
             {
                 Text = emailTemplate
