@@ -13,6 +13,7 @@ namespace Application.ViewModels.BidLimitDTOs
         public float? PriceLimit { get; set; }
         public int? AccountId { get; set; }
         public string? AccountName { get; set; }
+        public string? Reason { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? ExpireDate { get; set; }
         public string? Status { get; set; }

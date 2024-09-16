@@ -8,12 +8,10 @@ namespace WebAPI.Controllers
     public class AuthenticationController : BaseController
     {
         private readonly IAuthenticationService _authenticationService;
-        private readonly OtpService _otpService;
 
-        public AuthenticationController(IAuthenticationService authenticationService, OtpService otpService)
+        public AuthenticationController(IAuthenticationService authenticationService)
         {
             _authenticationService = authenticationService;
-            _otpService = otpService;
         }
 
         [HttpPost]
@@ -63,9 +61,24 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ForgetPassword(int userId, string email,string newPassword)
+        public async Task<IActionResult> SendOTPForForgetPassword(int userId)
         {
-            var result = await _authenticationService.ForgetPassword(userId, email, newPassword,_otpService.GenerateOtp());
+            var result = await _authenticationService.SendOTPForgetPassword(userId);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            else
+            {
+                return Ok(result);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> VerifyPassword(VerifyPassword verifyPassword)
+        {
+            var result = await _authenticationService.VerifyPassword(verifyPassword);
 
             if (!result.IsSuccess)
             {

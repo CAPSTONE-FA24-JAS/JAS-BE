@@ -2,6 +2,7 @@
 using Application.Interfaces;
 using Application.Repositories;
 using Application.Services;
+using Application.Utils;
 using Domain.Entity;
 using Google;
 using Infrastructures.Repositories;
@@ -31,7 +32,6 @@ namespace Infrastructures
             {
                 option.UseNpgsql(databaseConnection);
             });
-
             services.AddAutoMapper(typeof(Mapper).Assembly);
             //services.AddSingleton<UserManager<Account>>();
             return services;
