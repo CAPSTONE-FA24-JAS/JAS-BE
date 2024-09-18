@@ -242,7 +242,7 @@ namespace Application.Services
                 if (valuationById != null)
                 {
                     var valuation = _mapper.Map<ValuationDTO>(valuationById);
-                    response.Message = $"Update status Successfully";
+                    response.Message = $"Found valuation Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
                     response.Data = valuation;
