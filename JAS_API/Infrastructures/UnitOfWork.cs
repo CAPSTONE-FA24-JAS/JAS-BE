@@ -16,8 +16,11 @@ namespace Infrastructures
         private readonly IBidLimitRepository _bidLimitRepository;
         private readonly IImageValuationRepository _imageValuationRepository;
         private readonly IValuationRepository _valuationRepository;
+        private readonly IValuationDocumentRepository _valuationDocumentRepository;
         
-        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, IBidLimitRepository bidLimitRepository,IImageValuationRepository imageValuationRepository, IValuationRepository valuationRepository)
+        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, 
+                                                 IBidLimitRepository bidLimitRepository,IImageValuationRepository imageValuationRepository, 
+                                                 IValuationRepository valuationRepository, IValuationDocumentRepository valuationDocumentRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -25,6 +28,7 @@ namespace Infrastructures
             _bidLimitRepository = bidLimitRepository;
             _imageValuationRepository = imageValuationRepository;
             _valuationRepository = valuationRepository;
+            _valuationDocumentRepository = valuationDocumentRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -32,6 +36,8 @@ namespace Infrastructures
         public IBidLimitRepository BidLimitRepository => _bidLimitRepository;
         public IImageValuationRepository ImageValuationRepository => _imageValuationRepository;
         public IValuationRepository ValuationRepository => _valuationRepository;
+
+        public IValuationDocumentRepository ValuationDocumentRepository => _valuationDocumentRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

@@ -26,6 +26,8 @@ namespace Infrastructures
             services.AddScoped<IImageValuationRepository, ImageValuationRepository>();
             services.AddScoped<IValuationRepository, ValuationRepository>();
             services.AddScoped<IValuationService, ValuationService>();
+            services.AddScoped<IValuationDocumentRepository, ValuationDocumentRepository>();
+            
             services.AddScoped<ICurrentTime, CurrentTime>();
 
             services.AddDbContext<AppDbContext>(option =>

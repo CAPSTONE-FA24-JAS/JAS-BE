@@ -30,7 +30,7 @@ namespace Application.Interfaces
         //dung chung cho ca staff, seller update status
         public Task<APIResponseModel> UpdateStatusForValuationsAsync(int id, string status);
 
-        public Task<APIResponseModel> CreateRecieptAsync(int id, string statusOfJewerly);
+        public Task<APIResponseModel> CreateRecieptAsync(int id, ReceiptDTO model);
 
     }
 }

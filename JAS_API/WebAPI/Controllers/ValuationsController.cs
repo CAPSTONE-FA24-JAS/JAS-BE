@@ -99,9 +99,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> CreateRecieptAsync(int id, string statusOfJewerly)
+        public async Task<IActionResult> CreateRecieptAsync(int id, ReceiptDTO receipt)
         {
-            var result = await _valuationService.CreateRecieptAsync(id, statusOfJewerly);
+            var result = await _valuationService.CreateRecieptAsync(id, receipt);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
