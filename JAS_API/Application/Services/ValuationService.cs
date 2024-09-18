@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Repositories;
 using Application.ServiceReponse;
+using Application.Utils;
 using Application.ViewModels.ValuationDTOs;
 using AutoMapper;
 using Azure;
@@ -13,6 +14,8 @@ using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,6 +27,7 @@ namespace Application.Services
         private readonly IMapper _mapper;
         private readonly Cloudinary _cloudinary;
         private const string Tags = "Backend_ImageValuation";
+        private const string Tags_Receipt = "ReceiptPDF";
         public ValuationService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary)
         {
             _unitOfWork = unitOfWork;
@@ -232,14 +236,16 @@ namespace Application.Services
             var response = new APIResponseModel();
             try
             {
-                var valuationById = await _unitOfWork.ValuationRepository.GetByIdAsync(id);
+                var valuationById = await _unitOfWork.ValuationRepository.GetByIdAsync(id, includes: new Expression<Func<Valuation, 
+                                                                                           object>>[] { x => x.ImageValuations, x => x.ValuationDocuments, 
+                                                                                                        x => x.Seller, x => x.Staff });
                 if (valuationById != null)
                 {
                     var valuation = _mapper.Map<ValuationDTO>(valuationById);
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
-                    response.Data = valuationById;
+                    response.Data = valuation;
                 }
                 else
                 {
@@ -396,6 +402,83 @@ namespace Application.Services
                     response.Code = 200;
                     response.IsSuccess = true;
                     response.Data = valuationById;
+                }
+                else
+                {
+                    response.Message = $"Not found valuation";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> CreateRecieptAsync(int id, ReceiptDTO receipt)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var valuationById = await _unitOfWork.ValuationRepository.GetByIdAsync(id, includes: new Expression<Func<Valuation, 
+                                                                                                         object>>[] { x => x.ImageValuations, x => x.ValuationDocuments,
+                                                                                                                      x => x.Seller, x => x.Staff });
+                if (valuationById != null)
+                {
+                    valuationById.ActualStatusOfJewelry = receipt.ActualStatusOfJewelry;
+                    valuationById.DeliveryDate = DateTime.Now;
+
+                    _unitOfWork.ValuationRepository.Update(valuationById);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    var seller = await _unitOfWork.AccountRepository.GetByIdAsync(receipt.SellerID);   
+                   
+
+                    byte[] pdfBytes = CreatePDFFile.CreatePDF(valuationById, seller);
+
+                    string filePath = $"BienBanXacNhanNhanHang_{valuationById.Id}.pdf";
+
+                    await File.WriteAllBytesAsync(filePath, pdfBytes);
+
+                    var uploadFile = await _cloudinary.UploadAsync(new RawUploadParams
+                    {
+                        File = new FileDescription(filePath),
+                        Tags = Tags_Receipt,
+                        Type = "upload"
+
+                    }).ConfigureAwait(false);
+                    if (uploadFile == null || uploadFile.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        response.Message = $"File upload failed." + uploadFile.Error.Message + "";
+                        response.Code = (int)uploadFile.StatusCode;
+                        response.IsSuccess = false;
+                    }
+                    else
+                    {
+                        var valuationDoc = new ValuationDocumentDTO
+                        {
+                            ValuationId = valuationById.Id,
+                            ValuationDocumentTypeId = 2,
+                            FileDocument = uploadFile.SecureUrl.AbsoluteUri,
+                            CreationDate = DateTime.Now,
+                            CreatedBy = receipt.StaffID
+                        };
+                        var entity = _mapper.Map<ValuationDocument>(valuationDoc);
+                        await _unitOfWork.ValuationDocumentRepository.AddAsync(entity);
+                        await _unitOfWork.SaveChangeAsync();
+                    }
+                    var valuation = _mapper.Map<ValuationDTO>(valuationById);
+
+                    response.Message = $"Create Reciept Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuation;
                 }
                 else
                 {

@@ -97,5 +97,15 @@ namespace WebAPI.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
+
+        [HttpPut]
+        public async Task<IActionResult> CreateRecieptAsync(int id, ReceiptDTO receipt)
+        {
+            var result = await _valuationService.CreateRecieptAsync(id, receipt);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
     }
 }

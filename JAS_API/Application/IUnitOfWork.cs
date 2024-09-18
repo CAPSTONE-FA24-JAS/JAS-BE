@@ -14,6 +14,8 @@ namespace Application
         public IBidLimitRepository BidLimitRepository { get; }
         public IImageValuationRepository ImageValuationRepository { get; }
         public IValuationRepository ValuationRepository { get; }
+
+        public IValuationDocumentRepository ValuationDocumentRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
