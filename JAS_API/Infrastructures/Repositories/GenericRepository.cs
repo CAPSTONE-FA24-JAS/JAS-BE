@@ -44,7 +44,7 @@ namespace Infrastructures.Repositories
             return query.ToListAsync();
         }
 
-        public async Task<TEntity?> GetByIdAsync(int id, Expression<Func<TEntity, bool>>? condition = null,
+        public async Task<TEntity?> GetByIdAsync(int? id, Expression<Func<TEntity, bool>>? condition = null,
                                                 Expression<Func<TEntity, object>>? sort = null,
                                                  bool ascending = true,
                                                 params Expression<Func<TEntity, object>>[] includes)

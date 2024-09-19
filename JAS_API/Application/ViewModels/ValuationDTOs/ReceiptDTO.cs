@@ -8,9 +8,9 @@ namespace Application.ViewModels.ValuationDTOs
 {
     public class ReceiptDTO
     {
-        public int SellerID { get; set; }
+      //  public int SellerID { get; set; }
 
-        public int StaffID { get; set; }
+     //   public int StaffID { get; set; }
         public string? ActualStatusOfJewelry { get; set; }
         public DateTime? DeliveryDate { get; set; }
     }

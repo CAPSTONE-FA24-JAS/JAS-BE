@@ -24,7 +24,7 @@ namespace Application.Utils
 
                 // Add header
                 Font headerFont = FontFactory.GetFont("Times New Roman", 14, Font.BOLD);
-                Paragraph header = new Paragraph("Cộng hòa xã hội chủ nghĩa Việt Nam\nĐộc lập - Tự do - Hạnh phúc", headerFont)
+                Paragraph header = new Paragraph("Cong hoa xa hoi Chu nghia Viet Nam\nDoc Lap - Tu do - Hanh phuc", headerFont)
                 {
                     Alignment = Element.ALIGN_CENTER,
                     SpacingAfter = 20
@@ -42,28 +42,29 @@ namespace Application.Utils
 
                 // Add location and date
                 Font contentFont = FontFactory.GetFont("Arial", 12, Font.NORMAL);
-                document.Add(new Paragraph($"Tp Hồ Chí Minh, ngày {DateTime.Now.Day} tháng {DateTime.Now.Month} năm {DateTime.Now.Year}", contentFont));
+                document.Add(new Paragraph($"Tp Ho Chi Minh, ngay {DateTime.Now.Day} thang {DateTime.Now.Month} nam {DateTime.Now.Year}", contentFont));
                 document.Add(new Paragraph(" ", contentFont)); // Add a blank line
 
                 // Section 1: Bên A
                 document.Add(new Paragraph("1. Bên A:", contentFont));
                 document.Add(new Paragraph("Công ty: JAS company", contentFont));
-                document.Add(new Paragraph("Địa chỉ: S10.05, đường Nguyễn Xiển, phường Long Bình, tp Thủ Đức, Hồ Chí Minh", contentFont));
+                document.Add(new Paragraph("Address: S10.05, Nguyen Xien Street, Long Binh, Thu Duc, Hồ Chí Minh", contentFont));
                 document.Add(new Paragraph("SĐT: 0961545926", contentFont));
+                document.Add(new Paragraph("Email: JasCompany123@gmail.com", contentFont));
                 document.Add(new Paragraph(" ", contentFont)); // Add a blank line
 
                 // Section 2: Bên B
                 document.Add(new Paragraph("2. Bên B:", contentFont));
-                document.Add(new Paragraph($"Họ tên: {seller.LastName + seller.FirstName}", contentFont));
-                document.Add(new Paragraph($"Địa chỉ: {seller.Address}", contentFont));
-                document.Add(new Paragraph($"Số CMND: {seller.CitizenIdentificationCard} cấp ngày: {seller.IDIssuanceDate}   Ngày hết hạn: {seller.IDExpirationDate}", contentFont));
+                document.Add(new Paragraph($"Ho tên: {seller.LastName + seller.FirstName}", contentFont));
+                document.Add(new Paragraph($"Đia chi: {seller.Address}", contentFont));
+                document.Add(new Paragraph($"So CMND: {seller.CitizenIdentificationCard} câp ngay: {seller.IDIssuanceDate}   Ngay hêt han: {seller.IDExpirationDate}", contentFont));
                 document.Add(new Paragraph($"Email: {seller.Email}", contentFont));
                 document.Add(new Paragraph(" ", contentFont)); // Add a blank line
 
                 // Section 3: Nội dung
-                document.Add(new Paragraph("3. Nội dung:", contentFont));
-                document.Add(new Paragraph($"Công ty chúng tôi đã nhận được hàng của quý khách hàng (Bên B) như sau:", contentFont));
-                document.Add(new Paragraph($"- \"{valuation.Name}\"  với trạng thái: \"{valuation.ActualStatusOfJewelry}\"  vào ngày \"{valuation.DeliveryDate:dd/MM/yyyy}\"", contentFont));
+                document.Add(new Paragraph("3. Nôi dung:", contentFont));
+                document.Add(new Paragraph($"Công ty chung tôi đa nhân đươc hang cua quy khach hang (Bên B) như sau:", contentFont));
+                document.Add(new Paragraph($"- \"{valuation.Name}\"  vơi trang thai: \"{valuation.ActualStatusOfJewelry}\"  vao ngay \"{valuation.DeliveryDate:dd/MM/yyyy}\"", contentFont));
 
                 // Add final confirmation
                 document.Add(new Paragraph(" ", contentFont)); // Add a blank line
