@@ -114,7 +114,7 @@ namespace Application.Services
             {
                 var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: null,
                                                                              orderBy: x => x.OrderByDescending(t => t.CreationDate),
-                                                                             includeProperties: "Seller,ImageValuations",
+                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments",
                                                                              pageIndex: pageIndex,
                                                                              pageSize: pageSize);
                 List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
@@ -284,7 +284,7 @@ namespace Application.Services
 
                 var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
                                                                              orderBy: x => x.OrderByDescending( t => t.CreationDate),
-                                                                             includeProperties: "Seller,ImageValuations",
+                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments",
                                                                              pageIndex: pageIndex,
                                                                              pageSize: pageSize);
                 List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
@@ -343,7 +343,7 @@ namespace Application.Services
 
                 var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
                                                                              orderBy: x => x.OrderByDescending(t => t.CreationDate),
-                                                                             includeProperties: "Seller,ImageValuations",
+                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments",
                                                                              pageIndex: pageIndex,
                                                                              pageSize: pageSize);
                 List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
