@@ -432,12 +432,12 @@ namespace Application.Services
                 if (valuationById != null)
                 {
                     valuationById.ActualStatusOfJewelry = receipt.ActualStatusOfJewelry;
-                    valuationById.DeliveryDate = DateTime.Now;
+                    valuationById.DeliveryDate = receipt.DeliveryDate;
 
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
 
-                    var seller = await _unitOfWork.AccountRepository.GetByIdAsync(receipt.SellerID);   
+                    var seller = await _unitOfWork.AccountRepository.GetByIdAsync(valuationById.SellerId);   
                    
 
                     byte[] pdfBytes = CreatePDFFile.CreatePDF(valuationById, seller);
@@ -467,7 +467,7 @@ namespace Application.Services
                             ValuationDocumentTypeId = 2,
                             FileDocument = uploadFile.SecureUrl.AbsoluteUri,
                             CreationDate = DateTime.Now,
-                            CreatedBy = receipt.StaffID
+                            CreatedBy = valuationById.StaffId
                         };
                         var entity = _mapper.Map<ValuationDocument>(valuationDoc);
                         await _unitOfWork.ValuationDocumentRepository.AddAsync(entity);
