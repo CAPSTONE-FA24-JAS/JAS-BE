@@ -20,5 +20,9 @@
         public string? VNPayAccountName { get; set; }
         public int? RoleId { get; set; }
         public string? RoleName { get; set; }
+
+        public string? CitizenIdentificationCard { get; set; }
+        public DateTime? IDIssuanceDate { get; set; }
+        public DateTime? IDExpirationDate { get; set; }
     }
 }
