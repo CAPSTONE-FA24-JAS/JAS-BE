@@ -13,7 +13,7 @@ namespace Application.Interfaces
     {
         public Task<APIResponseModel> CreateNewBidLimit(CreateBidLimitDTO createBidLimitDTO);
         public Task<APIResponseModel> ViewListBidLimit();
-        public Task<APIResponseModel> ViewBidLimitByAccount(int accountId);
+        public Task<APIResponseModel> ViewBidLimitByCustomer(int customerId);
         public Task<APIResponseModel> ViewBidLimitById(int Id);
         public Task<APIResponseModel> UpdateStatus(UpdateBidLimitDTO updateBidLimitDTO);
         public Task<APIResponseModel> GetStatusBidLimt();

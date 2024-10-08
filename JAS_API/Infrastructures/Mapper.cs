@@ -18,12 +18,21 @@ namespace Infrastructures
         public Mapper() 
         {
             CreateMap(typeof(Pagination<>), typeof(Pagination<>));
-            CreateMap<Account, RegisterAccountDTO>().ReverseMap();
-            CreateMap<Account, CreateAccountDTO>().ReverseMap();
-            CreateMap<Account, AccountDTO>().ReverseMap()
-                .ForPath(x => x.Role.Name, y => y.MapFrom(x => x.RoleName))
+            CreateMap<Account, RegisterAccountDTO>().ReverseMap()
+                .ForMember(customer => customer.Customer, c => c.MapFrom(src => src.RegisterCustomer));
+            CreateMap<Account, CreateAccountDTO>()
+                .ForMember(dest => dest.StaffDTO, opt => opt.MapFrom(src => src.Staff))
                 .ReverseMap();
-            CreateMap<Account, UpdateProfileDTO>().ReverseMap();
+            CreateMap<Staff, StaffDTO>().ReverseMap();
+            CreateMap<Account, AccountDTO>()
+                .ForMember(dest => dest.CustomerDTO, opt => opt.MapFrom(src => src.Customer))
+                .ForPath(x => x.RoleName, y => y.MapFrom(x => x.Role.Name))
+                .ReverseMap();
+            CreateMap<Customer, CustomerDTO>();
+            CreateMap<Account, UpdateProfileDTO>()
+                .ForMember(dest => dest.CustomerProfileDTO, opt => opt.MapFrom(src => src.Customer))
+                .ReverseMap();
+            CreateMap<Customer, CustomerProfileDTO>().ReverseMap();
             CreateMap<Role, RoleDTO>().ReverseMap();
             CreateMap<BidLimit, BidLimitDTO>()
                 .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.CreationDate))
