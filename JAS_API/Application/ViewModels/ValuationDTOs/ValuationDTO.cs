@@ -1,5 +1,6 @@
 ﻿
 using Application.ViewModels.AccountDTOs;
+using Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,13 @@ namespace Application.ViewModels.ValuationDTOs
         public int? SellerId { get; set; }
         public int? StaffId { get; set; }
 
+        public string? ActualStatusOfJewelry { get; set; }
+        public DateTime? DeliveryDate { get; set; }
+
         public AccountDTO? Seller { get; set; }
+
+        public AccountDTO? Staff { get; set; }
+        public IEnumerable<ImageValuationDTO>? ImageValuations { get; set; }
+        public IEnumerable<ValuationDocumentDTO>? ValuationDocuments { get; set; }
     }
 }

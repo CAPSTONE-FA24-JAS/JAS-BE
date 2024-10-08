@@ -18,6 +18,7 @@ namespace Application
         public IWardRepository WardRepository { get; }
         public IDistrictRepository IDistrictRepository { get; }
         public IProvinceRepository ProvininceRepository { get; }
+        public IValuationDocumentRepository ValuationDocumentRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

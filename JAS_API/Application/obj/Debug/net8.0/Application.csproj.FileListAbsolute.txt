@@ -1,0 +1,6 @@
+D:\CAPSTONE\Source_code\BE\JAS-BE\JAS_API\Application\obj\Debug\net8.0\Application.csproj.AssemblyReference.cache
+D:\CAPSTONE\Source_code\BE\JAS-BE\JAS_API\Application\obj\Debug\net8.0\Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\CAPSTONE\Source_code\BE\JAS-BE\JAS_API\Application\obj\Debug\net8.0\Application.AssemblyInfoInputs.cache
+D:\CAPSTONE\Source_code\BE\JAS-BE\JAS_API\Application\obj\Debug\net8.0\Application.AssemblyInfo.cs
+D:\CAPSTONE\Source_code\BE\JAS-BE\JAS_API\Application\obj\Debug\net8.0\Application.csproj.CoreCompileInputs.cache
+D:\CAPSTONE\Source_code\BE\JAS-BE\JAS_API\Application\obj\Debug\net8.0\Application.sourcelink.json

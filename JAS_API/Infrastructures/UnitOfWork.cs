@@ -20,8 +20,10 @@ namespace Infrastructures
         private readonly IWardRepository _wardRepository;
         private readonly IDistrictRepository _districtRepository;
         private readonly IProvinceRepository _provinceRepository;
+        private readonly IValuationDocumentRepository _valuationDocumentRepository;
 
-        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, IBidLimitRepository bidLimitRepository, IImageValuationRepository imageValuationRepository, IValuationRepository valuationRepository, IAddressToShipRepository addressToShipRepository, IWardRepository wardRepository, IDistrictRepository districtRepository, IProvinceRepository provinceRepository)
+
+        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, IBidLimitRepository bidLimitRepository, IImageValuationRepository imageValuationRepository, IAddressToShipRepository addressToShipRepository, IWardRepository wardRepository, IDistrictRepository districtRepository, IProvinceRepository provinceRepository, IValuationRepository valuationRepository, IValuationDocumentRepository valuationDocumentRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -33,6 +35,7 @@ namespace Infrastructures
             _wardRepository = wardRepository;
             _districtRepository = districtRepository;
             _provinceRepository = provinceRepository;
+            _valuationDocumentRepository = valuationDocumentRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -49,6 +52,7 @@ namespace Infrastructures
 
         public IProvinceRepository ProvininceRepository => _provinceRepository;
 
+        public IValuationDocumentRepository ValuationDocumentRepository => _valuationDocumentRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

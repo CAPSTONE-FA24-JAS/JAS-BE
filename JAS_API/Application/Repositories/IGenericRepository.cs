@@ -15,7 +15,7 @@ namespace Application.Repositories
                                         Expression<Func<TEntity, object>>? sort = null,
                                         bool ascending = true,
                                         params Expression<Func<TEntity, object>>[] includes);
-        Task<TEntity?> GetByIdAsync(int id, 
+        Task<TEntity?> GetByIdAsync(int? id, 
                                     Expression<Func<TEntity,bool>>? condition = null,
                                     Expression<Func<TEntity, object>>? sort = null,
                                     bool ascending = true,

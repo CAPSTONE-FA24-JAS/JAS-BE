@@ -23,21 +23,89 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> getValuationsAsync()
+        public async Task<IActionResult> getValuationsAsync(int? pageSize, int? pageIndex)
         {
-            var result = await _valuationService.GetAllAsync();
+            var result = await _valuationService.GetAllAsync(pageSize, pageIndex);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+
+        //chi dinh staff cho consignItem
+        [HttpPut]
+        public async Task<IActionResult> AssignStaffForValuationAsync(int id, int staffId, string? status)
+        {
+            var result = await _valuationService.AssignStaffForValuationAsync(id, staffId, status);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+
+        //tao dinh gia so 
+        [HttpPut]
+        public async Task<IActionResult> createPreliminaryPriceAsync(int id, string status, float DesiredPrice)
+        {
+            var result = await _valuationService.CreatePreliminaryValuationAsync(id, status, DesiredPrice);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+
+        //xem Detail valuation 
+        [HttpGet]
+        public async Task<IActionResult> getValuationByIdAsync(int valuationId)
+        {
+            var result = await _valuationService.getPreliminaryValuationByIdAsync(valuationId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+
+        //staff xem all consign item, all dinh gia so bo.Neu status null thi hien thi het consign item
+        [HttpGet]
+        public async Task<IActionResult> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, string? status, int? pageSize, int? pageIndex)
+        {
+            var result = await _valuationService.getPreliminaryValuationsByStatusOfStaffAsync(staffId, status, pageSize, pageIndex);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+
+        //seller xem all consign item, all dinh gia so bo.Neu status null thi hien thi het consign item
+
+        [HttpGet]
+        public async Task<IActionResult> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string? status, int? pageSize, int? pageIndex)
+        {
+            var result = await _valuationService.getPreliminaryValuationByStatusOfSellerAsync(sellerId, status, pageSize, pageIndex);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+
+        //dung chung cho ca staff, seller update status
+        [HttpPut]
+        public async Task<IActionResult> UpdateStatusForValuationsAsync(int id, string status)
+        {
+            var result = await _valuationService.UpdateStatusForValuationsAsync(id, status);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
         }
 
         [HttpPut]
-        public async Task<IActionResult> updateStatusConsignItem(int id, int staffId, string status)
+        public async Task<IActionResult> CreateRecieptAsync(int id, ReceiptDTO receipt)
         {
-            var result = await _valuationService.UpdateStatusAsync(id, staffId, status);
+            var result = await _valuationService.CreateRecieptAsync(id, receipt);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
         }
+
     }
 }
