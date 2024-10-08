@@ -76,30 +76,30 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                //var bidLimits = await _unitOfWork.BidLimitRepository.GetAllAsync(includes: x => x.Account);
-                //if (bidLimits.Any())
-                //{
-                //    var DTOs = new List<BidLimitDTO>();
-                //    foreach (var bidLimit in bidLimits)
-                //    {
-                //        var mapper = _mapper.Map<BidLimitDTO>(bidLimit);
-                //        mapper.AccountName = bidLimit.Account.FirstName + " " + bidLimit.Account.LastName;
-                //        DTOs.Add(mapper);
-                //    }
-                //    if (DTOs.Count > 0)
-                //    {
-                //        reponse.Code = 200;
-                //        reponse.IsSuccess = true;
-                //        reponse.Message = "Received List BidLimit Successfull";
-                //        reponse.Data = DTOs;
-                //    }
-                //}
-                //else
-                //{
-                //    reponse.Code = 400;
-                //    reponse.IsSuccess = false;
-                //    reponse.Message = "Received List BidLimit Faild";
-                //}
+                var bidLimits = await _unitOfWork.BidLimitRepository.GetAllAsync(includes: x => x.Customer);
+                if (bidLimits.Any())
+                {
+                    var DTOs = new List<BidLimitDTO>();
+                    foreach (var bidLimit in bidLimits)
+                    {
+                        var mapper = _mapper.Map<BidLimitDTO>(bidLimit);
+                        mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
+                        DTOs.Add(mapper);
+                    }
+                    if (DTOs.Count > 0)
+                    {
+                        reponse.Code = 200;
+                        reponse.IsSuccess = true;
+                        reponse.Message = "Received List BidLimit Successfull";
+                        reponse.Data = DTOs;
+                    }
+                }
+                else
+                {
+                    reponse.Code = 400;
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Received List BidLimit Faild";
+                }
             }
             catch (Exception e)
             {
@@ -110,35 +110,35 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<APIResponseModel> ViewBidLimitByAccount(int accountId)
+        public async Task<APIResponseModel> ViewBidLimitByCustomer(int customerId)
         {
             var reponse = new APIResponseModel();
             try
             {
-                //var bidLimits = await _unitOfWork.BidLimitRepository.GetAllAsync(condition: x => x.AccountId == accountId, includes: x => x.Account);
-                //if(bidLimits.Any()) 
-                //{
-                //    var DTOs = new List<BidLimitDTO>();
-                //    foreach (var bidLimit in bidLimits)
-                //    {
-                //        var mapper = _mapper.Map<BidLimitDTO>(bidLimit);
-                //        mapper.AccountName = bidLimit.Account.FirstName + " " + bidLimit.Account.LastName;
-                //        DTOs.Add(mapper);
-                //    }
-                //    if(DTOs.Count > 0)
-                //    {
-                //        reponse.Code = 200;
-                //        reponse.IsSuccess = true;
-                //        reponse.Message = "Received List BidLimit Successfull";
-                //        reponse.Data = DTOs;
-                //    }
-                //}
-                //else
-                //{
-                //    reponse.Code = 400;
-                //    reponse.IsSuccess = false;
-                //    reponse.Message = "Received List BidLimit Faild";
-                //}
+                var bidLimits = await _unitOfWork.BidLimitRepository.GetAllAsync(condition: x => x.CustomerId == customerId, includes: x => x.Customer);
+                if (bidLimits.Any())
+                {
+                    var DTOs = new List<BidLimitDTO>();
+                    foreach (var bidLimit in bidLimits)
+                    {
+                        var mapper = _mapper.Map<BidLimitDTO>(bidLimit);
+                        mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
+                        DTOs.Add(mapper);
+                    }
+                    if (DTOs.Count > 0)
+                    {
+                        reponse.Code = 200;
+                        reponse.IsSuccess = true;
+                        reponse.Message = "Received List BidLimit Successfull";
+                        reponse.Data = DTOs;
+                    }
+                }
+                else
+                {
+                    reponse.Code = 400;
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Received List BidLimit Faild";
+                }
             }
             catch (Exception e)
             {
@@ -243,22 +243,22 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                //var bidLimit = await _unitOfWork.BidLimitRepository.GetByIdAsync(Id,includes: x => x.Account);
-                //if (bidLimit != null)
-                //{
-                //        var mapper = _mapper.Map<BidLimitDTO>(bidLimit);
-                //        mapper.AccountName = bidLimit.Account.FirstName + " " + bidLimit.Account.LastName;
-                //        reponse.Code = 200;
-                //        reponse.IsSuccess = true;
-                //        reponse.Message = "Received List BidLimit Successfull";
-                //        reponse.Data = mapper;
-                //}
-                //else
-                //{
-                //    reponse.Code = 400;
-                //    reponse.IsSuccess = false;
-                //    reponse.Message = "Received List BidLimit Faild";
-                //}
+                var bidLimit = await _unitOfWork.BidLimitRepository.GetByIdAsync(Id, includes: x => x.Customer);
+                if (bidLimit != null)
+                {
+                    var mapper = _mapper.Map<BidLimitDTO>(bidLimit);
+                    mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
+                    reponse.Code = 200;
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Received List BidLimit Successfull";
+                    reponse.Data = mapper;
+                }
+                else
+                {
+                    reponse.Code = 400;
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Received List BidLimit Faild";
+                }
             }
             catch (Exception e)
             {

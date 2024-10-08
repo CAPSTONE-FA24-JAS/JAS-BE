@@ -9,7 +9,7 @@ namespace Application.ViewModels.AddressToShipDTO
     public class CreateAddressToShipDTO
     {
         public string? AddressLine { get; set; }
-        public int? AccountId { get; set; }
+        public int? CustomerId { get; set; }
         public int? WardId { get; set; }
     }
 }
