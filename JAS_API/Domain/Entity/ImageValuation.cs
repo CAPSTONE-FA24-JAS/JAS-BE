@@ -10,7 +10,8 @@ namespace Domain.Entity
     {
         public string? ImageLink { get; set; }
         public int? ValuationId { get; set; }
-
+        public string? Title { get; set; }
+        public string? DefaultImage { get; set; }
         //RelationShip
         public virtual Valuation? Valuation { get; set; }
 

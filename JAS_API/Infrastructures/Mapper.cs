@@ -1,8 +1,12 @@
 ﻿using Application.Commons;
 using Application.ViewModels.AccountDTOs;
+using Application.ViewModels.AddressToShipDTO;
 using Application.ViewModels.BidLimitDTOs;
+using Application.ViewModels.DistrictDTOs;
+using Application.ViewModels.ProvinceDTOs;
 using Application.ViewModels.RoleDTOs;
 using Application.ViewModels.ValuationDTOs;
+using Application.ViewModels.WardDTOs;
 using AutoMapper;
 using Domain.Entity;
 
@@ -31,6 +35,15 @@ namespace Infrastructures
             CreateMap<ImageValuation, ImageValuationDTO>().ReverseMap();
             CreateMap<Valuation, ValuationDTO>()
                 .ForMember(dest => dest.Seller, opt => opt.MapFrom(src => src.Seller));
+            CreateMap<AddressToShip, CreateAddressToShipDTO>().ReverseMap();
+            CreateMap<AddressToShip, ViewAddressToShipDTO>().ReverseMap();
+            CreateMap<Ward, CreateWardDTO>().ReverseMap();
+            CreateMap<Ward, ViewWardDTO>().ReverseMap();
+            CreateMap<District, CreateDistrictDTO>().ReverseMap();
+            CreateMap<District, ViewDistrictDTO>().ReverseMap();
+            CreateMap<Province, CreateProvinceDTO>().ReverseMap();
+            CreateMap<Province, ViewProvinceDTO>().ReverseMap();
+
         }
     }
 }

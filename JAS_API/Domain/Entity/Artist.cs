@@ -11,5 +11,6 @@ namespace Domain.Entity
         public string? Name { get; set; }
         //
         public virtual IEnumerable<Jewelry>? Jewelries { get; set; } 
+        public virtual IEnumerable<FollwerArtist>? FollwerArtists { get; set; } 
     }
 }

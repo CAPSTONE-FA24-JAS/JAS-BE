@@ -26,11 +26,21 @@ namespace Infrastructures
             services.AddScoped<IImageValuationRepository, ImageValuationRepository>();
             services.AddScoped<IValuationRepository, ValuationRepository>();
             services.AddScoped<IValuationService, ValuationService>();
+
+            services.AddScoped<IAddressToShipService,AddressToShipService>();
+            services.AddScoped<IAddressToShipRepository, AddressToShipRepository>();
+            services.AddScoped<IWardService, WardService>();
+            services.AddScoped<IWardRepository, WardRepository>();
+            services.AddScoped<IDistrictService, DistrictService>();
+            services.AddScoped<IDistrictRepository,DistrictRepository>();
+            services.AddScoped<IProvinceService, ProvinceService>();
+            services.AddScoped<IProvinceRepository, ProvinceRepository>();
+
             services.AddScoped<ICurrentTime, CurrentTime>();
 
             services.AddDbContext<AppDbContext>(option =>
             {
-                option.UseNpgsql(databaseConnection);
+                option.UseLazyLoadingProxies().UseNpgsql(databaseConnection);
             });
             services.AddAutoMapper(typeof(Mapper).Assembly);
             //services.AddSingleton<UserManager<Account>>();

@@ -16,8 +16,12 @@ namespace Infrastructures
         private readonly IBidLimitRepository _bidLimitRepository;
         private readonly IImageValuationRepository _imageValuationRepository;
         private readonly IValuationRepository _valuationRepository;
-        
-        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, IBidLimitRepository bidLimitRepository,IImageValuationRepository imageValuationRepository, IValuationRepository valuationRepository)
+        private readonly IAddressToShipRepository _addressToShipRepository;
+        private readonly IWardRepository _wardRepository;
+        private readonly IDistrictRepository _districtRepository;
+        private readonly IProvinceRepository _provinceRepository;
+
+        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, IBidLimitRepository bidLimitRepository, IImageValuationRepository imageValuationRepository, IValuationRepository valuationRepository, IAddressToShipRepository addressToShipRepository, IWardRepository wardRepository, IDistrictRepository districtRepository, IProvinceRepository provinceRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -25,6 +29,10 @@ namespace Infrastructures
             _bidLimitRepository = bidLimitRepository;
             _imageValuationRepository = imageValuationRepository;
             _valuationRepository = valuationRepository;
+            _addressToShipRepository = addressToShipRepository;
+            _wardRepository = wardRepository;
+            _districtRepository = districtRepository;
+            _provinceRepository = provinceRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -32,6 +40,15 @@ namespace Infrastructures
         public IBidLimitRepository BidLimitRepository => _bidLimitRepository;
         public IImageValuationRepository ImageValuationRepository => _imageValuationRepository;
         public IValuationRepository ValuationRepository => _valuationRepository;
+
+        public IAddressToShipRepository AddressToShipRepository => _addressToShipRepository;
+
+        public IWardRepository WardRepository => _wardRepository;
+
+        public IDistrictRepository IDistrictRepository => _districtRepository;
+
+        public IProvinceRepository ProvininceRepository => _provinceRepository;
+
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

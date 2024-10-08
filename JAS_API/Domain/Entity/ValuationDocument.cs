@@ -8,11 +8,11 @@ namespace Domain.Entity
 {
     public class ValuationDocument : BaseEntity
     {
-        public string? FileDocument { get; set; }
+        public string? DocumentLink { get; set; }
         public int? ValuationId { get; set; }
-        public int? ValuationDocumentTypeId { get; set; }
+        public string? ValuationDocumentType { get; set; }
+        public string? SignatureCode { get; set; }
         //
         public virtual Valuation? Valuation { get; set; }
-        public virtual ValuationDocumentType? ValuationDocumentType { get; set;}
     }
 }
