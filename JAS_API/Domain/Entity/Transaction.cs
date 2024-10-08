@@ -8,14 +8,10 @@ namespace Domain.Entity
 {
     public class Transaction : BaseEntity
     {
+        public int? DocNo { get; set; }
         public float? Amount { get; set; }
         public DateTime? TransactionTime { get; set; }
-        public string? Status { get; set; }
-        
-        public int? WalletId { get; set; }
-        public int? TransactionTypeId { get; set; }
-
-        public virtual Wallet Wallet { get; set; }
-        public virtual TransactionType TransactionType { get; set; }
+        public string? TransactionType { get; set; }
+        public int? TransactionPerson { get; set; }
     }
 }

@@ -55,16 +55,16 @@ namespace Application.Utils
 
                 // Section 2: Bên B
                 document.Add(new Paragraph("2. Bên B:", contentFont));
-                document.Add(new Paragraph($"Ho tên: {seller.LastName + seller.FirstName}", contentFont));
-                document.Add(new Paragraph($"Đia chi: {seller.Address}", contentFont));
-                document.Add(new Paragraph($"So CMND: {seller.CitizenIdentificationCard} câp ngay: {seller.IDIssuanceDate}   Ngay hêt han: {seller.IDExpirationDate}", contentFont));
+                //document.Add(new Paragraph($"Ho tên: {seller.LastName + seller.FirstName}", contentFont));
+                //document.Add(new Paragraph($"Đia chi: {seller.Address}", contentFont));
+                //document.Add(new Paragraph($"So CMND: {seller.CitizenIdentificationCard} câp ngay: {seller.IDIssuanceDate}   Ngay hêt han: {seller.IDExpirationDate}", contentFont));
                 document.Add(new Paragraph($"Email: {seller.Email}", contentFont));
                 document.Add(new Paragraph(" ", contentFont)); // Add a blank line
 
                 // Section 3: Nội dung
                 document.Add(new Paragraph("3. Nôi dung:", contentFont));
                 document.Add(new Paragraph($"Công ty chung tôi đa nhân đươc hang cua quy khach hang (Bên B) như sau:", contentFont));
-                document.Add(new Paragraph($"- \"{valuation.Name}\"  vơi trang thai: \"{valuation.ActualStatusOfJewelry}\"  vao ngay \"{valuation.DeliveryDate:dd/MM/yyyy}\"", contentFont));
+                //document.Add(new Paragraph($"- \"{valuation.Name}\"  vơi trang thai: \"{valuation.ActualStatusOfJewelry}\"  vao ngay \"{valuation.DeliveryDate:dd/MM/yyyy}\"", contentFont));
 
                 // Add final confirmation
                 document.Add(new Paragraph(" ", contentFont)); // Add a blank line

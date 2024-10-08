@@ -8,7 +8,9 @@ namespace Domain.Entity
 {
     public class ImageJewelry : BaseEntity
     {
-        public string? File { get; set; }
+        public string? ImageLink { get; set; }
+        public string? Title { get; set; }
+        public string? ThumbnailImage { get; set; }
         public int? JewelryId { get; set; }
         //
         public virtual Jewelry? Jewelry { get; set; }

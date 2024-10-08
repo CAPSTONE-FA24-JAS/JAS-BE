@@ -16,11 +16,14 @@ namespace Infrastructures
         private readonly IBidLimitRepository _bidLimitRepository;
         private readonly IImageValuationRepository _imageValuationRepository;
         private readonly IValuationRepository _valuationRepository;
+        private readonly IAddressToShipRepository _addressToShipRepository;
+        private readonly IWardRepository _wardRepository;
+        private readonly IDistrictRepository _districtRepository;
+        private readonly IProvinceRepository _provinceRepository;
         private readonly IValuationDocumentRepository _valuationDocumentRepository;
-        
-        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, 
-                                                 IBidLimitRepository bidLimitRepository,IImageValuationRepository imageValuationRepository, 
-                                                 IValuationRepository valuationRepository, IValuationDocumentRepository valuationDocumentRepository)
+
+
+        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, IBidLimitRepository bidLimitRepository, IImageValuationRepository imageValuationRepository, IAddressToShipRepository addressToShipRepository, IWardRepository wardRepository, IDistrictRepository districtRepository, IProvinceRepository provinceRepository, IValuationRepository valuationRepository, IValuationDocumentRepository valuationDocumentRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -28,6 +31,10 @@ namespace Infrastructures
             _bidLimitRepository = bidLimitRepository;
             _imageValuationRepository = imageValuationRepository;
             _valuationRepository = valuationRepository;
+            _addressToShipRepository = addressToShipRepository;
+            _wardRepository = wardRepository;
+            _districtRepository = districtRepository;
+            _provinceRepository = provinceRepository;
             _valuationDocumentRepository = valuationDocumentRepository;
         }
 
@@ -36,6 +43,14 @@ namespace Infrastructures
         public IBidLimitRepository BidLimitRepository => _bidLimitRepository;
         public IImageValuationRepository ImageValuationRepository => _imageValuationRepository;
         public IValuationRepository ValuationRepository => _valuationRepository;
+
+        public IAddressToShipRepository AddressToShipRepository => _addressToShipRepository;
+
+        public IWardRepository WardRepository => _wardRepository;
+
+        public IDistrictRepository IDistrictRepository => _districtRepository;
+
+        public IProvinceRepository ProvininceRepository => _provinceRepository;
 
         public IValuationDocumentRepository ValuationDocumentRepository => _valuationDocumentRepository;
         public async Task<int> SaveChangeAsync()

@@ -200,7 +200,7 @@ namespace Application.Services
                 var valuationById = await _unitOfWork.ValuationRepository.GetByIdAsync(id);
                 if (valuationById != null)
                 {
-                    valuationById.DesiredPrice = preliminaryPrice;
+                    //valuationById.DesiredPrice = preliminaryPrice;
                     valuationById.PricingTime = DateTime.Now;
                     valuationById.Status = status;
                     
@@ -432,7 +432,7 @@ namespace Application.Services
                 if (valuationById != null)
                 {
                     valuationById.ActualStatusOfJewelry = receipt.ActualStatusOfJewelry;
-                    valuationById.DeliveryDate = receipt.DeliveryDate;
+                    //valuationById.DeliveryDate = receipt.DeliveryDate;
 
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();

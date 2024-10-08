@@ -167,14 +167,14 @@ namespace Application.Services
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.FirstName, ascending: true, includes: x => x.Role));
+                        //accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.FirstName, ascending: true, includes: x => x.Role));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Z_A):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.FirstName, ascending: false, includes: x => x.Role));
+                        //accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.FirstName, ascending: false, includes: x => x.Role));
                         reponse.Data = accounts;
                         break;
                     default:
@@ -252,29 +252,29 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.FirstName.Contains(Name) 
-                                                                       || x.LastName.Contains(Name) 
-                                                                       &&  x.IsConfirmed == true, includes: x => x.Role);
+                //var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.FirstName.Contains(Name) 
+                //                                                       || x.LastName.Contains(Name) 
+                //                                                       &&  x.IsConfirmed == true, includes: x => x.Role);
                 var DTOs = new List<AccountDTO>();
-                if (accounts == null)
-                {
-                    reponse.IsSuccess = false;
-                    reponse.Message = "List Account Null";
-                    reponse.Code = 400;
-                }
-                else
-                {
-                    reponse.IsSuccess = true;
-                    reponse.Message = "Search List Account Successfull";
-                    reponse.Code = 200;
-                    foreach (var item in accounts)
-                    {
-                        var mapper = _mapper.Map<AccountDTO>(item);
-                        mapper.RoleName = item.Role.Name;
-                        DTOs.Add(mapper);
-                    }
-                    reponse.Data = DTOs;
-                }
+                //if (accounts == null)
+                //{
+                //    reponse.IsSuccess = false;
+                //    reponse.Message = "List Account Null";
+                //    reponse.Code = 400;
+                //}
+                //else
+                //{
+                //    reponse.IsSuccess = true;
+                //    reponse.Message = "Search List Account Successfull";
+                //    reponse.Code = 200;
+                //    foreach (var item in accounts)
+                //    {
+                //        var mapper = _mapper.Map<AccountDTO>(item);
+                //        mapper.RoleName = item.Role.Name;
+                //        DTOs.Add(mapper);
+                //    }
+                //    reponse.Data = DTOs;
+                //}
             }catch(Exception e)
             {
                 reponse.IsSuccess = false;
@@ -349,7 +349,7 @@ namespace Application.Services
                     else
                     {
                         var enity = _mapper.Map(updateDTO, account);
-                        enity.ProfilePicture = uploadResult.SecureUrl.AbsoluteUri;
+                        //enity.ProfilePicture = uploadResult.SecureUrl.AbsoluteUri;
                         _unitOfWork.AccountRepository.Update(enity);
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
