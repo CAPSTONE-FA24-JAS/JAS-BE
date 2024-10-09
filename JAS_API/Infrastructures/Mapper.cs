@@ -60,6 +60,7 @@ namespace Infrastructures
             CreateMap<District, ViewDistrictDTO>().ReverseMap();
             CreateMap<Province, CreateProvinceDTO>().ReverseMap();
             CreateMap<Province, ViewProvinceDTO>().ReverseMap();
+            CreateMap<HistoryValuation, HistoryValuationDTO>().ReverseMap();
                 
 
         }
