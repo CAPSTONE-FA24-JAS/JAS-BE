@@ -36,6 +36,7 @@ namespace Infrastructures
             services.AddScoped<IProvinceService, ProvinceService>();
             services.AddScoped<IProvinceRepository, ProvinceRepository>();
             services.AddScoped<IValuationDocumentRepository, ValuationDocumentRepository>();
+            services.AddScoped<IHistoryValuationRepository, HistoryValuationRepository>();
             services.AddScoped<ICurrentTime, CurrentTime>();
 
             services.AddDbContext<AppDbContext>(option =>

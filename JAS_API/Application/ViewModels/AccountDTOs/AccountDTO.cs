@@ -8,7 +8,7 @@
         public string? PasswordHash { get; set; }
         public int? RoleId { get; set; }
         public string? RoleName { get; set; }
-        public virtual CustomerDTO? CustomerDTO { get; set; }
+        public CustomerDTO? CustomerDTO { get; set; }
     }
     public class CustomerDTO
     {
@@ -22,7 +22,7 @@
         public string? CitizenIdentificationCard { get; set; }
         public DateTime? IDIssuanceDate { get; set; }
         public DateTime? IDExpirationDate { get; set; }
-        public virtual AccountDTO? AccountDTO { get; set; }
+        public AccountDTO? AccountDTO { get; set; }
     }
 
 }

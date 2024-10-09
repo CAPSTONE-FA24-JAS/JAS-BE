@@ -22,9 +22,15 @@ namespace Infrastructures
         private readonly IProvinceRepository _provinceRepository;
         private readonly IValuationDocumentRepository _valuationDocumentRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IHistoryValuationRepository _historyValuationRepository;
 
 
-        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, IBidLimitRepository bidLimitRepository, IImageValuationRepository imageValuationRepository, IAddressToShipRepository addressToShipRepository, IWardRepository wardRepository, IDistrictRepository districtRepository, IProvinceRepository provinceRepository, IValuationRepository valuationRepository, IValuationDocumentRepository valuationDocumentRepository, ICustomerRepository customerRepository)
+        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
+                          IBidLimitRepository bidLimitRepository, IImageValuationRepository imageValuationRepository, 
+                          IAddressToShipRepository addressToShipRepository, IWardRepository wardRepository, 
+                          IDistrictRepository districtRepository, IProvinceRepository provinceRepository, 
+                          IValuationRepository valuationRepository, IValuationDocumentRepository valuationDocumentRepository, 
+                          ICustomerRepository customerRepository, IHistoryValuationRepository historyValuationRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -38,6 +44,7 @@ namespace Infrastructures
             _provinceRepository = provinceRepository;
             _valuationDocumentRepository = valuationDocumentRepository;
             _customerRepository = customerRepository;
+            _historyValuationRepository = historyValuationRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -58,6 +65,8 @@ namespace Infrastructures
 
         public ICustomerRepository CustomerRepository => _customerRepository;
 
+
+        public IHistoryValuationRepository HistoryValuationRepository => _historyValuationRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();
