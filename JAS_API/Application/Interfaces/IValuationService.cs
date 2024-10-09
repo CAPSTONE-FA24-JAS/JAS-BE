@@ -15,20 +15,24 @@ namespace Application.Interfaces
 
         public Task<APIResponseModel> GetAllAsync(int? pageSize, int? pageIndex);
 
-        public Task<APIResponseModel> AssignStaffForValuationAsync(int id, int staffId, string? status);
+        public Task<APIResponseModel> AssignStaffForValuationAsync(int id, int staffId, int status);
 
-        public Task<APIResponseModel> CreatePreliminaryValuationAsync(int id, string status, float preliminaryPrice);
+        public Task<APIResponseModel> RequestPreliminaryValuationAsync(int id, int status);
+
+        public Task<APIResponseModel> CreatePreliminaryValuationAsync(int id, int status, float EstimatePriceMin, float EstimatePriceMax);
 
         public Task<APIResponseModel> getPreliminaryValuationByIdAsync(int id);
 
         //seller xem all consign item, all dinh gia so bo
-        public Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string? status, int? pageSize, int? pageIndex);
+        public Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, int? status, int? pageSize, int? pageIndex);
 
         //staff xem all consign item, all dinh gia so bo
-        public Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, string? status, int? pageSize, int? pageIndex);
+        public Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, int? status, int? pageSize, int? pageIndex);
 
         //dung chung cho ca staff, seller update status
-        public Task<APIResponseModel> UpdateStatusForValuationsAsync(int id, string status);
+        public Task<APIResponseModel> UpdateStatusForValuationsAsync(int id, int status);
+
+        public Task<APIResponseModel> RejectForValuationsAsync(int id, int status, string reason);
 
         public Task<APIResponseModel> CreateRecieptAsync(int id, ReceiptDTO model);
 

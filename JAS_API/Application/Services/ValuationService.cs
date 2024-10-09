@@ -9,6 +9,7 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using CloudinaryDotNet.Core;
 using Domain.Entity;
+using Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
@@ -48,9 +49,13 @@ namespace Application.Services
                 }
                 else
                 {
-                    newvaluation.Status = "Requested";
+                    newvaluation.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault( x => x.Value == consignAnItem.Status).Name;
                     await _unitOfWork.ValuationRepository.AddAsync(newvaluation);
                     await _unitOfWork.SaveChangeAsync();
+
+                    
+                    AddHistoryValuation(newvaluation.Id, newvaluation.Status);
+
 
                     foreach (var image in consignAnItem.ImageValuation)
                     {
@@ -155,7 +160,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> AssignStaffForValuationAsync(int id, int staffId, string? status)
+        public async Task<APIResponseModel> AssignStaffForValuationAsync(int id, int staffId, int status)
         {
             var response = new APIResponseModel();
             try
@@ -164,15 +169,17 @@ namespace Application.Services
                 if(valuationById != null)
                 {
                     valuationById.StaffId = staffId;
-                    valuationById.Status = status;
-
+                    valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
 
+                    AddHistoryValuation(valuationById.Id, valuationById.Status);
+
+                    var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
-                    response.Data = valuationById;
+                    response.Data = valuationDTO;
                 }
                 else
                 {
@@ -192,7 +199,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> CreatePreliminaryValuationAsync(int id, string status, float preliminaryPrice)
+        public async Task<APIResponseModel> CreatePreliminaryValuationAsync(int id, int status, float EstimatePriceMin, float EstimatePriceMax)
         {
             var response = new APIResponseModel();
             try
@@ -202,16 +209,22 @@ namespace Application.Services
                 {
                     //valuationById.DesiredPrice = preliminaryPrice;
                     valuationById.PricingTime = DateTime.Now;
-                    valuationById.Status = status;
+                    valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+                    valuationById.EstimatePriceMin = EstimatePriceMin;
+                    valuationById.EstimatePriceMax = EstimatePriceMax;
                     
 
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
 
+                    AddHistoryValuation(valuationById.Id, valuationById.Status);
+
+                    var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
+
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
-                    response.Data = valuationById;
+                    response.Data = valuationDTO;
                 }
                 else
                 {
@@ -265,17 +278,18 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string? status, int? pageSize, int? pageIndex)
+        public async Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, int? status, int? pageSize, int? pageIndex)
         {
             var response = new APIResponseModel();
             
             try
             {
                 Expression<Func<Valuation, bool>> filter;
-
+                
                 if (status != null)
                 {
-                    filter = x => x.SellerId == sellerId && status.Equals(x.Status);
+                    var statusTranfer = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+                    filter = x => x.SellerId == sellerId && statusTranfer.Equals(x.Status);
                 }
                 else
                 {
@@ -325,16 +339,17 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, string? status, int? pageSize, int? pageIndex)
+        public async Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, int? status, int? pageSize, int? pageIndex)
         {
             var response = new APIResponseModel();
             try
             {
                 Expression<Func<Valuation, bool>> filter;
-
+                
                 if (status != null)
                 {
-                    filter = x => x.StaffId == staffId && status.Equals(x.Status);
+                    var statusTranfer = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+                    filter = x => x.StaffId == staffId && statusTranfer.Equals(x.Status);
                 }
                 else
                 {
@@ -385,23 +400,66 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> UpdateStatusForValuationsAsync(int id, string status)
+        public async Task<APIResponseModel> UpdateStatusForValuationsAsync(int id, int status)
         {
             var response = new APIResponseModel();
             try
             {
                 var valuationById = await _unitOfWork.ValuationRepository.GetByIdAsync(id);
                 if (valuationById != null)
-                {                    
-                    valuationById.Status = status;
+                {                                        
+                    valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
 
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
+
+                    AddHistoryValuation(valuationById.Id, valuationById.Status);
 
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
                     response.Data = valuationById;
+                }
+                else
+                {
+                    response.Message = $"Not found valuation";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> RejectForValuationsAsync(int id, int status, string reason)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var valuationById = await _unitOfWork.ValuationRepository.GetByIdAsync(id);
+                if (valuationById != null)
+                {
+                    valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;                   
+                    valuationById.CancelReason = reason;
+
+                    _unitOfWork.ValuationRepository.Update(valuationById);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    AddHistoryValuation(valuationById.Id, valuationById.Status);
+
+                    var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
+
+                    response.Message = $"Update status Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationDTO;
                 }
                 else
                 {
@@ -436,6 +494,9 @@ namespace Application.Services
 
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
+
+                    var statusTranfer = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == receipt.Status).Name;
+                    AddHistoryValuation(valuationById.Id, statusTranfer);
 
                     var seller = await _unitOfWork.AccountRepository.GetByIdAsync(valuationById.SellerId);   
                    
@@ -496,6 +557,57 @@ namespace Application.Services
                 response.IsSuccess = false;
             }
             return response;
+        }
+
+        public async Task<APIResponseModel> RequestPreliminaryValuationAsync(int id, int status)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var valuationById = await _unitOfWork.ValuationRepository.GetByIdAsync(id);
+                if (valuationById != null)
+                {                  
+                    valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+
+                    _unitOfWork.ValuationRepository.Update(valuationById);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    AddHistoryValuation(valuationById.Id, valuationById.Status);
+
+                    var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
+                    response.Message = $"Update status Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationDTO;
+                }
+                else
+                {
+                    response.Message = $"Not found valuation";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        private async void AddHistoryValuation(int id, string status)
+        {
+            var historyValuation = new HistoryValuation()
+            {
+                StatusName = status,
+                ValuationId = id,
+                CreationDate = DateTime.Now,
+            };
+            await _unitOfWork.HistoryValuationRepository.AddAsync(historyValuation);
+            await _unitOfWork.SaveChangeAsync();
         }
     }
 }

@@ -15,7 +15,8 @@ namespace Application.ViewModels.ValuationDTOs
         public float? Depth { get; set; }
         public string? Description { get; set; }
         public int? SellerId { get; set; }
-        
+
+        public int Status { get; set; }
         public List<IFormFile>? ImageValuation { get; set; }
     }
 }
