@@ -10,6 +10,6 @@ namespace Application.ViewModels.BidLimitDTOs
     public class CreateBidLimitDTO
     {
         public IFormFile? File { get; set; }
-        public int? AccountId { get; set; }
+        public int? CustomerId { get; set; }
     }
 }

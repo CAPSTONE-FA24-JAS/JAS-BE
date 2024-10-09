@@ -8,6 +8,7 @@ using CloudinaryDotNet.Actions;
 using Domain.Entity;
 using Domain.Enums;
 using System.Drawing;
+using System.Linq.Expressions;
 
 namespace Application.Services
 {
@@ -146,35 +147,35 @@ namespace Application.Services
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.CreationDate, ascending: true, includes: x => x.Role));
+                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.CreationDate, ascending: true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Active):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == true, includes: x => x.Role));
+                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Inactive):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == false, includes: x => x.Role));
+                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == false, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.A_Z):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        //accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.FirstName, ascending: true, includes: x => x.Role));
+                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.Customer.FirstName, ascending: true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Z_A):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        //accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.FirstName, ascending: false, includes: x => x.Role));
+                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.Customer.FirstName, ascending: false, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     default:
@@ -220,13 +221,14 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<APIResponseModel> GetProfileAccount(int Id)
+        public async Task<APIResponseModel> GetProfileCustomer(int Id)
         {
             var reponse = new APIResponseModel();
             try
             {
-                var account = await _unitOfWork.AccountRepository.GetByIdAsync(Id, x => x.IsConfirmed == true, includes: x => x.Role);
-                if(account == null)
+                var account = await _unitOfWork.AccountRepository.GetByIdAsync(id: Id,  x => x.IsConfirmed == true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer });
+
+                if (account == null)
                 {
                     reponse.IsSuccess = false;
                     reponse.Message = "Not found account in system";
@@ -252,30 +254,31 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                //var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.FirstName.Contains(Name) 
-                //                                                       || x.LastName.Contains(Name) 
-                //                                                       &&  x.IsConfirmed == true, includes: x => x.Role);
+                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.Customer.FirstName.Contains(Name)
+                                                                       || x.Customer.LastName.Contains(Name)
+                                                                       && x.IsConfirmed == true, includes: x => x.Role);
                 var DTOs = new List<AccountDTO>();
-                //if (accounts == null)
-                //{
-                //    reponse.IsSuccess = false;
-                //    reponse.Message = "List Account Null";
-                //    reponse.Code = 400;
-                //}
-                //else
-                //{
-                //    reponse.IsSuccess = true;
-                //    reponse.Message = "Search List Account Successfull";
-                //    reponse.Code = 200;
-                //    foreach (var item in accounts)
-                //    {
-                //        var mapper = _mapper.Map<AccountDTO>(item);
-                //        mapper.RoleName = item.Role.Name;
-                //        DTOs.Add(mapper);
-                //    }
-                //    reponse.Data = DTOs;
-                //}
-            }catch(Exception e)
+                    if (accounts == null)
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Message = "List Account Null";
+                        reponse.Code = 400;
+                    }
+                    else
+                    {
+                        reponse.IsSuccess = true;
+                        reponse.Message = "Search List Account Successfull";
+                        reponse.Code = 200;
+                        foreach (var item in accounts)
+                        {
+                            var mapper = _mapper.Map<AccountDTO>(item);
+                            mapper.RoleName = item.Role.Name;
+                            DTOs.Add(mapper);
+                        }
+                        reponse.Data = DTOs;
+                    }
+            }
+            catch(Exception e)
             {
                 reponse.IsSuccess = false;
                 reponse.Message = e.Message;
@@ -324,7 +327,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                Domain.Entity.Account account = await _unitOfWork.AccountRepository.GetByIdAsync(Id, includes: x => x.Role);
+                Domain.Entity.Account account = await _unitOfWork.AccountRepository.GetByIdAsync(Id, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer });
                 if (account == null)
                 {
                     reponse.Message = $"Not Found Account By Id:"+Id+".";
@@ -349,7 +352,7 @@ namespace Application.Services
                     else
                     {
                         var enity = _mapper.Map(updateDTO, account);
-                        //enity.ProfilePicture = uploadResult.SecureUrl.AbsoluteUri;
+                        enity.Customer.ProfilePicture = uploadResult.SecureUrl.AbsoluteUri;
                         _unitOfWork.AccountRepository.Update(enity);
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {

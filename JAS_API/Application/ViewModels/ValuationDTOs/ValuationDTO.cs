@@ -27,9 +27,9 @@ namespace Application.ViewModels.ValuationDTOs
         public int? SellerId { get; set; }
         public int? StaffId { get; set; }
 
-        public AccountDTO? Seller { get; set; }
+        public CustomerDTO? Seller { get; set; }
 
-        public AccountDTO? Staff { get; set; }
+        public StaffDTO? Staff { get; set; }
         public IEnumerable<ImageValuationDTO>? ImageValuations { get; set; }
         public IEnumerable<ValuationDocumentDTO>? ValuationDocuments { get; set; }
     }

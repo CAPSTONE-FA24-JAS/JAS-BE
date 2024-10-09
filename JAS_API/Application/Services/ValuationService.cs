@@ -170,10 +170,17 @@ namespace Application.Services
                 {
                     valuationById.StaffId = staffId;
                     valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+
+                    var historyValuation = new HistoryValuation()
+                    {
+                        StatusName = valuationById.Status,
+                        ValuationId = id,
+                        CreationDate = DateTime.Now,
+                    };
+                    AddHistoryValuation(id, valuationById.Status);
+                 
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
-
-                    AddHistoryValuation(valuationById.Id, valuationById.Status);
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
                     response.Message = $"Update status Successfully";
@@ -212,12 +219,12 @@ namespace Application.Services
                     valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
                     valuationById.EstimatePriceMin = EstimatePriceMin;
                     valuationById.EstimatePriceMax = EstimatePriceMax;
-                    
 
+                    AddHistoryValuation(id, valuationById.Status);
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
 
-                    AddHistoryValuation(valuationById.Id, valuationById.Status);
+                    
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
 
@@ -410,15 +417,16 @@ namespace Application.Services
                 {                                        
                     valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
 
+                    AddHistoryValuation(id, valuationById.Status);
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
 
-                    AddHistoryValuation(valuationById.Id, valuationById.Status);
+                    var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
 
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
-                    response.Data = valuationById;
+                    response.Data = valuationDTO;
                 }
                 else
                 {
@@ -449,10 +457,9 @@ namespace Application.Services
                     valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;                   
                     valuationById.CancelReason = reason;
 
+                    AddHistoryValuation(id, valuationById.Status);
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
-
-                    AddHistoryValuation(valuationById.Id, valuationById.Status);
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
 
@@ -490,18 +497,14 @@ namespace Application.Services
                 if (valuationById != null)
                 {
                     valuationById.ActualStatusOfJewelry = receipt.ActualStatusOfJewelry;
-                    //valuationById.DeliveryDate = receipt.DeliveryDate;
 
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
 
                     var statusTranfer = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == receipt.Status).Name;
-                    AddHistoryValuation(valuationById.Id, statusTranfer);
+                    AddHistoryValuation(valuationById.Id, statusTranfer);                    
 
-                    var seller = await _unitOfWork.AccountRepository.GetByIdAsync(valuationById.SellerId);   
-                   
-
-                    byte[] pdfBytes = CreatePDFFile.CreatePDF(valuationById, seller);
+                    byte[] pdfBytes = CreatePDFFile.CreatePDF(valuationById);
 
                     string filePath = $"BienBanXacNhanNhanHang_{valuationById.Id}.pdf";
 
@@ -525,8 +528,8 @@ namespace Application.Services
                         var valuationDoc = new ValuationDocumentDTO
                         {
                             ValuationId = valuationById.Id,
-                            ValuationDocumentTypeId = 2,
-                            FileDocument = uploadFile.SecureUrl.AbsoluteUri,
+                            ValuationDocumentType = "Reciept",
+                            DocumentLink = uploadFile.SecureUrl.AbsoluteUri,
                             CreationDate = DateTime.Now,
                             CreatedBy = valuationById.StaffId
                         };
@@ -569,12 +572,12 @@ namespace Application.Services
                 {                  
                     valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
 
+                    AddHistoryValuation(id, valuationById.Status);
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
 
-                    AddHistoryValuation(valuationById.Id, valuationById.Status);
-
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
+
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
@@ -607,7 +610,6 @@ namespace Application.Services
                 CreationDate = DateTime.Now,
             };
             await _unitOfWork.HistoryValuationRepository.AddAsync(historyValuation);
-            await _unitOfWork.SaveChangeAsync();
         }
     }
 }

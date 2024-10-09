@@ -8,10 +8,11 @@ namespace Application.ViewModels.ValuationDTOs
 {
     public class ValuationDocumentDTO
     {
-
-        public string? FileDocument { get; set; }
+        public int Id { get; set; }
+        public string? DocumentLink { get; set; }
         public int? ValuationId { get; set; }
-        public int? ValuationDocumentTypeId { get; set; }
+        public string? ValuationDocumentType { get; set; }
+        public string? SignatureCode { get; set; }
 
         public DateTime CreationDate { get; set; }
 

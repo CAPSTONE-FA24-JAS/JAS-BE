@@ -17,7 +17,7 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewProfile(int Id)
         {
-            var result = await _accountService.GetProfileAccount(Id);
+            var result = await _accountService.GetProfileCustomer(Id);
             if (result.IsSuccess)
             {
                 return Ok(result);

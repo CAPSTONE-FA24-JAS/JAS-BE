@@ -12,7 +12,6 @@ namespace Application.ViewModels.ValuationDTOs
 
      //   public int StaffID { get; set; }
         public string? ActualStatusOfJewelry { get; set; }
-        public DateTime? DeliveryDate { get; set; }
 
         public int Status { get; set; }
 

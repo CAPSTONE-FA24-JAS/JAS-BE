@@ -16,6 +16,7 @@ namespace Domain.Enums
         RecivedJewelry,
         FinalValuated,
         ManagerApproved,
-        Authorized
+        Authorized,
+        RejectedPreliminary
     }
 }

@@ -6,7 +6,7 @@ namespace Application.Interfaces
     {
         public Task<APIResponseModel> ViewListAccounts();
         public Task<APIResponseModel> SearchAccountByName(string Name);
-        public Task<APIResponseModel> GetProfileAccount(int Id);
+        public Task<APIResponseModel> GetProfileCustomer(int Id);
         public Task<APIResponseModel> CreateAccount(CreateAccountDTO createDTO);
         public Task<APIResponseModel> UpdateProfile(int Id, UpdateProfileDTO updateDTO);
         public Task<APIResponseModel> BanAccount(int Id);

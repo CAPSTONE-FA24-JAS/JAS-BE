@@ -40,9 +40,9 @@ namespace WebAPI.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> ViewAllBidLimitByAccount(int accountId)
+        public async Task<IActionResult> ViewAllBidLimitByAccount(int customerId)
         {
-            var result = await _bidLimitService.ViewBidLimitByAccount(accountId);
+            var result = await _bidLimitService.ViewBidLimitByCustomer(customerId);
             if (result.IsSuccess != true)
             {
                 return BadRequest(result);

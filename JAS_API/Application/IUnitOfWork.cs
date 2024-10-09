@@ -19,6 +19,7 @@ namespace Application
         public IDistrictRepository IDistrictRepository { get; }
         public IProvinceRepository ProvininceRepository { get; }
         public IValuationDocumentRepository ValuationDocumentRepository { get; }
+        public ICustomerRepository CustomerRepository { get; }
 
         public IHistoryValuationRepository HistoryValuationRepository { get; }
         public Task<int> SaveChangeAsync();
