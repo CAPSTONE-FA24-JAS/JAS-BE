@@ -7,10 +7,12 @@ namespace WebAPI.Controllers
     public class ValuationsController : BaseController
     {
         private readonly IValuationService _valuationService;
+        private readonly IHistoryValuationService _historyValuationService;
 
-        public ValuationsController(IValuationService valuationService)
+        public ValuationsController(IValuationService valuationService, IHistoryValuationService historyValuationService)
         {
             _valuationService = valuationService;
+            _historyValuationService = historyValuationService;
         }
 
         [HttpPost]
@@ -126,6 +128,16 @@ namespace WebAPI.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> getDetailHistoryValuation(int valuationId)
+        {
+            var result = await _historyValuationService.getDetailHistoryValuation(valuationId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
 
     }
 }
