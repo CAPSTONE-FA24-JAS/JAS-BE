@@ -17,5 +17,7 @@ namespace Application.Interfaces
 
         public Task<APIResponseModel> RequestFinalValuationForManagerAsync(RequestFinalValuationForManagerDTO requestDTO);
 
+        public Task<APIResponseModel> UpdateStatusByManagerAsync(int jewelryId, int status);
+
     }
 }

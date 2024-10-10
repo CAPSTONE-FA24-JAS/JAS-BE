@@ -13,6 +13,7 @@ using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -451,6 +452,46 @@ namespace Application.Services
                     var valuationDTO = _mapper.Map<JewelryDTO>(valuationById);
 
                     response.Message = $"Update Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationDTO;
+                }
+                else
+                {
+                    response.Message = $"Not found valuation";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> UpdateStatusByManagerAsync(int jewelryId, int status)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var jewelryById = await _unitOfWork.JewelryRepository.GetByIdAsync(jewelryId);
+                if (jewelryById != null)
+                {
+                    jewelryById.Valuation.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+                    
+
+                    AddHistoryValuation(jewelryId, jewelryById.Valuation.Status);
+                    _unitOfWork.JewelryRepository.Update(jewelryById);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    var valuationDTO = _mapper.Map<JewelryDTO>(jewelryById);
+
+                    response.Message = $"Update status Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
                     response.Data = valuationDTO;
