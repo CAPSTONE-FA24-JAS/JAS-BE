@@ -45,6 +45,19 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpPut]
+        public async Task<IActionResult> RequestFinalValuationForManagerAsync(RequestFinalValuationForManagerDTO requestDTO)
+        {
+            var result = await _jewelryService.RequestFinalValuationForManagerAsync(requestDTO);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
 
     }
 }
