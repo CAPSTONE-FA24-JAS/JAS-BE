@@ -20,7 +20,11 @@ namespace Application.ViewModels.ValuationDTOs
         public float? Depth { get; set; }
         public float? EstimatePriceMin { get; set; }
         public float? EstimatePriceMax { get; set; }
-        public string? ImageOfReceip { get; set; }int? SellerId { get; set; }
+        public string? ImageOfReceip { get; set; }
+        public string? ActualStatusOfJewelry { get; set; }
+        public string? Status { get; set; }
+        public string? CancelReason { get; set; }
+        public int? SellerId { get; set; }
         public int? StaffId { get; set; }
         public DateTime CreationDate { get; set; }
         public CustomerDTO? Seller { get; set; }

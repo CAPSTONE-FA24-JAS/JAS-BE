@@ -59,5 +59,19 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpPut]
+        public async Task<IActionResult> UpdateStatusByManagerAsync(int jewelryId, int status)
+        {
+            var result = await _jewelryService.UpdateStatusByManagerAsync(jewelryId, status);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
     }
 }
