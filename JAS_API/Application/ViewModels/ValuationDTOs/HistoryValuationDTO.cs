@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace Application.ViewModels.ValuationDTOs
 {
-    public class ImageValuationDTO
+    public class HistoryValuationDTO
     {
-        public int Id { get; set; }
-        public string? ImageLink { get; set; }
+        public string? StatusName { get; set; }
         public int? ValuationId { get; set; }
+
+        public DateTime CreationDate { get; set; }
     }
 }

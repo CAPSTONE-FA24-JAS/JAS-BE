@@ -10,7 +10,7 @@ namespace Application.ServiceReponse
 {
     public class LoginResponseDTO
     {
-        public Account User { get; set; }
+        public AccountDTO User { get; set; }
         public string AccessToken { get; set; }
     }
 }

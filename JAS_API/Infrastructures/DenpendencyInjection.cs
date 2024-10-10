@@ -36,6 +36,8 @@ namespace Infrastructures
             services.AddScoped<IProvinceService, ProvinceService>();
             services.AddScoped<IProvinceRepository, ProvinceRepository>();
             services.AddScoped<IValuationDocumentRepository, ValuationDocumentRepository>();
+            services.AddScoped<IHistoryValuationRepository, HistoryValuationRepository>();
+            services.AddScoped<IHistoryValuationService, HistoryValuationService>();
             services.AddScoped<ICurrentTime, CurrentTime>();
             services.AddScoped<IWalletService, WalletService>();
             services.AddScoped<IWalletRepository, WalletRepository>();

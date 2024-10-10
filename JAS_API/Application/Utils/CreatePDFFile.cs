@@ -12,7 +12,7 @@ namespace Application.Utils
 {
     public class CreatePDFFile
     {
-        public static byte[] CreatePDF(Valuation valuation, Account seller)
+        public static byte[] CreatePDF(Valuation valuation)
         {
             using (MemoryStream stream = new MemoryStream())
             {
@@ -58,7 +58,7 @@ namespace Application.Utils
                 //document.Add(new Paragraph($"Ho tên: {seller.LastName + seller.FirstName}", contentFont));
                 //document.Add(new Paragraph($"Đia chi: {seller.Address}", contentFont));
                 //document.Add(new Paragraph($"So CMND: {seller.CitizenIdentificationCard} câp ngay: {seller.IDIssuanceDate}   Ngay hêt han: {seller.IDExpirationDate}", contentFont));
-                document.Add(new Paragraph($"Email: {seller.Email}", contentFont));
+                document.Add(new Paragraph($"Email: {valuation.Seller.Account.Email}", contentFont));
                 document.Add(new Paragraph(" ", contentFont)); // Add a blank line
 
                 // Section 3: Nội dung

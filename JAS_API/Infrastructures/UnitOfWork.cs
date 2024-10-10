@@ -24,9 +24,11 @@ namespace Infrastructures
         private readonly ICustomerRepository _customerRepository;
         private readonly IWalletRepository _walletRepository;
         private readonly IAuctionRepository _auctionRepository;
+        private readonly IHistoryValuationRepository _historyValuationRepository;
 
 
-        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, IBidLimitRepository bidLimitRepository, IImageValuationRepository imageValuationRepository, IAddressToShipRepository addressToShipRepository, IWardRepository wardRepository, IDistrictRepository districtRepository, IProvinceRepository provinceRepository, IValuationRepository valuationRepository, IValuationDocumentRepository valuationDocumentRepository, ICustomerRepository customerRepository, IWalletRepository walletRepository, IAuctionRepository auctionRepository)
+
+        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, IBidLimitRepository bidLimitRepository, IImageValuationRepository imageValuationRepository, IAddressToShipRepository addressToShipRepository, IWardRepository wardRepository, IDistrictRepository districtRepository, IProvinceRepository provinceRepository, IValuationRepository valuationRepository, IValuationDocumentRepository valuationDocumentRepository, ICustomerRepository customerRepository, IWalletRepository walletRepository, IAuctionRepository auctionRepository, IHistoryValuationRepository historyValuationRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -42,6 +44,7 @@ namespace Infrastructures
             _customerRepository = customerRepository;
             _walletRepository = walletRepository;
             _auctionRepository = auctionRepository;
+            _historyValuationRepository = historyValuationRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -61,11 +64,10 @@ namespace Infrastructures
         public IValuationDocumentRepository ValuationDocumentRepository => _valuationDocumentRepository;
 
         public ICustomerRepository CustomerRepository => _customerRepository;
-
         public IWalletRepository WalletRepository => _walletRepository;
 
         public IAuctionRepository AuctionRepository => _auctionRepository;
-
+        public IHistoryValuationRepository HistoryValuationRepository => _historyValuationRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();

@@ -7,10 +7,12 @@ namespace WebAPI.Controllers
     public class ValuationsController : BaseController
     {
         private readonly IValuationService _valuationService;
+        private readonly IHistoryValuationService _historyValuationService;
 
-        public ValuationsController(IValuationService valuationService)
+        public ValuationsController(IValuationService valuationService, IHistoryValuationService historyValuationService)
         {
             _valuationService = valuationService;
+            _historyValuationService = historyValuationService;
         }
 
         [HttpPost]
@@ -34,7 +36,7 @@ namespace WebAPI.Controllers
 
         //chi dinh staff cho consignItem
         [HttpPut]
-        public async Task<IActionResult> AssignStaffForValuationAsync(int id, int staffId, string? status)
+        public async Task<IActionResult> AssignStaffForValuationAsync(int id, int staffId, int status)
         {
             var result = await _valuationService.AssignStaffForValuationAsync(id, staffId, status);
             if (result.IsSuccess)
@@ -43,11 +45,21 @@ namespace WebAPI.Controllers
         }
 
 
+        [HttpPut]
+        public async Task<IActionResult> RequestPreliminaryValuationAsync(int id, int status)
+        {
+            var result = await _valuationService.RequestPreliminaryValuationAsync(id, status);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+
         //tao dinh gia so 
         [HttpPut]
-        public async Task<IActionResult> createPreliminaryPriceAsync(int id, string status, float DesiredPrice)
+        public async Task<IActionResult> createPreliminaryPriceAsync(int id, int status, float EstimatePriceMin, float EstimatePriceMax)
         {
-            var result = await _valuationService.CreatePreliminaryValuationAsync(id, status, DesiredPrice);
+            var result = await _valuationService.CreatePreliminaryValuationAsync(id, status, EstimatePriceMin, EstimatePriceMax);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
@@ -67,7 +79,7 @@ namespace WebAPI.Controllers
 
         //staff xem all consign item, all dinh gia so bo.Neu status null thi hien thi het consign item
         [HttpGet]
-        public async Task<IActionResult> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, string? status, int? pageSize, int? pageIndex)
+        public async Task<IActionResult> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, int? status, int? pageSize, int? pageIndex)
         {
             var result = await _valuationService.getPreliminaryValuationsByStatusOfStaffAsync(staffId, status, pageSize, pageIndex);
             if (result.IsSuccess)
@@ -79,7 +91,7 @@ namespace WebAPI.Controllers
         //seller xem all consign item, all dinh gia so bo.Neu status null thi hien thi het consign item
 
         [HttpGet]
-        public async Task<IActionResult> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, string? status, int? pageSize, int? pageIndex)
+        public async Task<IActionResult> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, int? status, int? pageSize, int? pageIndex)
         {
             var result = await _valuationService.getPreliminaryValuationByStatusOfSellerAsync(sellerId, status, pageSize, pageIndex);
             if (result.IsSuccess)
@@ -88,11 +100,21 @@ namespace WebAPI.Controllers
         }
 
 
-        //dung chung cho ca staff, seller update status
+        //approved dung chung cho ca staff, seller update status
         [HttpPut]
-        public async Task<IActionResult> UpdateStatusForValuationsAsync(int id, string status)
+        public async Task<IActionResult> UpdateStatusForValuationsAsync(int id, int status)
         {
             var result = await _valuationService.UpdateStatusForValuationsAsync(id, status);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+        //reject dung seller update status
+        [HttpPut]
+        public async Task<IActionResult> RejectForValuationsAsync(int id, int status, string reason)
+        {
+            var result = await _valuationService.RejectForValuationsAsync(id, status, reason);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
@@ -106,6 +128,16 @@ namespace WebAPI.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> getDetailHistoryValuation(int valuationId)
+        {
+            var result = await _historyValuationService.getDetailHistoryValuation(valuationId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
 
     }
 }
