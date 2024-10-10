@@ -12,7 +12,7 @@ namespace Domain.Enums
         Assigned,
         RequestedPreliminary,
         Preliminary,
-        ApprovedPreliminray,
+        ApprovedPreliminary,
         RecivedJewelry,
         FinalValuated,
         ManagerApproved,
