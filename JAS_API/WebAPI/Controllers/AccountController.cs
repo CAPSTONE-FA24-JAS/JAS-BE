@@ -31,7 +31,7 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> SearchAccount(string name)
         {
-            var result = await _accountService.SearchAccountByName(name);
+            var result = await _accountService.SearchCustomerByName(name);
             if (result.IsSuccess)
             {
                 return Ok(result);

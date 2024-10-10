@@ -24,13 +24,15 @@ namespace Infrastructures
                 .ForMember(customer => customer.Customer, c => c.MapFrom(src => src.RegisterCustomerDTO));
             CreateMap<RegisterCustomerDTO, Customer>().ReverseMap();
             CreateMap<Account, CreateAccountDTO>()
-                .ForMember(dest => dest.StaffDTO, opt => opt.MapFrom(src => src.Staff))
+                .ForMember(dest => dest.CreateStaffDTO, opt => opt.MapFrom(src => src.Staff))
                 .ReverseMap();
+            CreateMap<Staff, CreateStaffDTO>().ReverseMap();
             CreateMap<Staff, StaffDTO>()
                 .ForMember(dest => dest.AccountDTO, opt => opt.MapFrom(src => src.Account))
                 .ReverseMap();          
             CreateMap<Account, AccountDTO>()
                 .ForMember(dest => dest.CustomerDTO, opt => opt.MapFrom(src => src.Customer))
+                .ForMember(dest => dest.StaffDTO, opt => opt.MapFrom(src => src.Staff))
                 .ForPath(x => x.RoleName, y => y.MapFrom(x => x.Role.Name))
                 .ReverseMap();
             CreateMap<Customer, CustomerDTO>()

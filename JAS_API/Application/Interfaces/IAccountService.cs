@@ -5,7 +5,7 @@ namespace Application.Interfaces
     public interface IAccountService
     {
         public Task<APIResponseModel> ViewListAccounts();
-        public Task<APIResponseModel> SearchAccountByName(string Name);
+        public Task<APIResponseModel> SearchCustomerByName(string Name);
         public Task<APIResponseModel> GetProfileCustomer(int Id);
         public Task<APIResponseModel> CreateAccount(CreateAccountDTO createDTO);
         public Task<APIResponseModel> UpdateProfile(int Id, UpdateProfileDTO updateDTO);

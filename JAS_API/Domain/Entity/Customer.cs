@@ -31,6 +31,7 @@ namespace Domain.Entity
         public virtual IEnumerable<Watching>? Watchings { get; set; }
         public virtual IEnumerable<Lot>? Lots { get; set; }
         public virtual IEnumerable<Invoice>? Invoices { get; set; }
+        public virtual IEnumerable<Valuation>? Seller { get; set; }
 
     }
 }

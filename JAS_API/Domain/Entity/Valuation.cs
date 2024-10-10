@@ -29,5 +29,6 @@ namespace Domain.Entity
         public virtual IEnumerable<ImageValuation>? ImageValuations { get; set; }
         public virtual IEnumerable<ValuationDocument>? ValuationDocuments { get; set; }
         public virtual IEnumerable<HistoryValuation>? HistoryValuations { get; set; }
+        public virtual Jewelry? Jewelry { get; set; }
     }
 }
