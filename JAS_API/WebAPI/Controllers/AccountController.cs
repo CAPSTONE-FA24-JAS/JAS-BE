@@ -29,7 +29,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchAccount(string name)
+        public async Task<IActionResult> SearchCustomerByName(string name)
         {
             var result = await _accountService.SearchCustomerByName(name);
             if (result.IsSuccess)
@@ -57,7 +57,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateNewAccount(CreateAccountDTO createDTO)
+        public async Task<IActionResult> CreateNewStaff(CreateAccountDTO createDTO)
         {
             var result = await _accountService.CreateAccount(createDTO);
             if (result.IsSuccess)
