@@ -37,6 +37,7 @@ namespace Application.Services
                     return reponse;
                 }
                 var newAuction = _mapper.Map<Auction>(createAuctionDTO);
+                newAuction.Status = EnumStatusAuction.NotStarted.ToString();
                 if(newAuction == null)
                 {
                     reponse.IsSuccess = false;
