@@ -1,8 +1,12 @@
 ﻿using Application.Commons;
 using Application.ViewModels.AccountDTOs;
 using Application.ViewModels.AddressToShipDTO;
+using Application.ViewModels.ArtistDTOs;
 using Application.ViewModels.BidLimitDTOs;
+using Application.ViewModels.CategoryDTOs;
 using Application.ViewModels.DistrictDTOs;
+using Application.ViewModels.JewelryDTOs;
+using Application.ViewModels.KeyCharacteristicDTOs;
 using Application.ViewModels.ProvinceDTOs;
 using Application.ViewModels.RoleDTOs;
 using Application.ViewModels.ValuationDTOs;
@@ -61,6 +65,69 @@ namespace Infrastructures
             CreateMap<Province, CreateProvinceDTO>().ReverseMap();
             CreateMap<Province, ViewProvinceDTO>().ReverseMap();
             CreateMap<HistoryValuation, HistoryValuationDTO>().ReverseMap();
+            CreateMap<Jewelry, JewelryDTO>()                
+                .ForMember(dest => dest.ImageJewelries, opt => opt.MapFrom(src => src.ImageJewelries))
+                .ForMember(dest => dest.KeyCharacteristicDetails, opt => opt.MapFrom(src => src.KeyCharacteristicDetails))
+                .ForMember(dest => dest.MainDiamonds, opt => opt.MapFrom(src => src.MainDiamonds))
+                .ForMember(dest => dest.SecondaryDiamonds, opt => opt.MapFrom(src => src.SecondaryDiamonds))
+                .ForMember(dest => dest.MainShaphies, opt => opt.MapFrom(src => src.MainShaphies))
+                .ForMember(dest => dest.SecondaryShaphies, opt => opt.MapFrom(src => src.SecondaryShaphies))
+                .ReverseMap();
+            CreateMap<CreateFinalValuationDTO, Jewelry>()
+                .ForMember(dest => dest.ImageJewelries, opt => opt.Ignore())
+                .ForMember(dest => dest.KeyCharacteristicDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.MainDiamonds, opt => opt.Ignore())
+                .ForMember(dest => dest.SecondaryDiamonds, opt => opt.Ignore())
+                .ForMember(dest => dest.MainShaphies, opt => opt.Ignore())
+                .ForMember(dest => dest.SecondaryShaphies, opt => opt.Ignore())
+                .ReverseMap();
+            CreateMap<CreateDiamondDTO, MainDiamond>()
+                .ForMember(dest => dest.ImageMainDiamonds, opt => opt.Ignore())
+                .ForMember(dest => dest.DocumentMainDiamonds, opt => opt.Ignore())
+                .ReverseMap();
+            CreateMap<CreateDiamondDTO, SecondaryDiamond>()
+                .ForMember(dest => dest.ImageSecondaryDiamonds, opt => opt.Ignore())
+                .ForMember(dest => dest.DocumentSecondaryDiamonds, opt => opt.Ignore())
+                .ReverseMap();
+            CreateMap<CreateShaphieDTO, MainShaphie>()
+                .ForMember(dest => dest.ImageMainShaphies, opt => opt.Ignore())
+                .ForMember(dest => dest.DocumentMainShaphies, opt => opt.Ignore())
+                .ReverseMap();
+            CreateMap<CreateShaphieDTO, SecondaryShaphie>()
+                .ForMember(dest => dest.ImageSecondaryShaphies, opt => opt.Ignore())
+                .ForMember(dest => dest.DocumentSecondaryShaphies, opt => opt.Ignore())
+                .ReverseMap();
+            CreateMap<MainDiamond, DiamondDTO>()
+                .ForMember(dest => dest.ImageDiamonds, opt => opt.MapFrom(src => src.ImageMainDiamonds))
+                .ForMember(dest => dest.DocumentDiamonds, opt => opt.MapFrom(src => src.DocumentMainDiamonds))
+                .ReverseMap();
+            CreateMap<SecondaryDiamond, DiamondDTO>()
+                .ForMember(dest => dest.ImageDiamonds, opt => opt.MapFrom(src => src.ImageSecondaryDiamonds))
+                .ForMember(dest => dest.DocumentDiamonds, opt => opt.MapFrom(src => src.DocumentSecondaryDiamonds))
+                .ReverseMap();
+            CreateMap<MainShaphie, ShapieDTO>()
+                .ForMember(dest => dest.ImageShaphies, opt => opt.MapFrom(src => src.ImageMainShaphies))
+                .ForMember(dest => dest.DocumentShaphies, opt => opt.MapFrom(src => src.DocumentMainShaphies))
+                .ReverseMap();
+            CreateMap<SecondaryShaphie, ShapieDTO>()
+                .ForMember(dest => dest.ImageShaphies, opt => opt.MapFrom(src => src.ImageSecondaryShaphies))
+                .ForMember(dest => dest.DocumentShaphies, opt => opt.MapFrom(src => src.DocumentSecondaryShaphies))
+                .ReverseMap();
+            CreateMap<ImageJewelry, ImageJewelryDTO>().ReverseMap();
+            CreateMap<ImageMainDiamond, ImageDiamondDTO>().ReverseMap();
+            CreateMap<ImageSecondaryDiamond, ImageDiamondDTO>().ReverseMap();
+            CreateMap<ImageMainShaphie, ImageShaphieDTO>().ReverseMap();
+            CreateMap<ImageSecondaryShaphie, ImageShaphieDTO>().ReverseMap();
+            CreateMap<KeyCharacteristicDetail, KeyCharacteristicDetailDTO>().ReverseMap();  
+            CreateMap<DocumentMainDiamond, DocumentDiamondDTO>().ReverseMap();
+            CreateMap<DocumentSecondaryDiamond, DocumentDiamondDTO>().ReverseMap();
+            CreateMap<DocumentMainShaphie, DocumentShaphieDTO>().ReverseMap();
+            CreateMap<DocumentSecondaryShaphie, DocumentShaphieDTO>().ReverseMap();
+            CreateMap<KeyCharacteristic, KeyCharacteristicDTO>().ReverseMap();
+            CreateMap<Category, CategoryDTO>().ReverseMap();
+            CreateMap<Artist, ArtistDTO>().ReverseMap();
+
+            
                 
 
         }

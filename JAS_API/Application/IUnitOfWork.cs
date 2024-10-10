@@ -1,4 +1,5 @@
-﻿using Application.Repositories;
+﻿using Application.Interfaces;
+using Application.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,42 @@ namespace Application
         public ICustomerRepository CustomerRepository { get; }
 
         public IHistoryValuationRepository HistoryValuationRepository { get; }
+
+        public IJewelryRepository JewelryRepository { get; }
+
+        public IKeyCharacteristicRepository KeyCharacteristicRepository { get; }
+
+        public ICategoryRepository CategoryRepository { get; }
+
+        public IArtistRepository ArtistRepository { get; }
+
+        public IImageJewelryRepository ImageJewelryRepository { get; }
+
+        public IKeyCharacteristicsDetailRepository KeyCharacteristicsDetailRepository { get; }
+
+        public IMainDiamondRepository MainDiamondRepository { get; }
+
+        public ISecondDiamondRepository SecondDiamondRepository { get; }
+
+        public IMainShaphieRepository MainShaphieRepository { get; }
+
+        public ISecondaryShaphieRepository SecondaryShaphieRepository{ get; }
+
+        public IDocumentMainDiamondRepository DocumentMainDiamondRepository { get; }
+
+        public IDocumentSecondaryDiamondRepository DocumentSecondaryDiamondRepository { get; }
+
+        public IImageMainDiamondRepository ImageMainDiamondRepository { get; }
+
+        public IImageSecondDiamondRepository ImageSecondDiamondRepository { get; }
+
+        public IDocumentMainShaphieRepository DocumentMainShaphieRepository {  get; }
+
+        public IDocumentSecondaryShaphieRepository DocumentSecondaryShaphieRepository {  get; }
+
+        public IImageMainShaphieRepository ImageMainShaphieRepository {  get; }
+
+        public IImageSecondaryShaphieRepository ImageSecondaryShaphieRepository {  get; }
         public Task<int> SaveChangeAsync();
     }
 }
