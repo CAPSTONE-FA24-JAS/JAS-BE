@@ -19,6 +19,9 @@ namespace Infrastructures.FluentAPIs
             builder.HasOne(x => x.Staff)
                 .WithMany(x => x.StaffValuations)
                 .HasForeignKey(x => x.StaffId);
+            builder.HasOne(x => x.Appraiser)
+                .WithMany(x => x.AppraiserValuations)
+                .HasForeignKey(x => x.AppraiserId);
         }
     }
 }

@@ -37,6 +37,28 @@ namespace WebAPI.Controllers
             return BadRequest(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetStatusAuction()
+        {
+            var result = await _auctionService.GetStatusAuction();
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAuctionsByStatus(int statusId)
+        {
+            var result = await _auctionService.GetAuctionByStatus(statusId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateAution(CreateAuctionDTO createAuctionDTO)
         {

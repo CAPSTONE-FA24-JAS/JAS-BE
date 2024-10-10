@@ -17,6 +17,7 @@ namespace Domain.Entity
         //
         public virtual Account? Account { get; set; }
         public virtual IEnumerable<Valuation>? StaffValuations { get; set; }
+        public virtual IEnumerable<Valuation>? AppraiserValuations { get; set; }
         public virtual IEnumerable<Invoice>? StaffInvoices { get; set; }
         public virtual IEnumerable<Invoice>? ShipperInvoices { get; set; }
         public virtual IEnumerable<Lot>? Lots { get; set; }
