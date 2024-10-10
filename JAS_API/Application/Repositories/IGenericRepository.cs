@@ -26,7 +26,7 @@ namespace Application.Repositories
         void SoftRemove(TEntity entity);
         Task AddRangeAsync(List<TEntity> entities);
         void SoftRemoveRange(List<TEntity> entities);
-
+        void SetPropertyModified(TEntity entity, string propertyName);
         Task<Pagination<TEntity>> ToPagination(int pageNumber = 0, int pageSize = 10);
 
         Task<(IEnumerable<TEntity> data, int totalItems)> GetAllPaging(

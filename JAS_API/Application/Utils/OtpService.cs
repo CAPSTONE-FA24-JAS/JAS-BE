@@ -1,6 +1,4 @@
 ﻿using OtpNet;
-using System;
-using System.Text;
 
 namespace Application.Utils
 {

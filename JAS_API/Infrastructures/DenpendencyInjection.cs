@@ -39,7 +39,10 @@ namespace Infrastructures
             services.AddScoped<IHistoryValuationRepository, HistoryValuationRepository>();
             services.AddScoped<IHistoryValuationService, HistoryValuationService>();
             services.AddScoped<ICurrentTime, CurrentTime>();
-
+            services.AddScoped<IWalletService, WalletService>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
+            services.AddScoped<IAuctionService, AuctionService>();
+            services.AddScoped<IAuctionRepository, AuctionRepository>();
             services.AddDbContext<AppDbContext>(option =>
             {
                 option.UseLazyLoadingProxies().UseNpgsql(databaseConnection);
