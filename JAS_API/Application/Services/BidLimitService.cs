@@ -255,7 +255,7 @@ namespace Application.Services
                 }
                 else
                 {
-                    reponse.Code = 400;
+                    reponse.Code = 404;
                     reponse.IsSuccess = false;
                     reponse.Message = "Received List BidLimit Faild";
                 }

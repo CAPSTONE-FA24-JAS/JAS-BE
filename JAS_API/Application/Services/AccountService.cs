@@ -249,7 +249,7 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<APIResponseModel> SearchAccountByName(string Name)
+        public async Task<APIResponseModel> SearchCustomerByName(string Name)
         {
             var reponse = new APIResponseModel();
             try
@@ -377,7 +377,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.IsConfirmed == true, includes :x => x.Role);
+                var accounts = await _unitOfWork.AccountRepository.GetAllAsync( includes :x => x.Role);
                 var DTOs = new List<AccountDTO>();
                 if (accounts == null)
                 {

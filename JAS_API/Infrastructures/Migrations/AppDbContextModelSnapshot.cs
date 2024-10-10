@@ -1560,6 +1560,9 @@ namespace Infrastructures.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("text");
 
+                    b.Property<int?>("ValuationId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("VideoLink")
                         .HasColumnType("text");
 
@@ -1568,6 +1571,9 @@ namespace Infrastructures.Migrations
                     b.HasIndex("ArtistId");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("ValuationId")
+                        .IsUnique();
 
                     b.ToTable("Jewelries");
                 });
@@ -1782,8 +1788,8 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<float?>("Dimension")
-                        .HasColumnType("real");
+                    b.Property<string>("Dimension")
+                        .HasColumnType("text");
 
                     b.Property<string>("Fluorescence")
                         .HasColumnType("text");
@@ -1794,14 +1800,17 @@ namespace Infrastructures.Migrations
                     b.Property<int?>("JewelryId")
                         .HasColumnType("integer");
 
-                    b.Property<float?>("LengthWidthRatio")
-                        .HasColumnType("real");
+                    b.Property<string>("LengthWidthRatio")
+                        .HasColumnType("text");
 
                     b.Property<int?>("ModificationBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("integer");
@@ -1810,6 +1819,9 @@ namespace Infrastructures.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Shape")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -1845,8 +1857,8 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<float?>("Dimension")
-                        .HasColumnType("real");
+                    b.Property<string>("Dimension")
+                        .HasColumnType("text");
 
                     b.Property<string>("EnhancementType")
                         .HasColumnType("text");
@@ -1862,6 +1874,9 @@ namespace Infrastructures.Migrations
 
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("integer");
@@ -2131,8 +2146,8 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<float?>("Dimension")
-                        .HasColumnType("real");
+                    b.Property<string>("Dimension")
+                        .HasColumnType("text");
 
                     b.Property<string>("Fluorescence")
                         .HasColumnType("text");
@@ -2143,14 +2158,17 @@ namespace Infrastructures.Migrations
                     b.Property<int?>("JewelryId")
                         .HasColumnType("integer");
 
-                    b.Property<float?>("LengthWidthRatio")
-                        .HasColumnType("real");
+                    b.Property<string>("LengthWidthRatio")
+                        .HasColumnType("text");
 
                     b.Property<int?>("ModificationBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("integer");
@@ -2159,6 +2177,12 @@ namespace Infrastructures.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Shape")
+                        .HasColumnType("text");
+
+                    b.Property<float?>("TotalCarat")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Type")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -2194,8 +2218,8 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<float?>("Dimension")
-                        .HasColumnType("real");
+                    b.Property<string>("Dimension")
+                        .HasColumnType("text");
 
                     b.Property<string>("EnhancementType")
                         .HasColumnType("text");
@@ -2212,11 +2236,17 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
                     b.Property<int?>("Quantity")
                         .HasColumnType("integer");
 
                     b.Property<string>("SettingType")
                         .HasColumnType("text");
+
+                    b.Property<float?>("TotalCarat")
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -2348,6 +2378,9 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("DeleteBy")
                         .HasColumnType("integer");
 
@@ -2400,6 +2433,8 @@ namespace Infrastructures.Migrations
                         .HasColumnType("real");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("SellerId");
 
@@ -2923,9 +2958,15 @@ namespace Infrastructures.Migrations
                         .WithMany("Jewelries")
                         .HasForeignKey("CategoryId");
 
+                    b.HasOne("Domain.Entity.Valuation", "Valuation")
+                        .WithOne("Jewelry")
+                        .HasForeignKey("Domain.Entity.Jewelry", "ValuationId");
+
                     b.Navigation("Artist");
 
                     b.Navigation("Category");
+
+                    b.Navigation("Valuation");
                 });
 
             modelBuilder.Entity("Domain.Entity.KeyCharacteristicDetail", b =>
@@ -3044,6 +3085,10 @@ namespace Infrastructures.Migrations
 
             modelBuilder.Entity("Domain.Entity.Valuation", b =>
                 {
+                    b.HasOne("Domain.Entity.Customer", null)
+                        .WithMany("Seller")
+                        .HasForeignKey("CustomerId");
+
                     b.HasOne("Domain.Entity.Customer", "Seller")
                         .WithMany("SellerValuations")
                         .HasForeignKey("SellerId");
@@ -3154,6 +3199,8 @@ namespace Infrastructures.Migrations
                     b.Navigation("Invoices");
 
                     b.Navigation("Lots");
+
+                    b.Navigation("Seller");
 
                     b.Navigation("SellerValuations");
 
@@ -3269,6 +3316,8 @@ namespace Infrastructures.Migrations
                     b.Navigation("HistoryValuations");
 
                     b.Navigation("ImageValuations");
+
+                    b.Navigation("Jewelry");
 
                     b.Navigation("ValuationDocuments");
                 });

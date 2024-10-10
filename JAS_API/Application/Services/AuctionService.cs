@@ -182,18 +182,6 @@ namespace Application.Services
                     _mapper.Map(updateAuctionDTO, auctionExisted);
                 }
 
-                //else if (auctionExisted.EndTime < _currentTime.GetCurrentTime())
-                //{
-                //    //_unitOfWork.AuctionRepository.SetPropertyModified(auctionExisted, "StartTime");
-                //    //_unitOfWork.AuctionRepository.SetPropertyModified(auctionExisted, "EndTime");
-                //    //_unitOfWork.AuctionRepository.SetPropertyModified(auctionExisted, "Description");
-                //    //_unitOfWork.AuctionRepository.SetPropertyModified(auctionExisted, "Location");
-                //    //_unitOfWork.AuctionRepository.SetPropertyModified(auctionExisted, "Notes");
-                //    auctionExisted.Status = EnumStatusAuction.Past.ToString();
-                //    auctionExisted.ModificationDate = DateTime.Now;
-                //    auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
-                //}
-                
                 _unitOfWork.AuctionRepository.Update(auctionExisted);
                 if (await _unitOfWork.SaveChangeAsync() > 0)
                 {

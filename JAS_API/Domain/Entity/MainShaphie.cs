@@ -8,12 +8,13 @@ namespace Domain.Entity
 {
     public class MainShaphie : BaseEntity
     {
+        public string? Name { get; set; }
         public string? Color { get; set; }
         public float? Carat { get; set; }
         public string? EnhancementType { get; set; }
         public int? Quantity { get; set; }
         public string? SettingType { get; set; }
-        public float? Dimension { get; set; }
+        public string? Dimension { get; set; }
         public int? JewelryId { get; set; }
 
         //
