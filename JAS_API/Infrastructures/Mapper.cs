@@ -1,6 +1,7 @@
 ﻿using Application.Commons;
 using Application.ViewModels.AccountDTOs;
 using Application.ViewModels.AddressToShipDTO;
+using Application.ViewModels.AuctionDTOs;
 using Application.ViewModels.ArtistDTOs;
 using Application.ViewModels.BidLimitDTOs;
 using Application.ViewModels.CategoryDTOs;
@@ -10,6 +11,7 @@ using Application.ViewModels.KeyCharacteristicDTOs;
 using Application.ViewModels.ProvinceDTOs;
 using Application.ViewModels.RoleDTOs;
 using Application.ViewModels.ValuationDTOs;
+using Application.ViewModels.WalletDTOs;
 using Application.ViewModels.WardDTOs;
 using AutoMapper;
 using Domain.Entity;
@@ -23,15 +25,18 @@ namespace Infrastructures
         {
             CreateMap(typeof(Pagination<>), typeof(Pagination<>));   
             CreateMap<Account, RegisterAccountDTO>().ReverseMap()
-                .ForMember(customer => customer.Customer, c => c.MapFrom(src => src.RegisterCustomer));
+                .ForMember(customer => customer.Customer, c => c.MapFrom(src => src.RegisterCustomerDTO));
+            CreateMap<RegisterCustomerDTO, Customer>().ReverseMap();
             CreateMap<Account, CreateAccountDTO>()
-                .ForMember(dest => dest.StaffDTO, opt => opt.MapFrom(src => src.Staff))
+                .ForMember(dest => dest.CreateStaffDTO, opt => opt.MapFrom(src => src.Staff))
                 .ReverseMap();
+            CreateMap<Staff, CreateStaffDTO>().ReverseMap();
             CreateMap<Staff, StaffDTO>()
                 .ForMember(dest => dest.AccountDTO, opt => opt.MapFrom(src => src.Account))
                 .ReverseMap();          
             CreateMap<Account, AccountDTO>()
                 .ForMember(dest => dest.CustomerDTO, opt => opt.MapFrom(src => src.Customer))
+                .ForMember(dest => dest.StaffDTO, opt => opt.MapFrom(src => src.Staff))
                 .ForPath(x => x.RoleName, y => y.MapFrom(x => x.Role.Name))
                 .ReverseMap();
             CreateMap<Customer, CustomerDTO>()
@@ -64,6 +69,12 @@ namespace Infrastructures
             CreateMap<District, ViewDistrictDTO>().ReverseMap();
             CreateMap<Province, CreateProvinceDTO>().ReverseMap();
             CreateMap<Province, ViewProvinceDTO>().ReverseMap();
+            CreateMap<Wallet, CreateWalletDTO>().ReverseMap();
+            CreateMap<Wallet, WalletDTO>().ReverseMap()
+                .ForMember(desc => desc.Customer, src => src.MapFrom(x => x.CustomerDTO));
+            CreateMap<Auction, AuctionDTO>().ReverseMap();
+            CreateMap<Auction, CreateAuctionDTO>().ReverseMap();
+            CreateMap<Auction, UpdateAuctionDTO>().ReverseMap();
             CreateMap<HistoryValuation, HistoryValuationDTO>().ReverseMap();
             CreateMap<Jewelry, JewelryDTO>()                
                 .ForMember(dest => dest.ImageJewelries, opt => opt.MapFrom(src => src.ImageJewelries))

@@ -176,5 +176,10 @@ namespace Infrastructures.Repositories
             return (query.ToList(), totalItems);
         }
 
+        public void SetPropertyModified(TEntity entity, string propertyName)
+        {
+            var entry = _dbSet.Entry(entity);
+            entry.Property(propertyName).IsModified = true;
+        }
     }
 }

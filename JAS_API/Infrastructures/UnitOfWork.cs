@@ -23,6 +23,8 @@ namespace Infrastructures
         private readonly IProvinceRepository _provinceRepository;
         private readonly IValuationDocumentRepository _valuationDocumentRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IWalletRepository _walletRepository;
+        private readonly IAuctionRepository _auctionRepository;
         private readonly IHistoryValuationRepository _historyValuationRepository;
         private readonly IJewelryRepository _jewelryRepository;
         private readonly IKeyCharacteristicRepository _keyCharacteristicRepository;
@@ -71,6 +73,8 @@ namespace Infrastructures
             _provinceRepository = provinceRepository;
             _valuationDocumentRepository = valuationDocumentRepository;
             _customerRepository = customerRepository;
+            _walletRepository = walletRepository;
+            _auctionRepository = auctionRepository;
             _historyValuationRepository = historyValuationRepository;
             _jewelryRepository = jewelryRepository;
             _keyCharacteristicRepository = keyCharacteristicRepository;
@@ -110,8 +114,9 @@ namespace Infrastructures
         public IValuationDocumentRepository ValuationDocumentRepository => _valuationDocumentRepository;
 
         public ICustomerRepository CustomerRepository => _customerRepository;
+        public IWalletRepository WalletRepository => _walletRepository;
 
-
+        public IAuctionRepository AuctionRepository => _auctionRepository;
         public IHistoryValuationRepository HistoryValuationRepository => _historyValuationRepository;
 
         public IJewelryRepository JewelryRepository => _jewelryRepository;

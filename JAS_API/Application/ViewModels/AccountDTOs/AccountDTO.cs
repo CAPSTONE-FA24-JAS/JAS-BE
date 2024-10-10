@@ -10,6 +10,7 @@
         public int? RoleId { get; set; }
         public string? RoleName { get; set; }
         public CustomerDTO? CustomerDTO { get; set; }
+        public StaffDTO? StaffDTO { get; set; }
     }
     public class CustomerDTO
     {

@@ -20,6 +20,7 @@ namespace Domain.Entity
         public DateTime? Time_Bidding { get; set; }
         public int? ArtistId { get; set; }
         public int? CategoryId { get; set; }
+        public int? ValuationId { get; set; }
 
         //
         public virtual Artist? Artist { get; set; }
@@ -31,5 +32,6 @@ namespace Domain.Entity
         public virtual IEnumerable<SecondaryDiamond>? SecondaryDiamonds { get; set;}
         public virtual IEnumerable<MainShaphie>? MainShaphies { get; set; }
         public virtual IEnumerable<SecondaryShaphie>? SecondaryShaphies { get; set; }
+        public virtual Valuation? Valuation { get; set; }
     }
 }

@@ -21,7 +21,8 @@ namespace Application
         public IProvinceRepository ProvininceRepository { get; }
         public IValuationDocumentRepository ValuationDocumentRepository { get; }
         public ICustomerRepository CustomerRepository { get; }
-
+        public IWalletRepository WalletRepository { get; }
+        public IAuctionRepository AuctionRepository { get; }
         public IHistoryValuationRepository HistoryValuationRepository { get; }
 
         public IJewelryRepository JewelryRepository { get; }

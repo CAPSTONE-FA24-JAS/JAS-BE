@@ -12,7 +12,6 @@ namespace Domain.Entity
         public string? BankAccountHolder { get; set; }
         public string? BankCode { get; set; }
         public int? CustomerId { get; set; }
-
         public virtual Customer? Customer { get; set; }
     }
 }
