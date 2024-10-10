@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
+using Application.Utils;
 using Application.ViewModels.ArtistDTOs;
 using Application.ViewModels.JewelryDTOs;
 using Application.ViewModels.ValuationDTOs;
@@ -8,6 +9,7 @@ using Azure;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Domain.Entity;
+using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -57,6 +59,17 @@ namespace Application.Services
             return uploadImage;
         }
 
+        private async void AddHistoryValuation(int id, string status)
+        {
+            var historyValuation = new HistoryValuation()
+            {
+                StatusName = status,
+                ValuationId = id,
+                CreationDate = DateTime.Now,
+            };
+            await _unitOfWork.HistoryValuationRepository.AddAsync(historyValuation);
+        }
+
         public async Task<APIResponseModel> CreateJewelryAsync(CreateFinalValuationDTO jewelryDTO)
         {
             var response = new APIResponseModel();
@@ -69,6 +82,10 @@ namespace Application.Services
                     response.IsSuccess = false;
                     response.Message = "Mapper failed";
                 }
+                jewelry.CreationDate = DateTime.Now;
+                jewelry.Valuation.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == 6).Name;
+
+                AddHistoryValuation(jewelry.Valuation.Id, jewelry.Valuation.Status);
 
                 await _unitOfWork.JewelryRepository.AddAsync(jewelry);
                 await _unitOfWork.SaveChangeAsync();
@@ -158,6 +175,7 @@ namespace Application.Services
              
             var diamond = _mapper.Map<MainDiamond>(diamondDTO);
             diamond.JewelryId = jewelryId;
+            diamond.CreationDate = DateTime.Now;
             await _unitOfWork.MainDiamondRepository.AddAsync(diamond);
             await _unitOfWork.SaveChangeAsync();
 
@@ -211,6 +229,7 @@ namespace Application.Services
         {
             var diamond = _mapper.Map<SecondaryDiamond>(diamondDTO);
             diamond.JewelryId = jewelryId;
+            diamond.CreationDate = DateTime.Now;
             await _unitOfWork.SecondDiamondRepository.AddAsync(diamond);
             await _unitOfWork.SaveChangeAsync();
 
@@ -262,6 +281,7 @@ namespace Application.Services
         {
             var shaphie = _mapper.Map<MainShaphie>(shaphieDTO);
             shaphie.JewelryId = jewelryId;
+            shaphie.CreationDate = DateTime.Now;
             await _unitOfWork.MainShaphieRepository.AddAsync(shaphie);
             await _unitOfWork.SaveChangeAsync();
 
@@ -315,6 +335,7 @@ namespace Application.Services
         {
             var shaphie = _mapper.Map<SecondaryShaphie>(shaphieDTO);
             shaphie.JewelryId = jewelryId;
+            shaphie.CreationDate = DateTime.Now;
             await _unitOfWork.SecondaryShaphieRepository.AddAsync(shaphie);
             await _unitOfWork.SaveChangeAsync();
 
@@ -332,7 +353,7 @@ namespace Application.Services
                     var imageSecondShaphie = new ImageShaphieDTO
                     {
                         ImageLink = uploadImage.SecureUrl.AbsoluteUri,
-                        ShaphieId = shaphieId
+                        ShaphieId = shaphieId                      
                     };
 
                     var imageSecondShaphieDTO = _mapper.Map<ImageSecondaryShaphie>(imageSecondShaphie);
@@ -370,7 +391,7 @@ namespace Application.Services
             {
                 var jewelrys = await _unitOfWork.JewelryRepository.GetAllPaging(filter: null,
                                                                              orderBy: x => x.OrderByDescending(t => t.CreationDate),
-                                                                             includeProperties: "Artist,Category,ImageJewelries,KeyCharacteristicDetails,Lot,MainDiamonds,SecondaryDiamonds,MainShaphies",
+                                                                             includeProperties: "Artist,Category,ImageJewelries,KeyCharacteristicDetails,Lot,MainDiamonds,SecondaryDiamonds,MainShaphies,SecondaryShaphies,Valuation",
                                                                              pageIndex: pageIndex,
                                                                              pageSize: pageSize);
                 List<JewelryDTO> listjewelryDTO = new List<JewelryDTO>();
@@ -400,6 +421,47 @@ namespace Application.Services
                     response.IsSuccess = true;
 
                 }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> RequestFinalValuationForManagerAsync(RequestFinalValuationForManagerDTO requestDTO)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var valuationById = await _unitOfWork.JewelryRepository.GetByIdAsync(requestDTO.JewelryId);
+                if (valuationById != null)
+                {
+                    
+                    valuationById.StartingPrice =  requestDTO.StartingPrice;
+                    valuationById.Time_Bidding = requestDTO.Time_Bidding;
+                    valuationById.BidForm = requestDTO.BidForm;
+                    
+                    _unitOfWork.JewelryRepository.Update(valuationById);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    var valuationDTO = _mapper.Map<JewelryDTO>(valuationById);
+
+                    response.Message = $"Update Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationDTO;
+                }
+                else
+                {
+                    response.Message = $"Not found valuation";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
             }
             catch (Exception ex)
             {
