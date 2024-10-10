@@ -46,11 +46,12 @@ namespace Infrastructures
         private readonly IImageSecondaryShaphieRepository _imageSecondaryShaphieRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
-                          IBidLimitRepository bidLimitRepository, IImageValuationRepository imageValuationRepository,
-                          IAddressToShipRepository addressToShipRepository, IWardRepository wardRepository,
-                          IDistrictRepository districtRepository, IProvinceRepository provinceRepository,
-                          IValuationRepository valuationRepository, IValuationDocumentRepository valuationDocumentRepository,
-                          ICustomerRepository customerRepository, IWalletRepository walletRepository,
+
+                          IBidLimitRepository bidLimitRepository, IImageValuationRepository imageValuationRepository, 
+                          IAddressToShipRepository addressToShipRepository, IWardRepository wardRepository, 
+                          IDistrictRepository districtRepository, IProvinceRepository provinceRepository, 
+                          IValuationRepository valuationRepository, IValuationDocumentRepository valuationDocumentRepository, 
+                          ICustomerRepository customerRepository,IWalletRepository walletRepository,
                           IAuctionRepository auctionRepository, IHistoryValuationRepository historyValuationRepository,
                           IJewelryRepository jewelryRepository, IKeyCharacteristicRepository keyCharacteristicRepository,
                           ICategoryRepository categoryRepository, IArtistRepository artistRepository,
