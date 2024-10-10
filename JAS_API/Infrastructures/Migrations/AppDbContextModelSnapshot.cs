@@ -2464,8 +2464,8 @@ namespace Infrastructures.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Balance")
-                        .HasColumnType("text");
+                    b.Property<decimal?>("Balance")
+                        .HasColumnType("numeric");
 
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("integer");
@@ -2490,6 +2490,9 @@ namespace Infrastructures.Migrations
 
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

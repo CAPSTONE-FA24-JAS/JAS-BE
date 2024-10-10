@@ -22,9 +22,11 @@ namespace Infrastructures
         private readonly IProvinceRepository _provinceRepository;
         private readonly IValuationDocumentRepository _valuationDocumentRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IWalletRepository _walletRepository;
+        private readonly IAuctionRepository _auctionRepository;
 
 
-        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, IBidLimitRepository bidLimitRepository, IImageValuationRepository imageValuationRepository, IAddressToShipRepository addressToShipRepository, IWardRepository wardRepository, IDistrictRepository districtRepository, IProvinceRepository provinceRepository, IValuationRepository valuationRepository, IValuationDocumentRepository valuationDocumentRepository, ICustomerRepository customerRepository)
+        public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository, IBidLimitRepository bidLimitRepository, IImageValuationRepository imageValuationRepository, IAddressToShipRepository addressToShipRepository, IWardRepository wardRepository, IDistrictRepository districtRepository, IProvinceRepository provinceRepository, IValuationRepository valuationRepository, IValuationDocumentRepository valuationDocumentRepository, ICustomerRepository customerRepository, IWalletRepository walletRepository, IAuctionRepository auctionRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -38,6 +40,8 @@ namespace Infrastructures
             _provinceRepository = provinceRepository;
             _valuationDocumentRepository = valuationDocumentRepository;
             _customerRepository = customerRepository;
+            _walletRepository = walletRepository;
+            _auctionRepository = auctionRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -57,6 +61,10 @@ namespace Infrastructures
         public IValuationDocumentRepository ValuationDocumentRepository => _valuationDocumentRepository;
 
         public ICustomerRepository CustomerRepository => _customerRepository;
+
+        public IWalletRepository WalletRepository => _walletRepository;
+
+        public IAuctionRepository AuctionRepository => _auctionRepository;
 
         public async Task<int> SaveChangeAsync()
         {
