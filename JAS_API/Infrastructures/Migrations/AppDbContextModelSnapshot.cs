@@ -2369,6 +2369,9 @@ namespace Infrastructures.Migrations
                     b.Property<string>("ActualStatusOfJewelry")
                         .HasColumnType("text");
 
+                    b.Property<int?>("AppraiserId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("CancelReason")
                         .HasColumnType("text");
 
@@ -2433,6 +2436,8 @@ namespace Infrastructures.Migrations
                         .HasColumnType("real");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppraiserId");
 
                     b.HasIndex("CustomerId");
 
@@ -3085,6 +3090,10 @@ namespace Infrastructures.Migrations
 
             modelBuilder.Entity("Domain.Entity.Valuation", b =>
                 {
+                    b.HasOne("Domain.Entity.Staff", "Appraiser")
+                        .WithMany("AppraiserValuations")
+                        .HasForeignKey("AppraiserId");
+
                     b.HasOne("Domain.Entity.Customer", null)
                         .WithMany("Seller")
                         .HasForeignKey("CustomerId");
@@ -3096,6 +3105,8 @@ namespace Infrastructures.Migrations
                     b.HasOne("Domain.Entity.Staff", "Staff")
                         .WithMany("StaffValuations")
                         .HasForeignKey("StaffId");
+
+                    b.Navigation("Appraiser");
 
                     b.Navigation("Seller");
 
@@ -3302,6 +3313,8 @@ namespace Infrastructures.Migrations
 
             modelBuilder.Entity("Domain.Entity.Staff", b =>
                 {
+                    b.Navigation("AppraiserValuations");
+
                     b.Navigation("Lots");
 
                     b.Navigation("ShipperInvoices");

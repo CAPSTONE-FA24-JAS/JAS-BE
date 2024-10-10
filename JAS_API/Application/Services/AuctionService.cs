@@ -1,6 +1,8 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
+using Application.Utils;
 using Application.ViewModels.AuctionDTOs;
+using Application.ViewModels.BidLimitDTOs;
 using AutoMapper;
 using Azure;
 using Domain.Entity;
@@ -148,6 +150,74 @@ namespace Application.Services
                 reponse.Message = "Exception Eror";
                 reponse.ErrorMessages = new List<string> { e.Message };
                 reponse.Code = 500;
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> GetAuctionByStatus(int valueId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var status = EnumHelper.GetEnums<EnumStatusAuction>().FirstOrDefault(x => x.Value == valueId).Name;
+                if (status != null)
+                {
+                    var auctionExisteds = await _unitOfWork.AuctionRepository.GetAllAsync(condition: x => x.Status == status);
+                    if (auctionExisteds == null)
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Auctions Not Found";
+                        reponse.Code = 404;
+                        return reponse;
+                    }
+                    var autionDTOs = _mapper.Map<IEnumerable<AuctionDTO>>(auctionExisteds);
+                    if (autionDTOs == null)
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Received Auctions Wrong When Mapping ";
+                        reponse.Code = 500;
+                        return reponse;
+                    }
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Auctions received successfully.";
+                    reponse.Code = 201;
+                    reponse.Data = autionDTOs;
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.Message = "Exception Eror";
+                reponse.ErrorMessages = new List<string> { e.Message };
+                reponse.Code = 500;
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> GetStatusAuction()
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var filters = EnumHelper.GetEnums<EnumStatusAuction>();
+                if (filters == null)
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Receive Filter Bid Limit Fail";
+                    reponse.Code = 404;
+                }
+                else
+                {
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Receive Filter Bid Limit Successfull";
+                    reponse.Code = 200;
+                    reponse.Data = filters;
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = true;
+                reponse.Message = e.Message;
             }
             return reponse;
         }

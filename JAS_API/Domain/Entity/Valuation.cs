@@ -22,10 +22,12 @@ namespace Domain.Entity
         public string? CancelReason { get; set; }
         public int? SellerId { get; set; }
         public int? StaffId { get; set; }
+        public int? AppraiserId { get; set; }
 
         //Enity Relationship
         public virtual Customer? Seller { get; set; }
         public virtual Staff? Staff { get; set; }
+        public virtual Staff? Appraiser { get; set; }
         public virtual IEnumerable<ImageValuation>? ImageValuations { get; set; }
         public virtual IEnumerable<ValuationDocument>? ValuationDocuments { get; set; }
         public virtual IEnumerable<HistoryValuation>? HistoryValuations { get; set; }
