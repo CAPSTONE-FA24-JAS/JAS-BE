@@ -398,7 +398,11 @@ namespace Application.Services
                     foreach (var item in accounts)
                     {
                         var mapper = _mapper.Map<AccountDTO>(item);
-                        mapper.CustomerDTO.PriceLimit = await FindBidLimitPrice(mapper.CustomerDTO.Id);
+                        if(mapper.RoleId == 1)
+                        {
+                            mapper.CustomerDTO.PriceLimit = await FindBidLimitPrice(mapper.CustomerDTO.Id);
+                        
+                        }
                         mapper.RoleName = item.Role.Name;
                         DTOs.Add(mapper);
                     }
