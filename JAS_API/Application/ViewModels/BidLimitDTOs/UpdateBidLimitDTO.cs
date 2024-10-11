@@ -12,5 +12,6 @@ namespace Application.ViewModels.BidLimitDTOs
         public int Status { get; set; }
         public float? PriceLimit { get; set; }
         public string? Reason { get; set; }
+        public int? StaffId { get; set; }
     }
 }

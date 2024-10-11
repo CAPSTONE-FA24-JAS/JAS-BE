@@ -3,6 +3,7 @@ using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.AccountDTOs;
 using AutoMapper;
+using Azure;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Domain.Entity;
@@ -76,6 +77,7 @@ namespace Application.Services
                 else
                 {
                     account.Status = true;
+                    account.PasswordHash = HashPassword.HashWithSHA256(createDTO.PasswordHash);
                     await _unitOfWork.AccountRepository.AddAsync(account);
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
@@ -140,42 +142,43 @@ namespace Application.Services
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts =  _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.CreationDate, ascending: false));
+                        accounts = await ConvertListAccountDTO(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.CreationDate, ascending: false));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Oldest_First):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.CreationDate, ascending: true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
+                        accounts = await ConvertListAccountDTO(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.CreationDate, ascending: true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Active):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
+                        //accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
+                        accounts = await ConvertListAccountDTO(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Inactive):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == false, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
+                        accounts = await ConvertListAccountDTO(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == false, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.A_Z):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.Customer.FirstName, ascending: true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
+                        accounts = await ConvertListAccountDTO(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.Customer.FirstName, ascending: true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Z_A):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.Customer.FirstName, ascending: false, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
+                        accounts = await ConvertListAccountDTO(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.Customer.FirstName, ascending: false, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     default:
@@ -236,7 +239,9 @@ namespace Application.Services
                 }
                 else
                 {
-                    reponse.Data = _mapper.Map<AccountDTO>(account);
+                    var mapper = _mapper.Map<AccountDTO>(account);
+                    mapper.CustomerDTO.PriceLimit = await FindBidLimitPrice(mapper.CustomerDTO.Id);
+                    reponse.Data = mapper;
                     reponse.IsSuccess = true;
                     reponse.Message = "Retrive profile successfully";
                     reponse.Code = 200;
@@ -273,6 +278,7 @@ namespace Application.Services
                         {
                             var mapper = _mapper.Map<AccountDTO>(item);
                             mapper.RoleName = item.Role.Name;
+                            mapper.CustomerDTO.PriceLimit = await FindBidLimitPrice(mapper.CustomerDTO.Id);
                             DTOs.Add(mapper);
                         }
                         reponse.Data = DTOs;
@@ -392,6 +398,11 @@ namespace Application.Services
                     foreach (var item in accounts)
                     {
                         var mapper = _mapper.Map<AccountDTO>(item);
+                        if (mapper.RoleId == 1)
+                        {
+                            mapper.CustomerDTO.PriceLimit = await FindBidLimitPrice(mapper.CustomerDTO.Id);
+
+                        }
                         mapper.RoleName = item.Role.Name;
                         DTOs.Add(mapper);
                     }
@@ -423,6 +434,7 @@ namespace Application.Services
                 {
                     var mapper = _mapper.Map<AccountDTO>(account);
                     mapper.RoleName = account.Role.Name;
+                    mapper.CustomerDTO.PriceLimit = await FindBidLimitPrice(mapper.CustomerDTO.Id);
                     DTOs.Add(mapper);
                     reponse.IsSuccess = true;
                     reponse.Message = "Received list account successfull";
@@ -436,5 +448,44 @@ namespace Application.Services
             }
             return reponse;
         }
+
+        public async Task<float?>? FindBidLimitPrice(int? customerId)
+        {
+            var bidLimit = await _unitOfWork.BidLimitRepository.GetAllAsync(condition: x => x.CustomerId == customerId);
+
+            var firstBidLimit = bidLimit.FirstOrDefault(); 
+
+            return firstBidLimit?.PriceLimit; 
+        }
+
+
+        //public void setValuePriceLimit(float? priceLimit, params AccountDTO[] accountDTOs)
+        //{
+        //    foreach (var accountDTO in accountDTOs)
+        //    {
+        //        accountDTO.CustomerDTO.PriceLimit = priceLimit;
+        //    }
+        //}
+
+        internal async Task<List<AccountDTO>> ConvertListAccountDTO(List<Domain.Entity.Account> accounts)
+        {
+            var DTOs = new List<AccountDTO>();
+                foreach (var account in accounts)
+                {
+                    var mapper = _mapper.Map<AccountDTO>(account);
+                    mapper.RoleName = account.Role.Name;
+                    if(mapper.RoleId == 1)
+                    {
+                        mapper.CustomerDTO.PriceLimit = await FindBidLimitPrice(mapper.CustomerDTO.Id);
+
+                    }
+                    DTOs.Add(mapper);
+                }
+         
+            return DTOs;
+        }
+
+
+
     }
 }

@@ -22,7 +22,7 @@ namespace Application.Interfaces
 
         public Task<APIResponseModel> GetRequestPreliminaryValuationAsync(int? pageSize, int? pageIndex);
 
-        public Task<APIResponseModel> CreatePreliminaryValuationAsync(int id, int status, float EstimatePriceMin, float EstimatePriceMax);
+        public Task<APIResponseModel> CreatePreliminaryValuationAsync(int id, int status, float EstimatePriceMin, float EstimatePriceMax, int appraiserId);
 
         public Task<APIResponseModel> getPreliminaryValuationByIdAsync(int id);
 
