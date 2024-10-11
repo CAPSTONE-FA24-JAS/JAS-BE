@@ -573,8 +573,10 @@ namespace Application.Services
                 {
                     var status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == 8).Name;
                     jewelry.Valuation.Status = status;
-                    await _unitOfWork.ValuationRepository.AddAsync(jewelry.Valuation);
-                    AddHistoryValuation(jewelry.Valuation.Id, status);
+                    var valuation = _mapper.Map<Valuation>(jewelry.Valuation);
+                    _unitOfWork.ValuationRepository.Update(valuation);
+
+                    AddHistoryValuation(valuation.Id, status);
                     await _unitOfWork.SaveChangeAsync();
 
                     byte[] pdfBytes = CreateAuthorizedPDFFile.CreateAuthorizedPDF(jewelry.Valuation);
@@ -610,12 +612,12 @@ namespace Application.Services
                         await _unitOfWork.ValuationDocumentRepository.AddAsync(entity);
                         await _unitOfWork.SaveChangeAsync();
                     }
-                }
-            }
-            catch (DbException ex)
-            {
-                response.IsSuccess = false;
-                response.Message = "Database error occurred.";
+                    var valuationDTO = _mapper.Map<ValuationDTO>(valuation);
+                    response.Message = "Authorized Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationDTO;
+                }               
             }
             catch (Exception ex)
             {
