@@ -504,7 +504,7 @@ namespace Application.Services
                     var statusTranfer = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == receipt.Status).Name;
                     AddHistoryValuation(valuationById.Id, statusTranfer);                    
 
-                    byte[] pdfBytes = CreateAuthorizedPDFFile.CreateAuthorizedPDF(valuationById);
+                    byte[] pdfBytes = CreatePDFFile.CreatePDF(valuationById);
 
                     string filePath = $"BienBanXacNhanNhanHang_{valuationById.Id}.pdf";
 
