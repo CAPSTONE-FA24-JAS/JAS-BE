@@ -207,6 +207,9 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
@@ -361,6 +364,9 @@ namespace Infrastructures.Migrations
 
                     b.Property<string>("Reason")
                         .HasColumnType("text");
+
+                    b.Property<int?>("StaffId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Status")
                         .HasColumnType("text");
@@ -1553,6 +1559,9 @@ namespace Infrastructures.Migrations
 
                     b.Property<float?>("StartingPrice")
                         .HasColumnType("real");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("Time_Bidding")
                         .HasColumnType("timestamp without time zone");
