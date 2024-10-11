@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
+using Application.ViewModels.AccountDTOs;
 using Application.ViewModels.ArtistDTOs;
 using Application.ViewModels.JewelryDTOs;
 using Application.ViewModels.ValuationDTOs;
@@ -13,6 +14,7 @@ using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -34,6 +36,7 @@ namespace Application.Services
         private const string TagsImageSecondShaphie = "ImageSecondShaphie";
         private const string TagsDocumentMainShaphie = "DocumentMainShaphie";
         private const string TagsDocumentSecondShaphie = "DocumentSecondShaphie";
+        private const string TagsAuthorized = "FilePDF_Authorized";
 
         public JewelryService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary)
         {
@@ -171,9 +174,9 @@ namespace Application.Services
         }
 
 
-       private async Task AddMainDiamondAsync(CreateDiamondDTO diamondDTO, int jewelryId)
+        private async Task AddMainDiamondAsync(CreateDiamondDTO diamondDTO, int jewelryId)
         {
-             
+
             var diamond = _mapper.Map<MainDiamond>(diamondDTO);
             diamond.JewelryId = jewelryId;
             diamond.CreationDate = DateTime.Now;
@@ -222,7 +225,7 @@ namespace Application.Services
                 }
             }
 
-          
+
         }
 
 
@@ -238,7 +241,7 @@ namespace Application.Services
         }
         private async Task AddImageandDocumentsSecondDiamondAsync(IEnumerable<IFormFile>? images, IEnumerable<IFormFile>? documents, int diamondId)
         {
-            if(images != null)
+            if (images != null)
             {
                 foreach (var image in images)
                 {
@@ -255,8 +258,8 @@ namespace Application.Services
                     await _unitOfWork.SaveChangeAsync();
                 }
             }
-            
-            if(documents != null)
+
+            if (documents != null)
             {
                 foreach (var document in documents)
                 {
@@ -328,7 +331,7 @@ namespace Application.Services
                 }
             }
 
-           
+
 
         }
 
@@ -354,7 +357,7 @@ namespace Application.Services
                     var imageSecondShaphie = new ImageShaphieDTO
                     {
                         ImageLink = uploadImage.SecureUrl.AbsoluteUri,
-                        ShaphieId = shaphieId                      
+                        ShaphieId = shaphieId
                     };
 
                     var imageSecondShaphieDTO = _mapper.Map<ImageSecondaryShaphie>(imageSecondShaphie);
@@ -382,7 +385,7 @@ namespace Application.Services
                 }
             }
 
-           
+
         }
 
         public async Task<APIResponseModel> GetJewelryAsync(int? pageSize, int? pageIndex)
@@ -441,11 +444,11 @@ namespace Application.Services
                 var valuationById = await _unitOfWork.JewelryRepository.GetByIdAsync(requestDTO.JewelryId);
                 if (valuationById != null)
                 {
-                    
-                    valuationById.StartingPrice =  requestDTO.StartingPrice;
+
+                    valuationById.StartingPrice = requestDTO.StartingPrice;
                     valuationById.Time_Bidding = requestDTO.Time_Bidding;
                     valuationById.BidForm = requestDTO.BidForm;
-                    
+
                     _unitOfWork.JewelryRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
 
@@ -483,7 +486,7 @@ namespace Application.Services
                 if (jewelryById != null)
                 {
                     jewelryById.Valuation.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
-                    
+
 
                     AddHistoryValuation(jewelryId, jewelryById.Valuation.Status);
                     _unitOfWork.JewelryRepository.Update(jewelryById);
@@ -510,6 +513,114 @@ namespace Application.Services
                 response.Message = "Exception";
                 response.Code = 500;
                 response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> RequestOTPForAuthorizedBySellerAsync(int jewelryId, int sellerId)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+
+                var seller = await _unitOfWork.CustomerRepository.GetByIdAsync(sellerId);
+
+                if (seller == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "user not found";
+                    response.Code = 404;
+                }
+                var otp = OtpService.GenerateOtpForAuthorized(seller.Account.ConfirmationToken, jewelryId, sellerId);
+                var emailSent = await SendEmail.SendEmailOTP(seller.Account.Email, otp);
+                if (!emailSent)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Error sending OTP email.";
+                }
+                else
+                {
+                    response.IsSuccess = true;
+                    response.Message = "Send OTP successfully, Please check email.";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> VerifyOTPForAuthorizedBySellerAsync(int jewelryId, int sellerId, string opt)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var seller = await _unitOfWork.CustomerRepository.GetByIdAsync(sellerId);
+                var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(jewelryId);
+                var statusResult = OtpService.ValidateOtpForAuthorized(seller.Account.ConfirmationToken, jewelryId, sellerId, opt);
+                dynamic validationResult = statusResult;
+                if (!validationResult.status)
+                {
+                    response.IsSuccess = false;
+                    response.Message = validationResult.msg + validationResult.timeStepMatched;
+                    return response;
+                }
+                else
+                {
+                    var status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == 8).Name;
+                    jewelry.Valuation.Status = status;
+                    await _unitOfWork.ValuationRepository.AddAsync(jewelry.Valuation);
+                    AddHistoryValuation(jewelry.Valuation.Id, status);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    byte[] pdfBytes = CreateAuthorizedPDFFile.CreateAuthorizedPDF(jewelry.Valuation);
+
+                    string filePath = $"GiayUyQuyen_{jewelry.Valuation.Id}.pdf";
+
+                    await File.WriteAllBytesAsync(filePath, pdfBytes);
+
+                    var uploadFile = await _cloudinary.UploadAsync(new RawUploadParams
+                    {
+                        File = new FileDescription(filePath),
+                        Tags = TagsAuthorized,
+                        Type = "upload"
+
+                    }).ConfigureAwait(false);
+                    if (uploadFile == null || uploadFile.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        response.Message = $"File upload failed." + uploadFile.Error.Message + "";
+                        response.Code = (int)uploadFile.StatusCode;
+                        response.IsSuccess = false;
+                    }
+                    else
+                    {
+                        var valuationDoc = new ValuationDocumentDTO
+                        {
+                            ValuationId = jewelry.Valuation.Id,
+                            ValuationDocumentType = "Authorized",
+                            DocumentLink = uploadFile.SecureUrl.AbsoluteUri,
+                            CreationDate = DateTime.Now,
+                            CreatedBy = jewelry.Valuation.StaffId
+                        };
+                        var entity = _mapper.Map<ValuationDocument>(valuationDoc);
+                        await _unitOfWork.ValuationDocumentRepository.AddAsync(entity);
+                        await _unitOfWork.SaveChangeAsync();
+                    }
+                }
+            }
+            catch (DbException ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "Database error occurred.";
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "Error";
             }
             return response;
         }
