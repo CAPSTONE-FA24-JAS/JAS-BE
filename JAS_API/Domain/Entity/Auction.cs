@@ -8,6 +8,7 @@ namespace Domain.Entity
 {
     public class Auction : BaseEntity
     {
+        public string? Name { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public DateTime? ActualEndTime { get; set; }
