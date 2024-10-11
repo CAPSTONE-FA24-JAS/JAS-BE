@@ -29,6 +29,8 @@ namespace Application.Interfaces
         //seller xem all consign item, all dinh gia so bo
         public Task<APIResponseModel> getPreliminaryValuationByStatusOfSellerAsync(int sellerId, int? status, int? pageSize, int? pageIndex);
 
+        public Task<APIResponseModel> getPreliminaryValuationByStatusOfAppraiserAsync(int appraiserId, int? status, int? pageSize, int? pageIndex);
+
         //staff xem all consign item, all dinh gia so bo
         public Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, int? status, int? pageSize, int? pageIndex);
 
