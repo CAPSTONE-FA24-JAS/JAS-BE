@@ -29,7 +29,7 @@ namespace Infrastructures
             CreateMap<Staff, CreateStaffDTO>().ReverseMap();
             CreateMap<Staff, StaffDTO>()
                 .ForMember(dest => dest.AccountDTO, opt => opt.MapFrom(src => src.Account))
-                .ReverseMap();          
+                .ReverseMap();
             CreateMap<Account, AccountDTO>()
                 .ForMember(dest => dest.CustomerDTO, opt => opt.MapFrom(src => src.Customer))
                 .ForMember(dest => dest.StaffDTO, opt => opt.MapFrom(src => src.Staff))

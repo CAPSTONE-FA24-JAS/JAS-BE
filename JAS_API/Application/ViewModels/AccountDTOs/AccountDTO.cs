@@ -23,6 +23,7 @@
         public string? CitizenIdentificationCard { get; set; }
         public DateTime? IDIssuanceDate { get; set; }
         public DateTime? IDExpirationDate { get; set; }
+        public float? PriceLimit { get; set; }
         public AccountDTO? AccountDTO { get; set; }
     }
 
