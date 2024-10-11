@@ -184,6 +184,7 @@ namespace Application.Services
             try
             {
                 var user = await _unitOfWork.AccountRepository.GetByIdAsync(userId);
+                
                 if (user == null)
                 {
                     response.IsSuccess = false;

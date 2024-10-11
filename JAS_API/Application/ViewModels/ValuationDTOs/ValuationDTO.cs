@@ -26,7 +26,7 @@ namespace Application.ViewModels.ValuationDTOs
         public string? CancelReason { get; set; }
         public int? SellerId { get; set; }
         public int? StaffId { get; set; }
-
+        public DateTime CreationDate { get; set; }
         public CustomerDTO? Seller { get; set; }
 
         public StaffDTO? Staff { get; set; }

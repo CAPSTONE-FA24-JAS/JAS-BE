@@ -33,5 +33,39 @@ namespace Application.Utils
                 return response;
             }
         }
+
+        public static string GenerateOtpForAuthorized(string secretKey, int jewelryId, int sellerId)
+        {
+            string combine = secretKey + jewelryId.ToString() + sellerId.ToString();
+            var guidBytes = Guid.Parse(combine).ToByteArray();
+            var Base = Base32Encoding.ToString(guidBytes);
+            var secretKeyBytes = Base32Encoding.ToBytes(Base);
+            var totp = new Totp(secretKeyBytes, step: 60);
+            var otp = totp.ComputeTotp();
+            return otp;
+        }
+
+
+        public static object ValidateOtpForAuthorized(string secretKey, int jewelryid, int staffId, string otp)
+        {
+            string combine = secretKey + jewelryid.ToString() + staffId.ToString();
+            var guidBytes = Guid.Parse(combine).ToByteArray();
+            var Base = Base32Encoding.ToString(guidBytes);
+            var secretKeyBytes = Base32Encoding.ToBytes(Base);
+            var totp = new Totp(secretKeyBytes, step: 60);
+            bool isValid = totp.VerifyTotp(otp, out long timeStepMatched, VerificationWindow.RfcSpecifiedNetworkDelay);
+
+            if (isValid)
+            {
+                var response = new { msg = "Verify successful", status = true };
+                return response;
+            }
+            else
+            {
+                var response = new { msg = "OTP not valid", status = false, timeStepMatched = timeStepMatched };
+                return response;
+            }
+        }
+
     }
 }

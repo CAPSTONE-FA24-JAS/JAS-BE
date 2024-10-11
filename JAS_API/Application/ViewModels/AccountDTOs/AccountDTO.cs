@@ -1,8 +1,11 @@
 
-﻿namespace Application.ViewModels.AccountDTOs
+using Application.ViewModels.BidLimitDTOs;
+
+namespace Application.ViewModels.AccountDTOs
 {
     public class AccountDTO
     {
+        public int? Id { get; set; }
         public string? Email { get; set; }
         public string? Gender { get; set; }
         public string? PasswordHash { get; set; }
@@ -25,6 +28,7 @@
         public DateTime? IDExpirationDate { get; set; }
         public float? PriceLimit { get; set; }
         public AccountDTO? AccountDTO { get; set; }
+
     }
 
 }
