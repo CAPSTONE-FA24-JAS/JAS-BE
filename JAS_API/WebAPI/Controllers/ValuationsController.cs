@@ -66,9 +66,9 @@ namespace WebAPI.Controllers
 
         //tao dinh gia so 
         [HttpPut]
-        public async Task<IActionResult> createPreliminaryPriceAsync(int id, int status, float EstimatePriceMin, float EstimatePriceMax)
+        public async Task<IActionResult> createPreliminaryPriceAsync(int id, int status, float EstimatePriceMin, float EstimatePriceMax, int appraiserId)
         {
-            var result = await _valuationService.CreatePreliminaryValuationAsync(id, status, EstimatePriceMin, EstimatePriceMax);
+            var result = await _valuationService.CreatePreliminaryValuationAsync(id, status, EstimatePriceMin, EstimatePriceMax, appraiserId);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);

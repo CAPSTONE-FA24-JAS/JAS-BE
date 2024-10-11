@@ -206,7 +206,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> CreatePreliminaryValuationAsync(int id, int status, float EstimatePriceMin, float EstimatePriceMax)
+        public async Task<APIResponseModel> CreatePreliminaryValuationAsync(int id, int status, float EstimatePriceMin, float EstimatePriceMax, int appraiserId)
         {
             var response = new APIResponseModel();
             try
@@ -219,6 +219,7 @@ namespace Application.Services
                     valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
                     valuationById.EstimatePriceMin = EstimatePriceMin;
                     valuationById.EstimatePriceMax = EstimatePriceMax;
+                    valuationById.AppraiserId = appraiserId;
 
                     AddHistoryValuation(id, valuationById.Status);
                     _unitOfWork.ValuationRepository.Update(valuationById);
