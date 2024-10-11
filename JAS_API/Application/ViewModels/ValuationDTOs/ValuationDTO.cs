@@ -30,6 +30,8 @@ namespace Application.ViewModels.ValuationDTOs
         public CustomerDTO? Seller { get; set; }
 
         public StaffDTO? Staff { get; set; }
+
+        public StaffDTO? Appraiser { get; set; }
         public IEnumerable<ImageValuationDTO>? ImageValuations { get; set; }
         public IEnumerable<ValuationDocumentDTO>? ValuationDocuments { get; set; }
     }
