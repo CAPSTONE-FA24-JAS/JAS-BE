@@ -12,6 +12,7 @@ namespace Domain.Entity
         public float? PriceLimit { get; set; }
         public string? Reason { get; set; }
         public int? CustomerId { get; set; }
+        public int? StaffId { get; set; }
         public DateTime? ExpireDate { get; set; }
         public string? Status { get; set; }
         //
