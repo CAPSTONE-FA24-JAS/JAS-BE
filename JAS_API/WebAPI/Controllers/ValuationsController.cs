@@ -54,6 +54,15 @@ namespace WebAPI.Controllers
             return BadRequest(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetRequestPreliminaryValuationAsync(int? pageSize, int? pageIndex)
+        {
+            var result = await _valuationService.GetRequestPreliminaryValuationAsync(pageSize, pageIndex);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
 
         //tao dinh gia so 
         [HttpPut]

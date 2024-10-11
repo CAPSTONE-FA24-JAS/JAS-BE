@@ -15,9 +15,12 @@ namespace Application.Interfaces
 
         public Task<APIResponseModel> GetAllAsync(int? pageSize, int? pageIndex);
 
+
         public Task<APIResponseModel> AssignStaffForValuationAsync(int id, int staffId, int status);
 
         public Task<APIResponseModel> RequestPreliminaryValuationAsync(int id, int status);
+
+        public Task<APIResponseModel> GetRequestPreliminaryValuationAsync(int? pageSize, int? pageIndex);
 
         public Task<APIResponseModel> CreatePreliminaryValuationAsync(int id, int status, float EstimatePriceMin, float EstimatePriceMax);
 

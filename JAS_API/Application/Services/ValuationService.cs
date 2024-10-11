@@ -611,5 +611,61 @@ namespace Application.Services
             };
             await _unitOfWork.HistoryValuationRepository.AddAsync(historyValuation);
         }
+
+        public async Task<APIResponseModel> GetRequestPreliminaryValuationAsync(int? pageSize, int? pageIndex)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                Expression<Func<Valuation, bool>> filter;
+
+               
+                    var statusTranfer = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == 2).Name;
+                    filter = x => statusTranfer.Equals(x.Status);
+                
+
+                var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
+                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff",
+                                                                             pageIndex: pageIndex,
+                                                                             pageSize: pageSize);
+                List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
+                if (valuations.totalItems > 0)
+                {
+                    foreach (var item in valuations.data)
+                    {
+
+                        var valuationsResponse = _mapper.Map<ValuationDTO>(item);
+                        listValuationDTO.Add(valuationsResponse);
+                    };
+
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listValuationDTO,
+                        totalItemRepsone = valuations.totalItems
+                    };
+                    response.Message = $"List consign items Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have valuations";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
     }
 }

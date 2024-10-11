@@ -28,7 +28,6 @@ namespace Application.ViewModels.AccountDTOs
         public DateTime? IDExpirationDate { get; set; }
         public AccountDTO? AccountDTO { get; set; }
 
-        public  IEnumerable<BidLimitDTO>? BidLimits { get; set; }
     }
 
 }
