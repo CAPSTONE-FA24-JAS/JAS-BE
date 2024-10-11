@@ -19,5 +19,9 @@ namespace Application.Interfaces
 
         public Task<APIResponseModel> UpdateStatusByManagerAsync(int jewelryId, int status);
 
+        public Task<APIResponseModel> RequestOTPForAuthorizedBySellerAsync(int jewelryId, int sellerId);
+
+        public Task<APIResponseModel> VerifyOTPForAuthorizedBySellerAsync(int jewelryId, int sellerId, string opt);
+
     }
 }
