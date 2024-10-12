@@ -498,12 +498,12 @@ namespace Application.Services
                 if (valuationById != null)
                 {
                     valuationById.ActualStatusOfJewelry = receipt.ActualStatusOfJewelry;
-
+                    
+                    valuationById.Status = valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == receipt.Status).Name;
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
 
-                    var statusTranfer = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == receipt.Status).Name;
-                    AddHistoryValuation(valuationById.Id, statusTranfer);                    
+                    AddHistoryValuation(valuationById.Id, valuationById.Status);                    
 
                     byte[] pdfBytes = CreatePDFFile.CreatePDF(valuationById);
 
