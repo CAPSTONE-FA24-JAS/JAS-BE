@@ -97,6 +97,16 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> getPreliminaryValuationsOfStaffAsync(int staffId, int? pageSize, int? pageIndex)
+        {
+            var result = await _valuationService.getPreliminaryValuationsOfStaffAsync(staffId, pageSize, pageIndex);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+
+        [HttpGet]
         public async Task<IActionResult> getPreliminaryValuationByStatusOfAppraiserAsync(int appraiserId, int? status, int? pageSize, int? pageIndex)
         {
             var result = await _valuationService.getPreliminaryValuationByStatusOfAppraiserAsync(appraiserId, status, pageSize, pageIndex);
@@ -104,6 +114,7 @@ namespace WebAPI.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
+
 
 
         //seller xem all consign item, all dinh gia so bo.Neu status null thi hien thi het consign item
