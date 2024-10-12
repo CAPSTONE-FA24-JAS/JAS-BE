@@ -34,6 +34,8 @@ namespace Application.Interfaces
         //staff xem all consign item, all dinh gia so bo
         public Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, int? status, int? pageSize, int? pageIndex);
 
+        public Task<APIResponseModel> getPreliminaryValuationsOfStaffAsync(int staffId, int? pageSize, int? pageIndex);
+
         //dung chung cho ca staff, seller update status
         public Task<APIResponseModel> UpdateStatusForValuationsAsync(int id, int status);
 
