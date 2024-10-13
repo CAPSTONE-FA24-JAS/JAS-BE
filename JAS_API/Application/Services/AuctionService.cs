@@ -5,6 +5,8 @@ using Application.ViewModels.AuctionDTOs;
 using Application.ViewModels.BidLimitDTOs;
 using AutoMapper;
 using Azure;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Domain.Entity;
 using Domain.Enums;
 using Google.Apis.Util;
@@ -17,13 +19,16 @@ namespace Application.Services
         private readonly IMapper _mapper;
         private readonly IClaimsService _claimsService;
         private readonly ICurrentTime _currentTime;
+        private readonly Cloudinary _cloudinary;
+        private const string Tags = "Backend_ImageAuction";
 
-        public AuctionService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService, ICurrentTime currentTime)
+        public AuctionService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService, ICurrentTime currentTime, Cloudinary cloudinary)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _claimsService = claimsService;
             _currentTime = currentTime;
+            _cloudinary = cloudinary;
         }
 
         public async Task<APIResponseModel> CreateAuction(CreateAuctionDTO createAuctionDTO)
@@ -47,13 +52,25 @@ namespace Application.Services
                     reponse.Code = 500;
                     return reponse;
                 }
+                var uploadResult = await _cloudinary.UploadAsync(new ImageUploadParams
+                {
+                    File = new FileDescription(createAuctionDTO.FileImage.FileName,
+                               createAuctionDTO.FileImage.OpenReadStream()),
+                    Tags = Tags
+                }).ConfigureAwait(false);
+                if (uploadResult == null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    reponse.Message = $"File upload failed." + uploadResult.Error.Message + "";
+                    reponse.Code = (int)uploadResult.StatusCode;
+                    reponse.IsSuccess = false;
+                }
+                newAuction.ImageLink = uploadResult.SecureUrl.AbsoluteUri;
                 await _unitOfWork.AuctionRepository.AddAsync(newAuction);
                 if(await _unitOfWork.SaveChangeAsync() > 0)
                 {
                     reponse.IsSuccess = true;
                     reponse.Message = "Auction created successfully.";
                     reponse.Code = 201;
-                    reponse.Data = createAuctionDTO;
                     return reponse;
                 }
                 reponse.IsSuccess = false;
@@ -251,7 +268,19 @@ namespace Application.Services
                     auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
                     _mapper.Map(updateAuctionDTO, auctionExisted);
                 }
-
+                var uploadResult = await _cloudinary.UploadAsync(new ImageUploadParams
+                {
+                    File = new FileDescription(updateAuctionDTO.FileImage.FileName,
+                              updateAuctionDTO.FileImage.OpenReadStream()),
+                    Tags = Tags
+                }).ConfigureAwait(false);
+                if (uploadResult == null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    reponse.Message = $"File upload failed." + uploadResult.Error.Message + "";
+                    reponse.Code = (int)uploadResult.StatusCode;
+                    reponse.IsSuccess = false;
+                }
+                auctionExisted.ImageLink = uploadResult.SecureUrl.AbsoluteUri;
                 _unitOfWork.AuctionRepository.Update(auctionExisted);
                 if (await _unitOfWork.SaveChangeAsync() > 0)
                 {

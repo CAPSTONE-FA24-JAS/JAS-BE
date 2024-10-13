@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Application.ViewModels.AuctionDTOs
 {
@@ -13,7 +9,6 @@ namespace Application.ViewModels.AuctionDTOs
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public string? Description { get; set; }
-        public string? Location { get; set; }
-        public string? Notes { get; set; }
+        public IFormFile? FileImage { get; set; }
     }
 }
