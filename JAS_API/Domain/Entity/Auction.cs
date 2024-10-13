@@ -13,10 +13,8 @@ namespace Domain.Entity
         public DateTime? EndTime { get; set; }
         public DateTime? ActualEndTime { get; set; }
         public string? Description { get; set; }
-        public string? Location { get; set; }
-        public string? Notes { get; set; }
+        public string? ImageLink { get; set; }
         public string? Status { get; set; }
-
         // 
         public virtual IEnumerable<Lot>? Lots { get; set; }
     }
