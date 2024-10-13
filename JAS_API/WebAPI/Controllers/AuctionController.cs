@@ -60,7 +60,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAution(CreateAuctionDTO createAuctionDTO)
+        public async Task<IActionResult> CreateAution([FromForm] CreateAuctionDTO createAuctionDTO)
         {
             var result = await _auctionService.CreateAuction(createAuctionDTO);
             if (result.IsSuccess)

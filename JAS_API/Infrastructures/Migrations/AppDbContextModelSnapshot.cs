@@ -195,11 +195,11 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("ImageLink")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("Location")
-                        .HasColumnType("text");
 
                     b.Property<int?>("ModificationBy")
                         .HasColumnType("integer");
@@ -208,9 +208,6 @@ namespace Infrastructures.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Notes")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("StartTime")

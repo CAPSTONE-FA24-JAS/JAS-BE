@@ -171,6 +171,7 @@ namespace Application.Services
                             bidLimit.Status = status;
                             bidLimit.PriceLimit = updateBidLimitDTO.PriceLimit;
                             bidLimit.Reason = updateBidLimitDTO.Reason;
+                            bidLimit.StaffId = updateBidLimitDTO.StaffId;
                             _unitOfWork.BidLimitRepository.Update(bidLimit);
                             if (await _unitOfWork.SaveChangeAsync() > 0)
                             {
