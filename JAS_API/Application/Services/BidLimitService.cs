@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
+using Application.ViewModels.AccountDTOs;
 using Application.ViewModels.BidLimitDTOs;
 using AutoMapper;
 using CloudinaryDotNet;
@@ -8,6 +9,7 @@ using CloudinaryDotNet.Actions;
 using Domain.Entity;
 using Domain.Enums;
 using Microsoft.Identity.Client;
+using System.Linq.Expressions;
 
 namespace Application.Services
 {
@@ -48,7 +50,7 @@ namespace Application.Services
                 {
                     var enity = _mapper.Map<BidLimit>(createBidLimitDTO);
                     enity.File = uploadResult.SecureUrl.AbsoluteUri;
-                    enity.ExpireDate = DateTime.Now.AddMonths(3);
+                    enity.ExpireDate = DateTime.Now.AddMonths(6);
                     enity.Status = EnumStatusBidLimit.Pending.ToString();
                     enity.Reason = null;
                      await _unitOfWork.BidLimitRepository.AddAsync(enity);
@@ -154,7 +156,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var bidLimit = await _unitOfWork.BidLimitRepository.GetByIdAsync(updateBidLimitDTO.Id);
+                var bidLimit = await _unitOfWork.BidLimitRepository.GetByIdAsync(updateBidLimitDTO.Id, includes: x => x.Customer);
                 if (bidLimit == null)
                 {
                     reponse.Code = 400;
@@ -166,12 +168,24 @@ namespace Application.Services
                     var status = EnumHelper.GetEnums<EnumStatusBidLimit>().FirstOrDefault(x => x.Value == updateBidLimitDTO.Status).Name;
                     if(status != null)
                     {
-                        if(bidLimit.Status == EnumStatusBidLimit.Pending.ToString())
+                        var check = (ValueTuple<bool, string>)checkStatus(bidLimit, status);
+                        if (check.Item1 == true)
                         {
+                            if(status == EnumStatusBidLimit.SetPrice.ToString())
+                            {
+                                bidLimit.PriceLimit = updateBidLimitDTO.PriceLimit;
+                                bidLimit.StaffId = updateBidLimitDTO.StaffId;
+                            }
+                            if(status == EnumStatusBidLimit.Reject.ToString())
+                            {
+                                bidLimit.Reason = updateBidLimitDTO.Reason;
+                            }
+                            if(status == EnumStatusBidLimit.Approve.ToString())
+                            {
+                                bidLimit.Customer.PriceLimit = bidLimit.PriceLimit;
+                                bidLimit.Customer.ExpireDate = bidLimit.ExpireDate;
+                            }
                             bidLimit.Status = status;
-                            bidLimit.PriceLimit = updateBidLimitDTO.PriceLimit;
-                            bidLimit.Reason = updateBidLimitDTO.Reason;
-                            bidLimit.StaffId = updateBidLimitDTO.StaffId;
                             _unitOfWork.BidLimitRepository.Update(bidLimit);
                             if (await _unitOfWork.SaveChangeAsync() > 0)
                             {
@@ -188,7 +202,7 @@ namespace Application.Services
                         else
                         {
                             reponse.IsSuccess = false;
-                            reponse.Message = $"Bid Limit was rejected or approved cant update";
+                            reponse.Message = $"Faild with status : {check.Item2.ToString()}";
 
                         }
                         
@@ -211,27 +225,66 @@ namespace Application.Services
             return reponse;
         }
 
-        public object checkStatus(BidLimit bidLimit, string status)
+        internal object checkStatus(BidLimit bidLimit, string status)
         {
             object result = (status: true, msg: "Status is suiable");
-            //kiểm tra status đầu tiên là pending
-            //if(bidLimit.Status == status && status == EnumStatusBidLimit.Pending.ToString())// nếu pending vẫn là pending
-            //{
-            //    result = (status : false, msg : "Status of object is pending , cannt set pending again");
-            //    return result;
-            //}
-            //if ()
-            //{
-
-            //}
-
             switch (status)
             {
                 case nameof(EnumStatusBidLimit.Pending):
-                    //if ()
+                    if (bidLimit.Status == EnumStatusBidLimit.Pending.ToString()) 
+                    {
+                        result = (status: false, msg: "Status of object is pending , cannt set pending again");
+                    }
+                    if(bidLimit.Status == EnumStatusBidLimit.Approve.ToString() || bidLimit.Status == EnumStatusBidLimit.Reject.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is Approve or Reject , cannt set Pending ");
+                    }
+                    if (bidLimit.Status == EnumStatusBidLimit.SetPrice.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is SetPrice , cannt set pending again");
+                    }
+                    break;
+                case nameof(EnumStatusBidLimit.SetPrice):
+                    //if (bidLimit.Status == EnumStatusBidLimit.Pending.ToString())
                     //{
-
+                    //    result = (status: false, msg: "Status of object is setprrice , cannt set pending");
                     //}
+                    //if (bidLimit.Status == EnumStatusBidLimit.SetPrice.ToString())
+                    //{
+                    //    result = (status: false, msg: "Status of object is setprrice , cannt set setprice again");
+                    //}
+                    if (bidLimit.Status == EnumStatusBidLimit.Approve.ToString() || bidLimit.Status == EnumStatusBidLimit.Reject.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is Approve or Reject , cannt set SetPrice ");
+                    }
+                    break;
+                case nameof(EnumStatusBidLimit.Approve):
+                    if (bidLimit.Status == EnumStatusBidLimit.Pending.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is Pending , cannt set Approve you must setprice before approve");
+                    }
+                    if (bidLimit.Status == EnumStatusBidLimit.Approve.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is Approve , cannt set Approve again");
+                    }
+                    if (bidLimit.Status == EnumStatusBidLimit.Reject.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is Reject , cannt set Approve");
+                    }
+                    break;
+                case nameof(EnumStatusBidLimit.Reject):
+                    if (bidLimit.Status == EnumStatusBidLimit.Pending.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is Pending , cannt set Reject you must setprice before Reject");
+                    }
+                    if (bidLimit.Status == EnumStatusBidLimit.Reject.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is Reject , cannt set Reject again");
+                    }
+                    if (bidLimit.Status == EnumStatusBidLimit.Approve.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is Approve , cannt set Reject");
+                    }
                     break;
             }
             return result;
@@ -284,6 +337,59 @@ namespace Application.Services
                     reponse.Code = 404;
                     reponse.IsSuccess = false;
                     reponse.Message = "Received List BidLimit Faild";
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.Message = "Exception";
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> FilterBidLimtByStatus(int status)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var enumStatus = EnumHelper.GetEnums<EnumStatusBidLimit>().FirstOrDefault(x => x.Value == status)?.Name;
+
+                if (enumStatus != null) // Kiểm tra xem enumStatus có khác null không
+                {
+                    var bidLimits = await _unitOfWork.BidLimitRepository.GetAllAsync(
+                        includes: x => x.Customer,
+                        condition: x => x.Status == enumStatus
+                    );
+                    if (bidLimits.Any())
+                    {
+                        var DTOs = new List<BidLimitDTO>();
+                        foreach (var bidLimit in bidLimits)
+                        {
+                            var mapper = _mapper.Map<BidLimitDTO>(bidLimit);
+                            mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
+                            DTOs.Add(mapper);
+                        }
+                        if (DTOs.Count > 0)
+                        {
+                            reponse.Code = 200;
+                            reponse.IsSuccess = true;
+                            reponse.Message = $"Received List BidLimit Successfull by status {EnumHelper.GetEnums<EnumStatusBidLimit>().FirstOrDefault(x => x.Value == status).Name}";
+                            reponse.Data = DTOs;
+                        }
+                    }
+                    else
+                    {
+                        reponse.Code = 400;
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Received List BidLimit Faild";
+                    }
+                }
+                else
+                {
+                    reponse.Code = 400;
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Not Found Status In System";
                 }
             }
             catch (Exception e)
