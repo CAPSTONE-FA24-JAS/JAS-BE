@@ -28,6 +28,7 @@ namespace Application.ViewModels.AccountDTOs
         public DateTime? IDIssuanceDate { get; set; }
         public DateTime? IDExpirationDate { get; set; }
         public float? PriceLimit { get; set; }
+        public DateTime? ExpireDate { get; set; }
         public AccountDTO? AccountDTO { get; set; }
 
     }

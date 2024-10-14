@@ -591,6 +591,9 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<DateTime?>("ExpireDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("FirstName")
                         .HasColumnType("text");
 
@@ -614,6 +617,9 @@ namespace Infrastructures.Migrations
 
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<float?>("PriceLimit")
+                        .HasColumnType("real");
 
                     b.Property<string>("ProfilePicture")
                         .HasColumnType("text");

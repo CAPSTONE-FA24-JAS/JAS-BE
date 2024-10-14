@@ -53,7 +53,7 @@ namespace WebAPI.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> ViewAllBidLimitById(int Id)
+        public async Task<IActionResult> ViewBidLimitById(int Id)
         {
             var result = await _bidLimitService.ViewBidLimitById(Id);
             if (result.IsSuccess != true)
@@ -78,7 +78,19 @@ namespace WebAPI.Controllers
                 return Ok(result);
             }
         }
-        public float? PriceLimit { get; set; }
+        [HttpGet]
+        public async Task<IActionResult> ViewBidLimtByStatus(int statusValue)
+        {
+            var result = await _bidLimitService.FilterBidLimtByStatus(statusValue);
+            if (result.IsSuccess != true)
+            {
+                return BadRequest(result);
+            }
+            else
+            {
+                return Ok(result);
+            }
+        }
 
         [HttpPut]
         public async Task<IActionResult> UpdateStatusBidLimit(UpdateBidLimitDTO updateBidLimitDTO)
