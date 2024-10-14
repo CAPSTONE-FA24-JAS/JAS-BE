@@ -10,7 +10,7 @@ namespace Domain.Entity
     {
         public string? DocumentLink { get; set; }
         public string? DocumentTitle { get; set; }
-        public int? DiamondId { get; set; }
+        public int? MainDiamondId { get; set; }
         //
         public virtual MainDiamond? MainDiamond { get; set; }
     }

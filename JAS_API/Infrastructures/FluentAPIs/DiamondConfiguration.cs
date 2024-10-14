@@ -25,7 +25,7 @@ namespace Infrastructures.FluentAPIs
         {
             builder.HasOne(x => x.MainDiamond)
                 .WithMany(x => x.DocumentMainDiamonds)
-                .HasForeignKey(x => x.DiamondId);
+                .HasForeignKey(x => x.MainDiamondId);
         }
     }
     public class ImageMainDiamondConfiguration : IEntityTypeConfiguration<ImageMainDiamond>
@@ -34,7 +34,7 @@ namespace Infrastructures.FluentAPIs
         {
             builder.HasOne(x => x.MainDiamond)
                 .WithMany(x => x.ImageMainDiamonds)
-                .HasForeignKey(x => x.DiamondId);
+                .HasForeignKey(x => x.MainDiamondId);
         }
     }
     public class SecondaryDiamondConfiguration : IEntityTypeConfiguration<SecondaryDiamond>
@@ -53,7 +53,7 @@ namespace Infrastructures.FluentAPIs
         {
             builder.HasOne(x => x.SecondaryDiamond)
                 .WithMany(x => x.DocumentSecondaryDiamonds)
-                .HasForeignKey(x => x.DiamondId);
+                .HasForeignKey(x => x.SecondaryDiamondId);
         }
     }
     public class ImageSecondaryDiamondConfiguration : IEntityTypeConfiguration<ImageSecondaryDiamond>
@@ -62,7 +62,7 @@ namespace Infrastructures.FluentAPIs
         {
             builder.HasOne(x => x.SecondaryDiamond)
                 .WithMany(x => x.ImageSecondaryDiamonds)
-                .HasForeignKey(x => x.DiamondId);
+                .HasForeignKey(x => x.SecondaryDiamondId);
         }
     }
 }

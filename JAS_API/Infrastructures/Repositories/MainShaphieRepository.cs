@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Repositories;
 using Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -12,13 +13,14 @@ namespace Infrastructures.Repositories
     {
         private readonly AppDbContext _dbContext;
         public MainShaphieRepository(
-            AppDbContext context,
-            ICurrentTime timeService,
-            IClaimsService claimsService
-        )
-            : base(context, timeService, claimsService)
+             AppDbContext context,
+             ICurrentTime timeService,
+             IClaimsService claimsService
+         )
+             : base(context, timeService, claimsService)
         {
             _dbContext = context;
         }
+
     }
 }

@@ -19,7 +19,7 @@ namespace Infrastructures.FluentAPIs
         {
             builder.HasOne(x => x.MainShaphie)
                 .WithMany(x => x.DocumentMainShaphies)
-                .HasForeignKey(x => x.ShaphieId);
+                .HasForeignKey(x => x.MainShaphieId);
         }
     }
     public class ImageMainShaphieConfiguration : IEntityTypeConfiguration<ImageMainShaphie>
@@ -28,7 +28,7 @@ namespace Infrastructures.FluentAPIs
         {
             builder.HasOne(x => x.MainShaphie)
                 .WithMany(x => x.ImageMainShaphies)
-                .HasForeignKey(x => x.ShaphieId);
+                .HasForeignKey(x => x.MainShaphieId);
         }
     }
     public class SecondaryShaphieConfiguration : IEntityTypeConfiguration<SecondaryShaphie>
@@ -47,7 +47,7 @@ namespace Infrastructures.FluentAPIs
         {
             builder.HasOne(x => x.SecondaryShaphie)
                 .WithMany(x => x.DocumentSecondaryShaphies)
-                .HasForeignKey(x => x.ShaphieId);
+                .HasForeignKey(x => x.SecondaryShaphieId);
         }
     }
     public class ImageSecondaryShaphieConfiguration : IEntityTypeConfiguration<ImageSecondaryShaphie>
@@ -56,7 +56,7 @@ namespace Infrastructures.FluentAPIs
         {
             builder.HasOne(x => x.SecondaryShaphie)
                 .WithMany(x => x.ImageSecondaryShaphies)
-                .HasForeignKey(x => x.ShaphieId);
+                .HasForeignKey(x => x.SecondaryShaphieId);
         }
     }
 }

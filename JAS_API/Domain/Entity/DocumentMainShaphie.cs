@@ -10,7 +10,7 @@ namespace Domain.Entity
     {
         public string? DocumentLink { get; set; }
         public string? DocumentTitle { get; set; }
-        public int? ShaphieId { get; set; }
+        public int? MainShaphieId { get; set; }
         //
         public virtual MainShaphie? MainShaphie { get; set; }
     }

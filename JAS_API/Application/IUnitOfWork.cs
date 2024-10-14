@@ -1,5 +1,4 @@
-﻿using Application.Interfaces;
-using Application.Repositories;
+﻿using Application.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;

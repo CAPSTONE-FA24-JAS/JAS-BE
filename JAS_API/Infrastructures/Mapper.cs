@@ -85,6 +85,7 @@ namespace Infrastructures
                 .ForMember(dest => dest.SecondaryDiamonds, opt => opt.MapFrom(src => src.SecondaryDiamonds))
                 .ForMember(dest => dest.MainShaphies, opt => opt.MapFrom(src => src.MainShaphies))
                 .ForMember(dest => dest.SecondaryShaphies, opt => opt.MapFrom(src => src.SecondaryShaphies))
+                .ForMember(dest => dest.Valuation, opt => opt.MapFrom(src => src.Valuation))
                 .ReverseMap();
             CreateMap<CreateFinalValuationDTO, Jewelry>()
                 .ForMember(dest => dest.ImageJewelries, opt => opt.Ignore())
@@ -131,7 +132,8 @@ namespace Infrastructures
             CreateMap<ImageSecondaryDiamond, ImageDiamondDTO>().ReverseMap();
             CreateMap<ImageMainShaphie, ImageShaphieDTO>().ReverseMap();
             CreateMap<ImageSecondaryShaphie, ImageShaphieDTO>().ReverseMap();
-            CreateMap<KeyCharacteristicDetail, KeyCharacteristicDetailDTO>().ReverseMap();  
+            CreateMap<KeyCharacteristicDetail, KeyCharacteristicDetailDTO>()
+                .ForMember(dest => dest.KeyCharacteristic, opt => opt.MapFrom(src => src.KeyCharacteristic)).ReverseMap();  
             CreateMap<DocumentMainDiamond, DocumentDiamondDTO>().ReverseMap();
             CreateMap<DocumentSecondaryDiamond, DocumentDiamondDTO>().ReverseMap();
             CreateMap<DocumentMainShaphie, DocumentShaphieDTO>().ReverseMap();
