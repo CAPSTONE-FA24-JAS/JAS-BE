@@ -20,7 +20,7 @@ namespace Application.ViewModels.JewelryDTOs
         public int? JewelryId { get; set; }
 
         //
-        public IEnumerable<DocumentDiamondDTO>? DocumentShaphies { get; set; }
-        public IEnumerable<ImageDiamondDTO>? ImageShaphies { get; set; }
+        public IEnumerable<DocumentShaphieDTO>? DocumentShaphies { get; set; }
+        public IEnumerable<ImageShaphieDTO>? ImageShaphies { get; set; }
     }
 }

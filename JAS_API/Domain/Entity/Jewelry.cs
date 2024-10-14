@@ -13,6 +13,7 @@ namespace Domain.Entity
         public float? EstimatePriceMin { get; set; }
         public float? EstimatePriceMax { get; set; }
         public float? StartingPrice { get; set; }
+        public float? SpecificPrice { get; set; }
         public string? VideoLink { get; set; }
         public string? ForGender { get; set; }
         public string? Title { get; set; }

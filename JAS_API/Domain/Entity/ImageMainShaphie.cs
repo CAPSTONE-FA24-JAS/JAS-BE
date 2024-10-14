@@ -9,7 +9,7 @@ namespace Domain.Entity
     public class ImageMainShaphie : BaseEntity
     {
         public string? ImageLink { get; set; }
-        public int? ShaphieId { get; set; }
+        public int? MainShaphieId { get; set; }
         //
         public virtual MainShaphie? MainShaphie { get; set; }
     }

@@ -1,5 +1,4 @@
 ﻿using Application;
-using Application.Interfaces;
 using Application.Repositories;
 using Infrastructures.Repositories;
 using System;

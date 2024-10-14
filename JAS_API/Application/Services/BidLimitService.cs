@@ -228,6 +228,10 @@ namespace Application.Services
             switch (status)
             {
                 case nameof(EnumStatusBidLimit.Pending):
+                    //if ()
+                    //{
+
+                    //}
                     break;
             }
             return result;

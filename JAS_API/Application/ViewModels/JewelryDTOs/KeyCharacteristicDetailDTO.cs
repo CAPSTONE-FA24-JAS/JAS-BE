@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Application.ViewModels.KeyCharacteristicDTOs;
+using Domain.Entity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +14,7 @@ namespace Application.ViewModels.JewelryDTOs
         public string? Description { get; set; }
         public int? JewelryId { get; set; }
         public int? KeyCharacteristicId { get; set; }
+        public KeyCharacteristicDTO? KeyCharacteristic { get; set; }
 
     }
 }

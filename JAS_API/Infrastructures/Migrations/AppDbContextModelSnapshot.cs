@@ -756,9 +756,6 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int?>("DiamondId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("DocumentLink")
                         .HasColumnType("text");
 
@@ -822,9 +819,6 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int?>("ShaphieId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("MainShaphieId");
@@ -851,9 +845,6 @@ namespace Infrastructures.Migrations
 
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<int?>("DiamondId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("DocumentLink")
                         .HasColumnType("text");
@@ -916,9 +907,6 @@ namespace Infrastructures.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("SecondaryShaphieId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ShaphieId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -1210,9 +1198,6 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int?>("DiamondId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("ImageLink")
                         .HasColumnType("text");
 
@@ -1270,9 +1255,6 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int?>("ShaphieId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("MainShaphieId");
@@ -1299,9 +1281,6 @@ namespace Infrastructures.Migrations
 
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<int?>("DiamondId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("ImageLink")
                         .HasColumnType("text");
@@ -1358,9 +1337,6 @@ namespace Infrastructures.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("SecondaryShaphieId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ShaphieId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -1559,6 +1535,9 @@ namespace Infrastructures.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
+
+                    b.Property<float?>("SpecificPrice")
+                        .HasColumnType("real");
 
                     b.Property<float?>("StartingPrice")
                         .HasColumnType("real");
@@ -2437,6 +2416,9 @@ namespace Infrastructures.Migrations
 
                     b.Property<int?>("SellerId")
                         .HasColumnType("integer");
+
+                    b.Property<float?>("SpecificPrice")
+                        .HasColumnType("real");
 
                     b.Property<int?>("StaffId")
                         .HasColumnType("integer");

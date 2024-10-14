@@ -9,7 +9,7 @@ namespace Domain.Entity
     public class ImageSecondaryDiamond : BaseEntity
     {
         public string? ImageLink { get; set; }
-        public int? DiamondId { get; set; }
+        public int? SecondaryDiamondId { get; set; }
 
         //
         public virtual SecondaryDiamond? SecondaryDiamond { get; set; }
