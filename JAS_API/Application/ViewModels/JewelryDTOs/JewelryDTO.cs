@@ -1,4 +1,6 @@
-﻿using Application.ViewModels.ValuationDTOs;
+﻿using Application.ViewModels.ArtistDTOs;
+using Application.ViewModels.CategoryDTOs;
+using Application.ViewModels.ValuationDTOs;
 using Domain.Entity;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -17,15 +19,21 @@ namespace Application.ViewModels.JewelryDTOs
         public float? EstimatePriceMin { get; set; }
         public float? EstimatePriceMax { get; set; }
         public float? StartingPrice { get; set; }
+
+        public float? SpecificPrice { get; set; }
         public string? VideoLink { get; set; }
         public string? ForGender { get; set; }
         public string? Title { get; set; }
         public string? BidForm { get; set; }
         public DateTime? Time_Bidding { get; set; }
         public int? ArtistId { get; set; }
+        
         public int? CategoryId { get; set; }
-
+        
         public int? ValuationId { get; set; }
+
+        public ArtistDTO? Artist { get; set; }
+        public CategoryDTO? Category { get; set; }
         public IEnumerable<ImageJewelryDTO>? ImageJewelries { get; set; }
         public IEnumerable<KeyCharacteristicDetailDTO>? KeyCharacteristicDetails { get; set; }
         public IEnumerable<DiamondDTO>? MainDiamonds { get; set; }
