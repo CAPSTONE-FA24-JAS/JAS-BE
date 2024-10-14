@@ -1,5 +1,6 @@
 ﻿
 using Application.ViewModels.AccountDTOs;
+using Application.ViewModels.JewelryDTOs;
 using Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -34,5 +35,6 @@ namespace Application.ViewModels.ValuationDTOs
         public StaffDTO? Appraiser { get; set; }
         public IEnumerable<ImageValuationDTO>? ImageValuations { get; set; }
         public IEnumerable<ValuationDocumentDTO>? ValuationDocuments { get; set; }
+        public JewelryDTO? Jewelry { get; set; }
     }
 }
