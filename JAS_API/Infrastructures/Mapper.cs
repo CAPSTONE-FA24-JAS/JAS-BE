@@ -74,7 +74,9 @@ namespace Infrastructures
             CreateMap<Wallet, CreateWalletDTO>().ReverseMap();
             CreateMap<Wallet, WalletDTO>().ReverseMap()
                 .ForMember(desc => desc.Customer, src => src.MapFrom(x => x.CustomerDTO));
-            CreateMap<Auction, AuctionDTO>().ReverseMap();
+            CreateMap<Auction, AuctionDTO>()
+                .ForPath(dest => dest.TotalLot, src => src.MapFrom(x => x.Lots.Count()))
+                .ReverseMap();
             CreateMap<Auction, CreateAuctionDTO>().ReverseMap();
             CreateMap<Auction, UpdateAuctionDTO>().ReverseMap();
             CreateMap<HistoryValuation, HistoryValuationDTO>().ReverseMap();

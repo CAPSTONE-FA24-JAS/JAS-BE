@@ -119,7 +119,7 @@ namespace Application.Services
             {
                 var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: null,
                                                                              orderBy: x => x.OrderByDescending(t => t.CreationDate),
-                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff",
+                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff,Appraiser",
                                                                              pageIndex: pageIndex,
                                                                              pageSize: pageSize);
                 List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
@@ -306,7 +306,7 @@ namespace Application.Services
 
                 var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
                                                                              orderBy: x => x.OrderByDescending( t => t.CreationDate),
-                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff",
+                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff,Appraiser",
                                                                              pageIndex: pageIndex,
                                                                              pageSize: pageSize);
                 List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
@@ -366,7 +366,7 @@ namespace Application.Services
 
                 var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
                                                                              orderBy: x => x.OrderByDescending(t => t.CreationDate),
-                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff",
+                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff,Appraiser",
                                                                              pageIndex: pageIndex,
                                                                              pageSize: pageSize);
                 List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
@@ -498,12 +498,12 @@ namespace Application.Services
                 if (valuationById != null)
                 {
                     valuationById.ActualStatusOfJewelry = receipt.ActualStatusOfJewelry;
-
+                    
+                    valuationById.Status = valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == receipt.Status).Name;
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
 
-                    var statusTranfer = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == receipt.Status).Name;
-                    AddHistoryValuation(valuationById.Id, statusTranfer);                    
+                    AddHistoryValuation(valuationById.Id, valuationById.Status);                    
 
                     byte[] pdfBytes = CreatePDFFile.CreatePDF(valuationById);
 
@@ -627,7 +627,126 @@ namespace Application.Services
 
                 var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
                                                                              orderBy: x => x.OrderByDescending(t => t.CreationDate),
-                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff",
+                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff,Appraiser",
+                                                                             pageIndex: pageIndex,
+                                                                             pageSize: pageSize);
+                List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
+                if (valuations.totalItems > 0)
+                {
+                    foreach (var item in valuations.data)
+                    {
+
+                        var valuationsResponse = _mapper.Map<ValuationDTO>(item);
+                        listValuationDTO.Add(valuationsResponse);
+                    };
+
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listValuationDTO,
+                        totalItemRepsone = valuations.totalItems
+                    };
+                    response.Message = $"List consign items Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have valuations";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> getPreliminaryValuationByStatusOfAppraiserAsync(int appraiserId, int? status, int? pageSize, int? pageIndex)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                Expression<Func<Valuation, bool>> filter;
+
+                if (status != null)
+                {
+                    var statusTranfer = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+                    filter = x => x.AppraiserId == appraiserId && statusTranfer.Equals(x.Status);
+                }
+                else
+                {
+                    filter = x => x.AppraiserId == appraiserId;
+                }
+
+                var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
+                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff,Appraiser",
+                                                                             pageIndex: pageIndex,
+                                                                             pageSize: pageSize);
+                List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
+                if (valuations.totalItems > 0)
+                {
+                    foreach (var item in valuations.data)
+                    {
+
+                        var valuationsResponse = _mapper.Map<ValuationDTO>(item);
+                        listValuationDTO.Add(valuationsResponse);
+                    };
+
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listValuationDTO,
+                        totalItemRepsone = valuations.totalItems
+                    };
+                    response.Message = $"List consign items Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have valuations";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> getPreliminaryValuationsOfStaffAsync(int staffId, int? pageSize, int? pageIndex)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                Expression<Func<Valuation, bool>> filter;
+
+
+                var allowedStatuses = new List<int> { 3, 4, 5 };
+                var statusTranfer = EnumHelper.GetEnums<EnumStatusValuation>()
+                                              .Where(x => allowedStatuses.Contains(x.Value))
+                                              .Select(x => x.Name);
+                filter = x => x.StaffId == staffId && statusTranfer.Contains(x.Status);
+
+                var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
+                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff,Appraiser",
                                                                              pageIndex: pageIndex,
                                                                              pageSize: pageSize);
                 List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();

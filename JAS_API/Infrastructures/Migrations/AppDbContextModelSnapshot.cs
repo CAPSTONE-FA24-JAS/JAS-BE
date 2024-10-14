@@ -661,6 +661,9 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<DateTime?>("ExpireDateOfBidLimit")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -675,6 +678,9 @@ namespace Infrastructures.Migrations
 
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<float?>("PriceLimit")
+                        .HasColumnType("real");
 
                     b.Property<string>("Status")
                         .HasColumnType("text");

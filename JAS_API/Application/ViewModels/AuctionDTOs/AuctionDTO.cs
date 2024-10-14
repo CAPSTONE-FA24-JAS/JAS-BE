@@ -17,6 +17,7 @@ namespace Application.ViewModels.AuctionDTOs
         public string? Description { get; set; }
         public string? ImageLink { get; set; }
         public string? Status { get; set; }
+        public int? TotalLot {  get; set; } 
 
         //public virtual IEnumerable<Lot>? Lots { get; set; }
     }

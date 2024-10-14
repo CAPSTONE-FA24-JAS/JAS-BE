@@ -16,6 +16,8 @@ namespace Domain.Entity
         public int? LotId { get; set; }
         public float? BidLimit { get; set; }
         public float? AutoBidPrice { get; set; }
+        public float? PriceLimit { get; set; }
+        public DateTime? ExpireDateOfBidLimit { get; set; }
         //
 
         public virtual Customer? Customer { get; set; }
