@@ -1,6 +1,7 @@
 ﻿using Application;
 using Application.Interfaces;
 using Application.Repositories;
+using Infrastructures.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,7 @@ namespace Infrastructures
         private readonly IDocumentSecondaryShaphieRepository _documentSecondaryShaphieRepository;
         private readonly IImageMainShaphieRepository _imageMainShaphieRepository;
         private readonly IImageSecondaryShaphieRepository _imageSecondaryShaphieRepository;
+        private readonly ILotRepository _lotRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -61,7 +63,8 @@ namespace Infrastructures
                           IDocumentMainDiamondRepository documentMainDiamondRepository, IDocumentSecondaryDiamondRepository documentSecondaryDiamondRepository,
                           IImageMainDiamondRepository imageMainDiamondRepository, IImageSecondDiamondRepository imageSecondDiamondRepository,
                           IDocumentMainShaphieRepository documentMainShaphieRepository, IDocumentSecondaryShaphieRepository documentSecondaryShaphieRepository,
-                          IImageMainShaphieRepository imageMainShaphieRepository, IImageSecondaryShaphieRepository imageSecondaryShaphieRepository)
+                          IImageMainShaphieRepository imageMainShaphieRepository, IImageSecondaryShaphieRepository imageSecondaryShaphieRepository,
+                          ILotRepository lotRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -97,6 +100,7 @@ namespace Infrastructures
             _documentSecondaryShaphieRepository = documentSecondaryShaphieRepository;
             _imageMainShaphieRepository = imageMainShaphieRepository;
             _imageSecondaryShaphieRepository = imageSecondaryShaphieRepository;
+            _lotRepository = lotRepository; 
 
         }
 
@@ -105,27 +109,17 @@ namespace Infrastructures
         public IBidLimitRepository BidLimitRepository => _bidLimitRepository;
         public IImageValuationRepository ImageValuationRepository => _imageValuationRepository;
         public IValuationRepository ValuationRepository => _valuationRepository;
-
         public IAddressToShipRepository AddressToShipRepository => _addressToShipRepository;
-
         public IWardRepository WardRepository => _wardRepository;
-
         public IDistrictRepository IDistrictRepository => _districtRepository;
-
         public IProvinceRepository ProvininceRepository => _provinceRepository;
-
         public IValuationDocumentRepository ValuationDocumentRepository => _valuationDocumentRepository;
-
         public ICustomerRepository CustomerRepository => _customerRepository;
         public IWalletRepository WalletRepository => _walletRepository;
-
         public IAuctionRepository AuctionRepository => _auctionRepository;
         public IHistoryValuationRepository HistoryValuationRepository => _historyValuationRepository;
-
         public IJewelryRepository JewelryRepository => _jewelryRepository;
-
         public IKeyCharacteristicRepository KeyCharacteristicRepository => _keyCharacteristicRepository;   
-        
         public ICategoryRepository CategoryRepository => _categoryRepository;
 
         public IArtistRepository ArtistRepository => _artistRepository;
@@ -157,6 +151,8 @@ namespace Infrastructures
         public IImageMainShaphieRepository ImageMainShaphieRepository => _imageMainShaphieRepository;
 
         public IImageSecondaryShaphieRepository ImageSecondaryShaphieRepository => _imageSecondaryShaphieRepository;
+
+        public ILotRepository LotRepository => _lotRepository;
 
         public async Task<int> SaveChangeAsync()
         {
