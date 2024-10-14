@@ -17,5 +17,5 @@ namespace Domain.Entity
         public string? Status { get; set; }
         //
         public virtual Customer? Customer { get; set; }
-    }
+     }
 }
