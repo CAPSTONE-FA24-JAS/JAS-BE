@@ -531,7 +531,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> RequestOTPForAuthorizedBySellerAsync(int jewelryId, int sellerId)
+        public async Task<APIResponseModel> RequestOTPForAuthorizedBySellerAsync(int valuationId, int sellerId)
         {
             var response = new APIResponseModel();
             try
@@ -545,7 +545,7 @@ namespace Application.Services
                     response.Message = "user not found";
                     response.Code = 404;
                 }
-                var otp = OtpService.GenerateOtpForAuthorized(seller.Account.ConfirmationToken, jewelryId, sellerId);
+                var otp = OtpService.GenerateOtpForAuthorized(seller.Account.ConfirmationToken, valuationId, sellerId);
                 var emailSent = await SendEmail.SendEmailOTP(seller.Account.Email, otp);
                 if (!emailSent)
                 {
@@ -568,14 +568,14 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> VerifyOTPForAuthorizedBySellerAsync(int jewelryId, int sellerId, string opt)
+        public async Task<APIResponseModel> VerifyOTPForAuthorizedBySellerAsync(int valuationId, int sellerId, string opt)
         {
             var response = new APIResponseModel();
             try
             {
                 var seller = await _unitOfWork.CustomerRepository.GetByIdAsync(sellerId);
-                var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(jewelryId);
-                var statusResult = OtpService.ValidateOtpForAuthorized(seller.Account.ConfirmationToken, jewelryId, sellerId, opt);
+                var valuation = await _unitOfWork.ValuationRepository.GetByIdAsync(valuationId);
+                var statusResult = OtpService.ValidateOtpForAuthorized(seller.Account.ConfirmationToken, valuationId, sellerId, opt);
                 dynamic validationResult = statusResult;
                 if (!validationResult.status)
                 {
@@ -586,16 +586,19 @@ namespace Application.Services
                 else
                 {
                     var status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == 8).Name;
-                    jewelry.Valuation.Status = status;
-                    var valuation = _mapper.Map<Valuation>(jewelry.Valuation);
+                    valuation.Status = status;
+                    
                     _unitOfWork.ValuationRepository.Update(valuation);
 
+                    var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(valuation.Jewelry.Id);
+                    jewelry.Status = status;
+                    _unitOfWork.JewelryRepository.Update(jewelry);
                     AddHistoryValuation(valuation.Id, status);
                     await _unitOfWork.SaveChangeAsync();
 
-                    byte[] pdfBytes = CreateAuthorizedPDFFile.CreateAuthorizedPDF(jewelry.Valuation);
+                    byte[] pdfBytes = CreateAuthorizedPDFFile.CreateAuthorizedPDF(valuation);
 
-                    string filePath = $"GiayUyQuyen_{jewelry.Valuation.Id}.pdf";
+                    string filePath = $"GiayUyQuyen_{valuation.Id}.pdf";
 
                     await File.WriteAllBytesAsync(filePath, pdfBytes);
 
@@ -616,11 +619,11 @@ namespace Application.Services
                     {
                         var valuationDoc = new ValuationDocumentDTO
                         {
-                            ValuationId = jewelry.Valuation.Id,
+                            ValuationId = valuation.Id,
                             ValuationDocumentType = "Authorized",
                             DocumentLink = uploadFile.SecureUrl.AbsoluteUri,
                             CreationDate = DateTime.Now,
-                            CreatedBy = jewelry.Valuation.StaffId
+                            CreatedBy = valuation.StaffId
                         };
                         var entity = _mapper.Map<ValuationDocument>(valuationDoc);
                         await _unitOfWork.ValuationDocumentRepository.AddAsync(entity);

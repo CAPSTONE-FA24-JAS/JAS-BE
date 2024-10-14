@@ -43,7 +43,7 @@ namespace Application.Utils
                 var Base = Base32Encoding.ToString(hashBytes); // Chuyển hash thành Base32
                 var secretKeyBytes = Base32Encoding.ToBytes(Base); // Chuyển Base32 thành mảng byte
 
-                var totp = new Totp(secretKeyBytes, step: 60);
+                var totp = new Totp(secretKeyBytes, step: 200);
                 var otp = totp.ComputeTotp();
                 return otp;
             }
@@ -59,7 +59,7 @@ namespace Application.Utils
                 var Base = Base32Encoding.ToString(hashBytes); // Chuyển hash thành Base32
                 var secretKeyBytes = Base32Encoding.ToBytes(Base); // Chuyển Base32 thành mảng byte
 
-                var totp = new Totp(secretKeyBytes, step: 60);
+                var totp = new Totp(secretKeyBytes, step: 200);
                 bool isValid = totp.VerifyTotp(otp, out long timeStepMatched, VerificationWindow.RfcSpecifiedNetworkDelay);
 
                 if (isValid)
