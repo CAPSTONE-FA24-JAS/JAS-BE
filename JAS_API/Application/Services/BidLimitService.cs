@@ -211,6 +211,27 @@ namespace Application.Services
             return reponse;
         }
 
+        public object checkStatus(BidLimit bidLimit, string status)
+        {
+            object result = (status: true, msg: "Status is suiable");
+            //kiểm tra status đầu tiên là pending
+            //if(bidLimit.Status == status && status == EnumStatusBidLimit.Pending.ToString())// nếu pending vẫn là pending
+            //{
+            //    result = (status : false, msg : "Status of object is pending , cannt set pending again");
+            //    return result;
+            //}
+            //if ()
+            //{
+
+            //}
+
+            switch (status)
+            {
+                case nameof(EnumStatusBidLimit.Pending):
+                    break;
+            }
+            return result;
+        }
         public async Task<APIResponseModel> GetStatusBidLimt()
         {
             var reponse = new APIResponseModel();
