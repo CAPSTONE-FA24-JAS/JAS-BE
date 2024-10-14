@@ -10,6 +10,6 @@ namespace Application.Repositories
 {
     public interface IJewelryRepository : IGenericRepository<Jewelry>
     {
-        Task<IEnumerable<Jewelry>> GetAllAynsc(int? pageIndex = null, int? pageSize = null);
+        Task<(IEnumerable<Jewelry> data, int totalItem)> GetAllJewelryAynsc(int? pageIndex = null, int? pageSize = null);
     }
 }

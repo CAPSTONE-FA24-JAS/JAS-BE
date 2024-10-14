@@ -86,10 +86,14 @@ namespace Application.Services
                     response.IsSuccess = false;
                     response.Message = "Mapper failed";
                 }
+                var status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == 6).Name;
                 jewelry.CreationDate = DateTime.Now;
-                jewelry.Valuation.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == 6).Name;
+                var valuation = await _unitOfWork.ValuationRepository.GetByIdAsync(jewelryDTO.ValuationId);
 
-                AddHistoryValuation(jewelry.Valuation.Id, jewelry.Valuation.Status);
+                valuation.Status = status;              
+                jewelry.Status = status;
+
+                AddHistoryValuation(jewelryDTO.ValuationId, status);
 
                 await _unitOfWork.JewelryRepository.AddAsync(jewelry);
                 await _unitOfWork.SaveChangeAsync();
@@ -197,10 +201,11 @@ namespace Application.Services
                     var imageMainDiamond = new ImageDiamondDTO
                     {
                         ImageLink = uploadImage.SecureUrl.AbsoluteUri,
-                        DiamondId = diamondId
+                        
                     };
 
                     var imageMainDiamondDTO = _mapper.Map<ImageMainDiamond>(imageMainDiamond);
+                    imageMainDiamondDTO.MainDiamondId = diamondId;
                     await _unitOfWork.ImageMainDiamondRepository.AddAsync(imageMainDiamondDTO);
                     await _unitOfWork.SaveChangeAsync();
                 }
@@ -216,10 +221,11 @@ namespace Application.Services
                     {
                         DocumentLink = uploadImage.SecureUrl.AbsoluteUri,
                         DocumentTitle = "Document of Diamond",
-                        DiamondId = diamondId
+                        
                     };
 
                     var documentMainDiamondDTO = _mapper.Map<DocumentMainDiamond>(documentMainDiamond);
+                    documentMainDiamondDTO.MainDiamondId = diamondId;
                     await _unitOfWork.DocumentMainDiamondRepository.AddAsync(documentMainDiamondDTO);
                     await _unitOfWork.SaveChangeAsync();
                 }
@@ -250,10 +256,11 @@ namespace Application.Services
                     var imageSecondDiamond = new ImageDiamondDTO
                     {
                         ImageLink = uploadImage.SecureUrl.AbsoluteUri,
-                        DiamondId = diamondId
+                       
                     };
 
                     var imageSecondDiamondDTO = _mapper.Map<ImageSecondaryDiamond>(imageSecondDiamond);
+                    imageSecondDiamondDTO.SecondaryDiamondId = diamondId;
                     await _unitOfWork.ImageSecondDiamondRepository.AddAsync(imageSecondDiamondDTO);
                     await _unitOfWork.SaveChangeAsync();
                 }
@@ -269,10 +276,11 @@ namespace Application.Services
                     {
                         DocumentLink = uploadImage.SecureUrl.AbsoluteUri,
                         DocumentTitle = "Document of Diamond",
-                        DiamondId = diamondId
+                       
                     };
 
                     var documentSecondDiamondDTO = _mapper.Map<DocumentSecondaryDiamond>(documentSecondDiamond);
+                    documentSecondDiamondDTO.SecondaryDiamondId = diamondId;
                     await _unitOfWork.DocumentSecondaryDiamondRepository.AddAsync(documentSecondDiamondDTO);
                     await _unitOfWork.SaveChangeAsync();
                 }
@@ -303,10 +311,11 @@ namespace Application.Services
                     var imageMainShaphie = new ImageShaphieDTO
                     {
                         ImageLink = uploadImage.SecureUrl.AbsoluteUri,
-                        ShaphieId = shaphieId
+                         
                     };
 
                     var imageMainShaphieDTO = _mapper.Map<ImageMainShaphie>(imageMainShaphie);
+                    imageMainShaphieDTO.MainShaphieId = shaphieId;
                     await _unitOfWork.ImageMainShaphieRepository.AddAsync(imageMainShaphieDTO);
                     await _unitOfWork.SaveChangeAsync();
                 }
@@ -322,10 +331,11 @@ namespace Application.Services
                     {
                         DocumentLink = uploadImage.SecureUrl.AbsoluteUri,
                         DocumentTitle = "Document of Shaphie",
-                        ShaphieId = shaphieId
+                        
                     };
 
                     var documentMainShaphieDTO = _mapper.Map<DocumentMainShaphie>(documentMainShaphie);
+                    documentMainShaphieDTO.MainShaphieId = shaphieId;
                     await _unitOfWork.DocumentMainShaphieRepository.AddAsync(documentMainShaphieDTO);
                     await _unitOfWork.SaveChangeAsync();
                 }
@@ -357,10 +367,11 @@ namespace Application.Services
                     var imageSecondShaphie = new ImageShaphieDTO
                     {
                         ImageLink = uploadImage.SecureUrl.AbsoluteUri,
-                        ShaphieId = shaphieId
+                        
                     };
 
                     var imageSecondShaphieDTO = _mapper.Map<ImageSecondaryShaphie>(imageSecondShaphie);
+                    imageSecondShaphieDTO.SecondaryShaphieId = shaphieId;
                     await _unitOfWork.ImageSecondaryShaphieRepository.AddAsync(imageSecondShaphieDTO);
                     await _unitOfWork.SaveChangeAsync();
                 }
@@ -376,10 +387,11 @@ namespace Application.Services
                     {
                         DocumentLink = uploadImage.SecureUrl.AbsoluteUri,
                         DocumentTitle = "Document of Shaphie",
-                        ShaphieId = shaphieId
+                        
                     };
 
                     var documentSecondShaphieDTO = _mapper.Map<DocumentSecondaryShaphie>(documentSecondShaphie);
+                    documentSecondShaphieDTO.SecondaryShaphieId = shaphieId;
                     await _unitOfWork.DocumentSecondaryShaphieRepository.AddAsync(documentSecondShaphieDTO);
                     await _unitOfWork.SaveChangeAsync();
                 }
@@ -393,13 +405,15 @@ namespace Application.Services
             var response = new APIResponseModel();
             try
             {
-                var jewelrys = await _unitOfWork.JewelryRepository.GetAllPaging(filter: null,
-                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
-                                                                             includeProperties: "Artist,Category,ImageJewelries,KeyCharacteristicDetails,Lot,MainDiamonds,SecondaryDiamonds,MainShaphies,SecondaryShaphies,Valuation",
-                                                                             pageIndex: pageIndex,
-                                                                             pageSize: pageSize);
+                //var jewelrys = await _unitOfWork.JewelryRepository.GetAllPaging(filter: null,
+                //                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                //                                                             includeProperties: "Artist,Category,ImageJewelries,KeyCharacteristicDetails,Lot,MainDiamonds,SecondaryDiamonds,MainShaphies,SecondaryShaphies,Valuation",
+                //                                                             pageIndex: pageIndex,
+                //                                                             pageSize: pageSize);
+
+                var jewelrys = await _unitOfWork.JewelryRepository.GetAllJewelryAynsc(pageSize, pageIndex);
                 List<JewelryDTO> listjewelryDTO = new List<JewelryDTO>();
-                if (jewelrys.totalItems > 0)
+                if (jewelrys.totalItem > 0)
                 {
                     response.Message = $"List consign items Successfully";
                     response.Code = 200;
@@ -413,7 +427,7 @@ namespace Application.Services
                     var dataresponse = new
                     {
                         DataResponse = listjewelryDTO,
-                        totalItemRepsone = jewelrys.totalItems
+                        totalItemRepsone = jewelrys.totalItem
                     };
 
                     response.Data = dataresponse;

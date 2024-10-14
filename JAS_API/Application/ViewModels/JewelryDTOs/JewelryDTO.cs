@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Application.ViewModels.ValuationDTOs;
+using Domain.Entity;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,11 +24,15 @@ namespace Application.ViewModels.JewelryDTOs
         public DateTime? Time_Bidding { get; set; }
         public int? ArtistId { get; set; }
         public int? CategoryId { get; set; }
+
+        public int? ValuationId { get; set; }
         public IEnumerable<ImageJewelryDTO>? ImageJewelries { get; set; }
         public IEnumerable<KeyCharacteristicDetailDTO>? KeyCharacteristicDetails { get; set; }
         public IEnumerable<DiamondDTO>? MainDiamonds { get; set; }
         public IEnumerable<DiamondDTO>? SecondaryDiamonds { get; set; }
         public IEnumerable<ShapieDTO>? MainShaphies { get; set; }
         public IEnumerable<ShapieDTO>? SecondaryShaphies { get; set; }
+
+        public ValuationDTO? Valuation { get; set; }
     }
 }
