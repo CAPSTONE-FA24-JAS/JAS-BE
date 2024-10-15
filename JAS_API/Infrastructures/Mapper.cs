@@ -62,6 +62,7 @@ namespace Infrastructures
                 .ForMember(dest => dest.ValuationDocuments, opt => opt.MapFrom(src => src.ValuationDocuments))
                 .ForMember(dest => dest.Staff, opt => opt.MapFrom(src => src.Staff))
                 .ForMember(dest => dest.Appraiser, opt => opt.MapFrom(src => src.Appraiser))
+                .ForMember(dest => dest.Jewelry, opt => opt.MapFrom(src => src.Jewelry))
                 .ReverseMap();
             CreateMap<ValuationDocument, ValuationDocumentDTO>().ReverseMap();
             CreateMap<AddressToShip, CreateAddressToShipDTO>().ReverseMap();

@@ -74,9 +74,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> RequestOTPForAuthorizedBySellerAsync(int jewelryId, int sellerId)
+        public async Task<IActionResult> RequestOTPForAuthorizedBySellerAsync(int valuationId, int sellerId)
         {
-            var result = await _jewelryService.RequestOTPForAuthorizedBySellerAsync(jewelryId, sellerId);
+            var result = await _jewelryService.RequestOTPForAuthorizedBySellerAsync(valuationId, sellerId);
             if (result.IsSuccess)
             {
                 return Ok(result);
@@ -88,9 +88,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> VerifyOTPForAuthorizedBySellerAsync(int jewelryId, int sellerId, string opt)
+        public async Task<IActionResult> VerifyOTPForAuthorizedBySellerAsync(int valuationId, int sellerId, string opt)
         {
-            var result = await _jewelryService.VerifyOTPForAuthorizedBySellerAsync(jewelryId, sellerId, opt);
+            var result = await _jewelryService.VerifyOTPForAuthorizedBySellerAsync(valuationId, sellerId, opt);
             if (result.IsSuccess)
             {
                 return Ok(result);
