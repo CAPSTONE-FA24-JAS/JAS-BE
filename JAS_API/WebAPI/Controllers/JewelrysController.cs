@@ -31,7 +31,7 @@ namespace WebAPI.Controllers
         }
 
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> GetJewelryAsync(int? pageSize, int? pageIndex)
         {
             var result = await _jewelryService.GetJewelryAsync(pageSize, pageIndex);
