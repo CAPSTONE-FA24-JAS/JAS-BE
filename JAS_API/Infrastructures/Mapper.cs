@@ -15,6 +15,7 @@ using Application.ViewModels.WalletDTOs;
 using Application.ViewModels.WardDTOs;
 using AutoMapper;
 using Domain.Entity;
+using Application.ViewModels.LotDTOs;
 
 
 namespace Infrastructures
@@ -88,6 +89,8 @@ namespace Infrastructures
                 .ForMember(dest => dest.MainShaphies, opt => opt.MapFrom(src => src.MainShaphies))
                 .ForMember(dest => dest.SecondaryShaphies, opt => opt.MapFrom(src => src.SecondaryShaphies))
                 .ForMember(dest => dest.Valuation, opt => opt.MapFrom(src => src.Valuation))
+                .ForMember(dest => dest.Artist, opt => opt.MapFrom(src => src.Artist))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
                 .ReverseMap();
             CreateMap<CreateFinalValuationDTO, Jewelry>()
                 .ForMember(dest => dest.ImageJewelries, opt => opt.Ignore())
@@ -143,9 +146,14 @@ namespace Infrastructures
             CreateMap<KeyCharacteristic, KeyCharacteristicDTO>().ReverseMap();
             CreateMap<Category, CategoryDTO>().ReverseMap();
             CreateMap<Artist, ArtistDTO>().ReverseMap();
+            CreateMap<Lot, CreateLotFixedPriceDTO>().ReverseMap();
+            CreateMap<Lot, CreateLotSecretAuctionDTO>().ReverseMap();
+            CreateMap<Lot, CreateLotPublicAuctionDTO>().ReverseMap();
+            CreateMap<Lot, CreateLotAuctionPriceGraduallyReducedDTO>().ReverseMap();
 
-            
-                
+
+
+
 
         }
     }
