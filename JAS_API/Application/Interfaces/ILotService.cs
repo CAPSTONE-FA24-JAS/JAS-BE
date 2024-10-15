@@ -9,6 +9,9 @@ namespace Application.Interfaces
 {
     public interface ILotService
     {
-        Task<APIResponseModel> CreateLotType();
+        Task<APIResponseModel> CreateLot(object lotDTO);
+        Task<APIResponseModel> GetLotTypes();
+        Task<APIResponseModel> GetLotTypeById(int lotTypeId);
+
     }
 }

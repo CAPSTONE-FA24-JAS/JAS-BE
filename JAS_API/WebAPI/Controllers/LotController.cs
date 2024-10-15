@@ -1,0 +1,86 @@
+﻿using Application.Interfaces;
+using Application.ViewModels.LotDTOs;
+using Domain.Enums;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace WebAPI.Controllers
+{
+    
+    public class LotController : BaseController
+    {
+        private readonly ILotService _lotService;
+
+        public LotController(ILotService lotService)
+        {
+            _lotService = lotService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewListLotType()
+        {
+            var result = await _lotService.GetLotTypes();
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewLotTypeById(int lotTypeId)
+        {
+            var result = await _lotService.GetLotTypeById(lotTypeId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateLotFixedPrice(CreateLotFixedPriceDTO createLotDTO)
+        {
+            var result = await _lotService.CreateLot(createLotDTO);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateLotSecretAuction(CreateLotSecretAuctionDTO createLotDTO)
+        {
+            var result = await _lotService.CreateLot(createLotDTO);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateLotPublicAuction(CreateLotPublicAuctionDTO createLotDTO)
+        {
+            var result = await _lotService.CreateLot(createLotDTO);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreateLotAuctionPriceGraduallyReduced(CreateLotAuctionPriceGraduallyReducedDTO createLotDTO)
+        {
+            var result = await _lotService.CreateLot(createLotDTO);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+    }
+}
