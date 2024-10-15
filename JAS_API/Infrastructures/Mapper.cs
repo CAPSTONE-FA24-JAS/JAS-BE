@@ -15,6 +15,7 @@ using Application.ViewModels.WalletDTOs;
 using Application.ViewModels.WardDTOs;
 using AutoMapper;
 using Domain.Entity;
+using Application.ViewModels.LotDTOs;
 
 
 namespace Infrastructures
@@ -146,9 +147,14 @@ namespace Infrastructures
             CreateMap<KeyCharacteristic, KeyCharacteristicDTO>().ReverseMap();
             CreateMap<Category, CategoryDTO>().ReverseMap();
             CreateMap<Artist, ArtistDTO>().ReverseMap();
+            CreateMap<Lot, CreateLotFixedPriceDTO>().ReverseMap();
+            CreateMap<Lot, CreateLotSecretAuctionDTO>().ReverseMap();
+            CreateMap<Lot, CreateLotPublicAuctionDTO>().ReverseMap();
+            CreateMap<Lot, CreateLotAuctionPriceGraduallyReducedDTO>().ReverseMap();
 
-            
-                
+
+
+
 
         }
     }

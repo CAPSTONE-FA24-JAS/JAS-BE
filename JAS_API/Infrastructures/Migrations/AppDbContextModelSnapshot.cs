@@ -1718,6 +1718,9 @@ namespace Infrastructures.Migrations
                     b.Property<int?>("JewelryId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("LotType")
+                        .HasColumnType("text");
+
                     b.Property<int?>("ModificationBy")
                         .HasColumnType("integer");
 
