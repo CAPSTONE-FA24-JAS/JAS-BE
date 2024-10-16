@@ -15,6 +15,8 @@ namespace Application.Interfaces
 
         public Task<APIResponseModel> GetJewelryAsync(int? pageSize, int? pageIndex);
 
+        public Task<APIResponseModel> GetJewelryNoLotAsync(int? pageSize, int? pageIndex);
+
         public Task<APIResponseModel> RequestFinalValuationForManagerAsync(RequestFinalValuationForManagerDTO requestDTO);
 
         public Task<APIResponseModel> UpdateStatusByManagerAsync(int jewelryId, int status);
