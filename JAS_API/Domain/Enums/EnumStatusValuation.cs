@@ -8,15 +8,15 @@ namespace Domain.Enums
 {
     public enum EnumStatusValuation
     {
-        Requested,
-        Assigned,
-        RequestedPreliminary,
-        Preliminary,
-        ApprovedPreliminary,
-        RecivedJewelry,
-        FinalValuated,
-        ManagerApproved,
-        Authorized,
-        RejectedPreliminary
+        Requested = 0,
+        Assigned = 1,
+        RequestedPreliminary = 2,
+        Preliminary = 3,
+        ApprovedPreliminary = 4,
+        RecivedJewelry = 5,
+        FinalValuated = 6,
+        ManagerApproved = 7,
+        Authorized = 8,
+        RejectedPreliminary = 9
     }
 }

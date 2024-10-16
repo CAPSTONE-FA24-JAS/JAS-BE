@@ -1,4 +1,5 @@
 ﻿using Application.ServiceReponse;
+using Application.ViewModels.LotDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,5 @@ namespace Application.Interfaces
         Task<APIResponseModel> GetLotTypeById(int lotTypeId);
         Task<APIResponseModel> GetLots();
         Task<APIResponseModel> GetLotById(int Id);
-
-
     }
 }

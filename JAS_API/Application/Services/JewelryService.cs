@@ -91,7 +91,7 @@ namespace Application.Services
                 var valuation = await _unitOfWork.ValuationRepository.GetByIdAsync(jewelryDTO.ValuationId);
 
                 valuation.Status = status;              
-                jewelry.Status = status;
+                
 
                 AddHistoryValuation(jewelryDTO.ValuationId, status);
 
@@ -506,12 +506,12 @@ namespace Application.Services
                     _unitOfWork.JewelryRepository.Update(jewelryById);
                     await _unitOfWork.SaveChangeAsync();
 
-                    var valuationDTO = _mapper.Map<JewelryDTO>(jewelryById);
+                    var jewelryDTO = _mapper.Map<JewelryDTO>(jewelryById);
 
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
-                    response.Data = valuationDTO;
+                    response.Data = jewelryDTO;
                 }
                 else
                 {
@@ -640,6 +640,56 @@ namespace Application.Services
             {
                 response.IsSuccess = false;
                 response.Message = "Error";
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> GetJewelryNoLotAsync(int? pageSize, int? pageIndex)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                //var jewelrys = await _unitOfWork.JewelryRepository.GetAllPaging(filter: null,
+                //                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                //                                                             includeProperties: "Artist,Category,ImageJewelries,KeyCharacteristicDetails,Lot,MainDiamonds,SecondaryDiamonds,MainShaphies,SecondaryShaphies,Valuation",
+                //                                                             pageIndex: pageIndex,
+                //                                                             pageSize: pageSize);
+
+                var jewelrys = await _unitOfWork.JewelryRepository.GetAllJewelryNoLotAynsc(pageSize, pageIndex);
+                List<JewelryDTO> listjewelryDTO = new List<JewelryDTO>();
+                if (jewelrys.totalItem > 0)
+                {
+                    response.Message = $"List consign items Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    foreach (var item in jewelrys.data)
+                    {
+                        var jewelrysResponse = _mapper.Map<JewelryDTO>(item);
+                        listjewelryDTO.Add(jewelrysResponse);
+                    };
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listjewelryDTO,
+                        totalItemRepsone = jewelrys.totalItem
+                    };
+
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have valuations";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
             }
             return response;
         }
