@@ -12,6 +12,7 @@ namespace Application.ViewModels.LotDTOs
 {
     public class LotDTO
     {
+        public int? Id { get; set; }
         public float? StartPrice { get; set; }
         public float? CurrentPrice { get; set; }
         public float? FinalPriceSold { get; set; }
