@@ -171,7 +171,7 @@ namespace Application.Services
                         var check = (ValueTuple<bool, string>)checkStatus(bidLimit, status);
                         if (check.Item1 == true)
                         {
-                            if(status == EnumStatusBidLimit.SetPrice.ToString())
+                            if(status == EnumStatusBidLimit.Processing.ToString())
                             {
                                 bidLimit.PriceLimit = updateBidLimitDTO.PriceLimit;
                                 bidLimit.StaffId = updateBidLimitDTO.StaffId;
@@ -239,12 +239,12 @@ namespace Application.Services
                     {
                         result = (status: false, msg: "Status of object is Approve or Reject , cannt set Pending ");
                     }
-                    if (bidLimit.Status == EnumStatusBidLimit.SetPrice.ToString())
+                    if (bidLimit.Status == EnumStatusBidLimit.Processing.ToString())
                     {
                         result = (status: false, msg: "Status of object is SetPrice , cannt set pending again");
                     }
                     break;
-                case nameof(EnumStatusBidLimit.SetPrice):
+                case nameof(EnumStatusBidLimit.Processing):
                     //if (bidLimit.Status == EnumStatusBidLimit.Pending.ToString())
                     //{
                     //    result = (status: false, msg: "Status of object is setprrice , cannt set pending");
@@ -284,6 +284,24 @@ namespace Application.Services
                     if (bidLimit.Status == EnumStatusBidLimit.Approve.ToString())
                     {
                         result = (status: false, msg: "Status of object is Approve , cannt set Reject");
+                    }
+                    break;
+                case nameof(EnumStatusBidLimit.Cancel):
+                    if (bidLimit.Status == EnumStatusBidLimit.Cancel.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is Cancel , cannt set Cancel again");
+                    }
+                    if (bidLimit.Status == EnumStatusBidLimit.Approve.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is Approve , cannt set Cancel");
+                    }
+                    if (bidLimit.Status == EnumStatusBidLimit.Reject.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is Reject , cannt set Cancel");
+                    }
+                    if (bidLimit.Status == EnumStatusBidLimit.Processing.ToString())
+                    {
+                        result = (status: false, msg: "Status of object is Processing , cannt set Cancel");
                     }
                     break;
             }

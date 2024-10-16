@@ -51,7 +51,7 @@ namespace Application.Services
                     {
                         lot.LotType = EnumLotType.Auction_Price_GraduallyReduced.ToString();
                     }
-                    lot.Status = EnumStatusLot.Pending.ToString();
+                    lot.Status = EnumStatusLot.Creaeted.ToString();
                     lot.FloorFeePercent = 25;
 
                     await _unitOfWork.LotRepository.AddAsync(lot);
@@ -136,5 +136,8 @@ namespace Application.Services
             }
             return reponse;
         }
+
+
+
     }
 }

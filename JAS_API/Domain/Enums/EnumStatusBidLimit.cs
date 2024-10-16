@@ -9,8 +9,9 @@ namespace Domain.Enums
     public enum EnumStatusBidLimit
     {
         Pending,
-        SetPrice,
+        Processing,
         Approve,
-        Reject
+        Reject,
+        Cancel
     }
 }

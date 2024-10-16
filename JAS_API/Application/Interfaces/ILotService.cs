@@ -12,6 +12,9 @@ namespace Application.Interfaces
         Task<APIResponseModel> CreateLot(object lotDTO);
         Task<APIResponseModel> GetLotTypes();
         Task<APIResponseModel> GetLotTypeById(int lotTypeId);
+        Task<APIResponseModel> GetLots();
+        Task<APIResponseModel> GetLotById(int Id);
+
 
     }
 }
