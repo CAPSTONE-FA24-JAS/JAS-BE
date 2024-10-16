@@ -845,5 +845,61 @@ namespace Application.Services
             }
             return response;
         }
+
+        public async Task<APIResponseModel> getPreliminaryValuationsOfAppraiserAsync(int appraiserId, int? pageSize, int? pageIndex)
+        {
+
+            var response = new APIResponseModel();
+            try
+            {
+                Expression<Func<Valuation, bool>> filter;
+
+                
+                    filter = x => x.AppraiserId == appraiserId;
+                
+
+                var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: filter,
+                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff,Appraiser",
+                                                                             pageIndex: pageIndex,
+                                                                             pageSize: pageSize);
+                List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
+                if (valuations.totalItems > 0)
+                {
+                    foreach (var item in valuations.data)
+                    {
+
+                        var valuationsResponse = _mapper.Map<ValuationDTO>(item);
+                        listValuationDTO.Add(valuationsResponse);
+                    };
+
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listValuationDTO,
+                        totalItemRepsone = valuations.totalItems
+                    };
+                    response.Message = $"List consign items Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have valuations";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
     }
 }
