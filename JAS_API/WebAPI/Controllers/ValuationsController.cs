@@ -168,6 +168,8 @@ namespace WebAPI.Controllers
         }
 
 
+        //get all dinh gia cuoi cua staff theo valuation co status 6,7,8
+
         [HttpGet]
         public async Task<IActionResult> getFinalValuationsOfStaffAsync(int staffId, int? pageSize, int? pageIndex)
         {
@@ -177,6 +179,7 @@ namespace WebAPI.Controllers
             return BadRequest(result);
         }
 
+        //get all valuation by appraiserid 
         [HttpGet]
         public async Task<IActionResult> getPreliminaryValuationsOfAppraiserAsync(int appraiserId, int? pageSize, int? pageIndex)
         {
