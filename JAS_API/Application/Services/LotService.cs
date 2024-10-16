@@ -7,6 +7,7 @@ using Application.ViewModels.LotDTOs;
 using AutoMapper;
 using Domain.Entity;
 using Domain.Enums;
+using Org.BouncyCastle.Pqc.Crypto.Lms;
 using System.Linq.Expressions;
 
 namespace Application.Services
@@ -249,5 +250,39 @@ namespace Application.Services
 
         }
 
+        public async Task<APIResponseModel> GetLotByAuctionId(int auctionId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var lots = await _unitOfWork.LotRepository.GetAllAsync( condition: x => x.AuctionId == auctionId, includes: new Expression<Func<Lot, object>>[] { x => x.Staff, x => x.Seller, x => x.Jewelry });
+                if (!lots.Any())
+                {
+                    reponse.Code = 404;
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Not Found Lots";
+                }
+                else
+                {
+                    reponse.Code = 200;
+                    var DTOs = new List<object>();
+                    foreach (var lot in lots)
+                    {
+                        var mapper = IsMapper(lot, lot.LotType);
+                        DTOs.Add(mapper);
+                    }
+                    reponse.Data = DTOs;
+                    reponse.IsSuccess = true;
+                    reponse.Message = $"Received lots is successfuly. Have {DTOs.Count} lot in Auction";
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.Code = 500;
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
     }
 }
