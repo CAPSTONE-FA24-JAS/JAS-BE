@@ -45,6 +45,21 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetJewelryNoLotAsync(int? pageSize, int? pageIndex)
+        {
+            var result = await _jewelryService.GetJewelryNoLotAsync(pageSize, pageIndex);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+
         [HttpPut]
         public async Task<IActionResult> RequestFinalValuationForManagerAsync(RequestFinalValuationForManagerDTO requestDTO)
         {

@@ -11,5 +11,7 @@ namespace Application.Repositories
     public interface IJewelryRepository : IGenericRepository<Jewelry>
     {
         Task<(IEnumerable<Jewelry> data, int totalItem)> GetAllJewelryAynsc(int? pageIndex = null, int? pageSize = null);
+
+        Task<(IEnumerable<Jewelry> data, int totalItem)> GetAllJewelryNoLotAynsc(int? pageIndex = null, int? pageSize = null);
     }
 }
