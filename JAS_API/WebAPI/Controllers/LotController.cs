@@ -38,6 +38,28 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ViewListLot()
+        {
+            var result = await _lotService.GetLots();
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewDetailLotById(int Id)
+        {
+            var result = await _lotService.GetLotById(Id);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateLotFixedPrice(CreateLotFixedPriceDTO createLotDTO)
         {
