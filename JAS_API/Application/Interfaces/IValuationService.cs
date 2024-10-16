@@ -31,6 +31,8 @@ namespace Application.Interfaces
 
         public Task<APIResponseModel> getPreliminaryValuationByStatusOfAppraiserAsync(int appraiserId, int? status, int? pageSize, int? pageIndex);
 
+        public Task<APIResponseModel> getPreliminaryValuationsOfAppraiserAsync(int appraiserId, int? pageSize, int? pageIndex);
+
         //staff xem all consign item, all dinh gia so bo
         public Task<APIResponseModel> getPreliminaryValuationsByStatusOfStaffAsync(int staffId, int? status, int? pageSize, int? pageIndex);
 
