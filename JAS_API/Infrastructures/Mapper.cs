@@ -151,9 +151,11 @@ namespace Infrastructures
             CreateMap<Lot, CreateLotSecretAuctionDTO>().ReverseMap();
             CreateMap<Lot, CreateLotPublicAuctionDTO>().ReverseMap();
             CreateMap<Lot, CreateLotAuctionPriceGraduallyReducedDTO>().ReverseMap();
-
-
-
+            CreateMap<Lot, LotFixedPriceDTO>().ReverseMap();
+            CreateMap<Lot, LotSecretAuctionDTO>().ReverseMap();
+            CreateMap<Lot, LotPublicAuctionDTO>().ReverseMap();
+            CreateMap<Lot, LotAuctionPriceGraduallyReducedDTO>().ReverseMap();
+            CreateMap<Customer, SellerDTO>();
 
 
         }
