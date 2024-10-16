@@ -36,6 +36,9 @@ namespace Application.Interfaces
 
         public Task<APIResponseModel> getPreliminaryValuationsOfStaffAsync(int staffId, int? pageSize, int? pageIndex);
 
+        //get đinh gia cuoii theo staffId, status = 
+        public Task<APIResponseModel> getFinalValuationsOfStaffAsync(int staffId, int? pageSize, int? pageIndex);
+
         //dung chung cho ca staff, seller update status
         public Task<APIResponseModel> UpdateStatusForValuationsAsync(int id, int status);
 

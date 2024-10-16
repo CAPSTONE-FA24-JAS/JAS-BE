@@ -168,5 +168,13 @@ namespace WebAPI.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> getFinalValuationsOfStaffAsync(int staffId, int? pageSize, int? pageIndex)
+        {
+            var result = await _valuationService.getFinalValuationsOfStaffAsync(staffId, pageSize, pageIndex);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
     }
 }

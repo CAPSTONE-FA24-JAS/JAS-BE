@@ -91,7 +91,7 @@ namespace Application.Services
                 var valuation = await _unitOfWork.ValuationRepository.GetByIdAsync(jewelryDTO.ValuationId);
 
                 valuation.Status = status;              
-                jewelry.Status = status;
+                
 
                 AddHistoryValuation(jewelryDTO.ValuationId, status);
 
@@ -506,12 +506,12 @@ namespace Application.Services
                     _unitOfWork.JewelryRepository.Update(jewelryById);
                     await _unitOfWork.SaveChangeAsync();
 
-                    var valuationDTO = _mapper.Map<JewelryDTO>(jewelryById);
+                    var jewelryDTO = _mapper.Map<JewelryDTO>(jewelryById);
 
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
-                    response.Data = valuationDTO;
+                    response.Data = jewelryDTO;
                 }
                 else
                 {
