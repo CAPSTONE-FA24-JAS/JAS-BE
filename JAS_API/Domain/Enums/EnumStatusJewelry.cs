@@ -11,6 +11,7 @@ namespace Domain.Enums
         Added = 1,
         Auctioned = 2,
         Sold = 3,
-        Canceled = 4       
+        Canceled = 4,
+        Passed = 5
     }
 }

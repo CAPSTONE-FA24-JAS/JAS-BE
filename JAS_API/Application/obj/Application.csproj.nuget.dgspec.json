@@ -74,6 +74,10 @@
               "target": "Package",
               "version": "[8.0.5, )"
             },
+            "Microsoft.Extensions.Caching.StackExchangeRedis": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
             "Microsoft.IdentityModel.Protocols": {
               "target": "Package",
               "version": "[8.0.0, )"
