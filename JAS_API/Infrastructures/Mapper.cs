@@ -155,6 +155,9 @@ namespace Infrastructures
             CreateMap<Lot, LotSecretAuctionDTO>().ReverseMap();
             CreateMap<Lot, LotPublicAuctionDTO>().ReverseMap();
             CreateMap<Lot, LotAuctionPriceGraduallyReducedDTO>().ReverseMap();
+            CreateMap<Lot, LotDTO>()
+                .ForPath(x => x.ImageLinkJewelry, x => x.MapFrom(x => x.Jewelry.ImageJewelries.FirstOrDefault().ImageLink))
+                .ReverseMap();
             CreateMap<Customer, SellerDTO>();
 
 

@@ -265,15 +265,9 @@ namespace Application.Services
                 else
                 {
                     reponse.Code = 200;
-                    var DTOs = new List<object>();
-                    foreach (var lot in lots)
-                    {
-                        var mapper = IsMapper(lot, lot.LotType);
-                        DTOs.Add(mapper);
-                    }
-                    reponse.Data = DTOs;
+                    reponse.Data = _mapper.Map<IEnumerable<LotDTO>>(lots);
                     reponse.IsSuccess = true;
-                    reponse.Message = $"Received lots is successfuly. Have {DTOs.Count} lot in Auction";
+                    reponse.Message = $"Received lots is successfuly. Have {lots.Count} lot in Auction";
                 }
             }
             catch (Exception e)
