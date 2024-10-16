@@ -27,6 +27,9 @@ var cloudinary = new Cloudinary(new Account(
 // Đăng ký dịch vụ Cloudinary
 builder.Services.AddSingleton(cloudinary);
 
+//dki signalR
+builder.Services.AddSignalR();
+
 builder.Services.AddSingleton(configuration);
 builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, build =>
 {
@@ -109,6 +112,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<BiddingHub>("/bidding");
 
 app.Run();
 public partial class Program { }

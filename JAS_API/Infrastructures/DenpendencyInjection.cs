@@ -67,6 +67,8 @@ namespace Infrastructures
             services.AddScoped<IAuctionRepository, AuctionRepository>();
             services.AddScoped<ILotService, LotService>();
             services.AddScoped<ILotRepository, LotRepository>();
+            services.AddScoped<ICacheService, CacheService>();
+            services.AddSingleton<ShareDB>();
             services.AddDbContext<AppDbContext>(option =>
             {
                 option.UseLazyLoadingProxies().UseNpgsql(databaseConnection);
