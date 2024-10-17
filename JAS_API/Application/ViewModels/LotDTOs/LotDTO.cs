@@ -1,18 +1,12 @@
 ﻿using Application.ViewModels.AccountDTOs;
 using Application.ViewModels.AuctionDTOs;
 using Application.ViewModels.JewelryDTOs;
-using Domain.Entity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Application.ViewModels.LotDTOs
 {
     public class LotDTO
     {
         public int? Id { get; set; }
+        public string? Title { get; set; }
         public float? StartPrice { get; set; }
         public float? MinPrice { get; set; }
         public float? CurrentPrice { get; set; }
