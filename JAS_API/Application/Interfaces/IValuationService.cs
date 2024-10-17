@@ -41,6 +41,9 @@ namespace Application.Interfaces
         //get đinh gia cuoii theo staffId, status = 
         public Task<APIResponseModel> getFinalValuationsOfStaffAsync(int staffId, int? pageSize, int? pageIndex);
 
+        public Task<APIResponseModel> getFinalValuationsOfAppraiserAsync(int appraiserId, int? pageSize, int? pageIndex);
+
+
         //dung chung cho ca staff, seller update status
         public Task<APIResponseModel> UpdateStatusForValuationsAsync(int id, int status);
 

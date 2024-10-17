@@ -461,7 +461,7 @@ namespace Application.Services
 
                     valuationById.StartingPrice = requestDTO.StartingPrice;
                     valuationById.Time_Bidding = requestDTO.Time_Bidding;
-                    valuationById.BidForm = requestDTO.BidForm;
+                    valuationById.BidForm = EnumHelper.GetEnums<EnumLotType>().FirstOrDefault(x => x.Value == requestDTO.BidForm).Name; ;
 
                     _unitOfWork.JewelryRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();

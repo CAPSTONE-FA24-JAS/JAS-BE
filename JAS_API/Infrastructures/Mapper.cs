@@ -42,6 +42,7 @@ namespace Infrastructures
                 .ReverseMap();
             CreateMap<Customer, CustomerDTO>()
                 .ForMember(dest => dest.AccountDTO, opt => opt.MapFrom(src => src.Account))
+                .ForMember(dest => dest.WalletDTO, opt => opt.MapFrom(src => src.Wallet))
                 .ReverseMap();          
             CreateMap<Account, UpdateProfileDTO>()
                 .ForMember(dest => dest.CustomerProfileDTO, opt => opt.MapFrom(src => src.Customer))
@@ -50,6 +51,7 @@ namespace Infrastructures
             CreateMap<Role, RoleDTO>().ReverseMap();
             CreateMap<BidLimit, BidLimitDTO>()
                 .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.CreationDate))
+                .ForMember(dest => dest.StaffName, opt => opt.MapFrom((src, dest, destMember, context) => (string)context.Items["StaffName"]))
                 .ReverseMap();
             CreateMap<BidLimit, CreateBidLimitDTO>().ReverseMap();
             CreateMap<BidLimit, UpdateBidLimitDTO>().ReverseMap();
@@ -159,6 +161,7 @@ namespace Infrastructures
                 .ForPath(x => x.ImageLinkJewelry, x => x.MapFrom(x => x.Jewelry.ImageJewelries.FirstOrDefault().ImageLink))
                 .ReverseMap();
             CreateMap<Customer, SellerDTO>();
+            CreateMap<CustomerLot, RegisterToLotDTO>();
 
 
         }

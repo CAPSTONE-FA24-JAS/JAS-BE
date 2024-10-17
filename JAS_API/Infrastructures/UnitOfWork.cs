@@ -45,6 +45,8 @@ namespace Infrastructures
         private readonly IImageMainShaphieRepository _imageMainShaphieRepository;
         private readonly IImageSecondaryShaphieRepository _imageSecondaryShaphieRepository;
         private readonly ILotRepository _lotRepository;
+        private readonly IStaffRepository _staffRepository;
+        private readonly ICustomerLotRepository _customerLotRepository;
         private readonly IBidPriceRepository _bidPriceRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
@@ -64,7 +66,8 @@ namespace Infrastructures
                           IImageMainDiamondRepository imageMainDiamondRepository, IImageSecondDiamondRepository imageSecondDiamondRepository,
                           IDocumentMainShaphieRepository documentMainShaphieRepository, IDocumentSecondaryShaphieRepository documentSecondaryShaphieRepository,
                           IImageMainShaphieRepository imageMainShaphieRepository, IImageSecondaryShaphieRepository imageSecondaryShaphieRepository,
-                          ILotRepository lotRepository, IBidPriceRepository bidPriceRepository)
+                          ILotRepository lotRepository, IStaffRepository staffRepository, ICustomerLotRepository customerLotRepository,
+                          IBidPriceRepository bidPriceRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -101,6 +104,9 @@ namespace Infrastructures
             _imageMainShaphieRepository = imageMainShaphieRepository;
             _imageSecondaryShaphieRepository = imageSecondaryShaphieRepository;
             _lotRepository = lotRepository; 
+            _staffRepository = staffRepository;
+            _customerLotRepository = customerLotRepository;
+
             _bidPriceRepository = bidPriceRepository;
         }
 
@@ -154,7 +160,13 @@ namespace Infrastructures
 
         public ILotRepository LotRepository => _lotRepository;
 
-        public IBidPriceRepository IBidPriceRepository => _bidPriceRepository;
+        public IStaffRepository StaffRepository => _staffRepository;
+
+        public ICustomerLotRepository CustomerLotRepository => _customerLotRepository;
+
+        public IBidPriceRepository BidPriceRepository => _bidPriceRepository;
+
+       
 
         public async Task<int> SaveChangeAsync()
         {

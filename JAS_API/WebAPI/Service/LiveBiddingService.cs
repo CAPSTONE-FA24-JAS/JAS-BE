@@ -90,10 +90,30 @@ namespace WebAPI.Service
             var winner = topBidders.FirstOrDefault();
             if( winner == null )
             {
+                var winnerCustomerLot = await _unitOfWork.CustomerLotRepository.GetCustomerLotByCustomerAndLot(winner.CustomerId, winner.LotId);
+            //    winnerCustomerLot.IsWinner = true;
+                winnerCustomerLot.CurrentPrice = winner.CurrentPrice;
+                _unitOfWork.CustomerLotRepository.Update(winnerCustomerLot);
 
+                var losers = topBidders.Skip(1);
+                foreach(var loser in losers)
+                {
+                    var loserCustomerLot = await _unitOfWork.CustomerLotRepository.GetCustomerLotByCustomerAndLot(loser.CustomerId, loser.LotId);
+                    //    loserCustomerLot.IsWinner = false;
+                    _unitOfWork.CustomerLotRepository.Update(loserCustomerLot);
+                }
+                
             }
             await _unitOfWork.SaveChangeAsync();
 
+            //tao invoice cho wwinner
+
+            //hoan coc cho loser
+
+
+            //gui thong bao den client trong lot
+            string lotGroupName = $"lot-{lotId}";
+            await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEnded", winner.CustomerId, winner.CurrentPrice);
         }
     }
 }

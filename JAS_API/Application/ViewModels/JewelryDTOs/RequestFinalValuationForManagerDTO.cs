@@ -11,7 +11,7 @@ namespace Application.ViewModels.JewelryDTOs
         
         public float? StartingPrice { get; set; }
         
-        public string? BidForm { get; set; }
+        public int? BidForm { get; set; }
         public DateTime? Time_Bidding { get; set; }
 
         public int? JewelryId { get; set; }
