@@ -63,7 +63,7 @@ namespace Application.Services
                             lot.LotType = EnumLotType.Auction_Price_GraduallyReduced.ToString();
                         }
 
-                        lot.Status = EnumStatusLot.Creaeted.ToString();
+                        lot.Status = EnumStatusLot.Created.ToString();
                         lot.FloorFeePercent = 25;
                         await _unitOfWork.LotRepository.AddAsync(lot);
                         var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(lot.JewelryId);
@@ -275,6 +275,34 @@ namespace Application.Services
                 reponse.Code = 500;
                 reponse.IsSuccess = false;
                 reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> GetListStatusOfLot()
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var filters = EnumHelper.GetEnums<EnumStatusLot>();
+                if (filters == null)
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Receive Status Of Lot Fail";
+                    reponse.Code = 400;
+                }
+                else
+                {
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Receive Status Of Lot Successfull";
+                    reponse.Code = 200;
+                    reponse.Data = filters;
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = true;
+                reponse.Message = e.Message;
             }
             return reponse;
         }

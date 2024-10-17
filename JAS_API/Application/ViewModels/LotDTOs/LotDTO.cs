@@ -14,6 +14,7 @@ namespace Application.ViewModels.LotDTOs
     {
         public int? Id { get; set; }
         public float? StartPrice { get; set; }
+        public float? MinPrice { get; set; }
         public float? CurrentPrice { get; set; }
         public float? FinalPriceSold { get; set; }
         public string? Status { get; set; }
@@ -75,7 +76,7 @@ namespace Application.ViewModels.LotDTOs
     public class LotPublicAuctionDTO : LotDetailDTO
     {
         public float? StartPrice { get; set; }
-        public float? CurrentPrice { get; set; }
+        //public float? CurrentPrice { get; set; }
         public float? FinalPriceSold { get; set; }
         public float? BidIncrement { get; set; }
         public float? BuyNowPrice { get; set; }
@@ -85,6 +86,7 @@ namespace Application.ViewModels.LotDTOs
     public class LotAuctionPriceGraduallyReducedDTO : LotDetailDTO
     {
         public float? StartPrice { get; set; }
+        //public float? MinPrice { get; set; }
         public float? FinalPriceSold { get; set; }
         public float? BidIncrement { get; set; }
 

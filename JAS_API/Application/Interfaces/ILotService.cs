@@ -16,5 +16,6 @@ namespace Application.Interfaces
         Task<APIResponseModel> GetLots();
         Task<APIResponseModel> GetLotById(int Id);
         Task<APIResponseModel> GetLotByAuctionId(int auctionId);
+        Task<APIResponseModel> GetListStatusOfLot();
     }
 }
