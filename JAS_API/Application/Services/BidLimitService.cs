@@ -79,29 +79,29 @@ namespace Application.Services
             try
             {
                 var bidLimits = await _unitOfWork.BidLimitRepository.GetAllAsync(includes: x => x.Customer);
-                if (bidLimits.Any())
+                var DTOs = new List<BidLimitDTO>();
+                foreach (var bidLimit in bidLimits)
                 {
-                    var DTOs = new List<BidLimitDTO>();
-                    foreach (var bidLimit in bidLimits)
-                    {
-                        var mapper = _mapper.Map<BidLimitDTO>(bidLimit);
-                        mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
-                        DTOs.Add(mapper);
-                    }
-                    if (DTOs.Count > 0)
-                    {
-                        reponse.Code = 200;
-                        reponse.IsSuccess = true;
-                        reponse.Message = "Received List BidLimit Successfull";
-                        reponse.Data = DTOs;
-                    }
+                    var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
+                    string staffName = staff.FirstName + " " + staff.LastName;
+                    var mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
+                    mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
+                    DTOs.Add(mapper);
+                }
+                if (DTOs.Count > 0)
+                {
+                    reponse.Code = 200;
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Received List BidLimit Successfull";
+                    reponse.Data = DTOs;
                 }
                 else
                 {
-                    reponse.Code = 400;
-                    reponse.IsSuccess = false;
-                    reponse.Message = "Received List BidLimit Faild";
+                    reponse.Code = 200;
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Received List Is Empty";
                 }
+                
             }
             catch (Exception e)
             {
@@ -118,28 +118,27 @@ namespace Application.Services
             try
             {
                 var bidLimits = await _unitOfWork.BidLimitRepository.GetAllAsync(condition: x => x.CustomerId == customerId, includes: x => x.Customer);
-                if (bidLimits.Any())
+                var DTOs = new List<BidLimitDTO>();
+                foreach (var bidLimit in bidLimits)
                 {
-                    var DTOs = new List<BidLimitDTO>();
-                    foreach (var bidLimit in bidLimits)
-                    {
-                        var mapper = _mapper.Map<BidLimitDTO>(bidLimit);
-                        mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
-                        DTOs.Add(mapper);
-                    }
-                    if (DTOs.Count > 0)
-                    {
-                        reponse.Code = 200;
-                        reponse.IsSuccess = true;
-                        reponse.Message = "Received List BidLimit Successfull";
-                        reponse.Data = DTOs;
-                    }
+                    var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
+                    string staffName = staff.FirstName + " " + staff.LastName;
+                    var mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
+                    mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
+                    DTOs.Add(mapper);
+                }
+                if (DTOs.Count > 0)
+                {
+                    reponse.Code = 200;
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Received List BidLimit Successfull";
+                    reponse.Data = DTOs;
                 }
                 else
                 {
-                    reponse.Code = 400;
-                    reponse.IsSuccess = false;
-                    reponse.Message = "Received List BidLimit Faild";
+                    reponse.Code = 200;
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Received List BidLimit is Empty";
                 }
             }
             catch (Exception e)
@@ -343,7 +342,9 @@ namespace Application.Services
                 var bidLimit = await _unitOfWork.BidLimitRepository.GetByIdAsync(Id, includes: x => x.Customer);
                 if (bidLimit != null)
                 {
-                    var mapper = _mapper.Map<BidLimitDTO>(bidLimit);
+                    var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
+                    string staffName = staff.FirstName + " " + staff.LastName;
+                    var mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
                     mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
                     reponse.Code = 200;
                     reponse.IsSuccess = true;
@@ -373,18 +374,18 @@ namespace Application.Services
             {
                 var enumStatus = EnumHelper.GetEnums<EnumStatusBidLimit>().FirstOrDefault(x => x.Value == status)?.Name;
 
-                if (enumStatus != null) // Kiểm tra xem enumStatus có khác null không
+                if (enumStatus != null) 
                 {
                     var bidLimits = await _unitOfWork.BidLimitRepository.GetAllAsync(
                         includes: x => x.Customer,
                         condition: x => x.Status == enumStatus
                     );
-                    if (bidLimits.Any())
-                    {
                         var DTOs = new List<BidLimitDTO>();
                         foreach (var bidLimit in bidLimits)
                         {
-                            var mapper = _mapper.Map<BidLimitDTO>(bidLimit);
+                            var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
+                            string staffName = staff.FirstName + " " + staff.LastName;
+                            var mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
                             mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
                             DTOs.Add(mapper);
                         }
@@ -395,13 +396,13 @@ namespace Application.Services
                             reponse.Message = $"Received List BidLimit Successfull by status {EnumHelper.GetEnums<EnumStatusBidLimit>().FirstOrDefault(x => x.Value == status).Name}";
                             reponse.Data = DTOs;
                         }
-                    }
-                    else
-                    {
-                        reponse.Code = 400;
-                        reponse.IsSuccess = false;
-                        reponse.Message = "Received List BidLimit Faild";
-                    }
+                        else
+                        {
+                            reponse.Code = 200;
+                            reponse.IsSuccess = true;
+                            reponse.Message = $"Not Found BidLimit Have This Status {enumStatus}";
+                        }
+
                 }
                 else
                 {
