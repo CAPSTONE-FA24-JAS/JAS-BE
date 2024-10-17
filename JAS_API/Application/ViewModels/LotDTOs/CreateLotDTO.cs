@@ -74,7 +74,7 @@ namespace Application.ViewModels.LotDTOs
     {
         public float? StartPrice { get; set; }
         //public float? CurrentPrice { get; set; }
-        //public float? FinalPriceSold { get; set; }
+        public float? FinalPriceSold { get; set; }
         
         public float? BidIncrement { get; set; }
         public float? Deposit { get; set; }
