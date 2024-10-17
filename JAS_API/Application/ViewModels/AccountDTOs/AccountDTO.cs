@@ -12,6 +12,7 @@ namespace Application.ViewModels.AccountDTOs
         public string? PasswordHash { get; set; }
         public int? RoleId { get; set; }
         public string? RoleName { get; set; }
+        
         public CustomerDTO? CustomerDTO { get; set; }
         public StaffDTO? StaffDTO { get; set; }
     }
@@ -29,6 +30,7 @@ namespace Application.ViewModels.AccountDTOs
         public DateTime? IDExpirationDate { get; set; }
         public float? PriceLimit { get; set; }
         public DateTime? ExpireDate { get; set; }
+        public int? WalletId { get; set; }
         public AccountDTO? AccountDTO { get; set; }
 
     }
