@@ -43,6 +43,7 @@ namespace Application
         public IImageSecondaryShaphieRepository ImageSecondaryShaphieRepository {  get; }
         public ILotRepository LotRepository { get; }
         public IStaffRepository StaffRepository { get; }
+        public ICustomerLotRepository CustomerLotRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
