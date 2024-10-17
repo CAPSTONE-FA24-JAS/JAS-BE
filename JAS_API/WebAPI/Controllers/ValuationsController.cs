@@ -188,5 +188,14 @@ namespace WebAPI.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> getFinalValuationsOfAppraiserAsync(int appraiserId, int? pageSize, int? pageIndex)
+        {
+            var result = await _valuationService.getFinalValuationsOfAppraiserAsync(appraiserId, pageSize, pageIndex);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
     }
 }

@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Repositories
 {
-    public interface ICustomerLotRepository : IGenericRepository<CustomerLot>
+    public interface IBidPriceRepository : IGenericRepository<BidPrice>
     {
-        Task<CustomerLot> GetCustomerLotByCustomerAndLot(int? customerIId, int? lotId);
     }
 }

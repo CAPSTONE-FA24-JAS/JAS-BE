@@ -10,7 +10,7 @@ namespace Application.ViewModels.CustomerLotDTOs
     {
         
         public int? CustomerId { get; set; }
-        public int? LotId { get; set; }
+        public int LotId { get; set; }
         
        
     }

@@ -1,5 +1,7 @@
 
 using Application.ViewModels.BidLimitDTOs;
+using Application.ViewModels.WalletDTOs;
+using Domain.Entity;
 
 namespace Application.ViewModels.AccountDTOs
 {
@@ -31,6 +33,7 @@ namespace Application.ViewModels.AccountDTOs
         public float? PriceLimit { get; set; }
         public DateTime? ExpireDate { get; set; }
         public int? WalletId { get; set; }
+        public WalletDTO? WalletDTO { get; set; }
         public AccountDTO? AccountDTO { get; set; }
 
     }
