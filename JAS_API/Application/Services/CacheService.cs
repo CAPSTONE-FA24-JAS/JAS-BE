@@ -146,8 +146,13 @@ namespace Application.Services
             var lotHashKey = $"lot-{lot.Id}";
             var lotData = JsonSerializer.Serialize(lot);
             _cacheDb.HashSet(lotHashKey, "lot", lotData);
-            var timestamp = new DateTimeOffset(lot.EndTime).ToUnixTimeSeconds();
-            _cacheDb.SortedSetAdd("LotEndTime", lot.Id.ToString(), timestamp);
+            if (lot.EndTime.HasValue)
+            {
+                var timestamp = new DateTimeOffset(lot.EndTime.Value).ToUnixTimeSeconds();
+                _cacheDb.SortedSetAdd("LotEndTime", lot.Id.ToString(), timestamp);
+            }
+           
+            
         }
 
         //get lot theo lot id
