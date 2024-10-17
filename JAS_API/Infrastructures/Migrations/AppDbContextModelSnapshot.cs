@@ -1742,6 +1742,9 @@ namespace Infrastructures.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("text");
 
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AuctionId");

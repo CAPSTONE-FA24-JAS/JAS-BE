@@ -9,6 +9,7 @@ namespace Domain.Entity
 {
     public class Lot : BaseEntity
     {
+        public string? Title { get; set; }
         public float? StartPrice { get; set; }
         public float? CurrentPrice { get; set; }
         public float? FinalPriceSold { get; set; }
