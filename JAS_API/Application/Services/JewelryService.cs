@@ -502,7 +502,7 @@ namespace Application.Services
                     jewelryById.Valuation.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
 
 
-                    AddHistoryValuation(jewelryId, jewelryById.Valuation.Status);
+                    AddHistoryValuation(jewelryById.Valuation.Id, jewelryById.Valuation.Status);
                     _unitOfWork.JewelryRepository.Update(jewelryById);
                     await _unitOfWork.SaveChangeAsync();
 
