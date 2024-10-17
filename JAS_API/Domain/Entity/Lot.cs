@@ -18,7 +18,7 @@ namespace Domain.Entity
         public float? BuyNowPrice { get; set; }
         public int? FloorFeePercent { get; set; }
         public DateTime? StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
+        public DateTime EndTime { get; set; }
         public DateTime? ActualEndTime { get; set; }
         public bool? IsExtend { get; set; }
         public bool? HaveFinancialProof { get; set; }

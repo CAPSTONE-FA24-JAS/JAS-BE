@@ -16,11 +16,13 @@ namespace Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
 
-        public LotService(IUnitOfWork unitOfWork, IMapper mapper)
+        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _cacheService = cacheService;
         }
 
         public async Task<APIResponseModel> CreateLot(object lotDTO)
@@ -68,8 +70,19 @@ namespace Application.Services
                         await _unitOfWork.LotRepository.AddAsync(lot);
                         var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(lot.JewelryId);
                         jewelry.Status = EnumStatusJewelry.Added.ToString();
+
+                        var lotRedis = new Lot
+                        {
+                            StartTime = lot.StartTime,
+                            EndTime = lot.EndTime,
+                            Id = lot.Id,
+                            Status = lot.Status
+                        };
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
+                            // Lưu lot vào Redis(dung hash)
+                            _cacheService.SetLotInfo(lotRedis);
+
                             reponse.Code = 200;
                             reponse.IsSuccess = true;
                             reponse.Message = $"CreateLot {lot.LotType} is successfuly";

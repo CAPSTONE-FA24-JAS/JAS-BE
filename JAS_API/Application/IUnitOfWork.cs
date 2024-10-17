@@ -42,6 +42,8 @@ namespace Application
         public IImageMainShaphieRepository ImageMainShaphieRepository {  get; }
         public IImageSecondaryShaphieRepository ImageSecondaryShaphieRepository {  get; }
         public ILotRepository LotRepository { get; }
+
+        public IBidPriceRepository BidPriceRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

@@ -78,18 +78,25 @@ namespace WebAPI.Controllers
 
                 await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
 
+                // Lấy thời gian kết thúc từ Redis
+                var lot = _cacheService.GetLotById(conn.LotId);
+
+                DateTime endTime = lot.EndTime;
+
                 //10s cuối
-                DateTime endTime = new DateTime(2024, 10, 3, 8, 54, 0);
                 TimeSpan extendTime = endTime - request.Timestamp;
+
+                // Nếu còn dưới 10 giây thì gia hạn thêm 10 giây
                 if (extendTime.TotalSeconds < 10)
                 {
                     endTime = endTime.AddSeconds(10);
+                    _cacheService.UpdateLotEndTime(conn.LotId, endTime);
                 }
-
                 return Ok(topBidders);
             }
             return BadRequest(new { message = "Connection not found" });
 
         }
+
     }
 }

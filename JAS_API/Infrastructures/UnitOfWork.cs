@@ -45,6 +45,7 @@ namespace Infrastructures
         private readonly IImageMainShaphieRepository _imageMainShaphieRepository;
         private readonly IImageSecondaryShaphieRepository _imageSecondaryShaphieRepository;
         private readonly ILotRepository _lotRepository;
+        private readonly IBidPriceRepository _bidPriceRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -63,7 +64,7 @@ namespace Infrastructures
                           IImageMainDiamondRepository imageMainDiamondRepository, IImageSecondDiamondRepository imageSecondDiamondRepository,
                           IDocumentMainShaphieRepository documentMainShaphieRepository, IDocumentSecondaryShaphieRepository documentSecondaryShaphieRepository,
                           IImageMainShaphieRepository imageMainShaphieRepository, IImageSecondaryShaphieRepository imageSecondaryShaphieRepository,
-                          ILotRepository lotRepository)
+                          ILotRepository lotRepository, IBidPriceRepository bidPriceRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -100,7 +101,7 @@ namespace Infrastructures
             _imageMainShaphieRepository = imageMainShaphieRepository;
             _imageSecondaryShaphieRepository = imageSecondaryShaphieRepository;
             _lotRepository = lotRepository; 
-
+            _bidPriceRepository = bidPriceRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -152,6 +153,8 @@ namespace Infrastructures
         public IImageSecondaryShaphieRepository ImageSecondaryShaphieRepository => _imageSecondaryShaphieRepository;
 
         public ILotRepository LotRepository => _lotRepository;
+
+        public IBidPriceRepository IBidPriceRepository => _bidPriceRepository;
 
         public async Task<int> SaveChangeAsync()
         {
