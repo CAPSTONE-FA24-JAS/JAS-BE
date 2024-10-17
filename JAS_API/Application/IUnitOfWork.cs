@@ -44,6 +44,8 @@ namespace Application
         public ILotRepository LotRepository { get; }
         public IStaffRepository StaffRepository { get; }
         public ICustomerLotRepository CustomerLotRepository { get; }
+
+        public IBidPriceRepository BidPriceRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

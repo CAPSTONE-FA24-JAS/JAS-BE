@@ -71,6 +71,7 @@ namespace Infrastructures
             services.AddScoped<ICustomerLotRepository, CustomerLotRepository>();
 
             services.AddScoped<ICacheService, CacheService>();
+            services.AddScoped<IBidPriceRepository, BidPriceRepository>();
             services.AddSingleton<ShareDB>();
             services.AddDbContext<AppDbContext>(option =>
             {

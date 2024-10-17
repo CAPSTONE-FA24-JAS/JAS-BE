@@ -47,6 +47,7 @@ namespace Infrastructures
         private readonly ILotRepository _lotRepository;
         private readonly IStaffRepository _staffRepository;
         private readonly ICustomerLotRepository _customerLotRepository;
+        private readonly IBidPriceRepository _bidPriceRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -65,7 +66,8 @@ namespace Infrastructures
                           IImageMainDiamondRepository imageMainDiamondRepository, IImageSecondDiamondRepository imageSecondDiamondRepository,
                           IDocumentMainShaphieRepository documentMainShaphieRepository, IDocumentSecondaryShaphieRepository documentSecondaryShaphieRepository,
                           IImageMainShaphieRepository imageMainShaphieRepository, IImageSecondaryShaphieRepository imageSecondaryShaphieRepository,
-                          ILotRepository lotRepository, IStaffRepository staffRepository, ICustomerLotRepository customerLotRepository)
+                          ILotRepository lotRepository, IStaffRepository staffRepository, ICustomerLotRepository customerLotRepository,
+                          IBidPriceRepository bidPriceRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -105,6 +107,7 @@ namespace Infrastructures
             _staffRepository = staffRepository;
             _customerLotRepository = customerLotRepository;
 
+            _bidPriceRepository = bidPriceRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -160,6 +163,10 @@ namespace Infrastructures
         public IStaffRepository StaffRepository => _staffRepository;
 
         public ICustomerLotRepository CustomerLotRepository => _customerLotRepository;
+
+        public IBidPriceRepository BidPriceRepository => _bidPriceRepository;
+
+       
 
         public async Task<int> SaveChangeAsync()
         {

@@ -8,8 +8,8 @@ namespace Application.ViewModels.CustomerLotDTOs
 {
     public class JoinLotRequestDTO
     {
-        public int? CustomerId { get; set; }
-        public int? LotId { get; set; }
+        public int CustomerId { get; set; }
+        public int LotId { get; set; }
 
         public string ConnectionId { get; set; }
     }
