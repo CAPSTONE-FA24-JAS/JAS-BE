@@ -39,6 +39,18 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ViewListStatusLot()
+        {
+            var result = await _lotService.GetListStatusOfLot();
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+
+        [HttpGet]
         public async Task<IActionResult> ViewListLot()
         {
             var result = await _lotService.GetLots();
