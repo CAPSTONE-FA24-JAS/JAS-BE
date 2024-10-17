@@ -46,6 +46,7 @@ namespace Infrastructures
         private readonly IImageSecondaryShaphieRepository _imageSecondaryShaphieRepository;
         private readonly ILotRepository _lotRepository;
         private readonly IStaffRepository _staffRepository;
+        private readonly ICustomerLotRepository _customerLotRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -64,7 +65,7 @@ namespace Infrastructures
                           IImageMainDiamondRepository imageMainDiamondRepository, IImageSecondDiamondRepository imageSecondDiamondRepository,
                           IDocumentMainShaphieRepository documentMainShaphieRepository, IDocumentSecondaryShaphieRepository documentSecondaryShaphieRepository,
                           IImageMainShaphieRepository imageMainShaphieRepository, IImageSecondaryShaphieRepository imageSecondaryShaphieRepository,
-                          ILotRepository lotRepository, IStaffRepository staffRepository)
+                          ILotRepository lotRepository, IStaffRepository staffRepository, ICustomerLotRepository customerLotRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -102,6 +103,7 @@ namespace Infrastructures
             _imageSecondaryShaphieRepository = imageSecondaryShaphieRepository;
             _lotRepository = lotRepository; 
             _staffRepository = staffRepository;
+            _customerLotRepository = customerLotRepository;
 
         }
 
@@ -156,6 +158,8 @@ namespace Infrastructures
         public ILotRepository LotRepository => _lotRepository;
 
         public IStaffRepository StaffRepository => _staffRepository;
+
+        public ICustomerLotRepository CustomerLotRepository => _customerLotRepository;
 
         public async Task<int> SaveChangeAsync()
         {

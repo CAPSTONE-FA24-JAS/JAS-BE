@@ -68,6 +68,7 @@ namespace Infrastructures
             services.AddScoped<ILotService, LotService>();
             services.AddScoped<ILotRepository, LotRepository>();
             services.AddScoped<IStaffRepository, StaffRepository>();
+            services.AddScoped<ICustomerLotRepository, CustomerLotRepository>();
 
             services.AddScoped<ICacheService, CacheService>();
             services.AddSingleton<ShareDB>();

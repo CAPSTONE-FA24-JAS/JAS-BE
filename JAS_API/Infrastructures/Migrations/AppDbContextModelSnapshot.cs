@@ -643,12 +643,6 @@ namespace Infrastructures.Migrations
                     b.Property<float?>("AutoBidPrice")
                         .HasColumnType("real");
 
-                    b.Property<float?>("BidLimit")
-                        .HasColumnType("real");
-
-                    b.Property<string>("BidType")
-                        .HasColumnType("text");
-
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("integer");
 
@@ -669,6 +663,9 @@ namespace Infrastructures.Migrations
 
                     b.Property<DateTime?>("ExpireDateOfBidLimit")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool?>("IsAutoBid")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");

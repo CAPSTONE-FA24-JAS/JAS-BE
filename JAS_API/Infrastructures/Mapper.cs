@@ -160,6 +160,7 @@ namespace Infrastructures
                 .ForPath(x => x.ImageLinkJewelry, x => x.MapFrom(x => x.Jewelry.ImageJewelries.FirstOrDefault().ImageLink))
                 .ReverseMap();
             CreateMap<Customer, SellerDTO>();
+            CreateMap<CustomerLot, RegisterToLotDTO>();
 
 
         }
