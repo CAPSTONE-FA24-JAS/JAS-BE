@@ -37,7 +37,7 @@ namespace Application.Services
                 else
                 {
                     var lot = _mapper.Map<Lot>(lotDTO);
-                    var check = (ValueTuple<bool, string>)CheckExitProperty(lot);
+                    var check =  (ValueTuple<bool, string>)await CheckExitProperty(lot);
                     if (check.Item1 == false)
                     {
                         reponse.Code = 402;
@@ -239,15 +239,15 @@ namespace Application.Services
 
             return result;
         }
-        internal object CheckExitProperty(Lot lot)
+        internal async Task<object> CheckExitProperty(Lot lot)
         {
             object result = (status: true, msg: "Status is suiable");
-            if (_unitOfWork.JewelryRepository.GetByIdAsync(lot.JewelryId).Result.Status != null)
+            var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(lot.JewelryId);
+            if (jewelry.Status != null)
             {
                 result = (status: false, msg: "jewelry cannot add to lot because it was sold or add to another lot");
             }
             return result;
-
         }
 
         public async Task<APIResponseModel> GetLotByAuctionId(int auctionId)
