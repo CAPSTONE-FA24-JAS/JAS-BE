@@ -80,18 +80,21 @@ namespace WebAPI.Controllers
 
                 // Lấy thời gian kết thúc từ Redis
                 var lot = _cacheService.GetLotById(conn.LotId);
-
-                DateTime endTime = lot.EndTime;
-
-                //10s cuối
-                TimeSpan extendTime = endTime - request.Timestamp;
-
-                // Nếu còn dưới 10 giây thì gia hạn thêm 10 giây
-                if (extendTime.TotalSeconds < 10)
+                if (lot.EndTime.HasValue)
                 {
-                    endTime = endTime.AddSeconds(10);
-                    _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                    DateTime endTime = lot.EndTime.Value;
+
+                    //10s cuối
+                    TimeSpan extendTime = endTime - request.Timestamp;
+
+                    // Nếu còn dưới 10 giây thì gia hạn thêm 10 giây
+                    if (extendTime.TotalSeconds < 10)
+                    {
+                        endTime = endTime.AddSeconds(10);
+                        _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                    }
                 }
+                    
                 return Ok(topBidders);
             }
             return BadRequest(new { message = "Connection not found" });
