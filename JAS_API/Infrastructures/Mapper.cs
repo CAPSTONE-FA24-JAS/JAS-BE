@@ -42,6 +42,7 @@ namespace Infrastructures
                 .ReverseMap();
             CreateMap<Customer, CustomerDTO>()
                 .ForMember(dest => dest.AccountDTO, opt => opt.MapFrom(src => src.Account))
+                .ForPath(dest => dest.WalletId, opt => opt.MapFrom(src => src.Wallet.Id))
                 .ForMember(dest => dest.WalletDTO, opt => opt.MapFrom(src => src.Wallet))
                 .ReverseMap();          
             CreateMap<Account, UpdateProfileDTO>()

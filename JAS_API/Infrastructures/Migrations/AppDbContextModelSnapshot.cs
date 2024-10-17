@@ -673,6 +673,15 @@ namespace Infrastructures.Migrations
                     b.Property<bool?>("IsDeposit")
                         .HasColumnType("boolean");
 
+                    b.Property<bool?>("IsInvoiced")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsRefunded")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsWinner")
+                        .HasColumnType("boolean");
+
                     b.Property<int?>("LotId")
                         .HasColumnType("integer");
 
