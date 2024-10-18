@@ -5,6 +5,7 @@ using Application.ViewModels.LotDTOs;
 using AutoMapper;
 using Domain.Entity;
 using Domain.Enums;
+using Google.Apis.Storage.v1.Data;
 using System.Linq.Expressions;
 
 namespace Application.Services
@@ -14,12 +15,16 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ICacheService _cacheService;
+        private readonly IAccountService _accountService;
+        private readonly IWalletService _walletService;
 
-        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService)
+        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IAccountService accountService, IWalletService  walletService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cacheService = cacheService;
+            _accountService = accountService;
+            _walletService = walletService;
         }
 
         public async Task<APIResponseModel> CreateLot(object lotDTO)
@@ -307,6 +312,64 @@ namespace Application.Services
                     reponse.Message = "Receive Status Of Lot Successfull";
                     reponse.Code = 200;
                     reponse.Data = filters;
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = true;
+                reponse.Message = e.Message;
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> RegisterToLot(RegisterToLotDTO registerToLotDTO)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                //kiem tra chung minh tai chinh co thoa dieu kien hay khong
+                var checkbidlimit =  await _accountService.CheckBidLimit((int)registerToLotDTO.CustomerId);
+                if (!checkbidlimit.IsSuccess) 
+                { 
+                    return reponse = checkbidlimit;
+                }
+                //kiem tra vi co chua , va so du co du khong
+                var checkWallet = await _walletService.CheckWalletExist((int)registerToLotDTO.CustomerId, (float)registerToLotDTO.CurrentPrice);
+                if (!checkWallet.IsSuccess)
+                {
+                    return reponse = checkWallet;
+                }
+                if (checkWallet.Data is Wallet wallet)
+                {
+                    var minusDeposit =  await _walletService.UpdateBanlance(wallet.Id, (decimal)registerToLotDTO.CurrentPrice, false);
+                    if (!minusDeposit.IsSuccess)
+                    {
+                        return reponse = minusDeposit;
+                    }
+                    else
+                    {
+                        var customerLot = _mapper.Map<CustomerLot>(registerToLotDTO);
+                        customerLot.IsDeposit = true;
+                        if (checkbidlimit.Data is Customer customer)
+                        {
+                            customerLot.PriceLimit = customer.PriceLimit;
+                            customerLot.ExpireDateOfBidLimit = customer.ExpireDate;
+                        }
+                        customerLot.Status = "Registered";
+                        await _unitOfWork.CustomerLotRepository.AddAsync(customerLot);
+                        if(await _unitOfWork.SaveChangeAsync() > 0)
+                        {
+                            reponse.IsSuccess = true;
+                            reponse.Message = "Register customer to lot successfully";
+                            reponse.Code = 200;
+                        }
+                        else
+                        {
+                            reponse.IsSuccess = false;
+                            reponse.Message = "Register customer to lot faild";
+                            reponse.Code = 400;
+                        }
+                    }
                 }
             }
             catch (Exception e)

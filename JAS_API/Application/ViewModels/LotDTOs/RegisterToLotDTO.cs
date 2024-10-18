@@ -16,6 +16,9 @@ namespace Application.ViewModels.LotDTOs
         public int? LotId { get; set; }
         public float? AutoBidPrice { get; set; }
         //public float? PriceLimit { get; set; }
-        public DateTime? ExpireDateOfBidLimit { get; set; }
+        //public bool? IsWinner { get; set; }
+        //public bool? IsRefunded { get; set; }
+        //public bool? IsInvoiced { get; set; }
+        //public DateTime? ExpireDateOfBidLimit { get; set; }
     }
 }

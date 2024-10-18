@@ -438,16 +438,6 @@ namespace Application.Services
             }
             return reponse;
         }
-
-        //public async Task<float?>? FindBidLimitPrice(int? customerId)
-        //{
-        //    var bidLimit = await _unitOfWork.BidLimitRepository.GetAllAsync(condition: x => x.CustomerId == customerId);
-
-        //    var firstBidLimit = bidLimit.FirstOrDefault(); 
-
-        //    return firstBidLimit?.PriceLimit; 
-        //}
-
         internal async Task<List<AccountDTO>> ConvertListAccountDTO(List<Domain.Entity.Account> accounts)
         {
             var DTOs = new List<AccountDTO>();
@@ -460,7 +450,41 @@ namespace Application.Services
             return DTOs;
         }
 
+        public async Task<APIResponseModel> CheckBidLimit(int customerId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
+                
+                    if (customer.PriceLimit == null)
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Customer haven't bidlimt, please regiser new bidlimit before join to lot";
+                        reponse.Code = 400;
+                        return reponse;
+                    }
+                    else
+                    {
+                        if(customer.ExpireDate.Value < DateTime.Now) 
+                        {
+                            reponse.IsSuccess = false;
+                            reponse.Message = "Customer have bidlimt, But BidLimit is outtime, Please register new bidlimit";
+                            reponse.Code = 400;
+                            return reponse;
+                        }
+                    }
+                reponse.IsSuccess = true;
+                reponse.Message = "Customer have bidlimit avaiable";
+                reponse.Code = 200;
 
-
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.Message = e.Message;
+            }
+            return reponse;
+        }
     }
 }
