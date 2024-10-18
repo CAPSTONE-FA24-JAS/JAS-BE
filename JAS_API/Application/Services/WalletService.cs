@@ -4,6 +4,7 @@ using Application.Utils;
 using Application.ViewModels.BidLimitDTOs;
 using Application.ViewModels.WalletDTOs;
 using AutoMapper;
+using Azure;
 using Domain.Entity;
 using Domain.Enums;
 
@@ -45,6 +46,45 @@ namespace Application.Services
             {
                reponse.IsSuccess = false;
                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> CheckWalletExist(int customerId, float depositPrice)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                //kiem tra co the chua
+                var walletexists = await _unitOfWork.WalletRepository.GetAllAsync(condition: x => x.CustomerId == customerId);
+                var walletexist = walletexists.FirstOrDefault();
+                if (walletexist == null)
+                {
+                    reponse.Code = 404;
+                    reponse.Message = "Customer haven't a wallet, please activate wallet!";
+                    reponse.IsSuccess = false;
+                    return reponse;
+                }
+                else
+                {
+                    //kiem tra du so du khong
+                    if (walletexist.Balance < (decimal)depositPrice)
+                    {
+                        reponse.Code = 404;
+                        reponse.Message = "Customer insufficient balance, Please add money into your wallet!";
+                        reponse.IsSuccess = false;
+                        return reponse;
+                    }
+                }
+                reponse.IsSuccess = true;
+                reponse.Code = 200;
+                reponse.Message = "Received Successfuly, Wallet avaiable";
+                reponse.Data = walletexist;
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
             }
             return reponse;
         }
@@ -107,6 +147,48 @@ namespace Application.Services
         public Task<APIResponseModel> UnLockWallet(int walletId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<APIResponseModel> UpdateBanlance(int walletId, decimal amountMoney, bool isAdd)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                //kiem tra co the chua
+                var walletexist = await _unitOfWork.WalletRepository.GetByIdAsync(walletId);
+                // nap tien
+                if (isAdd)
+                {
+                    walletexist.Balance += amountMoney;
+                    _unitOfWork.WalletRepository.Update(walletexist);
+                    
+                }
+                else
+                {
+                    if(amountMoney > walletexist.Balance)
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Code = 402;
+                        reponse.Message = $"Balance of wallet have {walletexist.Balance}, it less than amount money you want to deduct";
+                        return reponse;
+                    }
+                    walletexist.Balance -= amountMoney;
+                    _unitOfWork.WalletRepository.Update(walletexist);
+                }
+                if (await _unitOfWork.SaveChangeAsync() > 0)
+                {
+                    reponse.IsSuccess = true;
+                    reponse.Code = 200;
+                    reponse.Message = $"{(isAdd ? "Add" : "Deduct")} Wallet Successfully";
+                }
+
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
         }
     }
 }

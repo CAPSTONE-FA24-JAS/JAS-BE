@@ -129,14 +129,14 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegisterToBid()
+        public async Task<IActionResult> RegisterToBid(RegisterToLotDTO registerToLotDTO)
         {
-            //var result = await _lotService.CreateLot(createLotDTO);
-            //if (!result.IsSuccess)
-            //{
-            //    return BadRequest(result);
-            //}
-            return Ok();
+            var result = await _lotService.RegisterToLot(registerToLotDTO) ;
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }
