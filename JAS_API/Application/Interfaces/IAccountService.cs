@@ -15,7 +15,7 @@ namespace Application.Interfaces
         public Task<APIResponseModel> GetFilter();
         public Task<APIResponseModel> FilterAccount(int filter);
         public Task<APIResponseModel> FilterAccountByRole(int role);
-
+        public Task<APIResponseModel> CheckBidLimit(int customerId);
 
     }
 }
