@@ -329,6 +329,7 @@ namespace Application.Services
             {
                 //kiem tra chung minh tai chinh co thoa dieu kien hay khong
                 var checkbidlimit =  await _accountService.CheckBidLimit((int)registerToLotDTO.CustomerId);
+                var depositOfLot = await _unitOfWork.LotRepository.GetByIdAsync(registerToLotDTO.LotId);
                 if (!checkbidlimit.IsSuccess) 
                 { 
                     return reponse = checkbidlimit;
@@ -341,7 +342,8 @@ namespace Application.Services
                 }
                 if (checkWallet.Data is Wallet wallet)
                 {
-                    var minusDeposit =  await _walletService.UpdateBanlance(wallet.Id, (decimal)registerToLotDTO.CurrentPrice, false);
+                    
+                    var minusDeposit =  await _walletService.UpdateBanlance(wallet.Id, (decimal)depositOfLot.Deposit, false);
                     if (!minusDeposit.IsSuccess)
                     {
                         return reponse = minusDeposit;

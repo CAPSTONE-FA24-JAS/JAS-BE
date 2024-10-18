@@ -1,7 +1,13 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\JAS_API",
+    "\\JAS_API\\Application",
+    "\\JAS_API\\Application\\Services",
+    "\\JAS_API\\Application\\ViewModels",
+    "\\JAS_API\\Application\\ViewModels\\LotDTOs",
+    "\\JAS_API\\WebAPI"
   ],
-  "SelectedNode": "\\JAS_API.sln",
+  "SelectedNode": "\\JAS_API\\WebAPI\\WebAPI.csproj",
   "PreviewInSolutionExplorer": false
 }
