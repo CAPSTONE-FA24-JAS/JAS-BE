@@ -38,7 +38,7 @@ namespace Application.Interfaces
         List<Lot> GetHashLots(Func<Lot, bool> filter);
         void UpdateLotStatus(int lotId, string status);
 
-
+        DateTime? GetMaxEndTimeFormSortedSetOfLot();
 
 
     }

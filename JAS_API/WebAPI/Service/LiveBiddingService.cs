@@ -24,16 +24,27 @@ namespace WebAPI.Service
         }
         public async Task ChecKLotEndAsync()
         {
+            var maxEndTime = _cacheService.GetMaxEndTimeFormSortedSetOfLot();
             var lotLiveBidding = _cacheService.GetHashLots(l => l.Status == "Auctioning");
-
+            var auctionId = 0;
             foreach(var lot in lotLiveBidding)
             {
                 var endTime = lot.EndTime;
-                if(DateTime.UtcNow > endTime)
+                if (endTime.HasValue && DateTime.UtcNow > endTime.Value)
                 {
-
+                    await EndLot(lot.Id, endTime.Value);
                 }
+                auctionId = lot.Auction.Id;
             }
+            //luu endTime max vao actual auction
+            var auction = await _unitOfWork.AuctionRepository.GetByIdAsync(auctionId);
+            if (auction != null)
+            {
+                auction.ActualEndTime = maxEndTime;
+                _unitOfWork.AuctionRepository.Update(auction);
+                await _unitOfWork.SaveChangeAsync();
+            }
+            
         }
 
         public async Task CheckLotStartAsync()
@@ -49,6 +60,7 @@ namespace WebAPI.Service
                     await StartLot(lot.Id);
                 }
             }
+
         }
 
         private async Task StartLot(int lotId)
@@ -65,7 +77,7 @@ namespace WebAPI.Service
             _cacheService.UpdateLotStatus(lotId, lot.Status);
         }
 
-        private async Task EndLot(int lotId)
+        private async Task EndLot(int lotId, DateTime endTime)
         {
 
 
@@ -76,10 +88,12 @@ namespace WebAPI.Service
             }
             //cap nhat trang thai lot vao db va redis
             lot.Status = EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 3).Name;
+            lot.ActualEndTime = endTime;
             _unitOfWork.LotRepository.Update(lot);
             
 
             _cacheService.UpdateLotStatus(lotId, lot.Status);
+            
 
 
             var bidPrices = _cacheService.GetSortedSetData<BidPrice>("BidPrice");
