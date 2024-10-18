@@ -231,7 +231,12 @@ namespace Application.Services
         }
 
 
-
+        public DateTime? GetMaxEndTimeFormSortedSetOfLot()
+        {
+            var maxEndTime = _cacheDb.SortedSetRangeByRankWithScores("LotEndTime", -1, -1).Select(x => (DateTime?)DateTimeOffset.FromUnixTimeSeconds((long)x.Score).UtcDateTime)
+                           .FirstOrDefault();
+            return maxEndTime;
+        }
 
 
     }
