@@ -41,7 +41,7 @@ builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
 
 //dki background service
-builder.Services.AddHostedService<AuctionMonitorService>();
+//builder.Services.AddHostedService<AuctionMonitorService>();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
