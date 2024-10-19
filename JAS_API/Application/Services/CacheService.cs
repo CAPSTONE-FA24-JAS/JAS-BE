@@ -21,7 +21,7 @@ namespace Application.Services
         {
             try
             {
-                var redis = ConnectionMultiplexer.Connect("localhost:6379");
+                var redis = ConnectionMultiplexer.Connect("redis-13723.c259.us-central1-2.gce.redns.redis-cloud.com:13723,password=sktOpOku1xjAbjx6Gee4Qte266QB8B6n");
                 _cacheDb = redis.GetDatabase();
             }
             catch (Exception ex)
