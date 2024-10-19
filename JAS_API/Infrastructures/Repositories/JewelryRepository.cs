@@ -72,22 +72,9 @@ namespace Infrastructures.Repositories
 
         public async Task<(IEnumerable<Jewelry> data, int totalItem)> GetAllJewelryNoLotAynsc(int? pageIndex = null, int? pageSize = null)
         {
-            var jewelry = _dbContext.Jewelries.Include(x => x.Artist)
-                                              .Include(x => x.Category)
-                                              .Include(x => x.ImageJewelries)
-                                              .Include(x => x.KeyCharacteristicDetails)
-                                                      .ThenInclude(kc => kc.KeyCharacteristic)
-                                              .Include(x => x.Lot)
-                                              .Include(x => x.MainDiamonds)
-                                                      .ThenInclude(md => md.ImageMainDiamonds)
-                                              .Include(x => x.SecondaryDiamonds)
-                                                      .ThenInclude(sd => sd.ImageSecondaryDiamonds)
-                                              .Include(x => x.MainShaphies)
-                                                      .ThenInclude(ms => ms.ImageMainShaphies)
-                                              .Include(x => x.SecondaryShaphies)
-                                                      .ThenInclude(ss => ss.ImageSecondaryShaphies)
-                                              .Include(x => x.Valuation)
-                                              .Where(x => x.IsDeleted == false && x.Status == null);
+            var jewelry = _dbContext.Jewelries.Include(x => x.ImageJewelries)                                             
+                                              .Include(x => x.Lot)                                            
+                                              .Where(x =>  x.Lot == null || x.Lot.Status == "Passed");
 
             if (pageIndex.HasValue && pageSize.HasValue)
             {

@@ -96,6 +96,9 @@ namespace Infrastructures
                 .ForMember(dest => dest.Artist, opt => opt.MapFrom(src => src.Artist))
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
                 .ReverseMap();
+            CreateMap<Jewelry, JewelryListDTO>()
+                .ForMember(dest => dest.ImageJewelries, opt => opt.MapFrom(src => src.ImageJewelries))
+                .ReverseMap();
             CreateMap<CreateFinalValuationDTO, Jewelry>()
                 .ForMember(dest => dest.ImageJewelries, opt => opt.Ignore())
                 .ForMember(dest => dest.KeyCharacteristicDetails, opt => opt.Ignore())
