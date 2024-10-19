@@ -590,9 +590,8 @@ namespace Application.Services
                     
                     _unitOfWork.ValuationRepository.Update(valuation);
 
-                    var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(valuation.Jewelry.Id);
-                    jewelry.Status = status;
-                    _unitOfWork.JewelryRepository.Update(jewelry);
+                    
+                    
                     AddHistoryValuation(valuation.Id, status);
                     await _unitOfWork.SaveChangeAsync();
 
