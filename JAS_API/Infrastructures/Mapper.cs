@@ -166,6 +166,7 @@ namespace Infrastructures
                 .ReverseMap();
             CreateMap<Customer, SellerDTO>().ReverseMap();
             CreateMap<CustomerLot, RegisterToLotDTO>().ReverseMap();
+            CreateMap<CustomerLot, CustomerLotDTO>().ReverseMap();
 
 
         }

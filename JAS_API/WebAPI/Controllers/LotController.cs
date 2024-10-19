@@ -82,6 +82,16 @@ namespace WebAPI.Controllers
             }
             return Ok(result);
         }
+        [HttpGet]
+        public async Task<IActionResult> ViewCustomerLotByLotId(int lotId)
+        {
+            var result = await _lotService.GetCustomerLotByLot(lotId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreateLotFixedPrice(CreateLotFixedPriceDTO createLotDTO)

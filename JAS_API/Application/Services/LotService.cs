@@ -384,5 +384,35 @@ namespace Application.Services
             }
             return reponse;
         }
+
+        public async Task<APIResponseModel> GetCustomerLotByLot(int lotId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var lots = await _unitOfWork.CustomerLotRepository.GetAllAsync(condition: x => x.LotId == lotId);
+                if(lots.Count() > 0)
+                {
+                    reponse.Code = 200;
+                    reponse.Data = _mapper.Map<IEnumerable<CustomerLotDTO>>(lots);
+                    reponse.IsSuccess = true;
+                    reponse.Message = $"Received Customer lot is successfuly.";
+                }
+                else
+                {
+                    reponse.Code = 400;
+                    reponse.IsSuccess = true;
+                    reponse.Message = $"Received Customer lot is empty.";
+
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.Code = 500;
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
     }
 }
