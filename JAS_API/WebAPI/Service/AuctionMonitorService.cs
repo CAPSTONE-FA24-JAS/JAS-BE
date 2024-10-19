@@ -3,12 +3,12 @@ namespace WebAPI.Service
 {
     public class AuctionMonitorService : BackgroundService
     {
-        private readonly ILiveBiddingService _liveBiddingService;
+        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<AuctionMonitorService> _logger;
 
-        public AuctionMonitorService(ILiveBiddingService liveBiddingService, ILogger<AuctionMonitorService> logger)
+        public AuctionMonitorService(IServiceProvider serviceProvider, ILogger<AuctionMonitorService> logger)
         {
-            _liveBiddingService = liveBiddingService;
+            _serviceProvider = serviceProvider;
             _logger = logger;
         }
 
@@ -16,11 +16,12 @@ namespace WebAPI.Service
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Checking for ended auctions...");
-
-                await _liveBiddingService.CheckLotStartAsync();
-                await _liveBiddingService.ChecKLotEndAsync();
-
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var liveBiddingService = scope.ServiceProvider.GetRequiredService<LiveBiddingService>();
+                    await liveBiddingService.CheckLotStartAsync();
+                    await liveBiddingService.ChecKLotEndAsync();
+                }
                 await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }
         }

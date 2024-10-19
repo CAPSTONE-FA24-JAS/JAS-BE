@@ -67,21 +67,24 @@ namespace Application.Services
                             lot.LotType = EnumLotType.Auction_Price_GraduallyReduced.ToString();
                         }
 
-                        lot.Status = EnumStatusLot.Created.ToString();
+                        lot.Status = EnumStatusLot.Waitting.ToString();
                         lot.FloorFeePercent = 25;
                         await _unitOfWork.LotRepository.AddAsync(lot);
                         var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(lot.JewelryId);
                         jewelry.Status = EnumStatusJewelry.Added.ToString();
 
-                        var lotRedis = new Lot
-                        {
-                            StartTime = lot.StartTime,
-                            EndTime = lot.EndTime,
-                            Id = lot.Id,
-                            Status = lot.Status
-                        };
+                       
+                        
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
+                            var lotRedis = new Lot
+                            {
+                                StartTime = lot.StartTime,
+                                EndTime = lot.EndTime,
+                                Id = lot.Id,
+                                Status = lot.Status,
+                                AuctionId = lot.AuctionId,
+                            };
                             // Lưu lot vào Redis(dung hash)
                             _cacheService.SetLotInfo(lotRedis);
 

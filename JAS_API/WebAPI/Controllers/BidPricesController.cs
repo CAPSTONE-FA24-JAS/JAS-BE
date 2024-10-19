@@ -34,9 +34,14 @@ namespace WebAPI.Controllers
                     { CustomerId = request.CustomerId ,
                       LotId = request.LotId 
                     };
+                   
 
                     await _hubContext.Groups.AddToGroupAsync(request.ConnectionId, lotGroupName);
-                    await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.CustomerId} has joined lot {request.LotId}");                 
+                    await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.CustomerId} has joined lot {request.LotId}");
+                    var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == request.LotId);
+                    var highestBid = topBidders.FirstOrDefault();
+
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
                 }
                 else
                 {
@@ -69,7 +74,7 @@ namespace WebAPI.Controllers
                 _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, request.Price);
 
                 // Truy xuất bảng xếp hạng giảm dần theo giá đấu từ Redis
-                var topBidders = _cacheService.GetSortedSetData<BidPrice>("BidPrice");
+                var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l  =>  l.LotId == conn.LotId);
                 var highestBid = topBidders.FirstOrDefault();
 
                 string lotGroupName = $"lot-{conn.LotId}";
