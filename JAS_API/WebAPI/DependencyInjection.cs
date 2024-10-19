@@ -24,7 +24,7 @@ namespace WebAPI
             services.AddSingleton<Stopwatch>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IClaimsService, ClaimsService>();
-            services.AddScoped<ILiveBiddingService, LiveBiddingService>();
+            
 
 
             services.AddHttpContextAccessor();

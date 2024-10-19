@@ -8,10 +8,10 @@ namespace Domain.Enums
 {
     public enum EnumStatusLot
     {
-        Created = 1, 
-        Auctioning = 2,   
+        Waitting = 1, 
+        Auctionning = 2,   
         Sold = 3 ,       
-        Canceled = 4,    
-        Closed = 5   
+        Passed = 4,    
+        Cancelled = 5   
     }
 }
