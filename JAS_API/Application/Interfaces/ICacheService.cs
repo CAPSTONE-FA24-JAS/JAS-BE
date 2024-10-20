@@ -15,13 +15,13 @@ namespace Application.Interfaces
 
         object RemoveData(string key);
 
-        bool SetSortedSetData<T>(string key, T value, int score);
+        bool SetSortedSetData<T>(string key, T value, float score);
 
         //luu lot và sap xep theo time
         bool SetSortedSetDataForTime<T>(string key, T value, DateTime endTime);
 
         //get theo time theo thu tu giam dan
-        List<T> GetSortedSetData<T>(string key);
+        List<T> GetSortedSetDataFilter<T>(string key, Func<T, bool> filter = null);
 
         List<T> GetSortedSetDataForTime<T>(string key, Func<T, bool> filter = null);
 

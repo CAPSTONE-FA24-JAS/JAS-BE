@@ -1,133 +1,180 @@
 ﻿
 using Application;
 using Application.Interfaces;
+using Application.Services;
 using Application.Utils;
 using Domain.Entity;
 using Domain.Enums;
 using Microsoft.AspNetCore.SignalR;
+using System.Reflection;
 using System.Security.Claims;
 using WebAPI.Middlewares;
 
 namespace WebAPI.Service
 {
-    public class LiveBiddingService : ILiveBiddingService
+    public class LiveBiddingService 
     {
-        private readonly ICacheService _cacheService;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IServiceProvider _serviceProvider;
+        
         private readonly IHubContext<BiddingHub> _hubContext;
 
-        public LiveBiddingService(ICacheService cacheService, IUnitOfWork unitOfWork, IHubContext<BiddingHub> hubContext)
-        {
-            _cacheService = cacheService;
-            _unitOfWork = unitOfWork;
+        public LiveBiddingService(IHubContext<BiddingHub> hubContext, IServiceProvider serviceProvider)
+        {    
             _hubContext = hubContext;
+            _serviceProvider = serviceProvider;
         }
         public async Task ChecKLotEndAsync()
         {
-            var maxEndTime = _cacheService.GetMaxEndTimeFormSortedSetOfLot();
-            var lotLiveBidding = _cacheService.GetHashLots(l => l.Status == "Auctioning");
-            var auctionId = 0;
-            foreach(var lot in lotLiveBidding)
+            using (var scope = _serviceProvider.CreateScope())
             {
-                var endTime = lot.EndTime;
-                if (endTime.HasValue && DateTime.UtcNow > endTime.Value)
+                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+                var maxEndTime = _cacheService.GetMaxEndTimeFormSortedSetOfLot();
+                var lotLiveBidding = _cacheService.GetHashLots(l => l.Status == EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 2).Name);
+                int? auctionId = 0;
+                foreach (var lot in lotLiveBidding)
                 {
-                    await EndLot(lot.Id, endTime.Value);
+                    var endTime = lot.EndTime;
+                    if (endTime.HasValue && DateTime.UtcNow > endTime.Value)
+                    {
+                         await EndLot(lot.Id, endTime.Value);
+                    }
+                    auctionId = lot.AuctionId;
+                    if(auctionId == null)
+                    {
+                        throw new Exception("AuctionId null");
+                    }
                 }
-                auctionId = lot.Auction.Id;
+                //luu endTime max vao actual auction
+                var auction = await _unitOfWork.AuctionRepository.GetByIdAsync(auctionId);
+                if (auction != null)
+                {
+                    auction.ActualEndTime = maxEndTime;
+                    _unitOfWork.AuctionRepository.Update(auction);
+                    await _unitOfWork.SaveChangeAsync();
+                }
             }
-            //luu endTime max vao actual auction
-            var auction = await _unitOfWork.AuctionRepository.GetByIdAsync(auctionId);
-            if (auction != null)
-            {
-                auction.ActualEndTime = maxEndTime;
-                _unitOfWork.AuctionRepository.Update(auction);
-                await _unitOfWork.SaveChangeAsync();
-            }
+                
             
         }
 
         public async Task CheckLotStartAsync()
         {
-            var lotWithStartTime = _cacheService.GetHashLots( l => l.Status == "Created");
-
-            foreach(var lot in lotWithStartTime)
+            using (var scope = _serviceProvider.CreateScope())
             {
-                var startTime = lot.StartTime;
-                if(startTime.HasValue && DateTime.UtcNow >= startTime.Value)
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+                var lotWithStartTime = _cacheService.GetHashLots(l => l.Status == EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 1).Name);
+
+                foreach (var lot in lotWithStartTime)
                 {
-                    // Nếu đã đến thời gian bắt đầu, chuyển trạng thái lot sang 'Auctioning'
-                    await StartLot(lot.Id);
+                    var startTime = lot.StartTime;
+                    if (startTime.HasValue && DateTime.UtcNow >= startTime.Value)
+                    {
+                        // Nếu đã đến thời gian bắt đầu, chuyển trạng thái lot sang 'Auctioning'
+                        await StartLot(lot.Id);
+                    }
                 }
             }
+               
 
         }
 
         private async Task StartLot(int lotId)
         {
-            var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
-            if(lot == null)
+            using (var scope = _serviceProvider.CreateScope())
             {
-                throw new Exception("Not found Lot Id");
-            }
-            lot.Status = EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 2).Name;
-            _unitOfWork.LotRepository.Update(lot);
-            await _unitOfWork.SaveChangeAsync();
+                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+                var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+                if (lot == null)
+                {
+                    throw new Exception("Not found Lot Id");
+                }
+                lot.Status = EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 2).Name;
+                _unitOfWork.LotRepository.Update(lot);
+                await _unitOfWork.SaveChangeAsync();
 
-            _cacheService.UpdateLotStatus(lotId, lot.Status);
+                _cacheService.UpdateLotStatus(lotId, lot.Status);
+            }
+               
         }
 
         private async Task EndLot(int lotId, DateTime endTime)
         {
-
-
-            var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
-            if( lot == null)
+            using (var scope = _serviceProvider.CreateScope())
             {
-                throw new Exception("Not found Lot Id");
-            }
-            //cap nhat trang thai lot vao db va redis
-            lot.Status = EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 3).Name;
-            lot.ActualEndTime = endTime;
-            _unitOfWork.LotRepository.Update(lot);
-            
-
-            _cacheService.UpdateLotStatus(lotId, lot.Status);
-            
-
-
-            var bidPrices = _cacheService.GetSortedSetData<BidPrice>("BidPrice");
-            await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
-
-            // Truy xuất dữ liệu giá đấu từ Redis để xác định người thắng
-            var topBidders = _cacheService.GetSortedSetData<BidPrice>("BidPrice");
-            var winner = topBidders.FirstOrDefault();
-            if( winner == null )
-            {
-                var winnerCustomerLot = await _unitOfWork.CustomerLotRepository.GetCustomerLotByCustomerAndLot(winner.CustomerId, winner.LotId);
-            //    winnerCustomerLot.IsWinner = true;
-                winnerCustomerLot.CurrentPrice = winner.CurrentPrice;
-                _unitOfWork.CustomerLotRepository.Update(winnerCustomerLot);
-
-                var losers = topBidders.Skip(1);
-                foreach(var loser in losers)
+                string lotGroupName = $"lot-{lotId}";
+                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+                var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+                if (lot == null)
                 {
-                    var loserCustomerLot = await _unitOfWork.CustomerLotRepository.GetCustomerLotByCustomerAndLot(loser.CustomerId, loser.LotId);
-                    //    loserCustomerLot.IsWinner = false;
-                    _unitOfWork.CustomerLotRepository.Update(loserCustomerLot);
+                    throw new Exception("Not found Lot Id");
                 }
                 
+                // Truy xuất dữ liệu bid prices từ redis rồi lưu vào sql
+                var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == lot.Id);
+                await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
+
+                // nếu lot đó k có ai đấu giá thì đổi qua status passed, cập nhật lên cả redis và sql
+                if (bidPrices.Count == 0)
+                {
+                    
+                    lot.Status = EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 4).Name;
+                    lot.ActualEndTime = endTime;
+
+                    _unitOfWork.LotRepository.Update(lot);
+
+                    _cacheService.UpdateLotStatus(lotId, lot.Status);
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEnded", "Phiên đã kết thúc!");
+
+                }
+                else
+                {
+                    var winner = bidPrices.FirstOrDefault();
+                    lot.Status = EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 3).Name;
+                    lot.ActualEndTime = endTime;
+                    _unitOfWork.LotRepository.Update(lot);
+                    _cacheService.UpdateLotStatus(lotId, lot.Status);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    if (winner != null)
+                    {
+                        //ngược lại, nếu có bid prices thì truy xuất ra gía max nhất( lưu theo sortedSet và có sắp xếp giảm dần ở hàm get
+                        //nên chỉ cần lấy thằng đầu tiên)
+                        //lưu status lot là sold
+                        var winnerCustomerLot = await _unitOfWork.CustomerLotRepository.GetCustomerLotByCustomerAndLot(winner.CustomerId, winner.LotId);
+                        winnerCustomerLot.IsWinner = true;
+                        winnerCustomerLot.CurrentPrice = winner.CurrentPrice;
+                        _unitOfWork.CustomerLotRepository.Update(winnerCustomerLot);
+                        await _unitOfWork.SaveChangeAsync();
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEnded", "Phiên đã kết thúc!", winner.CustomerId, winner.CurrentPrice);
+                        //tao invoice cho wwinner
+
+
+                        //lấy ra những thằng thua theo lot
+                        var losers = bidPrices.Skip(1);
+                        foreach (var loser in losers)
+                        {
+                            var loserCustomerLot = await _unitOfWork.CustomerLotRepository.GetCustomerLotByCustomerAndLot(loser.CustomerId, loser.LotId);
+                            loserCustomerLot.IsWinner = false;
+                            _unitOfWork.CustomerLotRepository.Update(loserCustomerLot);
+                            await _unitOfWork.SaveChangeAsync();
+                            //hoan coc cho loser
+
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Winner của lot tren redis null");
+                    }
+                }
+                
+               
+                await _unitOfWork.SaveChangeAsync();
             }
-            await _unitOfWork.SaveChangeAsync();
 
-            //tao invoice cho wwinner
-
-            //hoan coc cho loser
-
-
-            //gui thong bao den client trong lot
-            string lotGroupName = $"lot-{lotId}";
-            await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEnded", winner.CustomerId, winner.CurrentPrice);
+               
         }
     }
 }

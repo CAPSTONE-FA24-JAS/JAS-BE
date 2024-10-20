@@ -42,59 +42,49 @@ namespace Application.Services
                 else
                 {
                     var lot = _mapper.Map<Lot>(lotDTO);
-                    var autionExist = await _unitOfWork.AuctionRepository.GetByIdAsync(lot.AuctionId);
-                    if (autionExist ==  null)
+                    var check =  (ValueTuple<bool, string>)await CheckExitProperty(lot);
+                    if (check.Item1 == false)
                     {
-                        reponse.Code = 404;
+                        reponse.Code = 402;
                         reponse.IsSuccess = false;
-                        reponse.Message = "Auction not found";
+                        reponse.Message = "Jewlry was into another lot";
                     }
                     else
                     {
-                        var check = (ValueTuple<bool, string>)await CheckExitProperty(lot);
-                        if (check.Item1 == false)
+                        if (lotDTO is CreateLotFixedPriceDTO)
                         {
-                            reponse.Code = 402;
-                            reponse.IsSuccess = false;
-                            reponse.Message = "Jewlry was into another lot";
+                            lot.LotType = EnumLotType.Fixed_Price.ToString();
                         }
-                        else
+                        if (lotDTO is CreateLotSecretAuctionDTO)
                         {
-                            if (lotDTO is CreateLotFixedPriceDTO)
-                            {
-                                lot.LotType = EnumLotType.Fixed_Price.ToString();
-                            }
-                            if (lotDTO is CreateLotSecretAuctionDTO)
-                            {
-                                lot.LotType = EnumLotType.Secret_Auction.ToString();
-                            }
-                            if (lotDTO is CreateLotPublicAuctionDTO)
-                            {
-                                lot.LotType = EnumLotType.Public_Auction.ToString();
-                            }
-                            if (lotDTO is CreateLotAuctionPriceGraduallyReducedDTO)
-                            {
-                                lot.LotType = EnumLotType.Auction_Price_GraduallyReduced.ToString();
-                            }
-                            lot.StartTime = autionExist.StartTime;
-                            lot.EndTime = autionExist.EndTime;
-                            lot.Status = EnumStatusLot.Waiting.ToString();
-                            lot.FloorFeePercent = 25;
-                            await _unitOfWork.LotRepository.AddAsync(lot);
-                            var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(lot.JewelryId);
-                            jewelry.Status = EnumStatusJewelry.Added.ToString();
+                            lot.LotType = EnumLotType.Secret_Auction.ToString();
+                        }
+                        if (lotDTO is CreateLotPublicAuctionDTO)
+                        {
+                            lot.LotType = EnumLotType.Public_Auction.ToString();
+                        }
+                        if (lotDTO is CreateLotAuctionPriceGraduallyReducedDTO)
+                        {
+                            lot.LotType = EnumLotType.Auction_Price_GraduallyReduced.ToString();
+                        }
 
-                            var lotRedis = new Lot
-                            {
-                                StartTime = lot.StartTime,
-                                EndTime = lot.EndTime,
-                                Id = lot.Id,
-                                Status = lot.Status
-                            };
-                            if (await _unitOfWork.SaveChangeAsync() > 0)
-                            {
-                                // Lưu lot vào Redis(dung hash)
-                                //_cacheService.SetLotInfo(lotRedis);
+                        lot.Status = EnumStatusLot.Created.ToString();
+                        lot.FloorFeePercent = 25;
+                        await _unitOfWork.LotRepository.AddAsync(lot);
+                        var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(lot.JewelryId);
+                        jewelry.Status = EnumStatusJewelry.Added.ToString();
+
+                        var lotRedis = new Lot
+                        {
+                            StartTime = lot.StartTime,
+                            EndTime = lot.EndTime,
+                            Id = lot.Id,
+                            Status = lot.Status
+                        };
+                        if (await _unitOfWork.SaveChangeAsync() > 0)
+                        {
+                            // Lưu lot vào Redis(dung hash)
+                            _cacheService.SetLotInfo(lotRedis);
 
                                 reponse.Code = 200;
                                 reponse.IsSuccess = true;

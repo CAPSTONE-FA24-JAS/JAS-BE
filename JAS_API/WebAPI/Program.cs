@@ -11,6 +11,8 @@ using Google;
 using Microsoft.AspNetCore.Identity;
 using WebAPI.Service;
 using System.Text.Json.Serialization;
+using StackExchange.Redis;
+using Application.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,11 +38,22 @@ builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, buil
 {
     build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
 }));
+
 //builder.WebHost.UseUrls("https://localhost:7251");
 //builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
+
+// Get Redis connection string from appsettings
+var redisConnectionString = builder.Configuration.GetValue<string>("Redis:ConnectionString");
+
+var redis = ConnectionMultiplexer.Connect(redisConnectionString);
+builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
+
+
+builder.Services.AddSingleton<LiveBiddingService>();
+
 //dki background service
-//builder.Services.AddHostedService<AuctionMonitorService>();
+builder.Services.AddHostedService<AuctionMonitorService>();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -115,7 +128,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<BiddingHub>("/bidding");
+app.MapHub<BiddingHub>("/Auctionning");
 
 app.Run();
 public partial class Program { }

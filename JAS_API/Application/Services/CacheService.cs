@@ -17,12 +17,12 @@ namespace Application.Services
     {
         private readonly IDatabase _cacheDb;
 
-        public CacheService()
+        public CacheService(IConnectionMultiplexer connectionMultiplexer)
         {
             try
             {
-                var redis = ConnectionMultiplexer.Connect("localhost:6379");
-                _cacheDb = redis.GetDatabase();
+                
+                _cacheDb = connectionMultiplexer.GetDatabase();
             }
             catch (Exception ex)
             {
@@ -57,7 +57,7 @@ namespace Application.Services
 
         }
 
-        public bool SetSortedSetData<T>(string key, T value, int score)
+        public bool SetSortedSetData<T>(string key, T value, float score)
         {
 
             //   var expriryTime = expirationTime.DateTime.Subtract(DateTime.Now);
@@ -79,7 +79,7 @@ namespace Application.Services
 
 
         //get sortedset k filter
-        public List<T> GetSortedSetData<T>(string key)
+        public List<T> GetSortedSetDataFilter<T>(string key, Func<T, bool>? filter = null)
         {
             var value = _cacheDb.SortedSetRangeByRank(key, 0, -1, Order.Descending);
 
@@ -89,12 +89,14 @@ namespace Application.Services
                 if (item.HasValue)
                 {
                     var deserializedItem = JsonSerializer.Deserialize<T>(item);
-                    result.Add(deserializedItem);
+                    if (filter == null || filter(deserializedItem))
+                    {
+                        result.Add(deserializedItem);
+                    }
                 }
             }
 
             return result;
-
         }
 
         //get sortedSet filter
@@ -216,7 +218,7 @@ namespace Application.Services
             foreach (var lotKey in lotKeys)
             {
                 // Lấy dữ liệu của mỗi Lot từ Redis
-                var lotData = _cacheDb.HashGet(lotKey, "data");
+                var lotData = _cacheDb.HashGet(lotKey, "lot");
 
                 if (lotData.HasValue)
                 {

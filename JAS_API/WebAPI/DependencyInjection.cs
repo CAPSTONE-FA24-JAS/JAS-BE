@@ -7,6 +7,7 @@ using System.Diagnostics;
 using WebAPI.Middlewares;
 using WebAPI.Service;
 using Application.Interfaces;
+using Application.Services;
 
 namespace WebAPI
 {
@@ -24,7 +25,7 @@ namespace WebAPI
             services.AddSingleton<Stopwatch>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IClaimsService, ClaimsService>();
-            services.AddScoped<ILiveBiddingService, LiveBiddingService>();
+            services.AddScoped<IBidPriceService, BidPriceService>();
 
 
             services.AddHttpContextAccessor();

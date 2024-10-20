@@ -590,9 +590,8 @@ namespace Application.Services
                     
                     _unitOfWork.ValuationRepository.Update(valuation);
 
-                    var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(valuation.Jewelry.Id);
-                    jewelry.Status = status;
-                    _unitOfWork.JewelryRepository.Update(jewelry);
+                    
+                    
                     AddHistoryValuation(valuation.Id, status);
                     await _unitOfWork.SaveChangeAsync();
 
@@ -649,14 +648,10 @@ namespace Application.Services
             var response = new APIResponseModel();
             try
             {
-                //var jewelrys = await _unitOfWork.JewelryRepository.GetAllPaging(filter: null,
-                //                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
-                //                                                             includeProperties: "Artist,Category,ImageJewelries,KeyCharacteristicDetails,Lot,MainDiamonds,SecondaryDiamonds,MainShaphies,SecondaryShaphies,Valuation",
-                //                                                             pageIndex: pageIndex,
-                //                                                             pageSize: pageSize);
+                
 
                 var jewelrys = await _unitOfWork.JewelryRepository.GetAllJewelryNoLotAynsc(pageSize, pageIndex);
-                List<JewelryDTO> listjewelryDTO = new List<JewelryDTO>();
+                List<JewelryListDTO> listjewelryDTO = new List<JewelryListDTO>();
                 if (jewelrys.totalItem > 0)
                 {
                     response.Message = $"List consign items Successfully";
@@ -664,7 +659,7 @@ namespace Application.Services
                     response.IsSuccess = true;
                     foreach (var item in jewelrys.data)
                     {
-                        var jewelrysResponse = _mapper.Map<JewelryDTO>(item);
+                        var jewelrysResponse = _mapper.Map<JewelryListDTO>(item);
                         listjewelryDTO.Add(jewelrysResponse);
                     };
 
