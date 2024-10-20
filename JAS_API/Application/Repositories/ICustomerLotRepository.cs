@@ -10,5 +10,7 @@ namespace Application.Repositories
     public interface ICustomerLotRepository : IGenericRepository<CustomerLot>
     {
         Task<CustomerLot> GetCustomerLotByCustomerAndLot(int? customerIId, int? lotId);
+
+        
     }
 }

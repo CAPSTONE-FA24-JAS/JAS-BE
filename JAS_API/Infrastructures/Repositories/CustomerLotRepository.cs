@@ -27,11 +27,13 @@ namespace Infrastructures.Repositories
        public async Task<CustomerLot> GetCustomerLotByCustomerAndLot(int? customerIId, int? lotId)
         {
             var customerLot = await _dbContext.CustomerLots.Where(x => x.CustomerId == customerIId && x.LotId == lotId).FirstOrDefaultAsync();
-            if (customerLot != null)
+            if (customerLot == null)
             {
-                return customerLot;
+                throw new Exception("Not found CustomerLot");
             }
-            return null;
+            return customerLot;
         }
+
+     
     }
 }
