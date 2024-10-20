@@ -1,10 +1,9 @@
 ﻿using Application.Interfaces;
-using Application.Repositories;
 using Application.ViewModels.VNPayDTOs;
 using Application.ViewModels.WalletDTOs;
-using Microsoft.AspNetCore.Http;
+using Domain.Entity;
+using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 
 namespace WebAPI.Controllers
 {
@@ -13,12 +12,16 @@ namespace WebAPI.Controllers
         private readonly IWalletService _walletService;
         private readonly IVNPayService _vpnService;
         private readonly IAccountService _accountService;
+        private readonly IVNPayService _vNPayService;
+        private readonly IWalletTransactionService _walletTransactionService;
 
-        public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService)
+        public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService, IVNPayService vNPayService, IWalletTransactionService walletTransactionService)
         {
             _walletService = walletService;
             _vpnService = vpnService;
             _accountService = accountService;
+            _vNPayService = vNPayService;
+            _walletTransactionService = walletTransactionService;
         }
 
         [HttpGet]
@@ -56,28 +59,41 @@ namespace WebAPI.Controllers
                 Amount = topUpWalletDTO.Amount,
                 CreatedDate = DateTime.UtcNow,
                 Description = "Nap tien vao vi",
-                FullName = "danh ne",
+                FullName = "",
                 OrderId = new Random().Next(1000, 100000)
             };
-            return Redirect(_vpnService.CreatePaymentUrl(HttpContext, vnPayModel));
-
+            var transaction = new WalletTransaction()
+            {
+                transactionType = EnumTransactionType.AddWallet.ToString(),
+                DocNo = topUpWalletDTO.WalletId,
+            };
+            string paymentUrl = _vpnService.CreatePaymentUrl(HttpContext, vnPayModel, transaction);
+            return Content(paymentUrl);
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> PayCallBack()
         {
-            var result = await _vpnService.PaymentExecute(Request.Query);
-            if (result.IsSuccess)
+            var result =  _vpnService.PaymentExecute(Request.Query);
+           
+            if (result.VnPayResponseCode == "00" || result.Success != null)
             {
-                if (result.Data is VNPaymentReponseDTO reponseDTO)
+                var tranUpdate = await _walletTransactionService.UpdateTransaction(result.OrderId);
+                if(!tranUpdate.IsSuccess)
                 {
-                    if (reponseDTO.VnPayResponseCode == "00")
-                    {
-                        //cap nhat vi 
+                        return BadRequest(tranUpdate);
+                }
 
-                        return Ok(result);
+                if (tranUpdate.Data is WalletTransaction trans)
+                {
+                    var walletUpdate = await _walletService.UpdateBanlance((int)trans.DocNo, (decimal)trans.Amount, true);
+
+                    if (!walletUpdate.IsSuccess)
+                    {
+                        return BadRequest(walletUpdate);
                     }
                 }
+                return Ok(result);
             }
             return BadRequest(result);
         }

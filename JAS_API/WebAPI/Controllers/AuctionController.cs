@@ -81,6 +81,17 @@ namespace WebAPI.Controllers
             return BadRequest(result);
         }
 
+        [HttpPut]
+        public async Task<IActionResult> ApproveAution(int auctionId)
+        {
+            var result = await _auctionService.ApproveAuction(auctionId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
         [HttpDelete]
         public async Task<IActionResult> SoftDeleteAuction(int Id)
         {

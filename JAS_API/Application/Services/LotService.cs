@@ -3,6 +3,7 @@ using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.LotDTOs;
 using AutoMapper;
+using Azure;
 using Domain.Entity;
 using Domain.Enums;
 using Google.Apis.Storage.v1.Data;
@@ -67,38 +68,38 @@ namespace Application.Services
                             lot.LotType = EnumLotType.Auction_Price_GraduallyReduced.ToString();
                         }
 
-                        lot.Status = EnumStatusLot.Waitting.ToString();
+                        lot.Status = EnumStatusLot.Created.ToString();
                         lot.FloorFeePercent = 25;
                         await _unitOfWork.LotRepository.AddAsync(lot);
                         var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(lot.JewelryId);
                         jewelry.Status = EnumStatusJewelry.Added.ToString();
 
-                       
-                        
+                        var lotRedis = new Lot
+                        {
+                            StartTime = lot.StartTime,
+                            EndTime = lot.EndTime,
+                            Id = lot.Id,
+                            Status = lot.Status
+                        };
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
-                            var lotRedis = new Lot
-                            {
-                                StartTime = lot.StartTime,
-                                EndTime = lot.EndTime,
-                                Id = lot.Id,
-                                Status = lot.Status,
-                                AuctionId = lot.AuctionId,
-                            };
                             // Lưu lot vào Redis(dung hash)
                             _cacheService.SetLotInfo(lotRedis);
 
-                            reponse.Code = 200;
-                            reponse.IsSuccess = true;
-                            reponse.Message = $"CreateLot {lot.LotType} is successfuly";
+                                reponse.Code = 200;
+                                reponse.IsSuccess = true;
+                                reponse.Message = $"CreateLot {lot.LotType} is successfuly";
+                            }
+                            else
+                            {
+                                reponse.Code = 409;
+                                reponse.IsSuccess = false;
+                                reponse.Message = "Error when saving change";
+                            }
                         }
-                        else
-                        {
-                            reponse.Code = 409;
-                            reponse.IsSuccess = false;
-                            reponse.Message = "Error when saving change";
-                        }
+
                     }
+                    
                 }
             }
             catch (Exception e)
@@ -413,6 +414,71 @@ namespace Application.Services
                 reponse.ErrorMessages = new List<string> { e.Message };
             }
             return reponse;
+        }
+        public async Task<APIResponseModel> CheckCustomerInLot(int customerId, int lotId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var lots = await _unitOfWork.CustomerLotRepository.GetAllAsync(condition: x => x.LotId == lotId, x => x.CustomerId == customerId);
+                if (lots.Count() > 0)
+                {
+                    reponse.Code = 200;
+                    reponse.Data = true;
+                    reponse.IsSuccess = true;
+                    reponse.Message = $"Customer was joined to lot";
+                }
+                else
+                {
+                    reponse.Code = 400;
+                    reponse.IsSuccess = true;
+                    reponse.Message = $"Customer havent in lot.";
+
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.Code = 500;
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> UpdateLotRange(int auctionId)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var lots = await _unitOfWork.LotRepository.GetAllAsync(condition: x => x.AuctionId == auctionId);
+                if (lots != null && lots.Any())
+                {
+                    foreach (var lot in lots)
+                    {
+                        lot.Status = EnumStatusLot.Ready.ToString();
+                    }
+
+                    _unitOfWork.LotRepository.UpdateRange(lots);
+                    await _unitOfWork.SaveChangeAsync(); 
+                    response.Code = 200;
+                    response.Data = true;
+                    response.IsSuccess = true;
+                    response.Message = $"Successfully updated lots for auction {auctionId}.";
+                }
+                else
+                {
+                    response.Code = 404;
+                    response.IsSuccess = false;
+                    response.Message = $"No lots found for auction {auctionId}.";
+                }
+            }
+            catch (Exception e)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.ErrorMessages = new List<string> { e.Message };
+            }
+            return response;
         }
     }
 }

@@ -2,6 +2,7 @@
 using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.VNPayDTOs;
+using Domain.Entity;
 using iTextSharp.xmp.impl;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -12,20 +13,22 @@ namespace Application.Services
     public class VNPayService : IVNPayService
     {
         private readonly IConfiguration _configuration;
+        private readonly IWalletTransactionService _walletTransactionService;
 
-        public VNPayService(IConfiguration configuration)
+        public VNPayService(IConfiguration configuration, IWalletTransactionService walletTransactionService)
         {
             _configuration = configuration;
+            _walletTransactionService = walletTransactionService;
         }
 
-        public string CreatePaymentUrl(HttpContext httpContext, VNPaymentRequestDTO model)
+        public string CreatePaymentUrl(HttpContext httpContext, VNPaymentRequestDTO model, WalletTransaction walletTransaction)
         {
             var tick = DateTime.Now.Ticks.ToString();
 
             var vnpay = new VnPayLibrary();
             vnpay.AddRequestData("vnp_Version", _configuration["VnPay:vnp_Version"]);
-            vnpay.AddRequestData("vnp_Command", _configuration["VnPay:vnp_TmnCode"]);
-            vnpay.AddRequestData("vnp_TmnCode", _configuration["VnPay:vnp_Version"]);
+            vnpay.AddRequestData("vnp_Command", _configuration["VnPay:Command"]);
+            vnpay.AddRequestData("vnp_TmnCode", _configuration["VnPay:vnp_TmnCode"]);
             vnpay.AddRequestData("vnp_Amount", (model.Amount * 100).ToString());
 
             vnpay.AddRequestData("vnp_CreateDate", model.CreatedDate.ToString("yyyyMMddHHmmss"));
@@ -34,17 +37,24 @@ namespace Application.Services
             vnpay.AddRequestData("vnp_Locale", _configuration["VnPay:Locale"]);
 
             vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + model.OrderId);
-            vnpay.AddRequestData("vnp_OrderType", "other"); //default value: other
+            vnpay.AddRequestData("vnp_OrderType", "other");
             vnpay.AddRequestData("vnp_ReturnUrl", _configuration["VnPay:PaymentBackReturnUrl"]);
             vnpay.AddRequestData("vnp_TxnRef", tick);
+
+            //tao transaction tam
+            walletTransaction.transactionId = tick;
+            walletTransaction.Status = "Pending";
+            walletTransaction.Amount = model.Amount;
+            walletTransaction.CreationDate = model.CreatedDate;
+            _walletTransactionService.CreateNewTransaction(walletTransaction);
 
             var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
             return paymentUrl;
         }
 
-        public async Task<APIResponseModel> PaymentExecute(IQueryCollection collection)
+        public VNPaymentReponseDTO PaymentExecute(IQueryCollection collection)
         {
-            var response = new APIResponseModel();
+            var vnpayreponse = new VNPaymentReponseDTO();
             var vnpay = new VnPayLibrary();
             foreach (var (key, value) in collection)
             {
@@ -55,29 +65,33 @@ namespace Application.Services
             }
 
             var vnp_orderId = Convert.ToInt64(vnpay.GetResponseData("vnp_TxnRef"));
-            long vnp_TransactionId = Convert.ToInt64(vnpay.GetResponseData("vnp_TransactionNo"));
-            String vnp_SecureHash = collection.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value;
-            string vnp_ResponseCode = vnpay.GetResponseData("vnp_ResponseCode");
+            var vnp_TransactionId = Convert.ToInt64(vnpay.GetResponseData("vnp_TransactionNo"));
+            var vnp_SecureHash = collection.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value;
+            var vnp_ResponseCode = vnpay.GetResponseData("vnp_ResponseCode");
             string vnp_TransactionStatus = vnpay.GetResponseData("vnp_TransactionStatus");
             var vnp_OrderInfo = vnpay.GetResponseData("vnp_OrderInfo");
+            var vnp_TrasactionTime = vnpay.GetResponseData("vnp_PayDate");
             bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, _configuration["VnPay:vnp_HashSecret"]);
 
             if (!checkSignature)
             {
-                response.IsSuccess = false;
-                return response;
+                vnpayreponse.Success = false;
+                return vnpayreponse;
             }
 
-            var vnpayreponse = new VNPaymentReponseDTO();
+            
             vnpayreponse.PaymentMethod = "VnPay";
             vnpayreponse.OrderDescription = vnp_OrderInfo;
             vnpayreponse.OrderId = vnp_orderId.ToString();
             vnpayreponse.TransactionId = vnp_TransactionId.ToString();
             vnpayreponse.Token = vnp_SecureHash;
             vnpayreponse.VnPayResponseCode = vnp_ResponseCode;
-            response.Data = vnpayreponse;
-            response.IsSuccess = true;
-            return response;
+            DateTime TransactionTime;
+            if (DateTime.TryParseExact(vnp_TrasactionTime, "yyyyMMddHHmmss", null, System.Globalization.DateTimeStyles.None, out TransactionTime))
+            {
+                vnpayreponse.CreatedDate = TransactionTime;
+            }
+            return vnpayreponse;
         }
     }
 }

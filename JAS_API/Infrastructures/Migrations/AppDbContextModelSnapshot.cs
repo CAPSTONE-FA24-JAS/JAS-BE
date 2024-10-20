@@ -2595,8 +2595,14 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("TransactionTime")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int?>("WalletId")
+                    b.Property<string>("transactionId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("transactionPerson")
                         .HasColumnType("integer");
+
+                    b.Property<string>("transactionType")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
