@@ -43,6 +43,9 @@ namespace Application.Services
             try
             {
                 string lotGroupName = $"lot-{request.LotId}";
+                var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == request.LotId);
+                var highestBid = topBidders.FirstOrDefault();
+
                 if (!_shared.connections.ContainsKey(request.ConnectionId))
                 {
                     _shared.connections[request.ConnectionId] = new AccountConnection
@@ -51,13 +54,17 @@ namespace Application.Services
                         LotId = request.LotId
                     };
 
-
+                    
                     await _hubContext.Groups.AddToGroupAsync(request.ConnectionId, lotGroupName);
-                    await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");                   
+                    await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
+
                 }
                 else
                 {
+                   
                     await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
 
                 }
                 reponse.IsSuccess = true;
@@ -83,11 +90,17 @@ namespace Application.Services
                 {
                     var account = await _unitOfWork.AccountRepository.GetByIdAsync(conn.AccountId);
                     var customerId = account.Customer.Id;
-                    var customer = await _unitOfWork.CustomerLotRepository.GetCustomerLotByCustomerAndLot(customerId, conn.LotId);
+                    var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
                     var limitbid = customer.PriceLimit;
                     if(limitbid.HasValue && limitbid < request.CurrentPrice)
                     {
                         reponse.Message = "giá đặt cao hơn limit bid";
+                        reponse.Code = 500;
+                        reponse.IsSuccess = false;
+                    }
+                    else if(limitbid == null)
+                    {
+                        reponse.Message = "khong tim thay limit bid trong database";
                         reponse.Code = 500;
                         reponse.IsSuccess = false;
                     }
