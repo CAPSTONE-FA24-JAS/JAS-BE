@@ -360,7 +360,7 @@ namespace Application.Services
                             customerLot.PriceLimit = customer.PriceLimit;
                             customerLot.ExpireDateOfBidLimit = customer.ExpireDate;
                         }
-                        customerLot.Status = "Registered";
+                        customerLot.Status = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == 1).Name;
                         await _unitOfWork.CustomerLotRepository.AddAsync(customerLot);
                         if(await _unitOfWork.SaveChangeAsync() > 0)
                         {

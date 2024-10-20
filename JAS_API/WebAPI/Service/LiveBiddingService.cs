@@ -151,7 +151,19 @@ namespace WebAPI.Service
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEnded", "Phiên đã kết thúc!", winner.CustomerId, winner.CurrentPrice);
                         //tao invoice cho wwinner
 
+                        var invoice = new Invoice
+                        {
+                            CustomerId = winner.CustomerId,
+                            CustomerLotId = winnerCustomerLot.Id,
+                            StaffId = winnerCustomerLot.Lot.StaffId,
+                            Price = winner.CurrentPrice,
+                            Free = (float?)(winner.CurrentPrice * 0.25),
+                            TotalPrice = (float?)(winner.CurrentPrice + winner.CurrentPrice * 0.25 - lot.Deposit),
+                        };
 
+                        await _unitOfWork.InvoiceRepository.AddAsync(invoice);
+                        winnerCustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == 2).Name;
+                        _unitOfWork.CustomerLotRepository.Update(winnerCustomerLot);
                         //lấy ra những thằng thua theo lot
                         var losers = bidPrices.Skip(1);
                         foreach (var loser in losers)
