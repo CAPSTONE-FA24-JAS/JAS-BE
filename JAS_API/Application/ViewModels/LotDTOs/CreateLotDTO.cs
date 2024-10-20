@@ -20,8 +20,6 @@ namespace Application.ViewModels.LotDTOs
     {
         public float? Deposit { get; set; }
         public float? BuyNowPrice { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
         public bool? IsExtend { get; set; }
         public bool? HaveFinancialProof { get; set; }
 
@@ -34,8 +32,6 @@ namespace Application.ViewModels.LotDTOs
         public float? StartPrice { get; set; }
         public float? FinalPriceSold { get; set; }
         public float? Deposit { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
         public bool? IsExtend { get; set; }
         public bool? HaveFinancialProof { get; set; }
         
@@ -49,8 +45,6 @@ namespace Application.ViewModels.LotDTOs
         public float? FinalPriceSold { get; set; }
         public float? BidIncrement { get; set; }
         public float? Deposit { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
         public bool? IsExtend { get; set; }
         public bool? HaveFinancialProof { get; set; }
         
@@ -64,8 +58,6 @@ namespace Application.ViewModels.LotDTOs
         public float? FinalPriceSold { get; set; }
         public float? BidIncrement { get; set; }
         public float? Deposit { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
         public bool? IsExtend { get; set; }
         public bool? HaveFinancialProof { get; set; }
 

@@ -1,5 +1,6 @@
 ﻿using Application.ServiceReponse;
 using Application.ViewModels.VNPayDTOs;
+using Domain.Entity;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace Application.Interfaces
 {
     public interface IVNPayService
     {
-        string CreatePaymentUrl(HttpContext httpContext, VNPaymentRequestDTO model);
-        Task<APIResponseModel> PaymentExecute(IQueryCollection collection);
+        string CreatePaymentUrl(HttpContext httpContext, VNPaymentRequestDTO model, WalletTransaction walletTransaction);
+        VNPaymentReponseDTO PaymentExecute(IQueryCollection collection);
     }
 }

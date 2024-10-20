@@ -2,8 +2,10 @@
 {
     public enum EnumStatusAuction
     {
-        NotStarted =1,
-        Living = 2,
-        Past = 3
+        Waiting =1,
+        UpComing = 2,
+        Live = 3,
+        Past = 4,
+        Cancelled = 5
     }
 }

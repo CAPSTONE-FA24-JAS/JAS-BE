@@ -37,9 +37,8 @@ builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, buil
     build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
 }));
 //builder.WebHost.UseUrls("https://localhost:7251");
-builder.WebHost.UseUrls("http://0.0.0.0:7251");
+//builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
-
 //dki background service
 //builder.Services.AddHostedService<AuctionMonitorService>();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -98,7 +97,7 @@ var app = builder.Build();
 
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
