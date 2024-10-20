@@ -8,9 +8,11 @@ namespace Application.ViewModels.CustomerLotDTOs
 {
     public class BiddingInputDTO
     {
-        public int Price { get; set; } = 0;
-        public DateTime Timestamp { get; set; }
+        public float CurrentPrice { get; set; }
+        public DateTime BidTime { get; set; }
 
         public string ConnectionId { get; set; }
+
+        
     }
 }

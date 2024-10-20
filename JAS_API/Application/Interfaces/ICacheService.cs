@@ -15,7 +15,7 @@ namespace Application.Interfaces
 
         object RemoveData(string key);
 
-        bool SetSortedSetData<T>(string key, T value, int score);
+        bool SetSortedSetData<T>(string key, T value, float score);
 
         //luu lot và sap xep theo time
         bool SetSortedSetDataForTime<T>(string key, T value, DateTime endTime);

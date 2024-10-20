@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.ViewModels.CustomerLotDTOs
+namespace Application.ViewModels.LiveBiddingDTOs
 {
-    public class JoinLotRequestDTO
+    public class AccountConnection
     {
         public int AccountId { get; set; }
         public int LotId { get; set; }
-
-        public string ConnectionId { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Application.ViewModels.CustomerLotDTOs;
+using Application.ViewModels.LiveBiddingDTOs;
 using Domain.Entity;
 using System;
 using System.Collections.Concurrent;
@@ -11,8 +12,8 @@ namespace Application.Services
 {
     public class ShareDB
     {
-        private readonly ConcurrentDictionary<string, CustomerLotDTO> _connections = new();
+        private readonly ConcurrentDictionary<string, AccountConnection> _connections = new();
 
-        public ConcurrentDictionary<string, CustomerLotDTO> connections => _connections;
+        public ConcurrentDictionary<string, AccountConnection> connections => _connections;
     }
 }

@@ -71,6 +71,8 @@ namespace Infrastructures
             services.AddScoped<ICustomerLotRepository, CustomerLotRepository>();
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IBidPriceRepository, BidPriceRepository>();
+            services.AddScoped<ICustomerLotService, CustomerLotService>();
+            
             services.AddSingleton<ShareDB>();
             services.AddSingleton<IVNPayService, VNPayService>();
             services.AddDbContext<AppDbContext>(option =>
