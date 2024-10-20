@@ -49,6 +49,7 @@ namespace Infrastructures
         private readonly ICustomerLotRepository _customerLotRepository;
         private readonly IBidPriceRepository _bidPriceRepository;
         private readonly IWalletTransactionRepository _walletTransactionRepository;
+        private readonly IInvoiceRepository _invoiceRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -68,7 +69,8 @@ namespace Infrastructures
                           IDocumentMainShaphieRepository documentMainShaphieRepository, IDocumentSecondaryShaphieRepository documentSecondaryShaphieRepository,
                           IImageMainShaphieRepository imageMainShaphieRepository, IImageSecondaryShaphieRepository imageSecondaryShaphieRepository,
                           ILotRepository lotRepository, IStaffRepository staffRepository, ICustomerLotRepository customerLotRepository,
-                          IBidPriceRepository bidPriceRepository, IWalletTransactionRepository walletTransactionRepository)
+                          IBidPriceRepository bidPriceRepository, IWalletTransactionRepository walletTransactionRepository,
+                          IInvoiceRepository invoiceRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -110,6 +112,7 @@ namespace Infrastructures
 
             _bidPriceRepository = bidPriceRepository;
             _walletTransactionRepository = walletTransactionRepository;
+            _invoiceRepository = invoiceRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -169,6 +172,9 @@ namespace Infrastructures
         public IBidPriceRepository BidPriceRepository => _bidPriceRepository;
 
         public IWalletTransactionRepository WalletTransactionRepository => _walletTransactionRepository;
+        public IInvoiceRepository InvoiceRepository => _invoiceRepository;
+
+       
 
         public async Task<int> SaveChangeAsync()
         {
