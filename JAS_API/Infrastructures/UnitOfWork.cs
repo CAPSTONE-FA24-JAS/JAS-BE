@@ -48,6 +48,7 @@ namespace Infrastructures
         private readonly IStaffRepository _staffRepository;
         private readonly ICustomerLotRepository _customerLotRepository;
         private readonly IBidPriceRepository _bidPriceRepository;
+        private readonly IWalletTransactionRepository _walletTransactionRepository;
         private readonly IInvoiceRepository _invoiceRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
@@ -68,7 +69,8 @@ namespace Infrastructures
                           IDocumentMainShaphieRepository documentMainShaphieRepository, IDocumentSecondaryShaphieRepository documentSecondaryShaphieRepository,
                           IImageMainShaphieRepository imageMainShaphieRepository, IImageSecondaryShaphieRepository imageSecondaryShaphieRepository,
                           ILotRepository lotRepository, IStaffRepository staffRepository, ICustomerLotRepository customerLotRepository,
-                          IBidPriceRepository bidPriceRepository, IInvoiceRepository invoiceRepository)
+                          IBidPriceRepository bidPriceRepository, IWalletTransactionRepository walletTransactionRepository,
+                          IInvoiceRepository invoiceRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -109,6 +111,7 @@ namespace Infrastructures
             _customerLotRepository = customerLotRepository;
 
             _bidPriceRepository = bidPriceRepository;
+            _walletTransactionRepository = walletTransactionRepository;
             _invoiceRepository = invoiceRepository;
         }
 
@@ -168,6 +171,7 @@ namespace Infrastructures
 
         public IBidPriceRepository BidPriceRepository => _bidPriceRepository;
 
+        public IWalletTransactionRepository WalletTransactionRepository => _walletTransactionRepository;
         public IInvoiceRepository InvoiceRepository => _invoiceRepository;
 
        

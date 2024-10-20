@@ -69,12 +69,16 @@ namespace Infrastructures
             services.AddScoped<ILotRepository, LotRepository>();
             services.AddScoped<IStaffRepository, StaffRepository>();
             services.AddScoped<ICustomerLotRepository, CustomerLotRepository>();
+            services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
+            services.AddScoped<IWalletTransactionService, WalletTransactionService>();
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IBidPriceRepository, BidPriceRepository>();
             services.AddScoped<ICustomerLotService, CustomerLotService>();
             
             services.AddSingleton<ShareDB>();
-            services.AddSingleton<IVNPayService, VNPayService>();
+            services.AddScoped<IVNPayService, VNPayService>();
+            services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
+            services.AddScoped<IWalletTransactionService, WalletTransactionService>();
             services.AddDbContext<AppDbContext>(option =>
             {
                 option.UseLazyLoadingProxies().UseNpgsql(databaseConnection);

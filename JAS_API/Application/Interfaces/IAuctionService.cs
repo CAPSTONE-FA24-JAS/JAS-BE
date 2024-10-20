@@ -12,5 +12,6 @@ namespace Application.Interfaces
         Task<APIResponseModel> DeleteSolfAuction(int Id);
         Task<APIResponseModel> GetStatusAuction();
         Task<APIResponseModel> GetAuctionByStatus(int valueId);
+        Task<APIResponseModel> ApproveAuction(int auctionId);
     }
 }

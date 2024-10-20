@@ -44,7 +44,7 @@ namespace Application
         public ILotRepository LotRepository { get; }
         public IStaffRepository StaffRepository { get; }
         public ICustomerLotRepository CustomerLotRepository { get; }
-
+        public IWalletTransactionRepository WalletTransactionRepository { get; }
         public IBidPriceRepository BidPriceRepository { get; }
 
         public IInvoiceRepository InvoiceRepository { get; }

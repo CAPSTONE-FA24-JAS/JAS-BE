@@ -21,14 +21,16 @@ namespace Application.Services
         private readonly ICurrentTime _currentTime;
         private readonly Cloudinary _cloudinary;
         private const string Tags = "Backend_ImageAuction";
+        private readonly ILotService _lotService;
 
-        public AuctionService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService, ICurrentTime currentTime, Cloudinary cloudinary)
+        public AuctionService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService, ICurrentTime currentTime, Cloudinary cloudinary, ILotService lotService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _claimsService = claimsService;
             _currentTime = currentTime;
             _cloudinary = cloudinary;
+            _lotService = lotService;
         }
 
         public async Task<APIResponseModel> CreateAuction(CreateAuctionDTO createAuctionDTO)
@@ -44,7 +46,7 @@ namespace Application.Services
                     return reponse;
                 }
                 var newAuction = _mapper.Map<Auction>(createAuctionDTO);
-                newAuction.Status = EnumStatusAuction.NotStarted.ToString();
+                newAuction.Status = EnumStatusAuction.Waiting.ToString();
                 if(newAuction == null)
                 {
                     reponse.IsSuccess = false;
@@ -256,16 +258,17 @@ namespace Application.Services
                 {
                     var starttime = auctionExisted.StartTime;
                     _mapper.Map(updateAuctionDTO, auctionExisted);
-                    auctionExisted.Status = EnumStatusAuction.Living.ToString();
+                    auctionExisted.Status = EnumStatusAuction.Live.ToString();
                     auctionExisted.ModificationDate = DateTime.Now;
                     auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
                     auctionExisted.StartTime = starttime;
                 }
                 else if (auctionExisted.StartTime > _currentTime.GetCurrentTime())
                 {
-                    auctionExisted.Status = EnumStatusAuction.NotStarted.ToString();
+                    auctionExisted.Status = EnumStatusAuction.UpComing.ToString();
                     auctionExisted.ModificationDate = DateTime.Now;
                     auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
+                    await _lotService.UpdateLotRange(auctionExisted.Id);
                     _mapper.Map(updateAuctionDTO, auctionExisted);
                 }
                 var uploadResult = await _cloudinary.UploadAsync(new ImageUploadParams
@@ -303,6 +306,50 @@ namespace Application.Services
             }
             return reponse;
         }
+
+        public async Task<APIResponseModel> ApproveAuction(int auctionId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var auctionExisted = await _unitOfWork.AuctionRepository.GetByIdAsync(auctionId);
+                if (auctionExisted == null)
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Auction Not Found";
+                    reponse.Code = 404;
+                    return reponse;
+                }
+                if (auctionExisted.StartTime > _currentTime.GetCurrentTime())
+                {
+                    auctionExisted.Status = EnumStatusAuction.UpComing.ToString();
+                    auctionExisted.ModificationDate = DateTime.Now;
+                    auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
+                    await _lotService.UpdateLotRange(auctionExisted.Id);
+                }
+                _unitOfWork.AuctionRepository.Update(auctionExisted);
+                if (await _unitOfWork.SaveChangeAsync() > 0)
+                {
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Auction updated successfully.";
+                    reponse.Code = 201;
+                    reponse.Data = _mapper.Map<AuctionDTO>(auctionExisted);
+                    return reponse;
+                }
+                reponse.IsSuccess = false;
+                reponse.Message = "Auction updated faild when saving.";
+                reponse.Code = 500;
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.Message = "Exception Eror";
+                reponse.ErrorMessages = new List<string> { e.Message };
+                reponse.Code = 500;
+            }
+            return reponse;
+        }
+
         public async Task<APIResponseModel> ViewAutions()
         {
             var reponse = new APIResponseModel();

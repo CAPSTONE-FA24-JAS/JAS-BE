@@ -14,6 +14,8 @@ namespace Application.Interfaces
         Task<APIResponseModel> CheckWalletStatus (int walletId);
         Task<APIResponseModel> CheckWalletExist(int customerId, float depositPrice);
         Task<APIResponseModel> UpdateBanlance(int walletId, decimal amountMoney, bool isDeposit);
+        Task<APIResponseModel> AddWallet(WalletTransaction walletTransaction);
+
 
     }
 }

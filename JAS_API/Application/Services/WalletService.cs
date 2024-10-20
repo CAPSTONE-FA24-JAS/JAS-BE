@@ -14,11 +14,40 @@ namespace Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IWalletTransactionService _walletTransactionService;
 
-        public WalletService(IUnitOfWork unitOfWork, IMapper mapper)
+        public WalletService(IUnitOfWork unitOfWork, IMapper mapper, IWalletTransactionService walletTransactionService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _walletTransactionService = walletTransactionService;
+        }
+
+        public async Task<APIResponseModel> AddWallet(WalletTransaction walletTransaction)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var transaction = await _walletTransactionService.CreateNewTransaction(walletTransaction);
+                if (!transaction.IsSuccess)
+                {
+                    return transaction;
+                }
+                var wallet = await UpdateBanlance((int)walletTransaction.DocNo, (decimal)walletTransaction.Amount, true);
+                if (!wallet.IsSuccess)
+                {
+                    return wallet;
+                }
+                reponse.IsSuccess = true;
+                reponse.Code = 200;
+                reponse.Message = "Received Successfuly";
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
         }
 
         public async Task<APIResponseModel> CheckBalance(int walletId)
