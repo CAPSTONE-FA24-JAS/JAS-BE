@@ -4,15 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.ViewModels.CustomerLotDTOs
+namespace Application.ViewModels.BidPriceDTOs
 {
-    public class CustomerLotDTO
+    public class BidPriceDTO
     {
-        
+        public float? CurrentPrice { get; set; }
+        public DateTime BidTime { get; set; }
         public int CustomerId { get; set; }
         public int LotId { get; set; }
-        public float? PriceLimit { get; set; }
-
-
     }
 }

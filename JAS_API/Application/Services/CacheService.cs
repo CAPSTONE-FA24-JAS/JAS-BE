@@ -57,7 +57,7 @@ namespace Application.Services
 
         }
 
-        public bool SetSortedSetData<T>(string key, T value, int score)
+        public bool SetSortedSetData<T>(string key, T value, float score)
         {
 
             //   var expriryTime = expirationTime.DateTime.Subtract(DateTime.Now);
