@@ -44,29 +44,48 @@ namespace Application.Services
             {
                 string lotGroupName = $"lot-{request.LotId}";
                 var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == request.LotId);
-                var highestBid = topBidders.FirstOrDefault();
+                
+                    var highestBid = topBidders.FirstOrDefault();
 
-                if (!_shared.connections.ContainsKey(request.ConnectionId))
-                {
-                    _shared.connections[request.ConnectionId] = new AccountConnection
+                    if (!_shared.connections.ContainsKey(request.ConnectionId))
                     {
-                        AccountId = request.AccountId,
-                        LotId = request.LotId
-                    };
+                        _shared.connections[request.ConnectionId] = new AccountConnection
+                        {
+                            AccountId = request.AccountId,
+                            LotId = request.LotId
+                        };
 
-                    
-                    await _hubContext.Groups.AddToGroupAsync(request.ConnectionId, lotGroupName);
-                    await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
-                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
+                        
+                        await _hubContext.Groups.AddToGroupAsync(request.ConnectionId, lotGroupName);
+                        await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
 
-                }
-                else
-                {
-                   
-                    await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
-                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
+                        if(highestBid == null)
+                        {
+                           await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", 0, 0);
+                         }
+                        else
+                        {
+                           await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
+                        }
+                       
 
-                }
+                    }
+                    else
+                    {
+
+                        await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
+                        if (highestBid == null)
+                        {
+                          await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", 0, 0);
+                        }
+                        else
+                       {
+                          await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
+                       }
+
+                        
+                    }
+      
                 reponse.IsSuccess = true;
                 reponse.Message = "Join Bid successfully";
                 reponse.Code = 200;
