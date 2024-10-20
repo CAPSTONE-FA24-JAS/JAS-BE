@@ -162,8 +162,13 @@ namespace WebAPI.Service
                         };
 
                         await _unitOfWork.InvoiceRepository.AddAsync(invoice);
+
                         winnerCustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == 2).Name;
+                        winnerCustomerLot.IsInvoiced = true;
                         _unitOfWork.CustomerLotRepository.Update(winnerCustomerLot);
+
+                       
+
                         //lấy ra những thằng thua theo lot
                         var losers = bidPrices.Skip(1);
                         foreach (var loser in losers)
@@ -171,9 +176,39 @@ namespace WebAPI.Service
                             var loserCustomerLot = await _unitOfWork.CustomerLotRepository.GetCustomerLotByCustomerAndLot(loser.CustomerId, loser.LotId);
                             loserCustomerLot.IsWinner = false;
                             _unitOfWork.CustomerLotRepository.Update(loserCustomerLot);
-                            await _unitOfWork.SaveChangeAsync();
+                           
                             //hoan coc cho loser
+                            var walletOfLoser = await _unitOfWork.WalletRepository.GetByIdAsync(loser.CustomerId);
+                            walletOfLoser.Balance = walletOfLoser.Balance -(decimal?)loserCustomerLot.Lot.Deposit;
+                            _unitOfWork.WalletRepository.Update(walletOfLoser);
+                            loserCustomerLot.IsRefunded = true;
+                            _unitOfWork.CustomerLotRepository.Update(loserCustomerLot);
 
+                            //cap nhat transaction vi
+                            var walletTrasaction = new WalletTransaction
+                            {
+                                transactionType = EnumTransactionType.RefundDeposit.ToString(),
+                                DocNo = loserCustomerLot.Id,
+                                Amount = lot.Deposit,
+                                TransactionTime = DateTime.UtcNow,
+                                Status = "Successfully"
+                            };
+
+                            await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrasaction);
+
+
+                            //cap nhat transaction cty
+                            var trasaction = new Transaction
+                            {
+                                TransactionType = EnumTransactionType.RefundDeposit.ToString(),
+                                DocNo = loserCustomerLot.Id,
+                                Amount = lot.Deposit,
+                                TransactionTime = DateTime.UtcNow,
+                                
+                            };
+                            await _unitOfWork.TransactionRepository.AddAsync(trasaction);
+
+                            await _unitOfWork.SaveChangeAsync();
                         }
                     }
                     else

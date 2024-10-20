@@ -48,6 +48,8 @@ namespace Application
         public IBidPriceRepository BidPriceRepository { get; }
 
         public IInvoiceRepository InvoiceRepository { get; }
+
+        public ITransactionRepository TransactionRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
