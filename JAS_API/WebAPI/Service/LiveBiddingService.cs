@@ -126,7 +126,7 @@ namespace WebAPI.Service
                     _unitOfWork.LotRepository.Update(lot);
 
                     _cacheService.UpdateLotStatus(lotId, lot.Status);
-                    await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEnded", "Phiên đã kết thúc!");
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEnded", "Phiên đã kết thúc va khong co ai dau gia!");
 
                 }
                 else
