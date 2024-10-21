@@ -82,11 +82,19 @@ namespace Application.Services
                 var DTOs = new List<BidLimitDTO>();
                 foreach (var bidLimit in bidLimits)
                 {
-                    var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
-                    string staffName = staff.FirstName + " " + staff.LastName;
-                    var mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
-                    mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
-                    DTOs.Add(mapper);
+                    BidLimitDTO mapper;
+                    if (bidLimit.StaffId != null)
+                    {
+                        var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
+                        string staffName = staff.FirstName + " " + staff.LastName;
+                         mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
+                        mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
+                        DTOs.Add(mapper);
+                    }
+                     mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = null);
+                     mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
+                     DTOs.Add(mapper);
+
                 }
                 if (DTOs.Count > 0)
                 {
