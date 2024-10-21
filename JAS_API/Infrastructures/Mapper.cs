@@ -52,7 +52,11 @@ namespace Infrastructures
             CreateMap<Role, RoleDTO>().ReverseMap();
             CreateMap<BidLimit, BidLimitDTO>()
                 .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.CreationDate))
-                .ForMember(dest => dest.StaffName, opt => opt.MapFrom((src, dest, destMember, context) => (string)context.Items["StaffName"]))
+                .ForMember(dest => dest.StaffName, opt => opt.MapFrom((src, dest, destMember, context) =>
+                {
+                    return context.Items.ContainsKey("StaffName") && context.Items["StaffName"] != null
+                        ? (string)context.Items["StaffName"] : dest.StaffName; 
+                }))
                 .ReverseMap();
             CreateMap<BidLimit, CreateBidLimitDTO>().ReverseMap();
             CreateMap<BidLimit, UpdateBidLimitDTO>().ReverseMap();
