@@ -16,6 +16,7 @@ using Application.ViewModels.WardDTOs;
 using AutoMapper;
 using Domain.Entity;
 using Application.ViewModels.LotDTOs;
+using Application.ViewModels;
 
 
 namespace Infrastructures
@@ -171,6 +172,7 @@ namespace Infrastructures
             CreateMap<Customer, SellerDTO>().ReverseMap();
             CreateMap<CustomerLot, RegisterToLotDTO>().ReverseMap();
             CreateMap<CustomerLot, CustomerLotDTO>().ReverseMap();
+            CreateMap<Invoice, InvoiceDTO>().ReverseMap();
 
 
         }

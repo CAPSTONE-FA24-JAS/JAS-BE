@@ -37,19 +37,12 @@ namespace Application.Services
 
             try
             {
-                Expression<Func<Invoice, bool>> filter;
-
-                
-                
-                    var statusTranfer = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
-                    filter = x => statusTranfer.Equals(x.Status);
+                                              
+                    var statusTranfer = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == status).Name;
+                    
                
 
-                var invoices = await _unitOfWork.InvoiceRepository.GetAllPaging(filter: filter,
-                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
-                                                                             includeProperties: "AddressToShip",
-                                                                             pageIndex: pageIndex,
-                                                                             pageSize: pageSize);
+                var invoices = await _unitOfWork.InvoiceRepository.getInvoicesByStatusForManger(statusTranfer, pageSize, pageIndex);
                 List<InvoiceDTO> listInvoiceDTO = new List<InvoiceDTO>();
                 if (invoices.totalItems > 0)
                 {
