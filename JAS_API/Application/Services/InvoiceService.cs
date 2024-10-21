@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
+using Application.ViewModels;
 using Application.ViewModels.ValuationDTOs;
 using AutoMapper;
 using CloudinaryDotNet;
@@ -49,29 +50,29 @@ namespace Application.Services
                                                                              includeProperties: "AddressToShip",
                                                                              pageIndex: pageIndex,
                                                                              pageSize: pageSize);
-                List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
+                List<InvoiceDTO> listInvoiceDTO = new List<InvoiceDTO>();
                 if (invoices.totalItems > 0)
                 {
                     foreach (var item in invoices.data)
                     {
-                        var valuationsResponse = _mapper.Map<ValuationDTO>(item);
-                        listValuationDTO.Add(valuationsResponse);
+                        var invoicesResponse = _mapper.Map<InvoiceDTO>(item);
+                        listInvoiceDTO.Add(invoicesResponse);
                     };
 
 
                     var dataresponse = new
                     {
-                        DataResponse = listValuationDTO,
+                        DataResponse = listInvoiceDTO,
                         totalItemRepsone = invoices.totalItems
                     };
-                    response.Message = $"List consign items Successfully";
+                    response.Message = $"List invoices Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
                     response.Data = dataresponse;
                 }
                 else
                 {
-                    response.Message = $"Don't have valuations";
+                    response.Message = $"Don't have invoices";
                     response.Code = 404;
                     response.IsSuccess = true;
 

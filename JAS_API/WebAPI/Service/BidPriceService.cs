@@ -44,8 +44,10 @@ namespace Application.Services
             {
                 string lotGroupName = $"lot-{request.LotId}";
                 var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == request.LotId);
-                
-                    var highestBid = topBidders.FirstOrDefault();
+                var lot = _cacheService.GetLotById(request.LotId);
+                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
+
+                var highestBid = topBidders.FirstOrDefault();
 
                     if (!_shared.connections.ContainsKey(request.ConnectionId))
                     {
@@ -58,14 +60,16 @@ namespace Application.Services
                         
                         await _hubContext.Groups.AddToGroupAsync(request.ConnectionId, lotGroupName);
                         await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
-
-                        if(highestBid == null)
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
+                        if (highestBid == null)
                         {
                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", 0, 0);
+                           await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
                          }
                         else
                         {
                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
+                           await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
                         }
                        
 
@@ -77,11 +81,13 @@ namespace Application.Services
                         if (highestBid == null)
                         {
                           await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", 0, 0);
+                          await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
                         }
                         else
-                       {
+                        {
                           await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
-                       }
+                          await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
+                        }
 
                         
                     }
@@ -161,7 +167,10 @@ namespace Application.Services
                             {
                                 endTime = endTime.AddSeconds(10);
                                 _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
                             }
+                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
+
                         }
 
                         reponse.IsSuccess = true;
