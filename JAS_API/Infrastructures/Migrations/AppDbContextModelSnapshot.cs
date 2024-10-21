@@ -2367,6 +2367,55 @@ namespace Infrastructures.Migrations
                     b.ToTable("StatusInvoices");
                 });
 
+            modelBuilder.Entity("Domain.Entity.Transaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<float?>("Amount")
+                        .HasColumnType("real");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("DocNo")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("TransactionPerson")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("TransactionTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("TransactionType")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Transactions");
+                });
+
             modelBuilder.Entity("Domain.Entity.Valuation", b =>
                 {
                     b.Property<int>("Id")
@@ -2606,7 +2655,7 @@ namespace Infrastructures.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WalletTransaction");
+                    b.ToTable("WalletTransactions");
                 });
 
             modelBuilder.Entity("Domain.Entity.Ward", b =>

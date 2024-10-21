@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
+using Application.ViewModels.AccountDTOs;
 using Application.ViewModels.LotDTOs;
 using AutoMapper;
 using Azure;
@@ -18,14 +19,16 @@ namespace Application.Services
         private readonly ICacheService _cacheService;
         private readonly IAccountService _accountService;
         private readonly IWalletService _walletService;
+        private readonly IWalletTransactionService _walletTransactionService;
 
-        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IAccountService accountService, IWalletService  walletService)
+        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IAccountService accountService, IWalletService walletService, IWalletTransactionService walletTransactionService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cacheService = cacheService;
             _accountService = accountService;
             _walletService = walletService;
+            _walletTransactionService = walletTransactionService;
         }
 
         public async Task<APIResponseModel> CreateLot(object lotDTO)
@@ -348,7 +351,7 @@ namespace Application.Services
                     return reponse = checkbidlimit;
                 }
                 //kiem tra vi co chua , va so du co du khong
-                var checkWallet = await _walletService.CheckWalletExist((int)registerToLotDTO.CustomerId, (float)registerToLotDTO.CurrentPrice);
+                var checkWallet = await _walletService.CheckWalletExist((int)registerToLotDTO.CustomerId, (float)depositOfLot.Deposit);
                 if (!checkWallet.IsSuccess)
                 {
                     return reponse = checkWallet;
@@ -357,6 +360,7 @@ namespace Application.Services
                 {
                     
                     var minusDeposit =  await _walletService.UpdateBanlance(wallet.Id, (decimal)depositOfLot.Deposit, false);
+                   
                     if (!minusDeposit.IsSuccess)
                     {
                         return reponse = minusDeposit;
@@ -365,6 +369,26 @@ namespace Application.Services
                     {
                         var customerLot = _mapper.Map<CustomerLot>(registerToLotDTO);
                         customerLot.IsDeposit = true;
+                        //tạo trans
+                        var newTransactionWallet = new WalletTransaction()
+                        {
+                            Amount = -depositOfLot.Deposit,
+                            DocNo = customerLot.Id,
+                            Status = "Completed",
+                            transactionType = EnumTransactionType.DepositWallet.ToString(),
+                            TransactionTime = DateTime.UtcNow,
+
+                        };
+                        var newTransactionCompany = new Transaction()
+                        {
+                            Amount = depositOfLot.Deposit,
+                            DocNo = customerLot.Id,
+                            TransactionType = EnumTransactionType.DepositWallet.ToString(),
+                            TransactionTime = DateTime.UtcNow,
+
+                        };
+                        await _unitOfWork.WalletTransactionRepository.AddAsync(newTransactionWallet);
+                        await _unitOfWork.TransactionRepository.AddAsync(newTransactionCompany);
                         if (checkbidlimit.Data is Customer customer)
                         {
                             customerLot.PriceLimit = customer.PriceLimit;

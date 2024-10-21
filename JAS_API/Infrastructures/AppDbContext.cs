@@ -55,7 +55,7 @@ namespace Infrastructures
         public DbSet<SecondaryShaphie> SecondaryShaphies { get; set; }
         public DbSet<Staff> Staffs { get; set; }
         public DbSet<StatusInvoice> StatusInvoices { get; set; }
-        public DbSet<WalletTransaction> Transactions { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Valuation> Valuations { get; set; }
         public DbSet<ValuationDocument> ValuationDocuments { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
