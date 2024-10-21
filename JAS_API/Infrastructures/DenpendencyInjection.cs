@@ -74,6 +74,7 @@ namespace Infrastructures
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IBidPriceRepository, BidPriceRepository>();
             services.AddScoped<ICustomerLotService, CustomerLotService>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
             
             services.AddSingleton<ShareDB>();
             services.AddScoped<IVNPayService, VNPayService>();

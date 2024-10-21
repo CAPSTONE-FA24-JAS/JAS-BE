@@ -46,6 +46,10 @@ namespace Application
         public ICustomerLotRepository CustomerLotRepository { get; }
         public IWalletTransactionRepository WalletTransactionRepository { get; }
         public IBidPriceRepository BidPriceRepository { get; }
+
+        public IInvoiceRepository InvoiceRepository { get; }
+
+        public ITransactionRepository TransactionRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
