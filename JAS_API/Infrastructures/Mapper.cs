@@ -16,7 +16,7 @@ using Application.ViewModels.WardDTOs;
 using AutoMapper;
 using Domain.Entity;
 using Application.ViewModels.LotDTOs;
-using Application.ViewModels;
+using Application.ViewModels.InvoiceDTOs;
 
 
 namespace Infrastructures
@@ -107,11 +107,16 @@ namespace Infrastructures
             CreateMap<CreateFinalValuationDTO, Jewelry>()
                 .ForMember(dest => dest.ImageJewelries, opt => opt.Ignore())
                 .ForMember(dest => dest.KeyCharacteristicDetails, opt => opt.Ignore())
-                .ForMember(dest => dest.MainDiamonds, opt => opt.Ignore())
-                .ForMember(dest => dest.SecondaryDiamonds, opt => opt.Ignore())
-                .ForMember(dest => dest.MainShaphies, opt => opt.Ignore())
-                .ForMember(dest => dest.SecondaryShaphies, opt => opt.Ignore())
                 .ReverseMap();
+
+            //CreateMap<CreateFinalValuationDTO, Jewelry>()
+            //    .ForMember(dest => dest.ImageJewelries, opt => opt.Ignore())
+            //    .ForMember(dest => dest.KeyCharacteristicDetails, opt => opt.Ignore())
+            //    .ForMember(dest => dest.MainDiamonds, opt => opt.Ignore())
+            //    .ForMember(dest => dest.SecondaryDiamonds, opt => opt.Ignore())
+            //    .ForMember(dest => dest.MainShaphies, opt => opt.Ignore())
+            //    .ForMember(dest => dest.SecondaryShaphies, opt => opt.Ignore())
+            //    .ReverseMap();
             CreateMap<CreateDiamondDTO, MainDiamond>()
                 .ForMember(dest => dest.ImageMainDiamonds, opt => opt.Ignore())
                 .ForMember(dest => dest.DocumentMainDiamonds, opt => opt.Ignore())

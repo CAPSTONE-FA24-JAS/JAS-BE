@@ -50,6 +50,8 @@ namespace Application
         public IInvoiceRepository InvoiceRepository { get; }
 
         public ITransactionRepository TransactionRepository { get; }
+
+        public IStatusInvoiceRepository StatusInvoiceRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

@@ -10,5 +10,7 @@ namespace Application.Interfaces
     public interface ICustomerLotService
     {
         public Task<APIResponseModel> GetCustomerLotByCustomerAndLot(int customerId, int lotId);
+
+        public Task<APIResponseModel> GetBidsOfCustomer(int? customerIId, int? status, int? pageIndex, int? pageSize);
     }
 }

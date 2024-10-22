@@ -1,9 +1,9 @@
 ﻿using Application.Interfaces;
 using Application.Repositories;
 using Domain.Entity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +34,9 @@ namespace Infrastructures.Repositories
             return customerLot;
         }
 
-     
+
+       
+
+
     }
 }

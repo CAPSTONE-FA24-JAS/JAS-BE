@@ -27,10 +27,10 @@ namespace Application.ViewModels.JewelryDTOs
 
         public List<IFormFile>? ImageJewelries { get; set; }
         public List<KeyCharacteristicDetailDTO>? KeyCharacteristicDetails { get; set; }       
-        public List<CreateDiamondDTO>? MainDiamonds { get; set; }
-        public List<CreateDiamondDTO>? SecondaryDiamonds { get; set; }
-        public List<CreateShaphieDTO>? MainShaphies { get; set; }
-        public List<CreateShaphieDTO>? SecondaryShaphies { get; set; }
+        //public List<CreateDiamondDTO>? MainDiamonds { get; set; }
+        //public List<CreateDiamondDTO>? SecondaryDiamonds { get; set; }
+        //public List<CreateShaphieDTO>? MainShaphies { get; set; }
+        //public List<CreateShaphieDTO>? SecondaryShaphies { get; set; }
 
 
     }
