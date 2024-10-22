@@ -18,6 +18,8 @@ namespace Application.Interfaces
         public Task<APIResponseModel> UpdateSuccessfulDeliveryByShipper(SuccessfulDeliveryRequestDTO deliveryDTO);
 
 
-        public Task<APIResponseModel> UpdateStatus(int invoiceId, int status);
+        public Task<APIResponseModel> FinishInvoiceByManager(int invoiceId, int status);
+
+        public Task<APIResponseModel> getInvoicesByStatusForCustomer(int customerId, int? status, int? pageSize, int? pageIndex);
     }
 }

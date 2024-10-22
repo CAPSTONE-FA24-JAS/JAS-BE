@@ -178,7 +178,9 @@ namespace Infrastructures
             CreateMap<Customer, SellerDTO>().ReverseMap();
             CreateMap<CustomerLot, RegisterToLotDTO>().ReverseMap();
             CreateMap<CustomerLot, CustomerLotDTO>().ReverseMap();
-            CreateMap<Invoice, InvoiceDTO>().ReverseMap();
+            CreateMap<Invoice, InvoiceDTO>()
+                .ForPath(x => x.ImageLinkJewelry, x => x.MapFrom(x => x.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink))
+                .ReverseMap();
 
 
         }

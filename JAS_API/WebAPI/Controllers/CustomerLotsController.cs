@@ -26,5 +26,17 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        //list my past bid by customerId
+        [HttpGet]
+        public async Task<IActionResult> GetPastBidOfCustomerAsync(int customerIId, List<int> status, int? pageIndex, int? pageSize)
+        {
+            var result = await _customerLotService.GetPastBidOfCustomer(customerIId, status, pageIndex, pageSize);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
     }
 }

@@ -16,5 +16,7 @@ namespace Application.ViewModels.InvoiceDTOs
         public int? AddressToShipId { get; set; }
 
         public int? ShipperId { get; set; }
+
+        public string? ImageLinkJewelry { get; set; }
     }
 }

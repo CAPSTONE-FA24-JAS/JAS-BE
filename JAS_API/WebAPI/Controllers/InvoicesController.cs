@@ -80,9 +80,9 @@ namespace WebAPI.Controllers
 
         //manager check va finish don hang
         [HttpPut]
-        public async Task<IActionResult> UpdateStatusByInvoiceId(int invoiceId, int status)
+        public async Task<IActionResult> FinishInvoiceByManager(int invoiceId, int status)
         {
-            var result = await _invoiceService.UpdateStatus(invoiceId, status);
+            var result = await _invoiceService.FinishInvoiceByManager(invoiceId, status);
             if (result.IsSuccess)
             {
                 return Ok(result);
@@ -92,6 +92,23 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+
+        //list invoice cua customer theo status. neu staus = null thi list all
+        [HttpGet]
+        public async Task<IActionResult> getInvoicesByStatusForCustomerAsync(int customerId, int? status, int? pageSize, int? pageIndex)
+        {
+            var result = await _invoiceService.getInvoicesByStatusForCustomer(customerId, status, pageSize, pageIndex);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
 
     }
 }
