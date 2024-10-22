@@ -29,7 +29,7 @@ namespace Infrastructures.Repositories
             var maxBidPrice = await _dbContext.BidPrices.Where( x => x.CustomerId == customerId  && x.LotId == lotId).OrderByDescending(x => x.CurrentPrice).FirstOrDefaultAsync();
             if(maxBidPrice == null)
             {
-                throw new Exception($"Khong tim thay bid price nao theo customerId: {customerId}  và lotId: {lotId}");
+                return null;
             }
             else
             {
