@@ -9,5 +9,6 @@ namespace Application.Repositories
 {
     public interface IBidPriceRepository : IGenericRepository<BidPrice>
     {
+        Task<BidPrice> GetMaxBidPriceByCustomerIdAndLot(int? customerId, int? lotId);
     }
 }
