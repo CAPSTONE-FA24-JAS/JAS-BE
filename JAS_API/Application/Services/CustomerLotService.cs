@@ -47,10 +47,21 @@ namespace Application.Services
                     response.IsSuccess = true;
                     foreach (var item in customerLots.data)
                     {
+
                         
                         var lotsResponse = _mapper.Map<MyBidDTO>(item);
+                        var maxBidPriceOfCustomer = await _unitOfWork.BidPriceRepository.GetMaxBidPriceByCustomerIdAndLot(item.CustomerId, item.LotId);
+                        if(maxBidPriceOfCustomer == null)
+                        {
+                            listLotDTO.Add(lotsResponse);
+                        }
+                        else
+                        {
+                            lotsResponse.yourMaxBidPrice = maxBidPriceOfCustomer.CurrentPrice;
+                            listLotDTO.Add(lotsResponse);
+                        }
                         
-                        listLotDTO.Add(lotsResponse);
+                        
                     };
 
                     var dataresponse = new
@@ -132,10 +143,17 @@ namespace Application.Services
                     response.IsSuccess = true;
                     foreach (var item in customerLots.data)
                     {
-                        var maxBidPriceOfCustomer = await _unitOfWork.BidPriceRepository.GetMaxBidPriceByCustomerIdAndLot(item.CustomerId, item.LotId);
                         var lotsResponse = _mapper.Map<MyBidDTO>(item);
-                        lotsResponse.yourMaxBidPrice = maxBidPriceOfCustomer.CurrentPrice;
-                        listLotDTO.Add(lotsResponse);
+                        var maxBidPriceOfCustomer = await _unitOfWork.BidPriceRepository.GetMaxBidPriceByCustomerIdAndLot(item.CustomerId, item.LotId);
+                        if (maxBidPriceOfCustomer == null)
+                        {
+                            listLotDTO.Add(lotsResponse);
+                        }
+                        else
+                        {
+                            lotsResponse.yourMaxBidPrice = maxBidPriceOfCustomer.CurrentPrice;
+                            listLotDTO.Add(lotsResponse);
+                        }
                     };
 
                     var dataresponse = new
