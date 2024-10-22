@@ -155,7 +155,8 @@ namespace Infrastructures
             CreateMap<ImageMainShaphie, ImageShaphieDTO>().ReverseMap();
             CreateMap<ImageSecondaryShaphie, ImageShaphieDTO>().ReverseMap();
             CreateMap<KeyCharacteristicDetail, KeyCharacteristicDetailDTO>()
-                .ForMember(dest => dest.KeyCharacteristic, opt => opt.MapFrom(src => src.KeyCharacteristic)).ReverseMap();  
+                .ForMember(dest => dest.KeyCharacteristic, opt => opt.MapFrom(src => src.KeyCharacteristic)).ReverseMap();
+            CreateMap<KeyCharacteristicDetail, CreateKeyCharacteristicDetailDTO>().ReverseMap();
             CreateMap<DocumentMainDiamond, DocumentDiamondDTO>().ReverseMap();
             CreateMap<DocumentSecondaryDiamond, DocumentDiamondDTO>().ReverseMap();
             CreateMap<DocumentMainShaphie, DocumentShaphieDTO>().ReverseMap();
