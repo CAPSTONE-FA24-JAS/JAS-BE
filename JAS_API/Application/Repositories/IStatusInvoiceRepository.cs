@@ -7,11 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Repositories
 {
-    public interface ICustomerLotRepository : IGenericRepository<CustomerLot>
+    public interface IStatusInvoiceRepository : IGenericRepository<StatusInvoice>
     {
-        Task<CustomerLot> GetCustomerLotByCustomerAndLot(int? customerIId, int? lotId);
-
-        
-
     }
 }

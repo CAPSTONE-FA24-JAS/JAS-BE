@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.ViewModels.CustomerLotDTOs
 {
-    public class CustomerLotDTO
+    public class CustomerLotByIdDTO
     {
         
         public int CustomerId { get; set; }

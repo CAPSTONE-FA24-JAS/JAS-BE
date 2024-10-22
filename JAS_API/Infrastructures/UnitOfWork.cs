@@ -51,6 +51,7 @@ namespace Infrastructures
         private readonly IWalletTransactionRepository _walletTransactionRepository;
         private readonly IInvoiceRepository _invoiceRepository;
         private readonly ITransactionRepository _transactionRepository;
+        private readonly IStatusInvoiceRepository _statusInvoiceRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -71,7 +72,8 @@ namespace Infrastructures
                           IImageMainShaphieRepository imageMainShaphieRepository, IImageSecondaryShaphieRepository imageSecondaryShaphieRepository,
                           ILotRepository lotRepository, IStaffRepository staffRepository, ICustomerLotRepository customerLotRepository,
                           IBidPriceRepository bidPriceRepository, IWalletTransactionRepository walletTransactionRepository,
-                          IInvoiceRepository invoiceRepository, ITransactionRepository transactionRepository)
+                          IInvoiceRepository invoiceRepository, ITransactionRepository transactionRepository, 
+                          IStatusInvoiceRepository statusInvoiceRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -115,6 +117,7 @@ namespace Infrastructures
             _walletTransactionRepository = walletTransactionRepository;
             _invoiceRepository = invoiceRepository;
             _transactionRepository = transactionRepository;
+            _statusInvoiceRepository = statusInvoiceRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -177,6 +180,8 @@ namespace Infrastructures
         public IInvoiceRepository InvoiceRepository => _invoiceRepository;
 
         public ITransactionRepository TransactionRepository => _transactionRepository;
+
+        public IStatusInvoiceRepository StatusInvoiceRepository => _statusInvoiceRepository;
 
        
 

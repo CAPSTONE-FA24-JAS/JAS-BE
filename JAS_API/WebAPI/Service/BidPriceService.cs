@@ -169,7 +169,11 @@ namespace Application.Services
                                 _cacheService.UpdateLotEndTime(conn.LotId, endTime);
                                 await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
                             }
-                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
+                            else
+                            {
+                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
+                            }
+                            
 
                         }
 
