@@ -128,37 +128,37 @@ namespace Application.Services
                     }
                 }
 
-                //if (jewelryDTO.MainDiamonds != null && jewelryDTO.MainDiamonds.Any())
-                //{
-                //    foreach (var diamond in jewelryDTO.MainDiamonds)
-                //    {
-                //        await AddMainDiamondAsync(diamond, jewelry.Id);
-                //    }
-                //}
+                if (jewelryDTO.MainDiamonds != null && jewelryDTO.MainDiamonds.Any())
+                {
+                    foreach (var diamond in jewelryDTO.MainDiamonds)
+                    {
+                        await AddMainDiamondAsync(diamond, jewelry.Id);
+                    }
+                }
 
-                //if (jewelryDTO.SecondaryDiamonds != null && jewelryDTO.SecondaryDiamonds.Any())
-                //{
-                //    foreach (var diamond in jewelryDTO.SecondaryDiamonds)
-                //    {
-                //        await AddSecondDiamondAsync(diamond, jewelry.Id);
-                //    }
-                //}
+                if (jewelryDTO.SecondaryDiamonds != null && jewelryDTO.SecondaryDiamonds.Any())
+                {
+                    foreach (var diamond in jewelryDTO.SecondaryDiamonds)
+                    {
+                        await AddSecondDiamondAsync(diamond, jewelry.Id);
+                    }
+                }
 
-                //if (jewelryDTO.MainShaphies != null && jewelryDTO.MainShaphies.Any())
-                //{
-                //    foreach (var shaphie in jewelryDTO.MainShaphies)
-                //    {
-                //        await AddMainShaphieAsync(shaphie, jewelry.Id);
-                //    }
-                //}
+                if (jewelryDTO.MainShaphies != null && jewelryDTO.MainShaphies.Any())
+                {
+                    foreach (var shaphie in jewelryDTO.MainShaphies)
+                    {
+                        await AddMainShaphieAsync(shaphie, jewelry.Id);
+                    }
+                }
 
-                //if (jewelryDTO.SecondaryShaphies != null && jewelryDTO.SecondaryShaphies.Any())
-                //{
-                //    foreach (var shaphie in jewelryDTO.SecondaryShaphies)
-                //    {
-                //        await AddSecondaryShaphieAsync(shaphie, jewelry.Id);
-                //    }
-                //}
+                if (jewelryDTO.SecondaryShaphies != null && jewelryDTO.SecondaryShaphies.Any())
+                {
+                    foreach (var shaphie in jewelryDTO.SecondaryShaphies)
+                    {
+                        await AddSecondaryShaphieAsync(shaphie, jewelry.Id);
+                    }
+                }
 
                 var finalValuation = _mapper.Map<JewelryDTO>(jewelry);
 
