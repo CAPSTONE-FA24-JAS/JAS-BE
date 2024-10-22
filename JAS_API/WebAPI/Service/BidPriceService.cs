@@ -165,7 +165,7 @@ namespace Application.Services
 
                         string lotGroupName = $"lot-{conn.LotId}";
                         //trar về name, giá ĐẤU, thời gian
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", conn.AccountId, request.CurrentPrice, request.BidTime);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
 
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
 
