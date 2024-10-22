@@ -8,9 +8,7 @@ namespace Application.ViewModels.KeyCharacteristicDTOs
 {
     public class CreateKeyCharacteristicDetailDTO
     {
-        public int Id { get; set; }
         public string? Description { get; set; }
-        public int? JewelryId { get; set; }
         public int? KeyCharacteristicId { get; set; }
     }
 }
