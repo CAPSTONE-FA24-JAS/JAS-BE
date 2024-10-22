@@ -254,7 +254,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> UpdateStatus(int invoiceId, int status)
+        public async Task<APIResponseModel> FinishInvoiceByManager(int invoiceId, int status)
         {
             var response = new APIResponseModel();
             try
@@ -268,14 +268,39 @@ namespace Application.Services
                     _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
                     _unitOfWork.InvoiceRepository.Update(invoiceById);
 
-                    await _unitOfWork.SaveChangeAsync();
+                    //hoan coc cho nguoi ban
+                    var sellerId = invoiceById.CustomerLot.Lot.Jewelry.Valuation.SellerId;
+                    if(sellerId == null)
+                    {
+                        throw new Exception("Khong tim thay sellerId");
+                    }
+                    else
+                    {
+                        //cong vao cho wallet seller
+                        var walletOfSeller = await _unitOfWork.WalletRepository.GetByCustomerId(sellerId);
 
-                    var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
+                        walletOfSeller.Balance = walletOfSeller.Balance + (decimal?)invoiceById.CustomerLot.Lot.Deposit;
 
-                    response.Message = $"Asign shipper Successfully";
-                    response.Code = 200;
-                    response.IsSuccess = true;
-                    response.Data = valuationDTO;
+                        _unitOfWork.WalletRepository.Update(walletOfSeller);
+
+                        //lưu transation vi seller
+                        var wallerTransaction = new WalletTransaction
+                        {
+
+                        };
+                        await _unitOfWork.SaveChangeAsync();
+
+
+
+
+                        var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
+
+                        response.Message = $"Finish invoice!";
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Data = valuationDTO;
+                    }
+                    
                 }
                 else
                 {
@@ -284,6 +309,61 @@ namespace Application.Services
                     response.IsSuccess = true;
                 }
 
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> getInvoicesByStatusForCustomer(int customerId, int? status, int? pageSize, int? pageIndex)
+        {
+            var response = new APIResponseModel();
+
+            try
+            {
+                string statusTranfer = null;
+                if (status == null)
+                {
+                    statusTranfer = string.Empty;
+                }
+                else
+                {
+                    statusTranfer = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == status).Name;
+                }
+               
+                var invoices = await _unitOfWork.InvoiceRepository.getInvoicesByStatusForCustomer(customerId, statusTranfer, pageSize, pageIndex);
+                List<InvoiceDTO> listInvoiceDTO = new List<InvoiceDTO>();
+                if (invoices.totalItems > 0)
+                {
+                    foreach (var item in invoices.data)
+                    {
+                        var invoicesResponse = _mapper.Map<InvoiceDTO>(item);
+                        listInvoiceDTO.Add(invoicesResponse);
+                    };
+
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listInvoiceDTO,
+                        totalItemRepsone = invoices.totalItems
+                    };
+                    response.Message = $"List invoices Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have invoices";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
             }
             catch (Exception ex)
             {

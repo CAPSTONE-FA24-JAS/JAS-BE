@@ -9,5 +9,6 @@ namespace Application.Repositories
 {
     public interface IWalletRepository : IGenericRepository<Wallet>
     {
+        Task<Wallet> GetByCustomerId(int? customerId);
     }
 }

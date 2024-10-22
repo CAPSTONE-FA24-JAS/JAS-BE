@@ -26,7 +26,7 @@ namespace Infrastructures.Repositories
         public async Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesByStatusForManger(string status, int? pageIndex, int? pageSize)
         {
             var invoices = _dbContext.Invoices.Include(x => x.CustomerLot)
-                                              .Where(cl => cl.Status == status);
+                                              .Where(x => x.CustomerLot.Status == status);
 
             if (pageIndex.HasValue && pageSize.HasValue)
             {
@@ -37,6 +37,42 @@ namespace Infrastructures.Repositories
             }
 
             var products = await invoices.ToListAsync(); 
+
+            var totalItems = products.Count;
+
+            if (products != null && products.Any())
+            {
+                return (products, totalItems);
+            }
+            else
+            {
+                throw new Exception("Don't have any Product");
+            }
+        }
+
+       public async Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesByStatusForCustomer(int customerId, string? status, int? pageIndex, int? pageSize)
+        {
+            IQueryable<Invoice> invoices;
+            if (status == null)
+            {
+                invoices = _dbContext.Invoices.Where(x => x.CustomerId == customerId);
+            }
+            else
+            {
+                invoices = _dbContext.Invoices.Include(x => x.CustomerLot)
+                                             .Where(x => x.CustomerLot.Status == status && x.CustomerId == customerId);
+            }
+            
+
+            if (pageIndex.HasValue && pageSize.HasValue)
+            {
+                int validPageIndex = pageIndex.Value > 0 ? pageIndex.Value - 1 : 0;
+                int validPageSize = pageSize.Value > 0 ? pageSize.Value : 10; // Assuming a default pageSize of 10 if an invalid value is passed
+
+                invoices = invoices.Skip(validPageIndex * validPageSize).Take(validPageSize);
+            }
+
+            var products = await invoices.ToListAsync();
 
             var totalItems = products.Count;
 

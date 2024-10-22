@@ -77,6 +77,8 @@ namespace Application.Services
             return response;
         }
 
+        
+
         public async Task<APIResponseModel> GetCustomerLotByCustomerAndLot(int customerId, int lotId)
         {
             var response = new APIResponseModel();
@@ -98,6 +100,55 @@ namespace Application.Services
                     response.IsSuccess = true;
                 }
 
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> GetPastBidOfCustomer(int customerIId, List<int> status, int? pageIndex, int? pageSize)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var statusTranfer = EnumHelper.GetEnums<EnumCustomerLot>()
+                                              .Where(x => status.Contains(x.Value))
+                                              .Select(x => x.Name);
+               
+                var customerLots = await _unitOfWork.LotRepository.GetPastBidOfCustomer(customerIId, statusTranfer, pageIndex, pageSize);
+
+                List<LotDTO> listLotDTO = new List<LotDTO>();
+                if (customerLots.totalItems > 0)
+                {
+                    response.Message = $"List consign items Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    foreach (var item in customerLots.data)
+                    {
+                        var lotsResponse = _mapper.Map<LotDTO>(item);
+                        listLotDTO.Add(lotsResponse);
+                    };
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listLotDTO,
+                        totalItemRepsone = customerLots.totalItems
+                    };
+
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have valuations";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
             }
             catch (Exception ex)
             {
