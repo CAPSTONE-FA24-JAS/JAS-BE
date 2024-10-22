@@ -37,17 +37,19 @@ namespace Application.Services
             try
             {
                 var statusTranfer = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == status).Name;
-                var customerLots = await _unitOfWork.LotRepository.GetBidsOfCustomer(customerIId, statusTranfer, pageIndex, pageSize);
+                var customerLots = await _unitOfWork.CustomerLotRepository.GetBidsOfCustomer(customerIId, statusTranfer, pageIndex, pageSize);
                 
-                List<LotDTO> listLotDTO = new List<LotDTO>();
+                List<MyBidDTO> listLotDTO = new List<MyBidDTO>();
                 if (customerLots.totalItems > 0)
                 {
-                    response.Message = $"List consign items Successfully";
+                    response.Message = $"List customerLot Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
                     foreach (var item in customerLots.data)
                     {
-                        var lotsResponse = _mapper.Map<LotDTO>(item);
+                        
+                        var lotsResponse = _mapper.Map<MyBidDTO>(item);
+                        
                         listLotDTO.Add(lotsResponse);
                     };
 
@@ -61,7 +63,7 @@ namespace Application.Services
                 }
                 else
                 {
-                    response.Message = $"Don't have valuations";
+                    response.Message = $"Don't have customerLot";
                     response.Code = 404;
                     response.IsSuccess = true;
 
@@ -120,9 +122,9 @@ namespace Application.Services
                                               .Where(x => status.Contains(x.Value))
                                               .Select(x => x.Name);
                
-                var customerLots = await _unitOfWork.LotRepository.GetPastBidOfCustomer(customerIId, statusTranfer, pageIndex, pageSize);
+                var customerLots = await _unitOfWork.CustomerLotRepository.GetPastBidOfCustomer(customerIId, statusTranfer, pageIndex, pageSize);
 
-                List<LotDTO> listLotDTO = new List<LotDTO>();
+                List<MyBidDTO> listLotDTO = new List<MyBidDTO>();
                 if (customerLots.totalItems > 0)
                 {
                     response.Message = $"List consign items Successfully";
@@ -130,7 +132,9 @@ namespace Application.Services
                     response.IsSuccess = true;
                     foreach (var item in customerLots.data)
                     {
-                        var lotsResponse = _mapper.Map<LotDTO>(item);
+                        var maxBidPriceOfCustomer = await _unitOfWork.BidPriceRepository.GetMaxBidPriceByCustomerIdAndLot(item.CustomerId, item.LotId);
+                        var lotsResponse = _mapper.Map<MyBidDTO>(item);
+                        lotsResponse.yourMaxBidPrice = maxBidPriceOfCustomer.CurrentPrice;
                         listLotDTO.Add(lotsResponse);
                     };
 

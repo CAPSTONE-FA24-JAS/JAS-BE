@@ -17,6 +17,7 @@ using AutoMapper;
 using Domain.Entity;
 using Application.ViewModels.LotDTOs;
 using Application.ViewModels.InvoiceDTOs;
+using Application.ViewModels.CustomerLotDTOs;
 
 
 namespace Infrastructures
@@ -180,6 +181,9 @@ namespace Infrastructures
             CreateMap<CustomerLot, CustomerLotDTO>().ReverseMap();
             CreateMap<Invoice, InvoiceDTO>()
                 .ForPath(x => x.ImageLinkJewelry, x => x.MapFrom(x => x.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink))
+                .ReverseMap();
+            CreateMap<CustomerLot, MyBidDTO>()
+                .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))
                 .ReverseMap();
 
 

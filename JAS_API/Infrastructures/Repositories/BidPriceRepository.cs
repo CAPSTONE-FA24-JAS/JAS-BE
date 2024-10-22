@@ -3,6 +3,7 @@ using Application.Repositories;
 using Domain.Entity;
 using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,20 @@ namespace Infrastructures.Repositories
             : base(context, timeService, claimsService)
         {
             _dbContext = context;
+        }
+
+
+       public async Task<BidPrice> GetMaxBidPriceByCustomerIdAndLot(int? customerId, int? lotId)
+        {
+            var maxBidPrice = await _dbContext.BidPrices.Where( x => x.CustomerId == customerId  && x.LotId == lotId).OrderByDescending(x => x.CurrentPrice).FirstOrDefaultAsync();
+            if(maxBidPrice == null)
+            {
+                throw new Exception($"Khong tim thay bid price nao theo customerId: {customerId}  và lotId: {lotId}");
+            }
+            else
+            {
+                return maxBidPrice;
+            }
         }
     }
 }

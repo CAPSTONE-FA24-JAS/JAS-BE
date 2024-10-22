@@ -11,7 +11,9 @@ namespace Application.Repositories
     {
         Task<CustomerLot> GetCustomerLotByCustomerAndLot(int? customerIId, int? lotId);
 
-        
+        Task<(IEnumerable<CustomerLot> data, int totalItems)> GetBidsOfCustomer(int? customerIId, string? status, int? pageIndex, int? pageSize);
+
+        Task<(IEnumerable<CustomerLot> data, int totalItems)> GetPastBidOfCustomer(int customerIId, IEnumerable<string> status, int? pageIndex, int? pageSize);
 
     }
 }
