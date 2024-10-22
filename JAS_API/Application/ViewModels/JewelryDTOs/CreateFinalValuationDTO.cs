@@ -1,4 +1,5 @@
-﻿using Domain.Entity;
+﻿using Application.ViewModels.KeyCharacteristicDTOs;
+using Domain.Entity;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace Application.ViewModels.JewelryDTOs
         public int ValuationId { get; set; }
 
         public List<IFormFile>? ImageJewelries { get; set; }
-        public List<KeyCharacteristicDetailDTO>? KeyCharacteristicDetails { get; set; }       
+        public List<CreateKeyCharacteristicDetailDTO>? KeyCharacteristicDetails { get; set; }       
         //public List<CreateDiamondDTO>? MainDiamonds { get; set; }
         //public List<CreateDiamondDTO>? SecondaryDiamonds { get; set; }
         //public List<CreateShaphieDTO>? MainShaphies { get; set; }

@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
+using Application.ViewModels.BidPriceDTOs;
 using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.LiveBiddingDTOs;
 using AutoMapper;
@@ -43,11 +44,11 @@ namespace Application.Services
             try
             {
                 string lotGroupName = $"lot-{request.LotId}";
-                var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == request.LotId);
+                var topBidders = _cacheService.GetSortedSetDataFilter<BidPriceDTO>("BidPrice", l => l.LotId == request.LotId);
                 var lot = _cacheService.GetLotById(request.LotId);
                 await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
 
-                var highestBid = topBidders.FirstOrDefault();
+                
 
                     if (!_shared.connections.ContainsKey(request.ConnectionId))
                     {
@@ -57,40 +58,53 @@ namespace Application.Services
                             LotId = request.LotId
                         };
 
+                       
                         
                         await _hubContext.Groups.AddToGroupAsync(request.ConnectionId, lotGroupName);
+
+                        
                         await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
-                       // await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
-                        if (highestBid == null)
-                        {
-                           await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", 0, 0);
-                           await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
-                           await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLot", topBidders);
+
+                    // await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
+
+                    if (topBidders.Any())
+                    {
+                        var highestBid = topBidders.FirstOrDefault();
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLot", topBidders);
+
                     }
-                        else
-                        {
-                           await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
-                           await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
-                           await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLot", topBidders);
-                    }
-                       
+                    else
+                    {
+
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", 0, 0);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLot", null);
+
+                    }                     
 
                     }
                     else
                     {
 
                         await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
-                        if (highestBid == null)
+                        if (topBidders.Any())
                         {
-                          await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", 0, 0);
-                          await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
+
+                        var highestBid = topBidders.FirstOrDefault();
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLot", topBidders);
+
+                       
                         }
                         else
                         {
-                          await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
-                          await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
-                        }
-
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", 0, 0);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLot", null);
+                    }
                         
                     }
       
