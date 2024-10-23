@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -286,12 +287,28 @@ namespace Application.Services
                         //lưu transation vi seller
                         var wallerTransaction = new WalletTransaction
                         {
-
+                            transactionType = EnumTransactionType.SellerPay.ToString(),
+                            DocNo = invoiceById.Id,
+                            Amount = invoiceById.CustomerLot.Lot.Deposit,
+                            TransactionTime = DateTime.Now,
+                            Status = "+"
                         };
+
+                        await _unitOfWork.WalletTransactionRepository.AddAsync(wallerTransaction);
+
+
+                        //luu transaction cho cong ty
+                        var transactionCompany = new Transaction
+                        {
+                            DocNo = invoiceById.Id,
+                            Amount = invoiceById.CustomerLot.Lot.Deposit,
+                            TransactionTime = wallerTransaction.TransactionTime,
+                            TransactionType = EnumTransactionType.SellerPay.ToString(),
+                        };
+                        await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
+
+
                         await _unitOfWork.SaveChangeAsync();
-
-
-
 
                         var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
 
