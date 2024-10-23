@@ -18,6 +18,7 @@ using Domain.Entity;
 using Application.ViewModels.LotDTOs;
 using Application.ViewModels.InvoiceDTOs;
 using Application.ViewModels.CustomerLotDTOs;
+using Application.ViewModels.BidPriceDTOs;
 
 
 namespace Infrastructures
@@ -211,7 +212,9 @@ namespace Infrastructures
             CreateMap<CustomerLot, MyBidDTO>()
                 .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))
                 .ReverseMap();
-
+            CreateMap<BidPrice, BidPriceDTO>()
+                .ForPath(x => x.CustomerName, x => x.MapFrom( x => x.Customer.LastName +" " + x.Customer.FirstName))
+                .ReverseMap();
 
         }
     }
