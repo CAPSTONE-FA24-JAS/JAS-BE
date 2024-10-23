@@ -1058,6 +1058,51 @@ namespace Infrastructures.Migrations
                     b.ToTable("FollwerArtists");
                 });
 
+            modelBuilder.Entity("Domain.Entity.HistoryStatusCustomerLot", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("CurrentTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("CustomerLotId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DeleteBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModificationBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerLotId");
+
+                    b.ToTable("HistoryStatusCustomerLot");
+                });
+
             modelBuilder.Entity("Domain.Entity.HistoryValuation", b =>
                 {
                     b.Property<int>("Id")
@@ -2914,6 +2959,15 @@ namespace Infrastructures.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("Domain.Entity.HistoryStatusCustomerLot", b =>
+                {
+                    b.HasOne("Domain.Entity.CustomerLot", "CustomerLot")
+                        .WithMany("HistoryStatusCustomerLots")
+                        .HasForeignKey("CustomerLotId");
+
+                    b.Navigation("CustomerLot");
+                });
+
             modelBuilder.Entity("Domain.Entity.HistoryValuation", b =>
                 {
                     b.HasOne("Domain.Entity.Valuation", "Valuation")
@@ -3310,6 +3364,8 @@ namespace Infrastructures.Migrations
             modelBuilder.Entity("Domain.Entity.CustomerLot", b =>
                 {
                     b.Navigation("AutoBids");
+
+                    b.Navigation("HistoryStatusCustomerLots");
 
                     b.Navigation("Invoice");
                 });

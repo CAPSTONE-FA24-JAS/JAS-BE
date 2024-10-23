@@ -26,5 +26,6 @@ namespace Domain.Entity
         public virtual Lot? Lot { get; set; }
         public virtual IEnumerable<AutoBid>? AutoBids {get; set;} 
         public virtual Invoice? Invoice { get; set; }
+        public virtual IEnumerable<HistoryStatusCustomerLot>? HistoryStatusCustomerLots {get; set;}
     }
 }
