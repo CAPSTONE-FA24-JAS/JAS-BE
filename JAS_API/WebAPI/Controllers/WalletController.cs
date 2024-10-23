@@ -125,5 +125,20 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+
+        [HttpPatch]
+        public async Task<IActionResult> ApproveRequestNewWithdraw(int transId)
+        {
+            var result = await _walletService.ApproveRequestWithdraw(transId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }
