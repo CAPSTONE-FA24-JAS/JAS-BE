@@ -79,6 +79,32 @@ namespace Application.Services
             return reponse;
         }
 
+        public async Task<APIResponseModel> CheckPasswordWallet(int walletId, string password)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var CheckPassword = await _unitOfWork.WalletRepository.GetByIdAsync(walletId, condition: x => x.Password == HashPassword.HashWithSHA256(password));
+                if (CheckPassword == null)
+                {
+                    reponse.Code = 404;
+                    reponse.Message = "Password is Faild, please check password again";
+                    reponse.IsSuccess = false;
+                    return reponse;
+                }
+                    reponse.IsSuccess = true;
+                    reponse.Code = 200;
+                    reponse.Message = "Received Successfuly, Password of wallet avaiable";
+                
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+
         public async Task<APIResponseModel> CheckWalletExist(int customerId, float depositPrice)
         {
             var reponse = new APIResponseModel();
@@ -139,6 +165,7 @@ namespace Application.Services
                 {
                     wallet.Balance = 0;
                     wallet.Status = EnumStatusWallet.UnLock.ToString();
+                    wallet.Password = HashPassword.HashWithSHA256(createWalletDTO.Password);
                     await _unitOfWork.WalletRepository.AddAsync(wallet);
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
