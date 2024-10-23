@@ -83,6 +83,7 @@ namespace Application.Services
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", 0, 0);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLot", null);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLotOfStaff", null);
 
                     }                     
 
@@ -107,7 +108,8 @@ namespace Application.Services
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", 0, 0);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLot", null);
-                        }
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLotOfStaff", null);
+                    }
                         
                     }
       
