@@ -111,5 +111,19 @@ namespace WebAPI.Controllers
             }
             return BadRequest(result);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> RequestNewWithdraw(RequestWithdrawDTO requestWithdrawDTO)
+        {
+            var result = await _walletService.RequestWithdraw(requestWithdrawDTO);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }

@@ -211,6 +211,7 @@ namespace Infrastructures
             CreateMap<CustomerLot, MyBidDTO>()
                 .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))
                 .ReverseMap();
+            CreateMap<RequestWithdraw, RequestWithdrawDTO>().ReverseMap();
 
 
         }

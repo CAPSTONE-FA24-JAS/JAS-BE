@@ -52,6 +52,7 @@ namespace Infrastructures
         private readonly IInvoiceRepository _invoiceRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IStatusInvoiceRepository _statusInvoiceRepository;
+        private readonly IRequestWithdrawRepository _requestWithdrawRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -73,7 +74,7 @@ namespace Infrastructures
                           ILotRepository lotRepository, IStaffRepository staffRepository, ICustomerLotRepository customerLotRepository,
                           IBidPriceRepository bidPriceRepository, IWalletTransactionRepository walletTransactionRepository,
                           IInvoiceRepository invoiceRepository, ITransactionRepository transactionRepository, 
-                          IStatusInvoiceRepository statusInvoiceRepository)
+                          IStatusInvoiceRepository statusInvoiceRepository, IRequestWithdrawRepository requestWithdrawRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -118,6 +119,7 @@ namespace Infrastructures
             _invoiceRepository = invoiceRepository;
             _transactionRepository = transactionRepository;
             _statusInvoiceRepository = statusInvoiceRepository;
+            _requestWithdrawRepository = requestWithdrawRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -183,7 +185,7 @@ namespace Infrastructures
 
         public IStatusInvoiceRepository StatusInvoiceRepository => _statusInvoiceRepository;
 
-       
+        public IRequestWithdrawRepository RequestWithdrawRepository => _requestWithdrawRepository;
 
         public async Task<int> SaveChangeAsync()
         {

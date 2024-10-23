@@ -52,6 +52,7 @@ namespace Application
         public ITransactionRepository TransactionRepository { get; }
 
         public IStatusInvoiceRepository StatusInvoiceRepository { get; }
+        public IRequestWithdrawRepository RequestWithdrawRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

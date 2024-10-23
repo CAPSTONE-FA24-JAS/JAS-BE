@@ -16,6 +16,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> UpdateBanlance(int walletId, decimal amountMoney, bool isDeposit);
         Task<APIResponseModel> AddWallet(WalletTransaction walletTransaction);
         Task<APIResponseModel> CheckPasswordWallet(int walletId, string password);
+        Task<APIResponseModel> RequestWithdraw(RequestWithdrawDTO requestWithdrawDTO);
 
     }
 }
