@@ -391,5 +391,80 @@ namespace Application.Services
             }
             return response;
         }
+
+        public async Task<APIResponseModel> GetInvoiceDetail(int Id)
+        {
+            var response = new APIResponseModel();
+
+            try
+            {
+
+                var invoiceExist = await _unitOfWork.InvoiceRepository.GetByIdAsync(Id);
+                var jewelryOfInvoice = invoiceExist.CustomerLot.Lot.Jewelry;
+                if (invoiceExist != null)
+                {
+                    var invoicesResponse = _mapper.Map<InvoiceDetailDTO>(invoiceExist, x => x.Items["Jewelry"] = jewelryOfInvoice);
+                    response.Message = $"Received Invoice Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = invoicesResponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have invoice";
+                    response.Code = 404;
+                    response.IsSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> UpdateAddressToshipForInvoice(UpdateAddressToShipInvoice model)
+        {
+            var response = new APIResponseModel();
+
+            try
+            {
+
+                var invoiceExist = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
+                if (invoiceExist != null)
+                {
+                    invoiceExist.AddressToShipId = model.AddressToShipId;
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        response.Message = $"Update Invoice Successfully";
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                    }
+                    else
+                    {
+                        response.Message = $"Update Invoice Fail When Saving";
+                        response.Code = 500;
+                        response.IsSuccess = false;
+                    }
+                }
+                else
+                {
+                    response.Message = $"Don't have invoice";
+                    response.Code = 404;
+                    response.IsSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
     }
 }

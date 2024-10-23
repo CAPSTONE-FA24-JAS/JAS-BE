@@ -326,19 +326,18 @@ namespace Application.Services
                     auctionExisted.ModificationDate = DateTime.Now;
                     auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
                     await _lotService.UpdateLotRange(auctionExisted.Id);
-                }
-                _unitOfWork.AuctionRepository.Update(auctionExisted);
-                if (await _unitOfWork.SaveChangeAsync() > 0)
-                {
-                    reponse.IsSuccess = true;
-                    reponse.Message = "Auction updated successfully.";
-                    reponse.Code = 201;
-                    reponse.Data = _mapper.Map<AuctionDTO>(auctionExisted);
-                    return reponse;
+                    _unitOfWork.AuctionRepository.Update(auctionExisted);
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        reponse.IsSuccess = true;
+                        reponse.Message = "Auction updated successfully.";
+                        reponse.Code = 201;
+                        reponse.Data = _mapper.Map<AuctionDTO>(auctionExisted);
+                        return reponse;
+                    }
                 }
                 reponse.IsSuccess = false;
-                reponse.Message = "Auction updated faild when saving.";
-                reponse.Code = 500;
+                reponse.Message = "Aution cannt saving because some condition.";
             }
             catch (Exception e)
             {
