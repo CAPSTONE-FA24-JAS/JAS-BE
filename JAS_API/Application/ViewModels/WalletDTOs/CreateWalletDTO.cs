@@ -9,5 +9,6 @@ namespace Application.ViewModels.WalletDTOs
     public class CreateWalletDTO
     {
         public int? CustomerId { get; set; }
+        public string? Password { get; set; }
     }
 }
