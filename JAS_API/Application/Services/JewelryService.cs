@@ -117,19 +117,21 @@ namespace Application.Services
                 }
 
                 if (jewelryDTO.KeyCharacteristicDetails != null && jewelryDTO.KeyCharacteristicDetails.Any())
-                {
+                {    
+                    List<KeyCharacteristicDetail> keyCharacteristicDetails = new List<KeyCharacteristicDetail>();
                     foreach (var key in jewelryDTO.KeyCharacteristicDetails)
                     {
-
                         var keyDTO = _mapper.Map<KeyCharacteristicDetail>(key);
                         keyDTO.JewelryId = jewelry.Id;
-                        await _unitOfWork.KeyCharacteristicsDetailRepository.AddAsync(keyDTO);
-                        await _unitOfWork.SaveChangeAsync();
+                        keyCharacteristicDetails.Add(keyDTO);                       
                     }
+                    await _unitOfWork.KeyCharacteristicsDetailRepository.AddRangeAsync(keyCharacteristicDetails);
+                    await _unitOfWork.SaveChangeAsync();
                 }
 
                 if (jewelryDTO.MainDiamonds != null && jewelryDTO.MainDiamonds.Any())
                 {
+                    
                     foreach (var diamond in jewelryDTO.MainDiamonds)
                     {
                         await AddMainDiamondAsync(diamond, jewelry.Id);
@@ -194,6 +196,7 @@ namespace Application.Services
         {
             if (images != null)
             {
+                List<ImageMainDiamond> imageList = new List<ImageMainDiamond>();
                 foreach (var image in images)
                 {
                     var uploadImage = await uploadImageOnCloudary(image, TagsImageMianDiamond);
@@ -204,15 +207,18 @@ namespace Application.Services
                         
                     };
 
-                    var imageMainDiamondDTO = _mapper.Map<ImageMainDiamond>(imageMainDiamond);
+                    var imageMainDiamondDTO = _mapper.Map<ImageMainDiamond>(imageMainDiamond);       
                     imageMainDiamondDTO.MainDiamondId = diamondId;
-                    await _unitOfWork.ImageMainDiamondRepository.AddAsync(imageMainDiamondDTO);
-                    await _unitOfWork.SaveChangeAsync();
+                    imageList.Add(imageMainDiamondDTO);        
                 }
+
+                await _unitOfWork.ImageMainDiamondRepository.AddRangeAsync(imageList);
+                await _unitOfWork.SaveChangeAsync();
             }
 
             if (documents != null)
             {
+                List<DocumentMainDiamond> documentList = new List<DocumentMainDiamond>();
                 foreach (var document in documents)
                 {
                     var uploadImage = await uploadImageOnCloudary(document, TagsDocumentMainDiamond);
@@ -226,9 +232,11 @@ namespace Application.Services
 
                     var documentMainDiamondDTO = _mapper.Map<DocumentMainDiamond>(documentMainDiamond);
                     documentMainDiamondDTO.MainDiamondId = diamondId;
-                    await _unitOfWork.DocumentMainDiamondRepository.AddAsync(documentMainDiamondDTO);
-                    await _unitOfWork.SaveChangeAsync();
+                    documentList.Add(documentMainDiamondDTO);
+                   
                 }
+                await _unitOfWork.DocumentMainDiamondRepository.AddRangeAsync(documentList);
+                await _unitOfWork.SaveChangeAsync();
             }
 
 
@@ -249,6 +257,7 @@ namespace Application.Services
         {
             if (images != null)
             {
+                List<ImageSecondaryDiamond> imageList = new List<ImageSecondaryDiamond>();
                 foreach (var image in images)
                 {
                     var uploadImage = await uploadImageOnCloudary(image, TagsImageSecondDiamond);
@@ -261,13 +270,17 @@ namespace Application.Services
 
                     var imageSecondDiamondDTO = _mapper.Map<ImageSecondaryDiamond>(imageSecondDiamond);
                     imageSecondDiamondDTO.SecondaryDiamondId = diamondId;
-                    await _unitOfWork.ImageSecondDiamondRepository.AddAsync(imageSecondDiamondDTO);
-                    await _unitOfWork.SaveChangeAsync();
+                    imageList.Add(imageSecondDiamondDTO);
+                    
                 }
+
+                await _unitOfWork.ImageSecondDiamondRepository.AddRangeAsync(imageList);
+                await _unitOfWork.SaveChangeAsync();
             }
 
             if (documents != null)
             {
+                List<DocumentSecondaryDiamond> documentList = new List<DocumentSecondaryDiamond>();
                 foreach (var document in documents)
                 {
                     var uploadImage = await uploadImageOnCloudary(document, TagsDocumentSecondDiamond);
@@ -281,9 +294,12 @@ namespace Application.Services
 
                     var documentSecondDiamondDTO = _mapper.Map<DocumentSecondaryDiamond>(documentSecondDiamond);
                     documentSecondDiamondDTO.SecondaryDiamondId = diamondId;
-                    await _unitOfWork.DocumentSecondaryDiamondRepository.AddAsync(documentSecondDiamondDTO);
-                    await _unitOfWork.SaveChangeAsync();
+                    documentList.Add(documentSecondDiamondDTO);
+
+                    
                 }
+                await _unitOfWork.DocumentSecondaryDiamondRepository.AddRangeAsync(documentList);
+                await _unitOfWork.SaveChangeAsync();
             }
 
         }
@@ -304,8 +320,10 @@ namespace Application.Services
         {
             if (images != null)
             {
+                List<ImageMainShaphie> imageList = new List<ImageMainShaphie>();
                 foreach (var image in images)
                 {
+
                     var uploadImage = await uploadImageOnCloudary(image, TagsImageMainShaphie);
 
                     var imageMainShaphie = new ImageShaphieDTO
@@ -316,13 +334,16 @@ namespace Application.Services
 
                     var imageMainShaphieDTO = _mapper.Map<ImageMainShaphie>(imageMainShaphie);
                     imageMainShaphieDTO.MainShaphieId = shaphieId;
-                    await _unitOfWork.ImageMainShaphieRepository.AddAsync(imageMainShaphieDTO);
-                    await _unitOfWork.SaveChangeAsync();
+                    imageList.Add(imageMainShaphieDTO);
+                   
                 }
+                await _unitOfWork.ImageMainShaphieRepository.AddRangeAsync(imageList);
+                await _unitOfWork.SaveChangeAsync();
             }
 
             if (documents != null)
             {
+                List<DocumentMainShaphie> documentList = new List<DocumentMainShaphie>();
                 foreach (var document in documents)
                 {
                     var uploadImage = await uploadImageOnCloudary(document, TagsDocumentMainShaphie);
@@ -336,9 +357,11 @@ namespace Application.Services
 
                     var documentMainShaphieDTO = _mapper.Map<DocumentMainShaphie>(documentMainShaphie);
                     documentMainShaphieDTO.MainShaphieId = shaphieId;
-                    await _unitOfWork.DocumentMainShaphieRepository.AddAsync(documentMainShaphieDTO);
-                    await _unitOfWork.SaveChangeAsync();
+                    documentList.Add(documentMainShaphieDTO);
+                    
                 }
+                await _unitOfWork.DocumentMainShaphieRepository.AddRangeAsync(documentList);
+                await _unitOfWork.SaveChangeAsync();
             }
 
 
@@ -360,6 +383,7 @@ namespace Application.Services
         {
             if (images != null)
             {
+                List<ImageSecondaryShaphie> imageList = new List<ImageSecondaryShaphie>();
                 foreach (var image in images)
                 {
                     var uploadImage = await uploadImageOnCloudary(image, TagsImageSecondShaphie);
@@ -372,13 +396,16 @@ namespace Application.Services
 
                     var imageSecondShaphieDTO = _mapper.Map<ImageSecondaryShaphie>(imageSecondShaphie);
                     imageSecondShaphieDTO.SecondaryShaphieId = shaphieId;
-                    await _unitOfWork.ImageSecondaryShaphieRepository.AddAsync(imageSecondShaphieDTO);
-                    await _unitOfWork.SaveChangeAsync();
+                    imageList.Add(imageSecondShaphieDTO);
+                    
                 }
+                await _unitOfWork.ImageSecondaryShaphieRepository.AddRangeAsync(imageList);
+                await _unitOfWork.SaveChangeAsync();
             }
 
             if (documents != null)
             {
+                List<DocumentSecondaryShaphie> documentList = new List<DocumentSecondaryShaphie>();
                 foreach (var document in documents)
                 {
                     var uploadImage = await uploadImageOnCloudary(document, TagsDocumentSecondShaphie);
@@ -392,9 +419,11 @@ namespace Application.Services
 
                     var documentSecondShaphieDTO = _mapper.Map<DocumentSecondaryShaphie>(documentSecondShaphie);
                     documentSecondShaphieDTO.SecondaryShaphieId = shaphieId;
-                    await _unitOfWork.DocumentSecondaryShaphieRepository.AddAsync(documentSecondShaphieDTO);
-                    await _unitOfWork.SaveChangeAsync();
+                    documentList.Add(documentSecondShaphieDTO);
+                    
                 }
+                await _unitOfWork.DocumentSecondaryShaphieRepository.AddRangeAsync(documentList);
+                await _unitOfWork.SaveChangeAsync();
             }
 
 

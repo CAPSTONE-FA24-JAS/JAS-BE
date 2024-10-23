@@ -9,6 +9,7 @@ namespace Application.ViewModels.JewelryDTOs
 {
     public class CreateDiamondDTO
     {
+        public string? Name { get; set; }
         public string? Color { get; set; }
         public string? Cut { get; set; }
         public string? Clarity { get; set; }

@@ -18,6 +18,7 @@ using Domain.Entity;
 using Application.ViewModels.LotDTOs;
 using Application.ViewModels.InvoiceDTOs;
 using Application.ViewModels.CustomerLotDTOs;
+using Application.ViewModels.BidPriceDTOs;
 
 
 namespace Infrastructures
@@ -179,8 +180,8 @@ namespace Infrastructures
             CreateMap<Customer, SellerDTO>().ReverseMap();
             CreateMap<CustomerLot, RegisterToLotDTO>().ReverseMap();
             CreateMap<CustomerLot, CustomerLotDTO>().ReverseMap();
-            CreateMap<Invoice, InvoiceDTO>()
-                .ForPath(x => x.ImageLinkJewelry, x => x.MapFrom(x => x.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink))
+            CreateMap<Invoice, InvoiceDTO>()             
+                .ForMember(dest => dest.MyBidDTO, opt => opt.MapFrom(src => src.CustomerLot))
                 .ReverseMap();
             CreateMap<Invoice, InvoiceDetailDTO>()
                 .ForPath(dest => dest.WinnerId, src => src.MapFrom(x => x.Customer.Id))
@@ -210,6 +211,9 @@ namespace Infrastructures
                 .ReverseMap();
             CreateMap<CustomerLot, MyBidDTO>()
                 .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))
+                .ReverseMap();
+            CreateMap<BidPrice, BidPriceDTO>()
+                .ForPath(x => x.CustomerName, x => x.MapFrom( x => x.Customer.LastName +" " + x.Customer.FirstName))
                 .ReverseMap();
             CreateMap<RequestWithdraw, RequestWithdrawDTO>().ReverseMap();
 

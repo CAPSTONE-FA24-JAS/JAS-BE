@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.ViewModels.CustomerLotDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,12 +10,13 @@ namespace Application.ViewModels.InvoiceDTOs
 {
     public class InvoiceDTO
     {
+        public int Id { get; set; }
         public string? Status { get; set; }
         public float? TotalPrice { get; set; }
         public int? PaymentMethodId { get; set; }
         public int? AddressToShipId { get; set; }
         public int? ShipperId { get; set; }
-        public string? ImageLinkJewelry { get; set; }
+        public MyBidDTO? MyBidDTO { get; set; }
     }
 
     public class InvoiceDetailDTO: InvoiceDTO

@@ -10,8 +10,8 @@ namespace Domain.Enums
     {
         Registed = 1,
         CreateInvoice = 2,
-        Paid = 3,
-        PendingPayment = 4,
+        PendingPayment = 3,
+        Paid = 4,
         Delivering = 5,
         Delivered =6,
         Rejected = 7,

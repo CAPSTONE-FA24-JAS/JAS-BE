@@ -39,6 +39,7 @@ namespace Application.Services
         {
             var response = new APIResponseModel();
             List<String> imagesValuation = new List<string>();
+            List<ImageValuation> imageValuationList = new List<ImageValuation>();
             try
             {
                 var newvaluation = _mapper.Map<Valuation>(consignAnItem);
@@ -56,7 +57,7 @@ namespace Application.Services
                     
                     AddHistoryValuation(newvaluation.Id, newvaluation.Status);
 
-
+                    
                     foreach (var image in consignAnItem.ImageValuation)
                     {
                         var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
@@ -83,21 +84,20 @@ namespace Application.Services
                             };
                             imagesValuation.Add(imageValuationinput.ImageLink);
                             var imageValuation = _mapper.Map<ImageValuation>(imageValuationinput);
-                            await _unitOfWork.ImageValuationRepository.AddAsync(imageValuation);
-                            if (await _unitOfWork.SaveChangeAsync() > 0)
-                            {
-                                response.Message = $"Image upload Successfull";
-                                response.Code = 200;
-                                response.IsSuccess = true;
-                            }
+                            imageValuationList.Add(imageValuation);
+                                                      
 
                         }
                     }
-
-                    response.Message = $"Consign an item Successfully";
-                    response.Code = 200;
-                    response.IsSuccess = true;
-                    response.Data = imagesValuation;
+                    await _unitOfWork.ImageValuationRepository.AddRangeAsync(imageValuationList);
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        response.Message = $"Consign an item Successfully";
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Data = imagesValuation;
+                    }
+                       
 
                 }
                 
