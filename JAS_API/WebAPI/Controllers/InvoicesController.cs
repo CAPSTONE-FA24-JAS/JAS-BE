@@ -63,6 +63,35 @@ namespace WebAPI.Controllers
             }
         }
 
+        //Get Detail of invoice by invoice id
+        [HttpGet]
+        public async Task<IActionResult> GetDetailInvoice(int invoiceId)
+        {
+            var result = await _invoiceService.GetInvoiceDetail(invoiceId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpPatch]
+        public async Task<IActionResult> UpdateAddressToShipForInvoice(UpdateAddressToShipInvoice model)
+        {
+            var result = await _invoiceService.UpdateAddressToshipForInvoice(model);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
         //shipper cap nhat anh và status khi giao hang thanh cong
         [HttpPut]
         public async Task<IActionResult> UpdateSuccessfulDeliveryByShipper(SuccessfulDeliveryRequestDTO deliveryDTO)

@@ -38,6 +38,20 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> CheckPasswordWallet(int walletId, string password)
+        {
+            var result = await _walletService.CheckPasswordWallet(walletId,password);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateWallet(CreateWalletDTO createWalletDTO)
         {
@@ -96,6 +110,20 @@ namespace WebAPI.Controllers
                 return Ok(result);
             }
             return BadRequest(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RequestNewWithdraw(RequestWithdrawDTO requestWithdrawDTO)
+        {
+            var result = await _walletService.RequestWithdraw(requestWithdrawDTO);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
     }
 }

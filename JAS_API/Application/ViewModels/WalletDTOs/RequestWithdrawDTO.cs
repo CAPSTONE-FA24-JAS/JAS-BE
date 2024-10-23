@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Application.ViewModels.WalletDTOs
 {
-    public class CreateWalletDTO
+    public class RequestWithdrawDTO
     {
-        public int? CustomerId { get; set; }
-        public string? Password { get; set; }
+        public int WalletId { get; set; }
+        public float Amount { get; set; }
     }
 }
