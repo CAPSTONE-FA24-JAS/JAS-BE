@@ -195,6 +195,72 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
+        public async Task<APIResponseModel> RequestWithdraw(RequestWithdrawDTO requestWithdrawDTO)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var walletExits =  await CheckBalance(requestWithdrawDTO.WalletId);
+                if (walletExits.Data is WalletDTO cs && walletExits.IsSuccess)
+                {
+                    if (cs.Balance >= requestWithdrawDTO.Amount)
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Code = 400;
+                        reponse.Message = "The amount exceeds the current balance.";
+                    }
+                    else
+                    {
+                        var request = _mapper.Map<RequestWithdraw>(requestWithdrawDTO);
+                        await _unitOfWork.RequestWithdrawRepository.AddAsync(request);
+                        var trans = new WalletTransaction()
+                        {
+                            Amount = requestWithdrawDTO.Amount,
+                            transactionType = EnumTransactionType.WithDrawWallet.ToString(),
+                            DocNo = requestWithdrawDTO.WalletId,
+                            TransactionTime = DateTime.UtcNow,
+                            Status = EnumStatusTransaction.Pending.ToString(),
+                            WalletId = requestWithdrawDTO.WalletId,
+                        };
+                        var resultTrans = await _walletTransactionService.CreateNewTransaction(trans);
+                        if (resultTrans.IsSuccess)
+                        {
+                            if (await _unitOfWork.SaveChangeAsync() > 0)
+                            {
+                                reponse.IsSuccess = true;
+                                reponse.Code = 200;
+                                reponse.Message = "Add new request successfuly";
+                                reponse.Data = _mapper.Map<WalletDTO>(request);
+                            }
+                            else
+                            {
+                                reponse.Code = 500;
+                                reponse.Message = "Error when saving Request Withdraw";
+                                reponse.IsSuccess = false;
+                            }
+                        }
+                        else
+                        {
+                            reponse.Code = 500;
+                            reponse.Message = "Error when saving Transaction";
+                            reponse.IsSuccess = false;
+                        }
+                    }
+                }
+                reponse.Code = 404;
+                reponse.Message = "Not Found Wallet";
+                reponse.IsSuccess = false;
+
+
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+
         public Task<APIResponseModel> TransactionHistory(int walletId)
         {
             throw new NotImplementedException();

@@ -215,6 +215,8 @@ namespace Infrastructures
             CreateMap<BidPrice, BidPriceDTO>()
                 .ForPath(x => x.CustomerName, x => x.MapFrom( x => x.Customer.LastName +" " + x.Customer.FirstName))
                 .ReverseMap();
+            CreateMap<RequestWithdraw, RequestWithdrawDTO>().ReverseMap();
+
 
         }
     }
