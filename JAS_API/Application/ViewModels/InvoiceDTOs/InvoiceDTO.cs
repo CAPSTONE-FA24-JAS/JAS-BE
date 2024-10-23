@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.ViewModels.CustomerLotDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,6 @@ namespace Application.ViewModels.InvoiceDTOs
 
         public int? ShipperId { get; set; }
 
-        public string? ImageLinkJewelry { get; set; }
+        public MyBidDTO? MyBidDTO { get; set; }
     }
 }
