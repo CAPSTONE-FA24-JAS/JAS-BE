@@ -21,5 +21,9 @@ namespace Application.Interfaces
         public Task<APIResponseModel> FinishInvoiceByManager(int invoiceId, int status);
 
         public Task<APIResponseModel> getInvoicesByStatusForCustomer(int customerId, int? status, int? pageSize, int? pageIndex);
+
+        Task<APIResponseModel> GetInvoiceDetail(int Id);
+        Task<APIResponseModel> UpdateAddressToshipForInvoice(UpdateAddressToShipInvoice model);
+
     }
 }

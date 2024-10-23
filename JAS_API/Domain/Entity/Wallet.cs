@@ -5,8 +5,10 @@
         public Decimal? Balance { get; set;}
         public int? CustomerId { get; set;}
         public string? Status { get; set;}
+        public string? Password { get; set;}
         //
         public virtual Customer? Customer { get; set;}
         public virtual IEnumerable<RequestWithdraw>? RequestWithdraws { get; set;}
+        public virtual IEnumerable<WalletTransaction>? WalletTransactions { get; set; }
     }
 }

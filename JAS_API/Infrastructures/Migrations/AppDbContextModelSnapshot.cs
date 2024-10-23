@@ -1453,6 +1453,9 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
                     b.Property<int?>("PaymentMethodId")
                         .HasColumnType("integer");
 
@@ -2592,6 +2595,9 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("Password")
+                        .HasColumnType("text");
+
                     b.Property<string>("Status")
                         .HasColumnType("text");
 
@@ -2644,6 +2650,9 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("TransactionTime")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<int?>("WalletId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("transactionId")
                         .HasColumnType("text");
 
@@ -2654,6 +2663,8 @@ namespace Infrastructures.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("WalletId");
 
                     b.ToTable("WalletTransactions");
                 });
@@ -3198,6 +3209,15 @@ namespace Infrastructures.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("Domain.Entity.WalletTransaction", b =>
+                {
+                    b.HasOne("Domain.Entity.Wallet", "Wallet")
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("WalletId");
+
+                    b.Navigation("Wallet");
+                });
+
             modelBuilder.Entity("Domain.Entity.Ward", b =>
                 {
                     b.HasOne("Domain.Entity.District", "District")
@@ -3405,6 +3425,8 @@ namespace Infrastructures.Migrations
             modelBuilder.Entity("Domain.Entity.Wallet", b =>
                 {
                     b.Navigation("RequestWithdraws");
+
+                    b.Navigation("WalletTransactions");
                 });
 
             modelBuilder.Entity("Domain.Entity.Ward", b =>

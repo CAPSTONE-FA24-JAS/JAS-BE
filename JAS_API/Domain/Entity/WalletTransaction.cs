@@ -9,6 +9,8 @@
         public DateTime? TransactionTime { get; set; }
         public int transactionPerson { get; set; }
         public string? Status { get; set; }
+        public int? WalletId { get; set; }
+        public virtual Wallet? Wallet { get; set; }
        
     }
 }
