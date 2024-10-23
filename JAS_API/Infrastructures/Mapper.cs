@@ -182,6 +182,32 @@ namespace Infrastructures
             CreateMap<Invoice, InvoiceDTO>()
                 .ForPath(x => x.ImageLinkJewelry, x => x.MapFrom(x => x.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink))
                 .ReverseMap();
+            CreateMap<Invoice, InvoiceDetailDTO>()
+                .ForPath(dest => dest.WinnerId, src => src.MapFrom(x => x.Customer.Id))
+                .ForPath(dest => dest.WinnerPhone, src => src.MapFrom(x => x.Customer.Account.PhoneNumber.ToString()))
+                .ForPath(dest => dest.WinnerName, src => src.MapFrom(x => (x.Customer.FirstName + " " + x.Customer.FirstName).ToString()))
+                .ForPath(dest => dest.WinnerEmail, src => src.MapFrom(x => x.Customer.Account.Email.ToString()))
+                .ForPath(dest => dest.AddressToShip, src => src.MapFrom(x => x.AddressToShip.AddressLine.ToString()))
+                .ForPath(dest => dest.LotId, src => src.MapFrom(x => x.CustomerLot.LotId))
+                .ForMember(dest => dest.ProductId, opt => opt.MapFrom((src, dest, destMember, context) =>
+                {
+                    if (context.Items.ContainsKey("Jewelry") && context.Items["Jewelry"] != null)
+                    {
+                        var jewelry = (Jewelry)context.Items["Jewelry"];
+                        return jewelry.Id; 
+                    }
+                    return 0;
+                }))
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom((src, dest, destMember, context) =>
+                {
+                    if (context.Items.ContainsKey("Jewelry") && context.Items["Jewelry"] != null)
+                    {
+                        var jewelry = (Jewelry)context.Items["Jewelry"];
+                        return jewelry.Name;
+                    }
+                    return "";
+                }))
+                .ReverseMap();
             CreateMap<CustomerLot, MyBidDTO>()
                 .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))
                 .ReverseMap();

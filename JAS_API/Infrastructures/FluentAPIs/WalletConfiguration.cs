@@ -17,6 +17,9 @@ namespace Infrastructures.FluentAPIs
             builder.HasOne(x => x.Customer)
                 .WithOne(x => x.Wallet)
                 .HasForeignKey<Wallet>(x => x.CustomerId);
+            builder.HasMany(x => x.WalletTransactions)
+                .WithOne(x => x.Wallet)
+                .HasForeignKey(x => x.WalletId);
         }
     }
 }
