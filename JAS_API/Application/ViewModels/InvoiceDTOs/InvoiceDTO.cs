@@ -8,6 +8,7 @@ namespace Application.ViewModels.InvoiceDTOs
 {
     public class InvoiceDTO
     {
+        public int Id { get; set; }
         public string? Status { get; set; }
 
         public float? TotalPrice { get; set; }

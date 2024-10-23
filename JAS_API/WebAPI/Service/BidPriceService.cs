@@ -44,9 +44,10 @@ namespace Application.Services
             try
             {
                 string lotGroupName = $"lot-{request.LotId}";
-                var topBidders = _cacheService.GetSortedSetDataFilter<BidPriceDTO>("BidPrice", l => l.LotId == request.LotId);
+                var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == request.LotId);
+                var topBiddersDTO = _mapper.Map<BidPriceDTO>(topBidders);
                 var lot = _cacheService.GetLotById(request.LotId);
-                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
+              //  await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
 
                 
 
@@ -73,6 +74,7 @@ namespace Application.Services
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLot", topBidders);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLotOfStaff", topBiddersDTO);
 
                     }
                     else
@@ -96,15 +98,16 @@ namespace Application.Services
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLot", topBidders);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLotOfStaff", topBiddersDTO);
 
-                       
+
                         }
                         else
                         {
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", 0, 0);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLot", null);
-                    }
+                        }
                         
                     }
       
@@ -133,6 +136,7 @@ namespace Application.Services
                     var customerId = account.Customer.Id;
                     var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
                     var limitbid = customer.PriceLimit;
+                    var customerName = customer.LastName +" " + customer.FirstName;
                     if(limitbid.HasValue && limitbid < request.CurrentPrice)
                     {
                         reponse.Message = "giá đặt cao hơn limit bid";
@@ -165,6 +169,8 @@ namespace Application.Services
 
                         string lotGroupName = $"lot-{conn.LotId}";
                         //trar về name, giá ĐẤU, thời gian
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, customerName, request.CurrentPrice, request.BidTime);
+
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
 
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
