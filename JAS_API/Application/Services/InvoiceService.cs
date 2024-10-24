@@ -213,7 +213,7 @@ namespace Application.Services
                     {
                         File = new FileDescription(deliveryDTO.ImageDelivery.FileName,
                                                    deliveryDTO.ImageDelivery.OpenReadStream()),
-                        Tags = Tags_Customer
+                        Tags = "Tags_Customer"
                     }).ConfigureAwait(false);
 
                     if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
@@ -540,6 +540,11 @@ namespace Application.Services
                 response.IsSuccess = false;
             }
             return response;
+        }
+
+        public Task<APIResponseModel> UpdateImageRecivedJewelryByShipper(int invoiceId, IFormFile imageDelivery)
+        {
+            throw new NotImplementedException();
         }
     }
 }
