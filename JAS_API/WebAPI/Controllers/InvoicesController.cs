@@ -175,5 +175,19 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> paymentInvoiceByWallet(PaymentInvoiceByWalletDTO model)
+        {
+            var result = await _invoiceService.PaymentInvoiceByWallet(model);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
     }
 }

@@ -30,15 +30,16 @@ namespace Application.Services
         private const string Tags = "Backend_ImageDelivery";
         private readonly IVNPayService _vNPayService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IWalletService _walletService;
 
-        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor)
+        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor,IWalletService walletService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinary = cloudinary;
             _vNPayService = vNPayService;
             _httpContextAccessor = httpContextAccessor;
-
+            _walletService = walletService;
         }
 
         public async Task<APIResponseModel> getInvoicesByStatusForManger(int status, int? pageSize, int? pageIndex)
@@ -475,9 +476,75 @@ namespace Application.Services
             return response;
         }
 
-        public Task<APIResponseModel> PaymentInvoiceByWallet(PaymentInvoiceByWalletDTO model)
+        public async Task<APIResponseModel> PaymentInvoiceByWallet(PaymentInvoiceByWalletDTO model)
         {
-            throw new NotImplementedException();
+
+            var response = new APIResponseModel();
+
+            try
+            {
+
+                var walletExist = await _unitOfWork.WalletRepository.GetByIdAsync(model.WalletId);
+                if (walletExist != null)
+                {
+                    var updateResult = await _walletService.UpdateBanlance(model.WalletId, (decimal)model.Amount, false);
+                    if (!updateResult.IsSuccess)
+                    {
+                        response.Message = $"Update balance faild";
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                    }
+                    else
+                    {
+                        var walletTrans = new WalletTransaction()
+                        {
+                            WalletId = model.WalletId,
+                            DocNo = model.InvoiceId,
+                            TransactionTime = DateTime.Now,
+                            Amount = -model.Amount,
+                            Status = EnumStatusTransaction.Completed.ToString(),
+                            transactionType = EnumTransactionType.BuyPay.ToString(),
+                        };
+
+                        var trans = new Transaction()
+                        {
+                            Amount = +model.Amount,
+                            DocNo = model.InvoiceId,
+                            TransactionTime = DateTime.Now,
+                            TransactionType = EnumTransactionType.BuyPay.ToString(),
+                        };
+
+                        await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
+                        await _unitOfWork.TransactionRepository.AddAsync(trans);
+                        if (await _unitOfWork.SaveChangeAsync() > 0)
+                        {
+                            response.Message = $"Update Wallet Successfully";
+                            response.Code = 200;
+                            response.IsSuccess = true;
+                        }
+                        else
+                        {
+                            response.Message = $"Update Wallet Fail When Saving";
+                            response.Code = 500;
+                            response.IsSuccess = false;
+                        }
+                    }
+                }
+                else
+                {
+                    response.Message = $"Don't have wallet";
+                    response.Code = 404;
+                    response.IsSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
         }
 
         public Task<APIResponseModel> PaymentInvoiceByBankTransfer(PaymentInvoiceByBankTransferDTO model)
