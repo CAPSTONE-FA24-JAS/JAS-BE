@@ -190,6 +190,7 @@ namespace Infrastructures
                 .ForPath(dest => dest.WinnerEmail, src => src.MapFrom(x => x.Customer.Account.Email.ToString()))
                 .ForPath(dest => dest.AddressToShip, src => src.MapFrom(x => x.AddressToShip.AddressLine.ToString()))
                 .ForPath(dest => dest.LotId, src => src.MapFrom(x => x.CustomerLot.LotId))
+                .ForMember(dest => dest.MyBidDTO, src => src.MapFrom(x => x.CustomerLot))
                 .ForMember(dest => dest.ProductId, opt => opt.MapFrom((src, dest, destMember, context) =>
                 {
                     if (context.Items.ContainsKey("Jewelry") && context.Items["Jewelry"] != null)
