@@ -38,5 +38,16 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetMyBidByCustomerLotIdAsync(int customerLotId)
+        {
+            var result = await _customerLotService.GetMyBidByCustomerLotId(customerLotId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
     }
 }

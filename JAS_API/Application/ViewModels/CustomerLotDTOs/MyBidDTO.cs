@@ -1,4 +1,5 @@
 ﻿using Application.ViewModels.LotDTOs;
+using Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,4 +26,6 @@ namespace Application.ViewModels.CustomerLotDTOs
 
 
     }
+
+    
 }

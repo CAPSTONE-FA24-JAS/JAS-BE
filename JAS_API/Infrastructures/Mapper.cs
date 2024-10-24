@@ -212,11 +212,16 @@ namespace Infrastructures
             CreateMap<CustomerLot, MyBidDTO>()
                 .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))
                 .ReverseMap();
+            CreateMap<CustomerLot, MyBidDetailDTO>()
+               .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))
+               .ForMember(dest => dest.HistoryStatusCustomerLots, opt => opt.MapFrom(src => src.HistoryStatusCustomerLots))
+               .ReverseMap();
             CreateMap<BidPrice, BidPriceDTO>()
                 .ForPath(x => x.LastName, x => x.MapFrom( x => x.Customer.LastName))
                 .ForPath(x => x.FirstName, x=> x.MapFrom( x => x.Customer.FirstName))
                 .ReverseMap();
             CreateMap<RequestWithdraw, RequestWithdrawDTO>().ReverseMap();
+            CreateMap<HistoryStatusCustomerLot, HistoryCustomerLotDTO>().ReverseMap();
 
 
         }

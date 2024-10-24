@@ -124,6 +124,38 @@ namespace Application.Services
             return response;
         }
 
+        public async Task<APIResponseModel> GetMyBidByCustomerLotId(int customerLotId)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var customerLotById = await _unitOfWork.CustomerLotRepository.GetByIdAsync(customerLotId);
+                if (customerLotById != null)
+                {
+                    var customerLot = _mapper.Map<MyBidDetailDTO>(customerLotById);
+                    response.Message = $"Found CustomerLot Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = customerLot;
+                }
+                else
+                {
+                    response.Message = $"Not found CustomerLot";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
         public async Task<APIResponseModel> GetPastBidOfCustomer(int customerIId, List<int> status, int? pageIndex, int? pageSize)
         {
             var response = new APIResponseModel();

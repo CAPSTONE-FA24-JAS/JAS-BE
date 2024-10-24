@@ -8,6 +8,7 @@ namespace Application.ViewModels.LotDTOs
 {
     public class CustomerLotDTO
     {
+        public int Id { get; set; }
         public bool? IsAutoBid { get; set; }
         public float? CurrentPrice { get; set; }
         public string? Status { get; set; }
