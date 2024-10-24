@@ -9,5 +9,6 @@ namespace Application.Repositories
 {
     public interface ICustomerRepository : IGenericRepository<Customer>
     {
+        List<Customer> GetCustomersByIds(List<int> customerIds);
     }
 }

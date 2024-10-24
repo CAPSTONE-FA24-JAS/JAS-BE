@@ -98,7 +98,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        //shipper cap nhat anh và status khi giao hang thanh cong
+        //shipper cap nhat anh và status khi nhan hang
         [HttpPut]
         public async Task<IActionResult> UpdateSuccessfulDeliveryByShipper(SuccessfulDeliveryRequestDTO deliveryDTO)
         {
@@ -112,6 +112,23 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+        //shipper cap nhat anh và status khi nhan hang
+        [HttpPut]
+        public async Task<IActionResult> UpdateImageRecivedJewelryByShipperAsync(int invoiceId, IFormFile imageDelivery)
+        {
+            var result = await _invoiceService.UpdateImageRecivedJewelryByShipper(invoiceId, imageDelivery);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+
 
         //manager check va finish don hang
         [HttpPut]

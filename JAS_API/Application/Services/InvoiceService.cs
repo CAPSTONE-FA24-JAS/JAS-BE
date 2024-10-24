@@ -213,7 +213,7 @@ namespace Application.Services
                     {
                         File = new FileDescription(deliveryDTO.ImageDelivery.FileName,
                                                    deliveryDTO.ImageDelivery.OpenReadStream()),
-                        Tags = Tags
+                        Tags = Tags_Customer
                     }).ConfigureAwait(false);
 
                     if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
