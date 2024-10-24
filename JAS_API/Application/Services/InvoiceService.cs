@@ -3,11 +3,14 @@ using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.InvoiceDTOs;
 using Application.ViewModels.ValuationDTOs;
+using Application.ViewModels.VNPayDTOs;
+using Application.ViewModels.WalletDTOs;
 using AutoMapper;
 using CloudinaryDotNet;
 using Domain.Entity;
 using Domain.Enums;
 using iTextSharp.text;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
@@ -25,12 +28,17 @@ namespace Application.Services
         private readonly IMapper _mapper;
         private readonly Cloudinary _cloudinary;
         private const string Tags = "Backend_ImageDelivery";
+        private readonly IVNPayService _vNPayService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary)
+        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinary = cloudinary;
+            _vNPayService = vNPayService;
+            _httpContextAccessor = httpContextAccessor;
+
         }
 
         public async Task<APIResponseModel> getInvoicesByStatusForManger(int status, int? pageSize, int? pageIndex)
@@ -446,6 +454,73 @@ namespace Application.Services
                     else
                     {
                         response.Message = $"Update Invoice Fail When Saving";
+                        response.Code = 500;
+                        response.IsSuccess = false;
+                    }
+                }
+                else
+                {
+                    response.Message = $"Don't have invoice";
+                    response.Code = 404;
+                    response.IsSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public Task<APIResponseModel> PaymentInvoiceByWallet(PaymentInvoiceByWalletDTO model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<APIResponseModel> PaymentInvoiceByBankTransfer(PaymentInvoiceByBankTransferDTO model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<APIResponseModel> PaymentInvoiceByVnPay(PaymentInvoiceByVnPayDTO model)
+        {
+            var response = new APIResponseModel();
+
+            try
+            {
+
+                var invoiceExist = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
+                if (invoiceExist != null)
+                {
+                    var vnPayModel = new VNPaymentRequestDTO
+                    {
+                        Amount = (float)model.Amount,
+                        CreatedDate = DateTime.UtcNow,
+                        Description = $"payment the invoice have id is : {model.InvoiceId}",
+                        FullName = invoiceExist.Customer.FirstName + " " + invoiceExist.Customer.LastName,
+                        OrderId = new Random().Next(1000, 100000)
+                    };
+                    var transaction = new WalletTransaction()
+                    {
+                        transactionType = EnumTransactionType.BuyPay.ToString(),
+                        DocNo = model.InvoiceId,
+                    };
+                    var httpContext = _httpContextAccessor.HttpContext;
+                    string paymentUrl = await _vNPayService.CreatePaymentUrl(httpContext, vnPayModel, transaction);
+
+                    if (!string.IsNullOrEmpty(paymentUrl))
+                    {
+                        response.Message = $"SucessFull";
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Data = paymentUrl;
+                    }
+                    else
+                    {
+                        response.Message = $"Invoice Fail";
                         response.Code = 500;
                         response.IsSuccess = false;
                     }

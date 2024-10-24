@@ -11,4 +11,6 @@ namespace Application.ViewModels.WalletDTOs
         public int WalletId { get; set; }
         public float Amount { get; set; }
     }
+
+    
 }

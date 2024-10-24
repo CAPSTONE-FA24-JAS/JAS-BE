@@ -18,6 +18,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> CheckPasswordWallet(int walletId, string password);
         Task<APIResponseModel> RequestWithdraw(RequestWithdrawDTO requestWithdrawDTO);
         Task<APIResponseModel> ApproveRequestWithdraw(int RequestId);
+        
 
     }
 }

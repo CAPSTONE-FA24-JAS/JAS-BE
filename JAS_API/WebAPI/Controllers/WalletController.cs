@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.ViewModels.VNPayDTOs;
 using Application.ViewModels.WalletDTOs;
+using CloudinaryDotNet.Actions;
 using Domain.Entity;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -14,14 +15,16 @@ namespace WebAPI.Controllers
         private readonly IAccountService _accountService;
         private readonly IVNPayService _vNPayService;
         private readonly IWalletTransactionService _walletTransactionService;
-
-        public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService, IVNPayService vNPayService, IWalletTransactionService walletTransactionService)
+        private readonly ITransactionService _transactionService;
+        
+        public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService, IVNPayService vNPayService, IWalletTransactionService walletTransactionService, ITransactionService transactionService)
         {
             _walletService = walletService;
             _vpnService = vpnService;
             _accountService = accountService;
             _vNPayService = vNPayService;
             _walletTransactionService = walletTransactionService;
+            _transactionService = transactionService;
         }
 
         [HttpGet]
@@ -81,7 +84,7 @@ namespace WebAPI.Controllers
                 transactionType = EnumTransactionType.AddWallet.ToString(),
                 DocNo = topUpWalletDTO.WalletId,
             };
-            string paymentUrl = _vpnService.CreatePaymentUrl(HttpContext, vnPayModel, transaction);
+            string paymentUrl = await _vpnService.CreatePaymentUrl(HttpContext, vnPayModel, transaction);
             return Content(paymentUrl);
         }
 
@@ -105,6 +108,21 @@ namespace WebAPI.Controllers
                     if (!walletUpdate.IsSuccess)
                     {
                         return BadRequest(walletUpdate);
+                    }
+                    if(trans.transactionType == EnumTransactionType.BuyPay.ToString())
+                    {
+                        var newTrans = new Transaction()
+                        {
+                            Amount = +trans.Amount,
+                            DocNo = trans.DocNo,
+                            TransactionTime = trans.TransactionTime,
+                            TransactionType = trans.transactionType,
+                        };
+                        var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
+                        if (!transactionResult.IsSuccess)
+                        {
+                            return BadRequest(result);
+                        }
                     }
                 }
                 return Ok(result);
