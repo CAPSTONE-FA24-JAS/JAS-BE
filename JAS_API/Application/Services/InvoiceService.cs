@@ -103,7 +103,7 @@ namespace Application.Services
                 var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
                 if (invoiceById != null)
                 {
-                    invoiceById.CustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+                    invoiceById.CustomerLot.Status = EnumCustomerLot.Delivering.ToString();
                     invoiceById.ShipperId = shipperId;
 
                     invoiceById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
@@ -148,7 +148,7 @@ namespace Application.Services
 
                 if (status != null)
                 {
-                    var statusTranfer = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+                    var statusTranfer = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == status).Name;
                     filter = x => x.ShipperId == shipperId && statusTranfer.Equals(x.Status);
                 }
                 else
@@ -207,7 +207,7 @@ namespace Application.Services
                 var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(deliveryDTO.InvoiceId);
                 if (invoiceById != null)
                 {
-                    invoiceById.CustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == deliveryDTO.Status).Name;
+                    invoiceById.CustomerLot.Status = EnumCustomerLot.Delivered.ToString();
                     _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
 
 
@@ -273,9 +273,9 @@ namespace Application.Services
                 var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
                 if (invoiceById != null)
                 {
-                    invoiceById.CustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+                    invoiceById.CustomerLot.Status = EnumCustomerLot.Finished.ToString();
 
-                    invoiceById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+                    invoiceById.Status = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == status).Name;
                     _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
                     _unitOfWork.InvoiceRepository.Update(invoiceById);
 
