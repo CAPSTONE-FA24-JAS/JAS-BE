@@ -8,6 +8,7 @@ using CloudinaryDotNet;
 using Domain.Entity;
 using Domain.Enums;
 using iTextSharp.text;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
@@ -24,7 +25,9 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly Cloudinary _cloudinary;
-        private const string Tags = "Backend_ImageDelivery";
+        private const string Tags_Shipper = "Delivery_ImageReceivedByCustomer";
+        private const string Tags_Customer = "Delivery_ImageReceivedByShipper";
+
 
         public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary)
         {
@@ -205,7 +208,7 @@ namespace Application.Services
                     {
                         File = new FileDescription(deliveryDTO.ImageDelivery.FileName,
                                                    deliveryDTO.ImageDelivery.OpenReadStream()),
-                        Tags = Tags
+                        Tags = Tags_Customer
                     }).ConfigureAwait(false);
 
                     if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
@@ -456,6 +459,72 @@ namespace Application.Services
                     response.Code = 404;
                     response.IsSuccess = false;
                 }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> UpdateImageRecivedJewelryByShipper(int invoiceId, IFormFile imageDelivery)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
+                if (invoiceById != null)
+                {
+                  //  invoiceById.CustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == deliveryDTO.Status).Name;
+                 //   _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
+
+
+                    var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
+                    {
+                        File = new FileDescription(imageDelivery.FileName,
+                                                   imageDelivery.OpenReadStream()),
+                        Tags = Tags_Shipper
+                    }).ConfigureAwait(false);
+
+                    if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        response.Message = $"Image upload failed." + uploadImage.Error.Message + "";
+                        response.Code = (int)uploadImage.StatusCode;
+                        response.IsSuccess = false;
+                    }
+                    else
+                    {
+                        var statusImvoice = new StatusInvoice
+                        {
+                            Status = "ShipperRecieved",
+                            CurrentDate = DateTime.Now,
+                            InvoiceId = invoiceId,
+                            ImageLink = uploadImage.SecureUrl.AbsoluteUri
+                        };
+
+                        await _unitOfWork.StatusInvoiceRepository.AddAsync(statusImvoice);
+                        await _unitOfWork.SaveChangeAsync();
+
+                        var statusInvoiceDTO = _mapper.Map<StatusInvoiceDTO>(statusImvoice);
+
+                        response.Message = $"Add data in StatusInvoice Successfully";
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Data = statusInvoiceDTO;
+                    }
+
+
+                }
+                else
+                {
+                    response.Message = $"Not found invoice";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
             }
             catch (Exception ex)
             {
