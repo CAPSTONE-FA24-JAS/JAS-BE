@@ -71,7 +71,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateAution(UpdateAuctionDTO updateAuctionDTO)
+        public async Task<IActionResult> UpdateAution([FromForm] UpdateAuctionDTO updateAuctionDTO)
         {
             var result = await _auctionService.UpdateAuction(updateAuctionDTO);
             if (result.IsSuccess)
