@@ -27,12 +27,13 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly Cloudinary _cloudinary;
-        private const string Tags = "Backend_ImageDelivery";
+        private const string Tags_Customer = "Customer_ImageDelivery";
+        private const string Tags_Shipper = "Shipper_ImageDelivery";
         private readonly IVNPayService _vNPayService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWalletService _walletService;
 
-        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor,IWalletService walletService)
+        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IWalletService walletService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -49,10 +50,10 @@ namespace Application.Services
 
             try
             {
-                                              
-                    var statusTranfer = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == status).Name;
-                    
-               
+
+                var statusTranfer = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == status).Name;
+
+
 
                 var invoices = await _unitOfWork.InvoiceRepository.getInvoicesByStatusForManger(statusTranfer, pageSize, pageIndex);
                 List<InvoiceDTO> listInvoiceDTO = new List<InvoiceDTO>();
@@ -209,12 +210,12 @@ namespace Application.Services
                     invoiceById.CustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == deliveryDTO.Status).Name;
                     _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
 
-                    
+
                     var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
                     {
                         File = new FileDescription(deliveryDTO.ImageDelivery.FileName,
                                                    deliveryDTO.ImageDelivery.OpenReadStream()),
-                        Tags = "Tags_Customer"
+                        Tags = Tags_Customer
                     }).ConfigureAwait(false);
 
                     if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
@@ -232,7 +233,7 @@ namespace Application.Services
                             InvoiceId = deliveryDTO.InvoiceId,
                             ImageLink = uploadImage.SecureUrl.AbsoluteUri
                         };
-                        
+
                         await _unitOfWork.StatusInvoiceRepository.AddAsync(statusImvoice);
                         await _unitOfWork.SaveChangeAsync();
 
@@ -244,7 +245,7 @@ namespace Application.Services
                         response.Data = statusInvoiceDTO;
                     }
 
-                    
+
                 }
                 else
                 {
@@ -273,14 +274,14 @@ namespace Application.Services
                 if (invoiceById != null)
                 {
                     invoiceById.CustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
-                    
+
                     invoiceById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
                     _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
                     _unitOfWork.InvoiceRepository.Update(invoiceById);
 
                     //hoan coc cho nguoi ban
                     var sellerId = invoiceById.CustomerLot.Lot.Jewelry.Valuation.SellerId;
-                    if(sellerId == null)
+                    if (sellerId == null)
                     {
                         throw new Exception("Khong tim thay sellerId");
                     }
@@ -326,7 +327,7 @@ namespace Application.Services
                         response.IsSuccess = true;
                         response.Data = valuationDTO;
                     }
-                    
+
                 }
                 else
                 {
@@ -361,7 +362,7 @@ namespace Application.Services
                 {
                     statusTranfer = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == status).Name;
                 }
-               
+
                 var invoices = await _unitOfWork.InvoiceRepository.getInvoicesByStatusForCustomer(customerId, statusTranfer, pageSize, pageIndex);
                 List<InvoiceDTO> listInvoiceDTO = new List<InvoiceDTO>();
                 if (invoices.totalItems > 0)
@@ -483,59 +484,65 @@ namespace Application.Services
 
             try
             {
-
-
-                var walletExist = await _unitOfWork.WalletRepository.GetByIdAsync(model.WalletId);
-                if (walletExist != null)
+                var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
+                if (invoiceById != null)
                 {
-                    var updateResult = await _walletService.UpdateBanlance(model.WalletId, (decimal)model.Amount, false);
-                    if (!updateResult.IsSuccess)
-                    {
-                        response.Message = $"Update balance faild";
-                        response.Code = 400;
-                        response.IsSuccess = false;
-                    }
-                    else
-                    {
-                        var walletTrans = new WalletTransaction()
-                        {
-                            WalletId = model.WalletId,
-                            DocNo = model.InvoiceId,
-                            TransactionTime = DateTime.Now,
-                            Amount = -model.Amount,
-                            Status = EnumStatusTransaction.Completed.ToString(),
-                            transactionType = EnumTransactionType.BuyPay.ToString(),
-                        };
+                    // invoiceById.CustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == deliveryDTO.Status).Name;
+                    //  _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
 
-                        var trans = new Transaction()
-                        {
-                            Amount = +model.Amount,
-                            DocNo = model.InvoiceId,
-                            TransactionTime = DateTime.Now,
-                            TransactionType = EnumTransactionType.BuyPay.ToString(),
-                        };
 
-                        await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
-                        await _unitOfWork.TransactionRepository.AddAsync(trans);
-                        if (await _unitOfWork.SaveChangeAsync() > 0)
+                    var walletExist = await _unitOfWork.WalletRepository.GetByIdAsync(model.WalletId);
+                    if (walletExist != null)
+                    {
+                        var updateResult = await _walletService.UpdateBanlance(model.WalletId, (decimal)model.Amount, false);
+                        if (!updateResult.IsSuccess)
                         {
-                            response.Message = $"Update Wallet Successfully";
-                            response.Code = 200;
-                            response.IsSuccess = true;
+                            response.Message = $"Update balance faild";
+                            response.Code = 400;
+                            response.IsSuccess = false;
                         }
                         else
                         {
-                            response.Message = $"Update Wallet Fail When Saving";
-                            response.Code = 500;
-                            response.IsSuccess = false;
+                            var walletTrans = new WalletTransaction()
+                            {
+                                WalletId = model.WalletId,
+                                DocNo = model.InvoiceId,
+                                TransactionTime = DateTime.Now,
+                                Amount = -model.Amount,
+                                Status = EnumStatusTransaction.Completed.ToString(),
+                                transactionType = EnumTransactionType.BuyPay.ToString(),
+                            };
+
+                            var trans = new Transaction()
+                            {
+                                Amount = +model.Amount,
+                                DocNo = model.InvoiceId,
+                                TransactionTime = DateTime.Now,
+                                TransactionType = EnumTransactionType.BuyPay.ToString(),
+                            };
+
+                            await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
+                            await _unitOfWork.TransactionRepository.AddAsync(trans);
+                            if (await _unitOfWork.SaveChangeAsync() > 0)
+                            {
+                                response.Message = $"Update Wallet Successfully";
+                                response.Code = 200;
+                                response.IsSuccess = true;
+                            }
+                            else
+                            {
+                                response.Message = $"Update Wallet Fail When Saving";
+                                response.Code = 500;
+                                response.IsSuccess = false;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    response.Message = $"Don't have wallet";
-                    response.Code = 404;
-                    response.IsSuccess = false;
+                    else
+                    {
+                        response.Message = $"Don't have wallet";
+                        response.Code = 404;
+                        response.IsSuccess = false;
+                    }
                 }
             }
             catch (Exception ex)
@@ -610,9 +617,70 @@ namespace Application.Services
             return response;
         }
 
-        public Task<APIResponseModel> UpdateImageRecivedJewelryByShipper(int invoiceId, IFormFile imageDelivery)
+        public async Task<APIResponseModel> UpdateImageRecivedJewelryByShipper(int invoiceId, IFormFile imageDelivery)
         {
-            throw new NotImplementedException();
+            var response = new APIResponseModel();
+            try
+            {
+                var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
+                if (invoiceById != null)
+                {
+                    invoiceById.CustomerLot.Status = EnumCustomerLot.Delivering.ToString();
+                    _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
+
+
+                    var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
+                    {
+                        File = new FileDescription(imageDelivery.FileName,
+                                                   imageDelivery.OpenReadStream()),
+                        Tags = Tags_Customer
+                    }).ConfigureAwait(false);
+
+                    if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        response.Message = $"Image upload failed." + uploadImage.Error.Message + "";
+                        response.Code = (int)uploadImage.StatusCode;
+                        response.IsSuccess = false;
+                    }
+                    else
+                    {
+                        var statusImvoice = new StatusInvoice
+                        {
+                            Status = EnumCustomerLot.Delivered.ToString(),
+                            CurrentDate = DateTime.Now,
+                            InvoiceId = invoiceId,
+                            ImageLink = uploadImage.SecureUrl.AbsoluteUri
+                        };
+
+                        await _unitOfWork.StatusInvoiceRepository.AddAsync(statusImvoice);
+                        await _unitOfWork.SaveChangeAsync();
+
+                        var statusInvoiceDTO = _mapper.Map<StatusInvoiceDTO>(statusImvoice);
+
+                        response.Message = $"Add data in StatusInvoice Successfully";
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Data = statusInvoiceDTO;
+                    }
+
+
+                }
+                else
+                {
+                    response.Message = $"Not found invoice";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
         }
     }
-}
+        }
