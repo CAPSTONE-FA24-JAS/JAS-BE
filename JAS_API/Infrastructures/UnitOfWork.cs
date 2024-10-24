@@ -53,6 +53,7 @@ namespace Infrastructures
         private readonly ITransactionRepository _transactionRepository;
         private readonly IStatusInvoiceRepository _statusInvoiceRepository;
         private readonly IRequestWithdrawRepository _requestWithdrawRepository;
+        private readonly IHistoryStatusCustomerLotRepository _historyStatusCustomerLotRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -74,7 +75,8 @@ namespace Infrastructures
                           ILotRepository lotRepository, IStaffRepository staffRepository, ICustomerLotRepository customerLotRepository,
                           IBidPriceRepository bidPriceRepository, IWalletTransactionRepository walletTransactionRepository,
                           IInvoiceRepository invoiceRepository, ITransactionRepository transactionRepository, 
-                          IStatusInvoiceRepository statusInvoiceRepository, IRequestWithdrawRepository requestWithdrawRepository)
+                          IStatusInvoiceRepository statusInvoiceRepository, IRequestWithdrawRepository requestWithdrawRepository,
+                          IHistoryStatusCustomerLotRepository historyStatusCustomerLotRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -120,6 +122,7 @@ namespace Infrastructures
             _transactionRepository = transactionRepository;
             _statusInvoiceRepository = statusInvoiceRepository;
             _requestWithdrawRepository = requestWithdrawRepository;
+            _historyStatusCustomerLotRepository = historyStatusCustomerLotRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -186,6 +189,8 @@ namespace Infrastructures
         public IStatusInvoiceRepository StatusInvoiceRepository => _statusInvoiceRepository;
 
         public IRequestWithdrawRepository RequestWithdrawRepository => _requestWithdrawRepository;
+
+        public IHistoryStatusCustomerLotRepository HistoryStatusCustomerLotRepository => _historyStatusCustomerLotRepository;
 
         public async Task<int> SaveChangeAsync()
         {

@@ -15,5 +15,6 @@ namespace Application.Interfaces
         public Task<APIResponseModel> GetBidsOfCustomer(int? customerIId, int? status, int? pageIndex, int? pageSize);
 
         public Task<APIResponseModel> GetPastBidOfCustomer(int customerIId, List<int> status, int? pageIndex, int? pageSize);
+
     }
 }
