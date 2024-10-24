@@ -124,7 +124,7 @@ namespace WebAPI.Service
                     if (bidPrices.Count == 0)
                     {
 
-                        lot.Status = EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 6).Name;
+                        lot.Status = EnumStatusLot.Passed.ToString();
                         lot.ActualEndTime = endTime;
 
                         _unitOfWork.LotRepository.Update(lot);
@@ -140,7 +140,7 @@ namespace WebAPI.Service
                         //lưu status lot là sold
                         //  cập nhật lên cả redis và sql; cập nhật endLot actual, giá bán được
                         var winner = bidPrices.FirstOrDefault();
-                        lot.Status = EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 4).Name;
+                        lot.Status = EnumStatusLot.Sold.ToString();
                         lot.ActualEndTime = endTime;
                         lot.CurrentPrice = winner.CurrentPrice;
                         _unitOfWork.LotRepository.Update(lot);
@@ -168,7 +168,7 @@ namespace WebAPI.Service
 
                         await _unitOfWork.InvoiceRepository.AddAsync(invoice);
 
-                        winnerCustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == 2).Name;
+                        winnerCustomerLot.Status = EnumCustomerLot.CreateInvoice.ToString();
                         winnerCustomerLot.IsInvoiced = true;
                         _unitOfWork.CustomerLotRepository.Update(winnerCustomerLot);
 
@@ -201,6 +201,16 @@ namespace WebAPI.Service
                         walletOfLoser.Balance = walletOfLoser.Balance + (decimal?)loser.Lot.Deposit;
                         _unitOfWork.WalletRepository.Update(walletOfLoser);
                         loser.IsRefunded = true;
+                        loser.Status = EnumCustomerLot.Refunded.ToString();
+
+                        //lưu history của loser là refunded
+                        var historyCustomerlot = new HistoryStatusCustomerLot()
+                        {
+                            Status = loser.Status,
+                            CustomerLotId = loser.Id,
+                            CurrentTime = DateTime.Now,
+                        };
+                        await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerlot);
 
 
                         //cap nhat transaction vi
