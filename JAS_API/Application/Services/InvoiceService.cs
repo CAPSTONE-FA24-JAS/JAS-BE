@@ -106,7 +106,7 @@ namespace Application.Services
                     invoiceById.CustomerLot.Status = EnumCustomerLot.Delivering.ToString();
                     invoiceById.ShipperId = shipperId;
 
-                    invoiceById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+                    invoiceById.Status = EnumCustomerLot.Delivering.ToString();
                     _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
                     _unitOfWork.InvoiceRepository.Update(invoiceById);
 
@@ -228,7 +228,7 @@ namespace Application.Services
                     {
                         var statusImvoice = new StatusInvoice
                         {
-                            Status = EnumCustomerLot.Delivered.ToString(),
+                            Status = "Delivered",
                             CurrentDate = DateTime.Now,
                             InvoiceId = deliveryDTO.InvoiceId,
                             ImageLink = uploadImage.SecureUrl.AbsoluteUri
@@ -237,12 +237,12 @@ namespace Application.Services
                         await _unitOfWork.StatusInvoiceRepository.AddAsync(statusImvoice);
                         await _unitOfWork.SaveChangeAsync();
 
-                        var statusInvoiceDTO = _mapper.Map<StatusInvoiceDTO>(statusImvoice);
+                        var invoiceByDTO = _mapper.Map<InvoiceDetailDTO>(invoiceById);
 
                         response.Message = $"Add data in StatusInvoice Successfully";
                         response.Code = 200;
                         response.IsSuccess = true;
-                        response.Data = statusInvoiceDTO;
+                        response.Data = invoiceByDTO;
                     }
 
 
@@ -646,7 +646,7 @@ namespace Application.Services
                     {
                         var statusImvoice = new StatusInvoice
                         {
-                            Status = EnumCustomerLot.Delivered.ToString(),
+                            Status = "Recieved",
                             CurrentDate = DateTime.Now,
                             InvoiceId = invoiceId,
                             ImageLink = uploadImage.SecureUrl.AbsoluteUri
@@ -655,12 +655,12 @@ namespace Application.Services
                         await _unitOfWork.StatusInvoiceRepository.AddAsync(statusImvoice);
                         await _unitOfWork.SaveChangeAsync();
 
-                        var statusInvoiceDTO = _mapper.Map<StatusInvoiceDTO>(statusImvoice);
+                        var invoiceByDTO = _mapper.Map<InvoiceDetailDTO>(invoiceById);
 
                         response.Message = $"Add data in StatusInvoice Successfully";
                         response.Code = 200;
                         response.IsSuccess = true;
-                        response.Data = statusInvoiceDTO;
+                        response.Data = invoiceByDTO;
                     }
 
 
