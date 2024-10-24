@@ -1,4 +1,5 @@
-﻿using Application.ViewModels.AccountDTO;
+﻿using Application.ViewModels.AccountDTOs;
+using Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Application.ServiceReponse
 {
     public class LoginResponseDTO
     {
-        public AccountDTO Account { get; set; }
+        public AccountDTO User { get; set; }
         public string AccessToken { get; set; }
     }
 }

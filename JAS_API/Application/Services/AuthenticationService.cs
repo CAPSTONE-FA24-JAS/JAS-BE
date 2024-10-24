@@ -2,12 +2,15 @@
 using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
-using Application.ViewModels.AccountDTO;
+using Application.ViewModels.AccountDTOs;
 using AutoMapper;
 using Domain.Entity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
+using static System.Net.WebRequestMethods;
 
 namespace Application.Services
 {
@@ -48,7 +51,7 @@ namespace Application.Services
                 var accountDTO = _mapper.Map<AccountDTO>( account );
                 var authResponse = new LoginResponseDTO
                 {
-                    Account = accountDTO,
+                    User = accountDTO,
                     AccessToken = token
                 };
                 response.IsSuccess = true;
@@ -117,7 +120,6 @@ namespace Application.Services
             return response;
         }
 
-
         public async Task<APIResponseModel> RegisterAsync(RegisterAccountDTO registerAccountDTO)
         {
             var response = new APIResponseModel();
@@ -137,8 +139,8 @@ namespace Application.Services
                     user.Status = true;
                     user.PasswordHash = HashPassword.HashWithSHA256(registerAccountDTO.PasswordHash);
                     await _unitOfWork.AccountRepository.AddAsync(user);
+                    //await _unitOfWork.CustomerRepository.AddAsync(user.Customer);    
                     var confirmationLink = $"http://localhost:7251/api/Authentication/ConfirmEmail/confirm?token={user.ConfirmationToken}&email={user.Email}";
-                
                     var emailSent = await SendEmail.SendConfirmationEmail(user.Email, confirmationLink);
                     if (!emailSent)
                     {
@@ -162,6 +164,111 @@ namespace Application.Services
                             response.Message = "Error saving the account.";
                         }
                     }
+            }
+            catch (DbException ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "Database error occurred.";
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "Error";
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> SendOTPForgetPassword(int userId)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var user = await _unitOfWork.AccountRepository.GetByIdAsync(userId);
+                
+                if (user == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "user not found";
+                    return response;
+                }
+                var otp = OtpService.GenerateOtp(user.ConfirmationToken);
+                var emailSent = await SendEmail.SendEmailOTP(user.Email, otp);
+                if (!emailSent)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Error sending OTP email.";
+                    return response;
+                }
+                else
+                {
+                    _unitOfWork.AccountRepository.Update(user);
+                    var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                    if (isSuccess)
+                    {
+                        response.IsSuccess = true;
+                        response.Message = "Send OTP successfully, Please check email.";
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = "Error saving the account.";
+                    }
+                }
+            }
+            catch (DbException ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "Database error occurred.";
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "Error";
+                response.ErrorMessages = new List<string> { ex.Message };
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> VerifyPassword(VerifyPassword verifyPassword)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                if (verifyPassword.NewPassword != verifyPassword.ConfirmNewPassword)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Password must same confirm password.";
+                }
+                else
+                {
+                    var user = await _unitOfWork.AccountRepository.GetByIdAsync(verifyPassword.UserId);
+                    var statusResult = OtpService.ValidateOtp(user.ConfirmationToken, verifyPassword.Otp);
+                    dynamic validationResult = statusResult;
+                    if (!validationResult.status)
+                    {
+                        response.IsSuccess = false;
+                        response.Message = validationResult.msg + validationResult.timeStepMatched;
+                        return response;
+                    }
+                    else
+                    {
+                        user.PasswordHash = HashPassword.HashWithSHA256(verifyPassword.NewPassword);
+                        _unitOfWork.AccountRepository.Update(user);
+                        var isSuccess = await _unitOfWork.SaveChangeAsync() > 0;
+                        if (isSuccess)
+                        {
+                            var userDTO = _mapper.Map<AccountDTO>(user);
+                            response.Data = userDTO;
+                            response.IsSuccess = true;
+                            response.Message = "update password successfully.";
+                        }
+                        else
+                        {
+                            response.IsSuccess = false;
+                            response.Message = "Error saving the account.";
+                        }
+                    }
+                }
             }
             catch (DbException ex)
             {

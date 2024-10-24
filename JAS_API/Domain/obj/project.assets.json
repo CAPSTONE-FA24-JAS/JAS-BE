@@ -5084,8 +5084,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ROG\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\congd\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
@@ -5093,15 +5092,11 @@
       "projectUniqueName": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Domain\\Domain.csproj",
       "projectName": "Domain",
       "projectPath": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Domain\\Domain.csproj",
-      "packagesPath": "C:\\Users\\ROG\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\congd\\.nuget\\packages\\",
       "outputPath": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Domain\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\ROG\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\congd\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -5122,6 +5117,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -5177,7 +5177,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.108/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.402/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

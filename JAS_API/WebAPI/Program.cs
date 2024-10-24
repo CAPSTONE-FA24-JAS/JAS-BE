@@ -7,6 +7,12 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using WebAPI.Middlewares;
 using CloudinaryDotNet;
+using Google;
+using Microsoft.AspNetCore.Identity;
+using WebAPI.Service;
+using System.Text.Json.Serialization;
+using StackExchange.Redis;
+using Application.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,14 +30,33 @@ var cloudinary = new Cloudinary(new Account(
 // Đăng ký dịch vụ Cloudinary
 builder.Services.AddSingleton(cloudinary);
 
+
+
+//dki signalR
+builder.Services.AddSignalR();
+
 builder.Services.AddSingleton(configuration);
 builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, build =>
 {
     build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
 }));
+
 //builder.WebHost.UseUrls("https://localhost:7251");
-builder.WebHost.UseUrls("http://0.0.0.0:7251");
+//builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
+
+// Get Redis connection string from appsettings
+var redisConnectionString = builder.Configuration.GetValue<string>("Redis:ConnectionString");
+
+var redis = ConnectionMultiplexer.Connect(redisConnectionString);
+builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
+
+
+builder.Services.AddSingleton<LiveBiddingService>();
+
+//dki background service
+builder.Services.AddHostedService<AuctionMonitorService>();
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -46,6 +71,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = configuration.JWTSection.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.JWTSection.SecretKey)),
         };
+    });
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals;// Hoặc ReferenceHandler.Ignore
+        options.JsonSerializerOptions.WriteIndented = true;
     });
 
 builder.Services.AddSwaggerGen(setup =>
@@ -74,7 +106,7 @@ builder.Services.AddSwaggerGen(setup =>
         { jwtSecurityScheme, Array.Empty<string>() }
     });
 });
-builder.Services.AddSingleton(configuration);
+
 
 var app = builder.Build();
 
@@ -91,12 +123,16 @@ app.UseMiddleware<ConfirmationTokenMiddleware>();
 app.MapHealthChecks("/healthchecks");
 app.UseHttpsRedirection();
 
+Console.WriteLine("Current server time: " + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
 
 app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<BiddingHub>("/Auctionning");
 
 app.Run();
 public partial class Program { }
+
+

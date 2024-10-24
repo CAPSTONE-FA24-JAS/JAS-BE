@@ -15,7 +15,7 @@ namespace Application.Repositories
                                         Expression<Func<TEntity, object>>? sort = null,
                                         bool ascending = true,
                                         params Expression<Func<TEntity, object>>[] includes);
-        Task<TEntity?> GetByIdAsync(int id, 
+        Task<TEntity?> GetByIdAsync(int? id, 
                                     Expression<Func<TEntity,bool>>? condition = null,
                                     Expression<Func<TEntity, object>>? sort = null,
                                     bool ascending = true,
@@ -26,8 +26,15 @@ namespace Application.Repositories
         void SoftRemove(TEntity entity);
         Task AddRangeAsync(List<TEntity> entities);
         void SoftRemoveRange(List<TEntity> entities);
-
+        void SetPropertyModified(TEntity entity, string propertyName);
         Task<Pagination<TEntity>> ToPagination(int pageNumber = 0, int pageSize = 10);
+
+        Task<(IEnumerable<TEntity> data, int totalItems)> GetAllPaging(
+        Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+        string includeProperties = "",
+        int? pageIndex = null,
+        int? pageSize = null);
 
     }
 }

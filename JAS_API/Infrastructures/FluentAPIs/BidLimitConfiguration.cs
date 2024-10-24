@@ -9,9 +9,9 @@ namespace Infrastructures.FluentAPIs
         public void Configure(EntityTypeBuilder<BidLimit> builder)
         {
             builder.HasKey(x => x.Id);
-            builder.HasOne(x => x.Account)
-                .WithOne(x => x.BidLimit)
-                .HasForeignKey<BidLimit>(x => x.AccountId);
+            builder.HasOne(x => x.Customer)
+                .WithMany(x => x.BidLimits)
+                .HasForeignKey(x => x.CustomerId);
         }
     }
 }

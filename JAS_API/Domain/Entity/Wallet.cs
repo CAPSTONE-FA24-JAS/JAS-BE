@@ -2,10 +2,15 @@
 {
     public class Wallet : BaseEntity
     {
-        public string? Balance { get; set;}
-        public int? AccountId { get; set;}
+        public Decimal? Balance { get; set;}
+        public Decimal? AvailableBalance { get; set;}
+        public Decimal? FrozenBalance { get; set; }
+        public int? CustomerId { get; set;}
+        public string? Status { get; set;}
+        public string? Password { get; set;}
         //
-        public virtual Account Account { get; set;}
-        public virtual IEnumerable<Transaction> Transactions { get; set;}
+        public virtual Customer? Customer { get; set;}
+        public virtual IEnumerable<RequestWithdraw>? RequestWithdraws { get; set;}
+        public virtual IEnumerable<WalletTransaction>? WalletTransactions { get; set; }
     }
 }

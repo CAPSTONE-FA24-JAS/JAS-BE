@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Application.ViewModels.AccountDTO;
+using Application.ViewModels.AccountDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +17,7 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewProfile(int Id)
         {
-            var result = await _accountService.GetProfileAccount(Id);
+            var result = await _accountService.GetProfileCustomer(Id);
             if (result.IsSuccess)
             {
                 return Ok(result);
@@ -29,9 +29,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchAccount(string name)
+        public async Task<IActionResult> SearchCustomerByName(string name)
         {
-            var result = await _accountService.SearchAccountByName(name);
+            var result = await _accountService.SearchCustomerByName(name);
             if (result.IsSuccess)
             {
                 return Ok(result);
@@ -57,7 +57,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateNewAccount(CreateAccountDTO createDTO)
+        public async Task<IActionResult> CreateNewStaff(CreateAccountDTO createDTO)
         {
             var result = await _accountService.CreateAccount(createDTO);
             if (result.IsSuccess)
@@ -98,7 +98,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpDelete]
         public async Task<IActionResult> DeleteAccount(int Id)
         {
             var result = await _accountService.DeleteAccount(Id);
@@ -153,5 +153,20 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> FilterAccountByRole(int roleID)
+        {
+            var result = await _accountService.FilterAccountByRole(roleID);
+            if (result.IsSuccess == true)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        
     }
 }

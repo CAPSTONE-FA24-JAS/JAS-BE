@@ -1,13 +1,15 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
-using Application.ViewModels.AccountDTO;
+using Application.ViewModels.AccountDTOs;
 using AutoMapper;
+using Azure;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Domain.Entity;
 using Domain.Enums;
 using System.Drawing;
+using System.Linq.Expressions;
 
 namespace Application.Services
 {
@@ -75,6 +77,7 @@ namespace Application.Services
                 else
                 {
                     account.Status = true;
+                    account.PasswordHash = HashPassword.HashWithSHA256(createDTO.PasswordHash);
                     await _unitOfWork.AccountRepository.AddAsync(account);
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
@@ -139,42 +142,42 @@ namespace Application.Services
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts =  _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.CreationDate, ascending: false));
+                        accounts = await ConvertListAccountDTO(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.CreationDate, ascending: false));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Oldest_First):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.CreationDate, ascending: true));
+                        accounts = await ConvertListAccountDTO(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.CreationDate, ascending: true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Active):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == true));
+                        accounts = await ConvertListAccountDTO(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Inactive):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == false));
+                        accounts = await ConvertListAccountDTO(await _unitOfWork.AccountRepository.GetAllAsync(x => x.Status == false, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.A_Z):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.FirstName, ascending: true));
+                        accounts = await ConvertListAccountDTO(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.Customer.FirstName, ascending: true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     case nameof(Domain.Enums.FilterAccount.Z_A):
                         reponse.IsSuccess = true;
                         reponse.Message = "Receive Filter Account Successfull";
                         reponse.Code = 200;
-                        accounts = _mapper.Map<IEnumerable<AccountDTO>>(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.FirstName, ascending: false));
+                        accounts = await ConvertListAccountDTO(await _unitOfWork.AccountRepository.GetAllAsync(sort: x => x.Customer.FirstName, ascending: false, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer }));
                         reponse.Data = accounts;
                         break;
                     default:
@@ -220,13 +223,14 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<APIResponseModel> GetProfileAccount(int Id)
+        public async Task<APIResponseModel> GetProfileCustomer(int Id)
         {
             var reponse = new APIResponseModel();
             try
             {
-                var account = await _unitOfWork.AccountRepository.GetByIdAsync(Id, x => x.IsConfirmed == true);
-                if(account == null)
+                var account = await _unitOfWork.AccountRepository.GetByIdAsync(id: Id,  x => x.IsConfirmed == true, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer });
+
+                if (account == null)
                 {
                     reponse.IsSuccess = false;
                     reponse.Message = "Not found account in system";
@@ -234,7 +238,8 @@ namespace Application.Services
                 }
                 else
                 {
-                    reponse.Data = _mapper.Map<AccountDTO>(account);
+                    var mapper = _mapper.Map<AccountDTO>(account);
+                    reponse.Data = mapper;
                     reponse.IsSuccess = true;
                     reponse.Message = "Retrive profile successfully";
                     reponse.Code = 200;
@@ -247,36 +252,36 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<APIResponseModel> SearchAccountByName(string Name)
+        public async Task<APIResponseModel> SearchCustomerByName(string Name)
         {
             var reponse = new APIResponseModel();
             try
             {
-                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.FirstName.Contains(Name) 
-                                                                       || x.LastName.Contains(Name) 
-                                                                       &&  x.IsConfirmed == true,
-                                                                       x => x.Role);
+                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.Customer.FirstName.Contains(Name)
+                                                                       || x.Customer.LastName.Contains(Name)
+                                                                       && x.IsConfirmed == true, includes: x => x.Role);
                 var DTOs = new List<AccountDTO>();
-                if (accounts == null)
-                {
-                    reponse.IsSuccess = false;
-                    reponse.Message = "List Account Null";
-                    reponse.Code = 400;
-                }
-                else
-                {
-                    reponse.IsSuccess = true;
-                    reponse.Message = "Search List Account Successfull";
-                    reponse.Code = 200;
-                    foreach (var item in accounts)
+                    if (accounts == null)
                     {
-                        var mapper = _mapper.Map<AccountDTO>(item);
-                        mapper.RoleName = item.Role.Name;
-                        DTOs.Add(mapper);
+                        reponse.IsSuccess = false;
+                        reponse.Message = "List Account Null";
+                        reponse.Code = 400;
                     }
-                    reponse.Data = DTOs;
-                }
-            }catch(Exception e)
+                    else
+                    {
+                        reponse.IsSuccess = true;
+                        reponse.Message = "Search List Account Successfull";
+                        reponse.Code = 200;
+                        foreach (var item in accounts)
+                        {
+                            var mapper = _mapper.Map<AccountDTO>(item);
+                            mapper.RoleName = item.Role.Name;
+                            DTOs.Add(mapper);
+                        }
+                        reponse.Data = DTOs;
+                    }
+            }
+            catch(Exception e)
             {
                 reponse.IsSuccess = false;
                 reponse.Message = e.Message;
@@ -325,7 +330,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                Domain.Entity.Account account = await _unitOfWork.AccountRepository.GetByIdAsync(Id, includes: x => x.Role);
+                Domain.Entity.Account account = await _unitOfWork.AccountRepository.GetByIdAsync(Id, includes: new Expression<Func<Domain.Entity.Account, object>>[] { x => x.Role, x => x.Customer });
                 if (account == null)
                 {
                     reponse.Message = $"Not Found Account By Id:"+Id+".";
@@ -350,13 +355,13 @@ namespace Application.Services
                     else
                     {
                         var enity = _mapper.Map(updateDTO, account);
-                        enity.ProfilePicture = uploadResult.SecureUrl.AbsoluteUri;
+                        enity.Customer.ProfilePicture = uploadResult.SecureUrl.AbsoluteUri;
                         _unitOfWork.AccountRepository.Update(enity);
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
                             reponse.Message = $"Image upload Successfull";
                             reponse.Code = 200;
-                            reponse.IsSuccess = false;
+                            reponse.IsSuccess = true;
                         }
                     }
                 }
@@ -375,7 +380,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.IsConfirmed == true, includes :x => x.Role);
+                var accounts = await _unitOfWork.AccountRepository.GetAllAsync( includes :x => x.Role);
                 var DTOs = new List<AccountDTO>();
                 if (accounts == null)
                 {
@@ -385,16 +390,94 @@ namespace Application.Services
                 }
                 else
                 {
-                    reponse.IsSuccess = true;
-                    reponse.Message = "Retreive List Account Successfull";
+                    
                     foreach (var item in accounts)
                     {
                         var mapper = _mapper.Map<AccountDTO>(item);
-                        mapper.RoleName = item.Role.Name;
                         DTOs.Add(mapper);
                     }
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Retreive List Account Successfull";
                     reponse.Data = DTOs;
                 }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.Message = e.Message;
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> FilterAccountByRole(int role)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(condition: x => x.RoleId == role, includes: x => x.Role);
+                List<AccountDTO> DTOs = new List<AccountDTO>();
+                if(accounts == null || accounts.Count == 0)
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Message = "List account is null";
+                    reponse.Code = 400;
+                }
+                foreach(var account in accounts)
+                {
+                    var mapper = _mapper.Map<AccountDTO>(account);
+                    DTOs.Add(mapper);
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Received list account successfull";
+                    reponse.Code = 200;
+                    reponse.Data = DTOs;
+                }
+            }catch(Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.InnerException.Message.ToString() };
+            }
+            return reponse;
+        }
+        internal async Task<List<AccountDTO>> ConvertListAccountDTO(List<Domain.Entity.Account> accounts)
+        {
+            var DTOs = new List<AccountDTO>();
+                foreach (var account in accounts)
+                {
+                    var mapper = _mapper.Map<AccountDTO>(account);
+                    DTOs.Add(mapper);
+                }
+         
+            return DTOs;
+        }
+
+        public async Task<APIResponseModel> CheckBidLimit(int customerId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
+                
+                    if (customer.PriceLimit == null)
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Customer haven't bidlimt, please regiser new bidlimit before join to lot";
+                        reponse.Code = 400;
+                        return reponse;
+                    }
+                    else
+                    {
+                        if(customer.ExpireDate.Value < DateTime.Now) 
+                        {
+                            reponse.IsSuccess = false;
+                            reponse.Message = "Customer have bidlimt, But BidLimit is outtime, Please register new bidlimit";
+                            reponse.Code = 400;
+                            return reponse;
+                        }
+                    }
+                reponse.IsSuccess = true;
+                reponse.Message = "Customer have bidlimit avaiable";
+                reponse.Code = 200;
+
             }
             catch (Exception e)
             {

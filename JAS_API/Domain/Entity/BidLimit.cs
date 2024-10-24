@@ -10,7 +10,12 @@ namespace Domain.Entity
     {
         public string? File { get; set; }
         public float? PriceLimit { get; set; }
-        public int? AccountId { get; set; }
-        public virtual Account Account { get; set; }
-    }
+        public string? Reason { get; set; }
+        public int? CustomerId { get; set; }
+        public int? StaffId { get; set; }
+        public DateTime? ExpireDate { get; set; }
+        public string? Status { get; set; }
+        //
+        public virtual Customer? Customer { get; set; }
+     }
 }
