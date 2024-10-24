@@ -478,8 +478,8 @@ namespace Application.Services
                 var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
                 if (invoiceById != null)
                 {
-                   // invoiceById.CustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == deliveryDTO.Status).Name;
-                  //  _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
+                    invoiceById.CustomerLot.Status = EnumCustomerLot.Delivering.ToString();
+                    _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
 
 
                     var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
