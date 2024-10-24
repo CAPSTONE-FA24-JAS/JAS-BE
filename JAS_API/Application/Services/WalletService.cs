@@ -299,7 +299,7 @@ namespace Application.Services
                 }
                 else
                 {
-                    if(amountMoney > walletexist.Balance)
+                    if(amountMoney > walletexist.AvailableBalance)
                     {
                         reponse.IsSuccess = false;
                         reponse.Code = 400;

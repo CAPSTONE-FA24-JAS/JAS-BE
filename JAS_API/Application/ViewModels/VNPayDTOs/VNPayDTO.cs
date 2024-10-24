@@ -33,10 +33,11 @@ namespace Application.ViewModels.VNPayDTOs
 
     public class PaymentInvoiceByWalletDTO : RequestWithdrawDTO
     {
-
+        public int InvoiceId { get; set; }
     }
     public class PaymentInvoiceByBankTransferDTO
     {
+        public int InvoiceId { get; set; }
         public decimal Amount { get; set; }
         public int CreditCardId { get; set; }
     }
