@@ -484,6 +484,7 @@ namespace Application.Services
             try
             {
 
+
                 var walletExist = await _unitOfWork.WalletRepository.GetByIdAsync(model.WalletId);
                 if (walletExist != null)
                 {
