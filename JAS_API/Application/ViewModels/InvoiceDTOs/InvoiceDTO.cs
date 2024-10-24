@@ -16,6 +16,7 @@ namespace Application.ViewModels.InvoiceDTOs
         public int? PaymentMethodId { get; set; }
         public int? AddressToShipId { get; set; }
         public int? ShipperId { get; set; }
+        public DateTime CreationDate { get; set; }
         public MyBidDTO? MyBidDTO { get; set; }
     }
 

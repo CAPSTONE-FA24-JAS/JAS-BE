@@ -164,6 +164,7 @@ namespace WebAPI.Service
                             Price = winner.CurrentPrice,
                             Free = (float?)(winner.CurrentPrice * 0.25),
                             TotalPrice = (float?)(winner.CurrentPrice + winner.CurrentPrice * 0.25 - lot.Deposit),
+                            CreationDate = DateTime.Now,
                         };
 
                         await _unitOfWork.InvoiceRepository.AddAsync(invoice);
