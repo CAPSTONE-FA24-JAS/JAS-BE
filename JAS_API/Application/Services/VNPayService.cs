@@ -3,6 +3,7 @@ using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.VNPayDTOs;
 using Domain.Entity;
+using Domain.Enums;
 using iTextSharp.xmp.impl;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -14,14 +15,18 @@ namespace Application.Services
     {
         private readonly IConfiguration _configuration;
         private readonly IWalletTransactionService _walletTransactionService;
+        private readonly ITransactionService _transactionService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public VNPayService(IConfiguration configuration, IWalletTransactionService walletTransactionService)
+        public VNPayService(IConfiguration configuration, IWalletTransactionService walletTransactionService, ITransactionService transaction, IUnitOfWork unitOfWork)
         {
             _configuration = configuration;
             _walletTransactionService = walletTransactionService;
+            _transactionService = transaction;
+            _unitOfWork = unitOfWork;
         }
 
-        public string CreatePaymentUrl(HttpContext httpContext, VNPaymentRequestDTO model, WalletTransaction walletTransaction)
+        public async Task<string> CreatePaymentUrl(HttpContext httpContext, VNPaymentRequestDTO model, WalletTransaction walletTransaction)
         {
             var tick = DateTime.Now.Ticks.ToString();
 
@@ -41,16 +46,43 @@ namespace Application.Services
             vnpay.AddRequestData("vnp_ReturnUrl", _configuration["VnPay:PaymentBackReturnUrl"]);
             vnpay.AddRequestData("vnp_TxnRef", tick);
 
-            //tao transaction tam
             walletTransaction.transactionId = tick;
-            walletTransaction.Status = "Pending";
+            walletTransaction.Status = EnumStatusTransaction.Pending.ToString();
             walletTransaction.Amount = model.Amount;
             walletTransaction.CreationDate = model.CreatedDate;
-            _walletTransactionService.CreateNewTransaction(walletTransaction);
 
-            var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
-            return paymentUrl;
+            
+
+            var walletTransactionResult = await _walletTransactionService.CreateNewTransaction(walletTransaction);
+
+            //if (walletTransaction.Status == EnumTransactionType.BuyPay.ToString())
+            //{
+                
+            //    var transactionResult = await _transactionService.CreateNewTransaction(trans);
+
+            //    if (walletTransactionResult.IsSuccess && transactionResult.IsSuccess)
+            //    {
+            //        if(await _unitOfWork.SaveChangeAsync() > 0)
+            //        {
+            //            var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
+            //            return paymentUrl;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+                if (walletTransactionResult.IsSuccess)
+                {
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
+                        return paymentUrl;
+                    }
+                }
+            //}
+            return "";
         }
+
 
         public VNPaymentReponseDTO PaymentExecute(IQueryCollection collection)
         {
@@ -78,14 +110,13 @@ namespace Application.Services
                 vnpayreponse.Success = false;
                 return vnpayreponse;
             }
-
-            
             vnpayreponse.PaymentMethod = "VnPay";
             vnpayreponse.OrderDescription = vnp_OrderInfo;
             vnpayreponse.OrderId = vnp_orderId.ToString();
             vnpayreponse.TransactionId = vnp_TransactionId.ToString();
             vnpayreponse.Token = vnp_SecureHash;
             vnpayreponse.VnPayResponseCode = vnp_ResponseCode;
+            vnpayreponse.Success = true;
             DateTime TransactionTime;
             if (DateTime.TryParseExact(vnp_TrasactionTime, "yyyyMMddHHmmss", null, System.Globalization.DateTimeStyles.None, out TransactionTime))
             {

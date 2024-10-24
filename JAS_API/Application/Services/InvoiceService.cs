@@ -3,6 +3,8 @@ using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.InvoiceDTOs;
 using Application.ViewModels.ValuationDTOs;
+using Application.ViewModels.VNPayDTOs;
+using Application.ViewModels.WalletDTOs;
 using AutoMapper;
 using CloudinaryDotNet;
 using Domain.Entity;
@@ -25,15 +27,18 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly Cloudinary _cloudinary;
-        private const string Tags_Shipper = "Delivery_ImageReceivedByCustomer";
-        private const string Tags_Customer = "Delivery_ImageReceivedByShipper";
+        private const string Tags = "Backend_ImageDelivery";
+        private readonly IVNPayService _vNPayService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-
-        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary)
+        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinary = cloudinary;
+            _vNPayService = vNPayService;
+            _httpContextAccessor = httpContextAccessor;
+
         }
 
         public async Task<APIResponseModel> getInvoicesByStatusForManger(int status, int? pageSize, int? pageIndex)
@@ -470,61 +475,62 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> UpdateImageRecivedJewelryByShipper(int invoiceId, IFormFile imageDelivery)
+        public Task<APIResponseModel> PaymentInvoiceByWallet(PaymentInvoiceByWalletDTO model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<APIResponseModel> PaymentInvoiceByBankTransfer(PaymentInvoiceByBankTransferDTO model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<APIResponseModel> PaymentInvoiceByVnPay(PaymentInvoiceByVnPayDTO model)
         {
             var response = new APIResponseModel();
+
             try
             {
-                var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
-                if (invoiceById != null)
+
+                var invoiceExist = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
+                if (invoiceExist != null)
                 {
-                  //  invoiceById.CustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == deliveryDTO.Status).Name;
-                 //   _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
-
-
-                    var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
+                    var vnPayModel = new VNPaymentRequestDTO
                     {
-                        File = new FileDescription(imageDelivery.FileName,
-                                                   imageDelivery.OpenReadStream()),
-                        Tags = Tags_Shipper
-                    }).ConfigureAwait(false);
-
-                    if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
+                        Amount = (float)model.Amount,
+                        CreatedDate = DateTime.UtcNow,
+                        Description = $"payment the invoice have id is : {model.InvoiceId}",
+                        FullName = invoiceExist.Customer.FirstName + " " + invoiceExist.Customer.LastName,
+                        OrderId = new Random().Next(1000, 100000)
+                    };
+                    var transaction = new WalletTransaction()
                     {
-                        response.Message = $"Image upload failed." + uploadImage.Error.Message + "";
-                        response.Code = (int)uploadImage.StatusCode;
-                        response.IsSuccess = false;
+                        transactionType = EnumTransactionType.BuyPay.ToString(),
+                        DocNo = model.InvoiceId,
+                    };
+                    var httpContext = _httpContextAccessor.HttpContext;
+                    string paymentUrl = await _vNPayService.CreatePaymentUrl(httpContext, vnPayModel, transaction);
+
+                    if (!string.IsNullOrEmpty(paymentUrl))
+                    {
+                        response.Message = $"SucessFull";
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Data = paymentUrl;
                     }
                     else
                     {
-                        var statusImvoice = new StatusInvoice
-                        {
-                            Status = "ShipperRecieved",
-                            CurrentDate = DateTime.Now,
-                            InvoiceId = invoiceId,
-                            ImageLink = uploadImage.SecureUrl.AbsoluteUri
-                        };
-
-                        await _unitOfWork.StatusInvoiceRepository.AddAsync(statusImvoice);
-                        await _unitOfWork.SaveChangeAsync();
-
-                        var statusInvoiceDTO = _mapper.Map<StatusInvoiceDTO>(statusImvoice);
-
-                        response.Message = $"Add data in StatusInvoice Successfully";
-                        response.Code = 200;
-                        response.IsSuccess = true;
-                        response.Data = statusInvoiceDTO;
+                        response.Message = $"Invoice Fail";
+                        response.Code = 500;
+                        response.IsSuccess = false;
                     }
-
-
                 }
                 else
                 {
-                    response.Message = $"Not found invoice";
+                    response.Message = $"Don't have invoice";
                     response.Code = 404;
-                    response.IsSuccess = true;
+                    response.IsSuccess = false;
                 }
-
             }
             catch (Exception ex)
             {

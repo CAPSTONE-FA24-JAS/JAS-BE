@@ -28,6 +28,21 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewListAddressToShipByCustomer(int customerId)
+        {
+            var result = await _addressToShipService.ViewListAddressToShipByCustomerId(customerId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateAddressToShip(CreateAddressToShipDTO createAddressToShipDTO)
         {

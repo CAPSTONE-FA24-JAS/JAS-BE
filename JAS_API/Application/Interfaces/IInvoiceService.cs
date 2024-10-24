@@ -1,6 +1,11 @@
 ﻿using Application.ServiceReponse;
 using Application.ViewModels.InvoiceDTOs;
+using Application.ViewModels.VNPayDTOs;
+using Application.ViewModels.WalletDTOs;
+using Domain.Entity;
+using Domain.Enums;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +32,10 @@ namespace Application.Interfaces
 
         Task<APIResponseModel> GetInvoiceDetail(int Id);
         Task<APIResponseModel> UpdateAddressToshipForInvoice(UpdateAddressToShipInvoice model);
+        Task<APIResponseModel> PaymentInvoiceByWallet(PaymentInvoiceByWalletDTO model);
+        Task<APIResponseModel> PaymentInvoiceByBankTransfer(PaymentInvoiceByBankTransferDTO model);
+        Task<APIResponseModel> PaymentInvoiceByVnPay(PaymentInvoiceByVnPayDTO model);
+        
 
     }
 }

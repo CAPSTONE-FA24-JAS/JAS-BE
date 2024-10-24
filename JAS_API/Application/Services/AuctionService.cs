@@ -279,9 +279,9 @@ namespace Application.Services
                 }).ConfigureAwait(false);
                 //if (uploadResult == null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
                 //{
-                 //   reponse.Message = $"File upload failed." + uploadResult.Error.Message + "";
-                 //   reponse.Code = (int)uploadResult.StatusCode;
-                 //   reponse.IsSuccess = false;
+                //    reponse.Message = $"File upload failed." + uploadResult.Error.Message + "";
+                //    reponse.Code = (int)uploadResult.StatusCode;
+                //    reponse.IsSuccess = false;
                 //}
                 auctionExisted.ImageLink = uploadResult.SecureUrl.AbsoluteUri;
                 _unitOfWork.AuctionRepository.Update(auctionExisted);

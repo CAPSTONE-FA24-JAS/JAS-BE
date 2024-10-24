@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.ViewModels.WalletDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,5 +28,21 @@ namespace Application.ViewModels.VNPayDTOs
         public string VnPayResponseCode { get; set; }
         public DateTime CreatedDate { get; set; }
 
+    }
+
+
+    public class PaymentInvoiceByWalletDTO : RequestWithdrawDTO
+    {
+
+    }
+    public class PaymentInvoiceByBankTransferDTO
+    {
+        public decimal Amount { get; set; }
+        public int CreditCardId { get; set; }
+    }
+    public class PaymentInvoiceByVnPayDTO
+    {
+        public int InvoiceId { get; set; }
+        public decimal Amount { get; set; }
     }
 }

@@ -1,6 +1,12 @@
 ﻿using Application.Interfaces;
 using Application.Services;
 using Application.ViewModels.InvoiceDTOs;
+using Application.ViewModels.VNPayDTOs;
+using Application.ViewModels.WalletDTOs;
+using Castle.Core.Resource;
+using Domain.Entity;
+using Domain.Enums;
+using iTextSharp.text;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -155,6 +161,19 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> paymentInvoiceByVnPay(PaymentInvoiceByVnPayDTO model)
+        {
+            var result = await _invoiceService.PaymentInvoiceByVnPay(model);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
 
     }
 }

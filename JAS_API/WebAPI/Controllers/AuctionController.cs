@@ -70,7 +70,7 @@ namespace WebAPI.Controllers
             return BadRequest(result);
         }
 
-        [HttpPut]
+        [HttpPatch]
         public async Task<IActionResult> UpdateAution([FromForm] UpdateAuctionDTO updateAuctionDTO)
         {
             var result = await _auctionService.UpdateAuction(updateAuctionDTO);
@@ -81,7 +81,7 @@ namespace WebAPI.Controllers
             return BadRequest(result);
         }
 
-        [HttpPut]
+        [HttpPatch]
         public async Task<IActionResult> ApproveAution(int auctionId)
         {
             var result = await _auctionService.ApproveAuction(auctionId);
