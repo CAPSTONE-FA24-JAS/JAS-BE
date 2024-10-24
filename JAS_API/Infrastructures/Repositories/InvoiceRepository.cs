@@ -23,10 +23,10 @@ namespace Infrastructures.Repositories
             _dbContext = context;
         }
 
-        public async Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesByStatusForManger(string status, int? pageIndex, int? pageSize)
+        public async Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesByStatusForManger(int? pageIndex, int? pageSize)
         {
             var invoices = _dbContext.Invoices.Include(x => x.CustomerLot)
-                                              .Where(x => x.CustomerLot.Status == status);
+                                              .Where(x => x.IsDeleted == false);
 
             if (pageIndex.HasValue && pageSize.HasValue)
             {

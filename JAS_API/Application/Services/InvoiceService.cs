@@ -43,7 +43,7 @@ namespace Application.Services
             _walletService = walletService;
         }
 
-        public async Task<APIResponseModel> getInvoicesByStatusForManger(int status, int? pageSize, int? pageIndex)
+        public async Task<APIResponseModel> getInvoicesByStatusForManger(int? pageSize, int? pageIndex)
         {
 
             var response = new APIResponseModel();
@@ -51,11 +51,11 @@ namespace Application.Services
             try
             {
 
-                var statusTranfer = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == status).Name;
+                
 
 
 
-                var invoices = await _unitOfWork.InvoiceRepository.getInvoicesByStatusForManger(statusTranfer, pageSize, pageIndex);
+                var invoices = await _unitOfWork.InvoiceRepository.getInvoicesByStatusForManger(pageSize, pageIndex);
                 List<InvoiceDTO> listInvoiceDTO = new List<InvoiceDTO>();
                 if (invoices.totalItems > 0)
                 {
@@ -265,7 +265,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> FinishInvoiceByManager(int invoiceId, int status)
+        public async Task<APIResponseModel> FinishInvoiceByManager(int invoiceId)
         {
             var response = new APIResponseModel();
             try
@@ -275,7 +275,7 @@ namespace Application.Services
                 {
                     invoiceById.CustomerLot.Status = EnumCustomerLot.Finished.ToString();
 
-                    invoiceById.Status = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == status).Name;
+                    invoiceById.Status = EnumCustomerLot.Finished.ToString(); 
                     _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
                     _unitOfWork.InvoiceRepository.Update(invoiceById);
 
