@@ -84,6 +84,7 @@ namespace Infrastructures
             services.AddScoped<IWalletTransactionService, WalletTransactionService>();
             services.AddScoped<IStatusInvoiceRepository, StatusInvoiceRepository>();
             services.AddScoped<IRequestWithdrawRepository, RequestWithdrawRepository>();
+            services.AddScoped<IHistoryStatusCustomerLotRepository, HistoryStatusCustomerLotRepository>();
             services.AddDbContext<AppDbContext>(option =>
             {
                 option.UseLazyLoadingProxies().UseNpgsql(databaseConnection);

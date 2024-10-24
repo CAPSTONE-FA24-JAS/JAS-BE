@@ -34,6 +34,16 @@ namespace Infrastructures.Repositories
             return customerLot;
         }
 
+        public List<CustomerLot> GetListCustomerLotByCustomerAndLot(List<BidPrice> bidPriceList)
+        {
+            var customerLots = _dbContext.CustomerLots.Where(x => bidPriceList.Any(bd => bd.CustomerId == x.CustomerId && bd.LotId == x.LotId)).ToList();
+            if (customerLots == null)
+            {
+                throw new Exception("Not found CustomerLot");
+            }
+            return customerLots;
+        }
+
         public async Task<(IEnumerable<CustomerLot> data, int totalItems)> GetBidsOfCustomer(int? customerIId, string? status, int? pageIndex, int? pageSize)
         {
             var customerLots = _dbContext.CustomerLots.Include(x => x.Lot)
