@@ -30,6 +30,8 @@ var cloudinary = new Cloudinary(new Account(
 // Đăng ký dịch vụ Cloudinary
 builder.Services.AddSingleton(cloudinary);
 
+
+
 //dki signalR
 builder.Services.AddSignalR();
 

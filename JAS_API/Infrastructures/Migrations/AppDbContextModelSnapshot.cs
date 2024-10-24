@@ -2613,6 +2613,9 @@ namespace Infrastructures.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal?>("AvailableBalance")
+                        .HasColumnType("numeric");
+
                     b.Property<decimal?>("Balance")
                         .HasColumnType("numeric");
 
@@ -2630,6 +2633,9 @@ namespace Infrastructures.Migrations
 
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<decimal?>("FrozenBalance")
+                        .HasColumnType("numeric");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");

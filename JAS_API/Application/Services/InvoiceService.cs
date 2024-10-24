@@ -3,6 +3,8 @@ using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.InvoiceDTOs;
 using Application.ViewModels.ValuationDTOs;
+using Application.ViewModels.VNPayDTOs;
+using Application.ViewModels.WalletDTOs;
 using AutoMapper;
 using CloudinaryDotNet;
 using Domain.Entity;
@@ -25,15 +27,19 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly Cloudinary _cloudinary;
-        private const string Tags_Shipper = "Delivery_ImageReceivedByCustomer";
-        private const string Tags_Customer = "Delivery_ImageReceivedByShipper";
+        private const string Tags = "Backend_ImageDelivery";
+        private readonly IVNPayService _vNPayService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IWalletService _walletService;
 
-
-        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary)
+        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor,IWalletService walletService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinary = cloudinary;
+            _vNPayService = vNPayService;
+            _httpContextAccessor = httpContextAccessor;
+            _walletService = walletService;
         }
 
         public async Task<APIResponseModel> getInvoicesByStatusForManger(int status, int? pageSize, int? pageIndex)
@@ -208,7 +214,7 @@ namespace Application.Services
                     {
                         File = new FileDescription(deliveryDTO.ImageDelivery.FileName,
                                                    deliveryDTO.ImageDelivery.OpenReadStream()),
-                        Tags = Tags_Customer
+                        Tags = "Tags_Customer"
                     }).ConfigureAwait(false);
 
                     if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
@@ -470,61 +476,67 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> UpdateImageRecivedJewelryByShipper(int invoiceId, IFormFile imageDelivery)
+        public async Task<APIResponseModel> PaymentInvoiceByWallet(PaymentInvoiceByWalletDTO model)
         {
+
             var response = new APIResponseModel();
+
             try
             {
-                var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
-                if (invoiceById != null)
+
+
+                var walletExist = await _unitOfWork.WalletRepository.GetByIdAsync(model.WalletId);
+                if (walletExist != null)
                 {
-                   // invoiceById.CustomerLot.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == deliveryDTO.Status).Name;
-                  //  _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
-
-
-                    var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
+                    var updateResult = await _walletService.UpdateBanlance(model.WalletId, (decimal)model.Amount, false);
+                    if (!updateResult.IsSuccess)
                     {
-                        File = new FileDescription(imageDelivery.FileName,
-                                                   imageDelivery.OpenReadStream()),
-                        Tags = Tags_Shipper
-                    }).ConfigureAwait(false);
-
-                    if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
-                    {
-                        response.Message = $"Image upload failed." + uploadImage.Error.Message + "";
-                        response.Code = (int)uploadImage.StatusCode;
+                        response.Message = $"Update balance faild";
+                        response.Code = 400;
                         response.IsSuccess = false;
                     }
                     else
                     {
-                        var statusImvoice = new StatusInvoice
+                        var walletTrans = new WalletTransaction()
                         {
-                            Status = "ShipperRecieved",
-                            CurrentDate = DateTime.Now,
-                            InvoiceId = invoiceId,
-                            ImageLink = uploadImage.SecureUrl.AbsoluteUri
+                            WalletId = model.WalletId,
+                            DocNo = model.InvoiceId,
+                            TransactionTime = DateTime.Now,
+                            Amount = -model.Amount,
+                            Status = EnumStatusTransaction.Completed.ToString(),
+                            transactionType = EnumTransactionType.BuyPay.ToString(),
                         };
 
-                        await _unitOfWork.StatusInvoiceRepository.AddAsync(statusImvoice);
-                        await _unitOfWork.SaveChangeAsync();
+                        var trans = new Transaction()
+                        {
+                            Amount = +model.Amount,
+                            DocNo = model.InvoiceId,
+                            TransactionTime = DateTime.Now,
+                            TransactionType = EnumTransactionType.BuyPay.ToString(),
+                        };
 
-                        var statusInvoiceDTO = _mapper.Map<StatusInvoiceDTO>(statusImvoice);
-
-                        response.Message = $"Add data in StatusInvoice Successfully";
-                        response.Code = 200;
-                        response.IsSuccess = true;
-                        response.Data = statusInvoiceDTO;
+                        await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
+                        await _unitOfWork.TransactionRepository.AddAsync(trans);
+                        if (await _unitOfWork.SaveChangeAsync() > 0)
+                        {
+                            response.Message = $"Update Wallet Successfully";
+                            response.Code = 200;
+                            response.IsSuccess = true;
+                        }
+                        else
+                        {
+                            response.Message = $"Update Wallet Fail When Saving";
+                            response.Code = 500;
+                            response.IsSuccess = false;
+                        }
                     }
-
-
                 }
                 else
                 {
-                    response.Message = $"Not found invoice";
+                    response.Message = $"Don't have wallet";
                     response.Code = 404;
-                    response.IsSuccess = true;
+                    response.IsSuccess = false;
                 }
-
             }
             catch (Exception ex)
             {
@@ -534,6 +546,73 @@ namespace Application.Services
                 response.IsSuccess = false;
             }
             return response;
+        }
+
+        public Task<APIResponseModel> PaymentInvoiceByBankTransfer(PaymentInvoiceByBankTransferDTO model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<APIResponseModel> PaymentInvoiceByVnPay(PaymentInvoiceByVnPayDTO model)
+        {
+            var response = new APIResponseModel();
+
+            try
+            {
+
+                var invoiceExist = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
+                if (invoiceExist != null)
+                {
+                    var vnPayModel = new VNPaymentRequestDTO
+                    {
+                        Amount = (float)model.Amount,
+                        CreatedDate = DateTime.UtcNow,
+                        Description = $"payment the invoice have id is : {model.InvoiceId}",
+                        FullName = invoiceExist.Customer.FirstName + " " + invoiceExist.Customer.LastName,
+                        OrderId = new Random().Next(1000, 100000)
+                    };
+                    var transaction = new WalletTransaction()
+                    {
+                        transactionType = EnumTransactionType.BuyPay.ToString(),
+                        DocNo = model.InvoiceId,
+                    };
+                    var httpContext = _httpContextAccessor.HttpContext;
+                    string paymentUrl = await _vNPayService.CreatePaymentUrl(httpContext, vnPayModel, transaction);
+
+                    if (!string.IsNullOrEmpty(paymentUrl))
+                    {
+                        response.Message = $"SucessFull";
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Data = paymentUrl;
+                    }
+                    else
+                    {
+                        response.Message = $"Invoice Fail";
+                        response.Code = 500;
+                        response.IsSuccess = false;
+                    }
+                }
+                else
+                {
+                    response.Message = $"Don't have invoice";
+                    response.Code = 404;
+                    response.IsSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public Task<APIResponseModel> UpdateImageRecivedJewelryByShipper(int invoiceId, IFormFile imageDelivery)
+        {
+            throw new NotImplementedException();
         }
     }
 }

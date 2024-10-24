@@ -203,7 +203,7 @@ namespace Application.Services
                 var walletExits =  await CheckBalance(requestWithdrawDTO.WalletId);
                 if (walletExits.Data is WalletDTO cs && walletExits.IsSuccess)
                 {
-                    if (cs.Balance >= requestWithdrawDTO.Amount)
+                    if (cs.Balance < requestWithdrawDTO.Amount)
                     {
                         reponse.IsSuccess = false;
                         reponse.Code = 400;
@@ -212,25 +212,41 @@ namespace Application.Services
                     else
                     {
                         var request = _mapper.Map<RequestWithdraw>(requestWithdrawDTO);
-                        await _unitOfWork.RequestWithdrawRepository.AddAsync(request);
                         var trans = new WalletTransaction()
                         {
-                            Amount = requestWithdrawDTO.Amount,
+                            Amount = -requestWithdrawDTO.Amount,
                             transactionType = EnumTransactionType.WithDrawWallet.ToString(),
                             DocNo = requestWithdrawDTO.WalletId,
                             TransactionTime = DateTime.UtcNow,
                             Status = EnumStatusTransaction.Pending.ToString(),
                             WalletId = requestWithdrawDTO.WalletId,
                         };
-                        var resultTrans = await _walletTransactionService.CreateNewTransaction(trans);
-                        if (resultTrans.IsSuccess)
+                        
+                        if (!await LockFundsForWithdrawal(requestWithdrawDTO.WalletId, (decimal)requestWithdrawDTO.Amount))
                         {
+                            reponse.IsSuccess = false;
+                            reponse.Code = 400;
+                            reponse.Message = "Update ForWithdrawal Faild";
+                        }
+                        else
+                        {
+                            await _unitOfWork.RequestWithdrawRepository.AddAsync(request);
                             if (await _unitOfWork.SaveChangeAsync() > 0)
                             {
-                                reponse.IsSuccess = true;
-                                reponse.Code = 200;
-                                reponse.Message = "Add new request successfuly";
-                                reponse.Data = _mapper.Map<WalletDTO>(request);
+                                trans.DocNo = request.Id;
+                                var resultTrans = await _walletTransactionService.CreateNewTransaction(trans);
+                                if (resultTrans.IsSuccess)
+                                {
+                                    reponse.Code = 200;
+                                    reponse.Message = "Add SuccessFull";
+                                    reponse.IsSuccess = true;
+                                }
+                                else
+                                {
+                                    reponse.Code = 500;
+                                    reponse.Message = "Error when saving Transaction";
+                                    reponse.IsSuccess = false;
+                                }
                             }
                             else
                             {
@@ -238,20 +254,17 @@ namespace Application.Services
                                 reponse.Message = "Error when saving Request Withdraw";
                                 reponse.IsSuccess = false;
                             }
+                            
                         }
-                        else
-                        {
-                            reponse.Code = 500;
-                            reponse.Message = "Error when saving Transaction";
-                            reponse.IsSuccess = false;
-                        }
+                        
                     }
                 }
-                reponse.Code = 404;
-                reponse.Message = "Not Found Wallet";
-                reponse.IsSuccess = false;
-
-
+                else
+                {
+                    reponse.Code = 404;
+                    reponse.Message = "Not Found Wallet";
+                    reponse.IsSuccess = false;
+                }
             }
             catch (Exception e)
             {
@@ -276,25 +289,25 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                //kiem tra co the chua
                 var walletexist = await _unitOfWork.WalletRepository.GetByIdAsync(walletId);
-                // nap tien
                 if (isAdd)
                 {
                     walletexist.Balance += amountMoney;
+                    walletexist.AvailableBalance += amountMoney;
                     _unitOfWork.WalletRepository.Update(walletexist);
                     
                 }
                 else
                 {
-                    if(amountMoney > walletexist.Balance)
+                    if(amountMoney > walletexist.AvailableBalance)
                     {
                         reponse.IsSuccess = false;
-                        reponse.Code = 402;
+                        reponse.Code = 400;
                         reponse.Message = $"Balance of wallet have {walletexist.Balance}, it less than amount money you want to deduct";
                         return reponse;
                     }
                     walletexist.Balance -= amountMoney;
+                    walletexist.AvailableBalance -= amountMoney;
                     _unitOfWork.WalletRepository.Update(walletexist);
                 }
                 if (await _unitOfWork.SaveChangeAsync() > 0)
@@ -302,6 +315,83 @@ namespace Application.Services
                     reponse.IsSuccess = true;
                     reponse.Code = 200;
                     reponse.Message = $"{(isAdd ? "Add" : "Deduct")} Wallet Successfully";
+                }
+
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+        public async Task<bool> LockFundsForWithdrawal(int walletId, decimal amountMoney)
+        {
+            var walletexist = await _unitOfWork.WalletRepository.GetByIdAsync(walletId);
+
+            if (walletexist == null)
+            {
+                throw new Exception("Wallet not found.");
+            }
+
+            if (walletexist.AvailableBalance < amountMoney)
+            {
+                throw new Exception("Not enough available balance to lock.");
+            }
+
+            walletexist.AvailableBalance -= amountMoney;
+            walletexist.FrozenBalance = (walletexist.FrozenBalance ?? 0) + amountMoney;
+            _unitOfWork.WalletRepository.Update(walletexist);
+
+            var result = await _unitOfWork.SaveChangeAsync();
+
+            if (result > 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<APIResponseModel> ApproveRequestWithdraw(int transId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var transExist = await _unitOfWork.WalletTransactionRepository.GetByIdAsync(transId);
+                if (transExist == null)
+                {
+                    reponse.Code = 404;
+                    reponse.Message = "Not Found Trans Withdraw In System";
+                    reponse.IsSuccess = false;
+                }
+                else
+                {
+                    var requestexist = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(transExist.DocNo);
+                    if (requestexist != null)
+                    {
+                        requestexist.Wallet.FrozenBalance -= (decimal)requestexist.Amount;
+                        requestexist.Wallet.Balance -= (decimal)requestexist.Amount;
+                        transExist.Status = EnumStatusTransaction.Completed.ToString();
+                        if (await _unitOfWork.SaveChangeAsync() > 0)
+                        {
+                            reponse.IsSuccess = true;
+                            reponse.Code = 200;
+                            reponse.Message = "Approve Successfuly";
+                        }
+                        else
+                        {
+                            reponse.Code = 500;
+                            reponse.Message = "Error when saving";
+                            reponse.IsSuccess = false;
+                        }
+                    }
+                    else
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Code = 400;
+                        reponse.Message = "Not Found Request In System";
+                    }
                 }
 
             }

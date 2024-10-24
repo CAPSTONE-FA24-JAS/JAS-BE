@@ -144,5 +144,64 @@ namespace Application.Services
             }
             return reponse;
         }
+
+        public async Task<APIResponseModel> ViewListAddressToShipByCustomerId(int customerId)
+        {
+            var reponse = new APIResponseModel();
+            var DTOs = new List<ViewAddressToShipDTO>();
+            try
+            {
+                var listAddressToShip = await _unitOfWork.AddressToShipRepository.GetAllAsync(condition: x => x.CustomerId == customerId,includes: x => x.Ward);
+                if (listAddressToShip != null)
+                {
+                    foreach (var a in listAddressToShip)
+                    {
+                        var mapper = _mapper.Map<ViewAddressToShipDTO>(a);
+                        if (a.Ward != null)
+                        {
+                            mapper.WardName = a.Ward.Name;
+                            if (a.Ward.District != null)
+                            {
+                                mapper.DistrictName = a.Ward.District.Name;
+                                if (a.Ward.District.Province != null)
+                                {
+                                    mapper.ProvinceName = a.Ward.District.Province.Name;
+                                }
+                            }
+                        }
+                        DTOs.Add(mapper);
+                    }
+                    if (DTOs.Count > 0)
+                    {
+                        reponse.IsSuccess = true;
+                        reponse.Message = "Received List Address Successfull";
+                        reponse.Code = 200;
+                        reponse.Data = DTOs;
+                    }
+                    else
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Message = "List is empty";
+                        reponse.Code = 400;
+                        reponse.Data = DTOs;
+
+                    }
+
+                }
+                else
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Message = "List is null.";
+                    reponse.Code = 400;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { ex.Message };
+            }
+            return reponse;
+        }
     }
 }
