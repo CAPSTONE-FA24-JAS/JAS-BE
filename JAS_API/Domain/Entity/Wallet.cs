@@ -3,6 +3,8 @@
     public class Wallet : BaseEntity
     {
         public Decimal? Balance { get; set;}
+        public Decimal? AvailableBalance { get; set;}
+        public Decimal? FrozenBalance { get; set; }
         public int? CustomerId { get; set;}
         public string? Status { get; set;}
         public string? Password { get; set;}

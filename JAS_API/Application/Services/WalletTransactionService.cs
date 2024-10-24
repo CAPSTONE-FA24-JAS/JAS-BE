@@ -23,18 +23,18 @@ namespace Application.Services
             try
             {
                 await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
-                if (await _unitOfWork.SaveChangeAsync() > 0)
-                {
-                    reponse.Message = $"Create New Transaction  SuccessFull";
-                    reponse.Code = 200;
+                //if (await _unitOfWork.SaveChangeAsync() > 0)
+                //{
+                //    reponse.Message = $"Create New Transaction  SuccessFull";
+                //    reponse.Code = 200;
                     reponse.IsSuccess = true;
-                }
-                else
-                {
-                    reponse.Message = $"Create New Transaction Fail";
-                    reponse.Code = 400;
-                    reponse.IsSuccess = false;
-                }
+                //}
+                //else
+                //{
+                //    reponse.Message = $"Create New Transaction Fail";
+                //    reponse.Code = 400;
+                //    reponse.IsSuccess = false;
+                //}
             }
             catch (Exception ex)
             {

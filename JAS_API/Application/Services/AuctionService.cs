@@ -277,12 +277,12 @@ namespace Application.Services
                               updateAuctionDTO.FileImage.OpenReadStream()),
                     Tags = Tags
                 }).ConfigureAwait(false);
-                if (uploadResult == null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
-                {
-                    reponse.Message = $"File upload failed." + uploadResult.Error.Message + "";
-                    reponse.Code = (int)uploadResult.StatusCode;
-                    reponse.IsSuccess = false;
-                }
+                //if (uploadResult == null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                //{
+                //    reponse.Message = $"File upload failed." + uploadResult.Error.Message + "";
+                //    reponse.Code = (int)uploadResult.StatusCode;
+                //    reponse.IsSuccess = false;
+                //}
                 auctionExisted.ImageLink = uploadResult.SecureUrl.AbsoluteUri;
                 _unitOfWork.AuctionRepository.Update(auctionExisted);
                 if (await _unitOfWork.SaveChangeAsync() > 0)
