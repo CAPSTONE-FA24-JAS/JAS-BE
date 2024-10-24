@@ -1,5 +1,6 @@
 ﻿using Application.ServiceReponse;
 using Application.ViewModels.InvoiceDTOs;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace Application.Interfaces
         public Task<APIResponseModel> AsignShipper(int invoiceId, int shipperId, int status);
 
         public Task<APIResponseModel> GetInvoiceByStatusOfShipper(int shipperId, int status, int? pageSize, int? pageIndex);
+
+        public Task<APIResponseModel> UpdateImageRecivedJewelryByShipper(int invoiceId, IFormFile imageDelivery);
 
         public Task<APIResponseModel> UpdateSuccessfulDeliveryByShipper(SuccessfulDeliveryRequestDTO deliveryDTO);
 
