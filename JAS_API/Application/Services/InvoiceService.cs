@@ -237,7 +237,10 @@ namespace Application.Services
                         await _unitOfWork.StatusInvoiceRepository.AddAsync(statusImvoice);
                         await _unitOfWork.SaveChangeAsync();
 
-                        var invoiceByDTO = _mapper.Map<InvoiceDetailDTO>(invoiceById);
+                        var jewelryOfInvoice = invoiceById.CustomerLot.Lot.Jewelry;
+
+                        var invoiceByDTO = _mapper.Map<InvoiceDetailDTO>(invoiceById, x => x.Items["Jewelry"] = jewelryOfInvoice);
+                       
 
                         response.Message = $"Add data in StatusInvoice Successfully";
                         response.Code = 200;
@@ -655,7 +658,10 @@ namespace Application.Services
                         await _unitOfWork.StatusInvoiceRepository.AddAsync(statusImvoice);
                         await _unitOfWork.SaveChangeAsync();
 
-                        var invoiceByDTO = _mapper.Map<InvoiceDetailDTO>(invoiceById);
+                        var jewelryOfInvoice = invoiceById.CustomerLot.Lot.Jewelry;
+                       
+                            var invoiceByDTO = _mapper.Map<InvoiceDetailDTO>(invoiceById, x => x.Items["Jewelry"] = jewelryOfInvoice);
+                            
 
                         response.Message = $"Add data in StatusInvoice Successfully";
                         response.Code = 200;
