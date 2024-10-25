@@ -123,7 +123,7 @@ namespace Application.Services
                 else
                 {
                     //kiem tra du so du khong
-                    if (walletexist.Balance < (decimal)depositPrice)
+                    if (walletexist.AvailableBalance < (decimal)depositPrice)
                     {
                         reponse.Code = 404;
                         reponse.Message = "Customer insufficient balance, Please add money into your wallet!";
@@ -293,7 +293,12 @@ namespace Application.Services
                 if (isAdd)
                 {
                     walletexist.Balance += amountMoney;
+                    if (walletexist.AvailableBalance == null)
+                    {
+                        walletexist.AvailableBalance = 0;
+                    }
                     walletexist.AvailableBalance += amountMoney;
+
                     _unitOfWork.WalletRepository.Update(walletexist);
                     
                 }
