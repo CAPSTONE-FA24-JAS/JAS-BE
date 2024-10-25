@@ -26,6 +26,7 @@ namespace Application.Services
             try
             {
                 var entity = _mapper.Map<AddressToShip>(createDTO);
+                entity.IsDefault = false;
                 await _unitOfWork.AddressToShipRepository.AddAsync(entity);
                 if(await _unitOfWork.SaveChangeAsync() > 0)
                 {
