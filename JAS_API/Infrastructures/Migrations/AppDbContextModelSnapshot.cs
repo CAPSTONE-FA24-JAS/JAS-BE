@@ -108,6 +108,9 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<bool?>("IsDefault")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -117,14 +120,9 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int?>("WardId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
-
-                    b.HasIndex("WardId");
 
                     b.ToTable("AddressToShips");
                 });
@@ -2821,13 +2819,7 @@ namespace Infrastructures.Migrations
                         .WithMany("AddressToShips")
                         .HasForeignKey("CustomerId");
 
-                    b.HasOne("Domain.Entity.Ward", "Ward")
-                        .WithMany("AddressToShips")
-                        .HasForeignKey("WardId");
-
                     b.Navigation("Customer");
-
-                    b.Navigation("Ward");
                 });
 
             modelBuilder.Entity("Domain.Entity.AutoBid", b =>
@@ -3489,11 +3481,6 @@ namespace Infrastructures.Migrations
                     b.Navigation("RequestWithdraws");
 
                     b.Navigation("WalletTransactions");
-                });
-
-            modelBuilder.Entity("Domain.Entity.Ward", b =>
-                {
-                    b.Navigation("AddressToShips");
                 });
 #pragma warning restore 612, 618
         }

@@ -110,7 +110,14 @@ namespace Application.Services
                     _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
                     _unitOfWork.InvoiceRepository.Update(invoiceById);
 
+                    var historyCustomerLot = new HistoryStatusCustomerLot
+                    {
+                        CurrentTime = DateTime.Now,
+                        Status = EnumCustomerLot.Delivering.ToString(),
+                        CustomerLotId = invoiceById.CustomerLotId
+                    };
 
+                    await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
                     await _unitOfWork.SaveChangeAsync();
 
                     var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
@@ -236,6 +243,17 @@ namespace Application.Services
                         };
 
                         await _unitOfWork.StatusInvoiceRepository.AddAsync(statusImvoice);
+
+                        //luu status history vao history customerlot
+                        var historyCustomerLot = new HistoryStatusCustomerLot
+                        {
+                            CurrentTime = DateTime.Now,
+                            Status = EnumCustomerLot.Delivered.ToString(),
+                            CustomerLotId = invoiceById.CustomerLotId
+                        };
+
+                        await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
+
                         await _unitOfWork.SaveChangeAsync();
 
                         var jewelryOfInvoice = invoiceById.CustomerLot.Lot.Jewelry;
@@ -320,6 +338,17 @@ namespace Application.Services
                             TransactionType = EnumTransactionType.SellerPay.ToString(),
                         };
                         await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
+
+
+                        //luu history cho history customerlot
+                        var historyCustomerLot = new HistoryStatusCustomerLot
+                        {
+                            CurrentTime = DateTime.Now,
+                            Status = EnumCustomerLot.Finished.ToString(),
+                            CustomerLotId = invoiceById.CustomerLotId
+                        };
+
+                        await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
 
 
                         await _unitOfWork.SaveChangeAsync();
