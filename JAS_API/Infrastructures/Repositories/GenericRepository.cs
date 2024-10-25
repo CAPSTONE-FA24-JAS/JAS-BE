@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Application.Repositories;
 using Domain.Entity;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Math.EC.Rfc7748;
 using System;
 using System.Collections.Generic;
 using System.Linq;
