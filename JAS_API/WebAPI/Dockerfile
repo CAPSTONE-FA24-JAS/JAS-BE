@@ -12,10 +12,10 @@ ENV ASPNETCORE_ENVIRONMENT=Development
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["WebAPI/WebAPI.csproj", "WebAPI/"]
-COPY ["Infrastructures/Infrastructures.csproj", "Infrastructures/"]
-COPY ["Application/Application.csproj", "Application/"]
-COPY ["Domain/Domain.csproj", "Domain/"]
+COPY ["JAS_API/WebAPI/WebAPI.csproj", "WebAPI/"]
+COPY ["JAS_API/Infrastructures/Infrastructures.csproj", "Infrastructures/"]
+COPY ["JAS_API/Application/Application.csproj", "Application/"]
+COPY ["JAS_API/Domain/Domain.csproj", "Domain/"]
 RUN dotnet restore "./WebAPI/WebAPI.csproj"
 COPY . .
 WORKDIR "/src/WebAPI"
