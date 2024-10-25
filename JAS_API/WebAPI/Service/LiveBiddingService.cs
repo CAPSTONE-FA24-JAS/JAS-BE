@@ -65,7 +65,7 @@ namespace WebAPI.Service
             using (var scope = _serviceProvider.CreateScope())
             {
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
-                var lotWithStartTime = _cacheService.GetHashLots(l => l.Status == EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 1).Name);
+                var lotWithStartTime = _cacheService.GetHashLots(l => l.Status == EnumStatusLot.Ready.ToString());
 
                 foreach (var lot in lotWithStartTime)
                 {
