@@ -83,5 +83,19 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+        [HttpPatch]
+        public async Task<IActionResult> SetAddressToShipIsDefault(int Id, int customerId)
+        {
+            var result = await _addressToShipService.UpdateAddressIsDefault(Id, customerId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }
