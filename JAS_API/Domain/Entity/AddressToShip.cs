@@ -9,6 +9,7 @@ namespace Domain.Entity
     public class AddressToShip : BaseEntity
     {
         public string? AddressLine { get; set; }
+        public bool? IsDefault { get; set; }
         public int? CustomerId { get; set; }
         public int? WardId { get; set; }
         //

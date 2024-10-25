@@ -87,6 +87,58 @@ namespace Application.Services
             return reponse;
         }
 
+        public async Task<APIResponseModel> UpdateAddressIsDefault(int addressId, int customerId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var oldAddressDefault= await _unitOfWork.AddressToShipRepository.GetAllAsync( x => x.IsDefault == true && x.CustomerId == customerId);
+                if (oldAddressDefault.Count > 0)
+                {
+                    oldAddressDefault.FirstOrDefault().IsDefault = false;
+                    var newAddressDefault = await _unitOfWork.AddressToShipRepository.GetByIdAsync(addressId);
+                    newAddressDefault.IsDefault = true;
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        reponse.IsSuccess = true;
+                        reponse.Message = "Set New Address Default Successfull";
+                        reponse.Code = 200;
+                    }
+                    else
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Set New Address Default Fail, When Saving";
+                        reponse.Code = 400;
+                    }
+                }
+                else
+                {
+                    var newAddressDefault = await _unitOfWork.AddressToShipRepository.GetByIdAsync(addressId);
+                    newAddressDefault.IsDefault = true;
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        reponse.IsSuccess = true;
+                        reponse.Message = "Set New Address Default Successfull";
+                        reponse.Code = 200;
+                    }
+                    else
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Set New Address Default Fail, When Saving";
+                        reponse.Code = 400;
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { ex.Message };
+            }
+            return reponse;
+        }
+
         public async Task<APIResponseModel> ViewListAddressToShip()
         {
             var reponse = new APIResponseModel();
