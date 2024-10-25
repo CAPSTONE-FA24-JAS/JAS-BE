@@ -22,7 +22,7 @@ COPY ["JAS_API/Domain/Domain.csproj", "JAS_API/Domain/"]
 RUN dotnet restore "JAS_API/WebAPI/WebAPI.csproj"
 
 # Copy the rest of the project files
-COPY ["JAS_API/", "./JAS_API/"]
+COPY ["JAS_API/", "./"]
 
 # Set the working directory to the WebAPI project
 WORKDIR "/src/JAS_API/WebAPI"
