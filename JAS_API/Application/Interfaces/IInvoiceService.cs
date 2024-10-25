@@ -16,7 +16,7 @@ namespace Application.Interfaces
 {
     public interface IInvoiceService
     {
-        public Task<APIResponseModel> getInvoicesByStatusForManger(int status, int?pageSize, int? pageIndex);
+        public Task<APIResponseModel> getInvoicesByStatusForManger(int?pageSize, int? pageIndex);
         public Task<APIResponseModel> AsignShipper(int invoiceId, int shipperId, int status);
 
         public Task<APIResponseModel> GetInvoiceByStatusOfShipper(int shipperId, int status, int? pageSize, int? pageIndex);
@@ -26,7 +26,7 @@ namespace Application.Interfaces
         public Task<APIResponseModel> UpdateSuccessfulDeliveryByShipper(SuccessfulDeliveryRequestDTO deliveryDTO);
 
 
-        public Task<APIResponseModel> FinishInvoiceByManager(int invoiceId, int status);
+        public Task<APIResponseModel> FinishInvoiceByManager(int invoiceId);
 
         public Task<APIResponseModel> getInvoicesByStatusForCustomer(int customerId, int? status, int? pageSize, int? pageIndex);
 
@@ -35,7 +35,8 @@ namespace Application.Interfaces
         Task<APIResponseModel> PaymentInvoiceByWallet(PaymentInvoiceByWalletDTO model);
         Task<APIResponseModel> PaymentInvoiceByBankTransfer(PaymentInvoiceByBankTransferDTO model);
         Task<APIResponseModel> PaymentInvoiceByVnPay(PaymentInvoiceByVnPayDTO model);
-        
+
+        Task<APIResponseModel>  GetInvoicesRecivedByShipper(int shipperId, int? pageIndex, int? pageSize);
 
     }
 }

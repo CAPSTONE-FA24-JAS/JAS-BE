@@ -24,9 +24,9 @@ namespace WebAPI.Controllers
 
         //List invoice for manager
         [HttpGet]
-        public async Task<IActionResult> getInvoicesByStatusForManger(int status, int? pageSize, int? pageIndex)
+        public async Task<IActionResult> getInvoicesByStatusForManger(int? pageSize, int? pageIndex)
         {
-            var result = await _invoiceService.getInvoicesByStatusForManger(status, pageSize, pageIndex);
+            var result = await _invoiceService.getInvoicesByStatusForManger(pageSize, pageIndex);
             if (result.IsSuccess)
             {
                 return Ok(result);
@@ -129,12 +129,28 @@ namespace WebAPI.Controllers
         }
 
 
+        //lay ra invoice da duoc shipper lay hang de di giao( check statusInvoice = recieved)
+        [HttpGet]
+        public async Task<IActionResult> GetInvoicesRecivedByShipperAsync(int shipperId, int? pageIndex, int? pageSize)
+        {
+            var result = await _invoiceService.GetInvoicesRecivedByShipper(shipperId, pageSize, pageIndex);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+
 
         //manager check va finish don hang
         [HttpPut]
-        public async Task<IActionResult> FinishInvoiceByManager(int invoiceId, int status)
+        public async Task<IActionResult> FinishInvoiceByManager(int invoiceId)
         {
-            var result = await _invoiceService.FinishInvoiceByManager(invoiceId, status);
+            var result = await _invoiceService.FinishInvoiceByManager(invoiceId);
             if (result.IsSuccess)
             {
                 return Ok(result);

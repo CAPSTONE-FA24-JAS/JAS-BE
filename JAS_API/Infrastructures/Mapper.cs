@@ -193,6 +193,8 @@ namespace Infrastructures
                 .ForPath(dest => dest.WinnerEmail, src => src.MapFrom(x => x.Customer.Account.Email.ToString()))
                 .ForPath(dest => dest.AddressToShip, src => src.MapFrom(x => x.AddressToShip.AddressLine.ToString()))
                 .ForPath(dest => dest.LotId, src => src.MapFrom(x => x.CustomerLot.LotId))
+                .ForMember(dest => dest.MyBidDTO, src => src.MapFrom(x => x.CustomerLot))
+                .ForMember(dest => dest.StatusInvoiceDTOs, src => src.MapFrom(x => x.StatusInvoices))
                 .ForMember(dest => dest.ProductId, opt => opt.MapFrom((src, dest, destMember, context) =>
                 {
                     if (context.Items.ContainsKey("Jewelry") && context.Items["Jewelry"] != null)
@@ -213,7 +215,8 @@ namespace Infrastructures
                 }))
                 .ReverseMap();
             CreateMap<CustomerLot, MyBidDTO>()
-                .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))
+                .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))   
+                .ForMember(dest => dest.HistoryCustomerLots, opt => opt.MapFrom(src => src.HistoryStatusCustomerLots))
                 .ReverseMap();
             CreateMap<CustomerLot, MyBidDetailDTO>()
                .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))
@@ -225,6 +228,7 @@ namespace Infrastructures
                 .ReverseMap();
             CreateMap<RequestWithdraw, RequestWithdrawDTO>().ReverseMap();
             CreateMap<HistoryStatusCustomerLot, HistoryCustomerLotDTO>().ReverseMap();
+            CreateMap<StatusInvoice, StatusInvoiceDTO>().ReverseMap();
 
 
         }
