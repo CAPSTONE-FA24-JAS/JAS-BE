@@ -199,7 +199,7 @@ namespace WebAPI.Service
                                 loser.IsWinner = false;
 
                                 //hoan coc cho loser
-                                var walletOfLoser = await _unitOfWork.WalletRepository.GetByIdAsync(loser.CustomerId);
+                                var walletOfLoser = await _unitOfWork.WalletRepository.GetByCustomerId(loser.CustomerId);
                                 walletOfLoser.Balance = walletOfLoser.Balance + (decimal?)loser.Lot.Deposit;
                                 _unitOfWork.WalletRepository.Update(walletOfLoser);
                                 loser.IsRefunded = true;
