@@ -34,12 +34,16 @@ namespace Infrastructures.Repositories
             return customerLot;
         }
 
-        public List<CustomerLot> GetListCustomerLotByCustomerAndLot(List<BidPrice> bidPriceList)
+        //get những thằng thua
+        public List<CustomerLot>? GetListCustomerLotByCustomerAndLot(List<BidPrice> bidPriceList, int customerLotWinnerId)
         {
-            var customerLots = _dbContext.CustomerLots.Where(x => bidPriceList.Any(bd => bd.CustomerId == x.CustomerId && bd.LotId == x.LotId)).ToList();
-            if (customerLots == null)
+            var customerLots = _dbContext.CustomerLots
+       .AsEnumerable() // Switch to client-side evaluation
+       .Where(x => bidPriceList.Any(bd => bd.CustomerId == x.CustomerId && bd.LotId == x.LotId) && x.Id != customerLotWinnerId)
+       .ToList();
+            if (!customerLots.Any())
             {
-                throw new Exception("Not found CustomerLot");
+                return null;
             }
             return customerLots;
         }

@@ -13,14 +13,14 @@ using WebAPI.Middlewares;
 
 namespace WebAPI.Service
 {
-    public class LiveBiddingService 
+    public class LiveBiddingService
     {
         private readonly IServiceProvider _serviceProvider;
-        
+
         private readonly IHubContext<BiddingHub> _hubContext;
 
         public LiveBiddingService(IHubContext<BiddingHub> hubContext, IServiceProvider serviceProvider)
-        {    
+        {
             _hubContext = hubContext;
             _serviceProvider = serviceProvider;
         }
@@ -30,6 +30,7 @@ namespace WebAPI.Service
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+                //lấy lại max endd time theo tất cả lot của auctionId( nó đang lấy giờ nhỏ nhất)
                 var maxEndTime = _cacheService.GetMaxEndTimeFormSortedSetOfLot();
                 var lotLiveBidding = _cacheService.GetHashLots(l => l.Status == EnumStatusLot.Auctioning.ToString());
                 int? auctionId = 0;
@@ -38,10 +39,10 @@ namespace WebAPI.Service
                     var endTime = lot.EndTime;
                     if (endTime.HasValue && DateTime.UtcNow > endTime.Value)
                     {
-                         await EndLot(lot.Id, endTime.Value);
+                        await EndLot(lot.Id, endTime.Value);
                     }
                     auctionId = lot.AuctionId;
-                    if(auctionId == null)
+                    if (auctionId == null)
                     {
                         throw new Exception("AuctionId null");
                     }
@@ -55,8 +56,8 @@ namespace WebAPI.Service
                     await _unitOfWork.SaveChangeAsync();
                 }
             }
-                
-            
+
+
         }
 
         public async Task CheckLotStartAsync()
@@ -76,11 +77,11 @@ namespace WebAPI.Service
                     }
                 }
             }
-               
+
 
         }
 
-       
+
 
         private async Task StartLot(int lotId)
         {
@@ -99,7 +100,7 @@ namespace WebAPI.Service
 
                 _cacheService.UpdateLotStatus(lotId, lot.Status);
             }
-               
+
         }
 
         private async Task EndLot(int lotId, DateTime endTime)
@@ -116,7 +117,7 @@ namespace WebAPI.Service
                 }
                 else
                 {
-                    // Truy xuất dữ liệu bid prices từ redis rồi lưu vào sql
+                    // Truy xuất dữ liệu bid prices từ redis 
                     var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == lot.Id);
                     await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
 
@@ -165,6 +166,7 @@ namespace WebAPI.Service
                             Free = (float?)(winner.CurrentPrice * 0.25),
                             TotalPrice = (float?)(winner.CurrentPrice + winner.CurrentPrice * 0.25 - lot.Deposit),
                             CreationDate = DateTime.Now,
+                            Status = EnumCustomerLot.CreateInvoice.ToString()
                         };
 
                         await _unitOfWork.InvoiceRepository.AddAsync(invoice);
@@ -181,78 +183,70 @@ namespace WebAPI.Service
                             CurrentTime = DateTime.Now,
                         };
                         await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerlot);
+
+                        //lấy ra những thằng thua theo lot(group by theo customerId và lotId,Lấy giá trị đầu tiên của mỗi nhóm (distinct)
+                        var custemerLotGroupBy = bidPrices.GroupBy(b => new { b.CustomerId, b.LotId })
+                                              .Select(g => g.First())
+                                              .ToList();
+
+                        //lay ra lisst customerLot theo list customerid vaf lotId
+                        var losers = _unitOfWork.CustomerLotRepository.GetListCustomerLotByCustomerAndLot(custemerLotGroupBy, winnerCustomerLot.Id);
+                        if(losers != null)
+                        {
+                            List<CustomerLot> listCustomerLot = new List<CustomerLot>();
+                            foreach (var loser in losers)
+                            {
+                                loser.IsWinner = false;
+
+                                //hoan coc cho loser
+                                var walletOfLoser = await _unitOfWork.WalletRepository.GetByIdAsync(loser.CustomerId);
+                                walletOfLoser.Balance = walletOfLoser.Balance + (decimal?)loser.Lot.Deposit;
+                                _unitOfWork.WalletRepository.Update(walletOfLoser);
+                                loser.IsRefunded = true;
+                                loser.Status = EnumCustomerLot.Refunded.ToString();
+
+                                listCustomerLot.Add(loser);
+                                //lưu history của loser là refunded
+                                var historyCustomerlotLoser = new HistoryStatusCustomerLot()
+                                {
+                                    Status = loser.Status,
+                                    CustomerLotId = loser.Id,
+                                    CurrentTime = DateTime.Now,
+                                };
+                                await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerlotLoser);
+
+
+                                //cap nhat transaction vi
+                                var walletTrasaction = new WalletTransaction
+                                {
+                                    transactionType = EnumTransactionType.RefundDeposit.ToString(),
+                                    DocNo = loser.Id,
+                                    Amount = lot.Deposit,
+                                    TransactionTime = DateTime.UtcNow,
+                                    Status = "Completed"
+                                };
+                                await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrasaction);
+
+
+                                //cap nhat transaction cty
+                                var trasaction = new Transaction
+                                {
+                                    TransactionType = EnumTransactionType.RefundDeposit.ToString(),
+                                    DocNo = loser.Id,
+                                    Amount = lot.Deposit,
+                                    TransactionTime = DateTime.UtcNow,
+
+                                };
+                                await _unitOfWork.TransactionRepository.AddAsync(trasaction);
+                                await _unitOfWork.SaveChangeAsync();
+                            }
+                            _unitOfWork.CustomerLotRepository.UpdateRange(listCustomerLot);
+                        }                       
                     }
-
-
-
-                    //lấy ra những thằng thua theo lot(Bỏ qua giá đấu đầu tiên,group by theo customerId và lotId,Lấy giá trị đầu tiên của mỗi nhóm (distinct)
-                    var losers = bidPrices.Skip(1)
-                                          .GroupBy(b => new { b.CustomerId, b.LotId })
-                                          .Select(g => g.First())
-                                          .ToList();
-
-                    //lay ra lisst customerLot theo list customerid vaf lotId
-                    var customerLots = _unitOfWork.CustomerLotRepository.GetListCustomerLotByCustomerAndLot(losers);
-                    foreach (var loser in customerLots)
-                    {
-                        loser.IsWinner = false;
-
-                        //hoan coc cho loser
-                        var walletOfLoser = await _unitOfWork.WalletRepository.GetByIdAsync(loser.CustomerId);
-                        walletOfLoser.Balance = walletOfLoser.Balance + (decimal?)loser.Lot.Deposit;
-                        _unitOfWork.WalletRepository.Update(walletOfLoser);
-                        loser.IsRefunded = true;
-                        loser.Status = EnumCustomerLot.Refunded.ToString();
-
-                        //lưu history của loser là refunded
-                        var historyCustomerlot = new HistoryStatusCustomerLot()
-                        {
-                            Status = loser.Status,
-                            CustomerLotId = loser.Id,
-                            CurrentTime = DateTime.Now,
-                        };
-                        await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerlot);
-
-
-                        //cap nhat transaction vi
-                        var walletTrasaction = new WalletTransaction
-                        {
-                            transactionType = EnumTransactionType.RefundDeposit.ToString(),
-                            DocNo = loser.Id,
-                            Amount = lot.Deposit,
-                            TransactionTime = DateTime.UtcNow,
-                            Status = "Completed"
-                        };
-                        await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrasaction);
-
-
-                        //cap nhat transaction cty
-                        var trasaction = new Transaction
-                        {
-                            TransactionType = EnumTransactionType.RefundDeposit.ToString(),
-                            DocNo = loser.Id,
-                            Amount = lot.Deposit,
-                            TransactionTime = DateTime.UtcNow,
-
-                        };
-                        await _unitOfWork.TransactionRepository.AddAsync(trasaction);
-                        await _unitOfWork.SaveChangeAsync();
-                    }
-                    _unitOfWork.CustomerLotRepository.UpdateRange(customerLots);
-
                 }
                 await _unitOfWork.SaveChangeAsync();
             }
-                
-                
-           
-
-
         }
-
-               
-        }
-
-        
+    }
     }
 
