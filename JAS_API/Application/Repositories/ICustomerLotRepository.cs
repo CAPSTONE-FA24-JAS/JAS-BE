@@ -14,7 +14,9 @@ namespace Application.Repositories
         Task<(IEnumerable<CustomerLot> data, int totalItems)> GetBidsOfCustomer(int? customerIId, string? status, int? pageIndex, int? pageSize);
 
         Task<(IEnumerable<CustomerLot> data, int totalItems)> GetPastBidOfCustomer(int customerIId, IEnumerable<string> status, int? pageIndex, int? pageSize);
-        List<CustomerLot> GetListCustomerLotByCustomerAndLot(List<BidPrice> bidPriceList);
+
+        //get những thằng thua
+        List<CustomerLot>? GetListCustomerLotByCustomerAndLot(List<BidPrice> bidPriceList, int customerLotWinnerId);
 
     }
 }
