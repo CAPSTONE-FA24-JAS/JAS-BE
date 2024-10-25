@@ -31,7 +31,7 @@ namespace WebAPI.Service
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 var maxEndTime = _cacheService.GetMaxEndTimeFormSortedSetOfLot();
-                var lotLiveBidding = _cacheService.GetHashLots(l => l.Status == EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 2).Name);
+                var lotLiveBidding = _cacheService.GetHashLots(l => l.Status == EnumStatusLot.Auctioning.ToString());
                 int? auctionId = 0;
                 foreach (var lot in lotLiveBidding)
                 {
@@ -93,7 +93,7 @@ namespace WebAPI.Service
                 {
                     throw new Exception("Not found Lot Id");
                 }
-                lot.Status = EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault(x => x.Value == 2).Name;
+                lot.Status = EnumStatusLot.Auctioning.ToString();
                 _unitOfWork.LotRepository.Update(lot);
                 await _unitOfWork.SaveChangeAsync();
 
@@ -147,7 +147,7 @@ namespace WebAPI.Service
                         _cacheService.UpdateLotStatus(lotId, lot.Status);
 
 
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEnded", "Phiên đã kết thúc!", winner.CustomerId, winner.CurrentPrice);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinner", "Phiên đã kết thúc!", winner.CustomerId, winner.CurrentPrice);
 
                         //xu ly cho thang thắng
                         //cập nhật customerLot trường IsWinner là true, cập nhật giá đấu được khi đã thắng, cập nhật status lên CreatedInvoice 
