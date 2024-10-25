@@ -130,7 +130,11 @@ namespace Application.Services
                 foreach (var bidLimit in bidLimits)
                 {
                     var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
-                    string staffName = staff.FirstName + " " + staff.LastName;
+                    string staffName = "";
+                    if (staff != null)
+                    {
+                        staffName = staff.FirstName + " " + staff.LastName;
+                    }
                     var mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
                     mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
                     DTOs.Add(mapper);
