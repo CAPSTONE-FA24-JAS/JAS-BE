@@ -16,9 +16,9 @@ namespace Infrastructures.FluentAPIs
             builder.HasOne(x => x.Customer)
                 .WithMany(x => x.AddressToShips)
                 .HasForeignKey(x => x.CustomerId);
-            builder.HasOne(x => x.Ward)
-                .WithMany(x => x.AddressToShips)
-                .HasForeignKey(x => x.WardId);
+            //builder.HasOne(x => x.Ward)
+            //    .WithMany(x => x.AddressToShips)
+            //    .HasForeignKey(x => x.WardId);
         }
     }
 }
