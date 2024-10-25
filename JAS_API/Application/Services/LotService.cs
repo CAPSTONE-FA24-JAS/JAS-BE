@@ -492,6 +492,7 @@ namespace Application.Services
                         lot.Status = EnumStatusLot.Ready.ToString();
                     }
 
+                    //cho lên redis update staus lot 1 loạt
                     _unitOfWork.LotRepository.UpdateRange(lots);
                     await _unitOfWork.SaveChangeAsync(); 
                     response.Code = 200;
