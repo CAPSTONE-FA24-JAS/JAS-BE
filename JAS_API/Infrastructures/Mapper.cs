@@ -215,7 +215,8 @@ namespace Infrastructures
                 }))
                 .ReverseMap();
             CreateMap<CustomerLot, MyBidDTO>()
-                .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))
+                .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))   
+                .ForMember(dest => dest.HistoryCustomerLots, opt => opt.MapFrom(src => src.HistoryStatusCustomerLots))
                 .ReverseMap();
             CreateMap<CustomerLot, MyBidDetailDTO>()
                .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))

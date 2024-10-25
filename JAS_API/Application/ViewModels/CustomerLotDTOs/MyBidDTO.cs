@@ -1,4 +1,5 @@
-﻿using Application.ViewModels.LotDTOs;
+﻿using Application.ViewModels.AccountDTOs;
+using Application.ViewModels.LotDTOs;
 using Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,16 @@ namespace Application.ViewModels.CustomerLotDTOs
         public bool? IsWinner { get; set; }
         public bool? IsRefunded { get; set; }
         public bool? IsInvoiced { get; set; }
-
-        public int? LotId { get; set; }
-
         public float? yourMaxBidPrice { get; set; }
+        public int? LotId { get; set; }
+        
+        
         public LotDTO LotDTO { get; set; }
+
+        
+        
+
+        public IEnumerable<HistoryCustomerLotDTO>? HistoryCustomerLots { get; set; }
 
 
     }
