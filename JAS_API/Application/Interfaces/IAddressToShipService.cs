@@ -15,5 +15,6 @@ namespace Application.Interfaces
         public Task<APIResponseModel> DeleteAddressToShip(int Id);
         public Task<APIResponseModel> ViewListAddressToShip();
         public Task<APIResponseModel> ViewListAddressToShipByCustomerId(int customerId);
+        public Task<APIResponseModel> ViewListWard();
     }
 }

@@ -78,7 +78,10 @@ namespace Infrastructures
             CreateMap<AddressToShip, CreateAddressToShipDTO>().ReverseMap();
             CreateMap<AddressToShip, ViewAddressToShipDTO>().ReverseMap();
             CreateMap<Ward, CreateWardDTO>().ReverseMap();
-            CreateMap<Ward, ViewWardDTO>().ReverseMap();
+            CreateMap<Ward, ViewWardDTO>()
+                .ForPath(dest => dest.DistrictName , src => src.MapFrom(x => x.District.Name))
+                .ForPath(dest => dest.ProvinceName, src => src.MapFrom(x => x.District.Province.Name))
+                .ReverseMap();
             CreateMap<District, CreateDistrictDTO>().ReverseMap();
             CreateMap<District, ViewDistrictDTO>().ReverseMap();
             CreateMap<Province, CreateProvinceDTO>().ReverseMap();

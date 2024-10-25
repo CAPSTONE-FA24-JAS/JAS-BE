@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.ViewModels.AddressToShipDTO;
+using Application.ViewModels.WardDTOs;
 using AutoMapper;
 using Domain.Entity;
 using Google.Apis.Util;
@@ -182,6 +183,53 @@ namespace Application.Services
                     {
                         reponse.IsSuccess = false;
                         reponse.Message = "List is empty";
+                        reponse.Code = 400;
+                        reponse.Data = DTOs;
+
+                    }
+
+                }
+                else
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Message = "List is null.";
+                    reponse.Code = 400;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { ex.Message };
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> ViewListWard()
+        {
+            var reponse = new APIResponseModel();
+            var DTOs = new List<ViewWardDTO>();
+            try
+            {
+                var listWard = await _unitOfWork.WardRepository.GetAllAsync();
+                if (listWard != null && listWard.Count > 0)
+                {
+                    foreach (var a in listWard)
+                    {
+                        var mapper = _mapper.Map<ViewWardDTO>(a);
+                        DTOs.Add(mapper);
+                    }
+                    if (DTOs.Count > 0)
+                    {
+                        reponse.IsSuccess = true;
+                        reponse.Message = "Received List Ward Successfull";
+                        reponse.Code = 200;
+                        reponse.Data = DTOs;
+                    }
+                    else
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Message = "List Ward is empty";
                         reponse.Code = 400;
                         reponse.Data = DTOs;
 

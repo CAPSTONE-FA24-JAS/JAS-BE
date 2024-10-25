@@ -454,7 +454,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var lots = await _unitOfWork.CustomerLotRepository.GetAllAsync(condition: x => x.LotId == lotId, x => x.CustomerId == customerId);
+                var lots = await _unitOfWork.CustomerLotRepository.GetAllAsync(condition: x => x.LotId == lotId && x.CustomerId == customerId);
                 if (lots.Count() > 0)
                 {
                     reponse.Code = 200;
