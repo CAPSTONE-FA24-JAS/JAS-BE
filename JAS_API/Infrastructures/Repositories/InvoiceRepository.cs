@@ -85,5 +85,37 @@ namespace Infrastructures.Repositories
                 throw new Exception("Don't have any Product");
             }
         }
+
+        public async Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesRecivedByShipper(int shipperId, int? pageIndex, int? pageSize)
+        {
+            IQueryable<Invoice> invoices;
+            
+           
+                invoices = _dbContext.Invoices.Include(x => x.StatusInvoices)
+                                             .Where(x => x.ShipperId == shipperId && x.Status == "Delivering" && x.StatusInvoices.Any(si => si.Status == "Recieved"));
+            
+
+
+            if (pageIndex.HasValue && pageSize.HasValue)
+            {
+                int validPageIndex = pageIndex.Value > 0 ? pageIndex.Value - 1 : 0;
+                int validPageSize = pageSize.Value > 0 ? pageSize.Value : 10; // Assuming a default pageSize of 10 if an invalid value is passed
+
+                invoices = invoices.Skip(validPageIndex * validPageSize).Take(validPageSize);
+            }
+
+            var products = await invoices.ToListAsync();
+
+            var totalItems = products.Count;
+
+            if (products != null && products.Any())
+            {
+                return (products, totalItems);
+            }
+            else
+            {
+                return (null, 0);
+            }
+        }
     }
 }
