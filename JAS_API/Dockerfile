@@ -16,7 +16,7 @@ COPY ["JAS_API/WebAPI/WebAPI.csproj", "WebAPI/"]
 COPY ["JAS_API/Infrastructures/Infrastructures.csproj", "Infrastructures/"]
 COPY ["JAS_API/Application/Application.csproj", "Application/"]
 COPY ["JAS_API/Domain/Domain.csproj", "Domain/"]
-RUN dotnet restore "./WebAPI/WebAPI.csproj"
+RUN dotnet restore "JAS_API/WebAPI/WebAPI.csproj"
 COPY . .
 WORKDIR "/src/WebAPI"
 RUN dotnet build "./WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
