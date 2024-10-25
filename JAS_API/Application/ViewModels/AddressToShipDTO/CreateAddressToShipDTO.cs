@@ -10,6 +10,5 @@ namespace Application.ViewModels.AddressToShipDTO
     {
         public string? AddressLine { get; set; }
         public int? CustomerId { get; set; }
-        public int? WardId { get; set; }
     }
 }
