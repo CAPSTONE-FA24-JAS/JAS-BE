@@ -1,5 +1,3 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
@@ -21,7 +19,7 @@ COPY ["JAS_API/Application/Application.csproj", "Application/"]
 COPY ["JAS_API/Domain/Domain.csproj", "Domain/"]
 
 # Restore dependencies with --disable-parallel to avoid conflicts in Docker
-RUN dotnet restore "./WebAPI/WebAPI.csproj" --disable-parallel
+RUN dotnet restore "WebAPI/WebAPI.csproj" --disable-parallel
 
 # Copy the rest of the project files
 COPY ["JAS_API/", "./"]
