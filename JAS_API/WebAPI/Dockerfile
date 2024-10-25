@@ -19,7 +19,7 @@ COPY ["JAS_API/Application/Application.csproj", "Application/"]
 COPY ["JAS_API/Domain/Domain.csproj", "Domain/"]
 
 # Restore dependencies with --disable-parallel to avoid conflicts in Docker
-RUN dotnet restore "WebAPI/WebAPI.csproj" --disable-parallel
+RUN dotnet restore "WebAPI/WebAPI.csproj" --disable-parallel --no-cache
 
 # Copy the rest of the project files
 COPY ["JAS_API/", "./"]
@@ -28,12 +28,12 @@ COPY ["JAS_API/", "./"]
 WORKDIR "/src/WebAPI"
 
 # Build the project in the specified configuration (Release by default)
-RUN dotnet build "./WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false --no-build
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
