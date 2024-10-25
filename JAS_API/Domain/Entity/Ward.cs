@@ -13,6 +13,6 @@ namespace Domain.Entity
 
         //
         public virtual District District { get; set; }
-        public virtual IEnumerable<AddressToShip> AddressToShips { get; set; }
+        //public virtual IEnumerable<AddressToShip> AddressToShips { get; set; }
     }
 }

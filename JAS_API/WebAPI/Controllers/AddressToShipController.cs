@@ -43,19 +43,19 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ViewListWard()
-        {
-            var result = await _addressToShipService.ViewListWard();
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            else
-            {
-                return BadRequest(result);
-            }
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> ViewListWard()
+        //{
+        //    var result = await _addressToShipService.ViewListWard();
+        //    if (result.IsSuccess)
+        //    {
+        //        return Ok(result);
+        //    }
+        //    else
+        //    {
+        //        return BadRequest(result);
+        //    }
+        //}
 
         [HttpPost]
         public async Task<IActionResult> CreateAddressToShip(CreateAddressToShipDTO createAddressToShipDTO)

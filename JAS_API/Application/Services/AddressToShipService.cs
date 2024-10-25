@@ -145,24 +145,12 @@ namespace Application.Services
             var DTOs = new List<ViewAddressToShipDTO>();
             try
             {
-                var listAddressToShip = await _unitOfWork.AddressToShipRepository.GetAllAsync(includes: x => x.Ward);
+                var listAddressToShip = await _unitOfWork.AddressToShipRepository.GetAllAsync();
                 if (listAddressToShip != null)
                 {
                     foreach(var a in listAddressToShip)
                     {
                         var mapper = _mapper.Map<ViewAddressToShipDTO>(a);
-                        if (a.Ward != null)
-                        {
-                            mapper.WardName = a.Ward.Name;
-                            if (a.Ward.District != null)
-                            {
-                                mapper.DistrictName = a.Ward.District.Name;
-                                if (a.Ward.District.Province != null)
-                                {
-                                    mapper.ProvinceName = a.Ward.District.Province.Name;
-                                }
-                            }
-                        }
                         DTOs.Add(mapper);
                     }
                     if(DTOs.Count > 0)
@@ -204,24 +192,12 @@ namespace Application.Services
             var DTOs = new List<ViewAddressToShipDTO>();
             try
             {
-                var listAddressToShip = await _unitOfWork.AddressToShipRepository.GetAllAsync(condition: x => x.CustomerId == customerId,includes: x => x.Ward);
+                var listAddressToShip = await _unitOfWork.AddressToShipRepository.GetAllAsync(condition: x => x.CustomerId == customerId);
                 if (listAddressToShip != null)
                 {
                     foreach (var a in listAddressToShip)
                     {
                         var mapper = _mapper.Map<ViewAddressToShipDTO>(a);
-                        if (a.Ward != null)
-                        {
-                            mapper.WardName = a.Ward.Name;
-                            if (a.Ward.District != null)
-                            {
-                                mapper.DistrictName = a.Ward.District.Name;
-                                if (a.Ward.District.Province != null)
-                                {
-                                    mapper.ProvinceName = a.Ward.District.Province.Name;
-                                }
-                            }
-                        }
                         DTOs.Add(mapper);
                     }
                     if (DTOs.Count > 0)
