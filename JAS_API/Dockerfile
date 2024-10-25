@@ -19,7 +19,7 @@ COPY ["JAS_API/Application/Application.csproj", "Application/"]
 COPY ["JAS_API/Domain/Domain.csproj", "Domain/"]
 
 # Restore dependencies with --disable-parallel to avoid conflicts in Docker
-RUN dotnet restore "WebAPI/WebAPI.csproj" --disable-parallel
+RUN dotnet restore "JAS_API/WebAPI/WebAPI.csproj" --disable-parallel
 
 # Copy the rest of the project files
 COPY ["JAS_API/", "./"]
