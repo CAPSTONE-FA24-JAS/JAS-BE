@@ -271,19 +271,22 @@ namespace Application.Services
                     await _lotService.UpdateLotRange(auctionExisted.Id);
                     _mapper.Map(updateAuctionDTO, auctionExisted);
                 }
-                var uploadResult = await _cloudinary.UploadAsync(new ImageUploadParams
+                if(updateAuctionDTO.FileImage != null)
                 {
-                    File = new FileDescription(updateAuctionDTO.FileImage.FileName,
+                    var uploadResult = await _cloudinary.UploadAsync(new ImageUploadParams
+                    {
+                        File = new FileDescription(updateAuctionDTO.FileImage.FileName,
                               updateAuctionDTO.FileImage.OpenReadStream()),
-                    Tags = Tags
-                }).ConfigureAwait(false);
-                //if (uploadResult == null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
-                //{
-                //    reponse.Message = $"File upload failed." + uploadResult.Error.Message + "";
-                //    reponse.Code = (int)uploadResult.StatusCode;
-                //    reponse.IsSuccess = false;
-                //}
-                auctionExisted.ImageLink = uploadResult.SecureUrl.AbsoluteUri;
+                        Tags = Tags
+                    }).ConfigureAwait(false);
+                    if (uploadResult == null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        reponse.Message = $"File upload failed." + uploadResult.Error.Message + "";
+                        reponse.Code = (int)uploadResult.StatusCode;
+                        reponse.IsSuccess = false;
+                    }
+                    auctionExisted.ImageLink = uploadResult.SecureUrl.AbsoluteUri;
+                }
                 _unitOfWork.AuctionRepository.Update(auctionExisted);
                 if (await _unitOfWork.SaveChangeAsync() > 0)
                 {
