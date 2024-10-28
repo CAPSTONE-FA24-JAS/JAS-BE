@@ -21,6 +21,7 @@ namespace WebAPI.Service
                     var liveBiddingService = scope.ServiceProvider.GetRequiredService<LiveBiddingService>();
                     await liveBiddingService.CheckLotStartAsync();
                     await liveBiddingService.ChecKLotEndAsync();
+                    await liveBiddingService.ChecKLotEndReducedBiddingAsync();
                 }
                 await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }

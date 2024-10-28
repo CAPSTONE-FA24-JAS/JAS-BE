@@ -218,6 +218,7 @@ namespace Application.Services
                     invoiceById.CustomerLot.Status = EnumCustomerLot.Delivered.ToString();
                     _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
 
+                    invoiceById.Status = EnumCustomerLot.Delivered.ToString();
 
                     var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
                     {

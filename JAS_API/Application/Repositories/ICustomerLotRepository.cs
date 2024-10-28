@@ -18,5 +18,7 @@ namespace Application.Repositories
         //get những thằng thua
         List<CustomerLot>? GetListCustomerLotByCustomerAndLot(List<BidPrice> bidPriceList, int customerLotWinnerId);
 
+        List<CustomerLot>? GetListCustomerLotByLotId(int lotId, int customerId);
+
     }
 }

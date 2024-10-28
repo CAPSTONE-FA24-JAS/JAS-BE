@@ -36,5 +36,35 @@ namespace Infrastructures.Repositories
                 return maxBidPrice;
             }
         }
+
+
+        //cho hinh thuc 3
+        public List<BidPrice> GetMaxBidPriceByLotId(int lotId)
+        {
+            var maxBidPrice = _dbContext.BidPrices.Where(x => x.LotId == lotId).ToList();
+            if (!maxBidPrice.Any())
+            {
+                return [];
+            }
+            else
+            {
+                return maxBidPrice;
+            }
+        }
+
+        //cho hinh thuc 4 dau gia ngc, chac chan chi cos 1 bidPrice
+        public async Task<BidPrice> GetBidPriceByLotIdForReduceBidding(int lotId)
+        {
+            var maxBidPrice = await _dbContext.BidPrices.Where(x => x.LotId == lotId).FirstOrDefaultAsync();
+            if (maxBidPrice == null)
+            {
+                return null;
+            }
+            else
+            {
+                return maxBidPrice;
+            }
+        }
+
     }
 }

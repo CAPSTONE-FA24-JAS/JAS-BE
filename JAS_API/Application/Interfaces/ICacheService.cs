@@ -40,6 +40,8 @@ namespace Application.Interfaces
 
         DateTime? GetMaxEndTimeFormSortedSetOfLot();
 
+        void UpdateLotActualEndTime(int lotId, DateTime newEndTime);
+
 
     }
 }
