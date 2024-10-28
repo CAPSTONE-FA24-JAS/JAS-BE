@@ -14,8 +14,8 @@ namespace Infrastructures.FluentAPIs
         public void Configure(EntityTypeBuilder<Invoice> builder)
         {
             builder.HasOne(x => x.AddressToShip)
-                .WithOne(x => x.Invoice)
-                .HasForeignKey<Invoice>(x => x.AddressToShipId);
+                .WithMany(x => x.Invoices)
+                .HasForeignKey(x => x.AddressToShipId);
 
             builder.HasOne(x => x.CustomerLot)
                 .WithOne(x => x.Invoice)

@@ -55,6 +55,7 @@ namespace Application
         public IRequestWithdrawRepository RequestWithdrawRepository { get; }
 
         public IHistoryStatusCustomerLotRepository HistoryStatusCustomerLotRepository { get; }
+        public IFeeShipRepository FeeShipRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
