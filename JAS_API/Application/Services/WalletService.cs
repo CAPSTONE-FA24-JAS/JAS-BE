@@ -15,12 +15,14 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IWalletTransactionService _walletTransactionService;
+        private readonly IClaimsService _claimsService;
 
-        public WalletService(IUnitOfWork unitOfWork, IMapper mapper, IWalletTransactionService walletTransactionService)
+        public WalletService(IUnitOfWork unitOfWork, IMapper mapper, IWalletTransactionService walletTransactionService, IClaimsService claimsService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _walletTransactionService = walletTransactionService;
+            _claimsService = claimsService;
         }
 
         public async Task<APIResponseModel> AddWallet(WalletTransaction walletTransaction)
@@ -220,6 +222,7 @@ namespace Application.Services
                             TransactionTime = DateTime.UtcNow,
                             Status = EnumStatusTransaction.Pending.ToString(),
                             WalletId = requestWithdrawDTO.WalletId,
+                            transactionPerson = _claimsService.GetCurrentUserId
                         };
                         
                         if (!await LockFundsForWithdrawal(requestWithdrawDTO.WalletId, (decimal)requestWithdrawDTO.Amount))
@@ -330,6 +333,7 @@ namespace Application.Services
             }
             return reponse;
         }
+
         public async Task<bool> LockFundsForWithdrawal(int walletId, decimal amountMoney)
         {
             var walletexist = await _unitOfWork.WalletRepository.GetByIdAsync(walletId);
