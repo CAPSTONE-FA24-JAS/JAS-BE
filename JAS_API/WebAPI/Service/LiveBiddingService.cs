@@ -147,11 +147,20 @@ namespace WebAPI.Service
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string lotGroupName = $"lot-{lotId}";
                 var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
-                while (bidPrice == null && lot.CurrentPrice > lot.FinalPriceSold && lot.EndTime > DateTime.UtcNow)
+                while (lot.CurrentPrice > lot.FinalPriceSold)
                 {
+
+                    await Task.Delay(30000);
+
                     lot.CurrentPrice = lot.StartPrice - lot.BidIncrement;
-                };       
-                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforReducedBiddingAuto", "Phiên đã kết thúc!");
+                    if(lot.CurrentPrice < lot.FinalPriceSold)
+                    {
+                        lot.CurrentPrice = lot.FinalPriceSold;
+                    }
+                };
+
+                await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionWithReduceBidding", "Giá đã giảm!", lot.CurrentPrice, DateTime.UtcNow);
+
 
             }
            
