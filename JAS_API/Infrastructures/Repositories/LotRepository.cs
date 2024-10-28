@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Repositories;
 using Domain.Entity;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,17 @@ namespace Infrastructures.Repositories
             _dbContext = context;
         }
 
-        
+        public List<Lot> GetLotsAsync(string lotType,string status)
+        {
+            var maxBidPrice = _dbContext.Lots.Where(x => x.LotType == lotType && x.Status == status).ToList();
+            if (!maxBidPrice.Any())
+            {
+                return [];
+            }
+            else
+            {
+                return maxBidPrice;
+            }
+        }
     }
 }

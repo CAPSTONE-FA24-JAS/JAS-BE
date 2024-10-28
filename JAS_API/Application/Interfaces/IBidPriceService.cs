@@ -14,5 +14,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> JoinBid(JoinLotRequestDTO request);
 
         Task<APIResponseModel> PlaceBiding(BiddingInputDTO request);
+
+        Task<APIResponseModel> PlaceBidForReducedBidding(BiddingInputDTO request);
     }
 }

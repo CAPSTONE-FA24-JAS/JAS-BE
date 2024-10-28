@@ -39,5 +39,15 @@ namespace WebAPI.Controllers
             return BadRequest(result);
         }
 
+        [HttpPost("place-bid-reduceBidding")]
+        public async Task<IActionResult> PlaceBidForReduceBidding([FromBody] BiddingInputDTO request)
+        {
+
+            var result = await _bidPriceService.PlaceBidForReducedBidding(request);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
     }
 }

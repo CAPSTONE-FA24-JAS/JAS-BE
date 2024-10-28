@@ -104,7 +104,16 @@ namespace Infrastructures.Repositories
 
         }
 
-
+        //lay ra het nhung customerLot theo lotId nhung ngoai tru thang thang(customerId)
+        public List<CustomerLot>? GetListCustomerLotByLotId(int lotId, int customerLotId)
+        {
+            var customerLots =  _dbContext.CustomerLots.AsEnumerable().Where(x => x.LotId == lotId && x.Id != customerLotId).ToList();
+            if (!customerLots.Any())
+            {
+                return [];
+            }
+            return customerLots;
+        }
 
 
     }

@@ -1,8 +1,10 @@
 ﻿
 using Application;
 using Application.Interfaces;
+using Application.ServiceReponse;
 using Application.Services;
 using Application.Utils;
+using Application.ViewModels.LiveBiddingDTOs;
 using Domain.Entity;
 using Domain.Enums;
 using Infrastructures;
@@ -60,6 +62,60 @@ namespace WebAPI.Service
 
         }
 
+        public async Task ChecKLotEndReducedBiddingAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+                //lấy lại max endd time theo tất cả lot của auctionId( nó đang lấy giờ nhỏ nhất)
+                var maxEndTime = _cacheService.GetMaxEndTimeFormSortedSetOfLot();
+                var lotLiveBidding = _unitOfWork.LotRepository.GetLotsAsync(EnumLotType.Auction_Price_GraduallyReduced.ToString(), EnumStatusLot.Auctioning.ToString());
+
+                int? auctionId = 0;
+                if (lotLiveBidding != null)
+                {
+                    foreach (var lot in lotLiveBidding)
+                    {
+                        string lotGroupName = $"lot-{lot.Id}";
+                        var bidPrice = _unitOfWork.BidPriceRepository.GetBidPriceByLotIdForReduceBidding(lot.Id);
+                        var endTime = lot.EndTime;
+                        if (endTime.HasValue && DateTime.UtcNow > endTime.Value)
+                        {
+                            
+                            if (bidPrice == null)
+                            {
+                                lot.Status = EnumStatusLot.Passed.ToString();
+                                _unitOfWork.LotRepository.Update(lot);
+                                await _unitOfWork.SaveChangeAsync();
+                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforReducedBiddingAuto", "Phiên đã kết thúc!");
+                            }
+                        }
+                        else
+                        {
+                           await  EndTimeReducedBidding(lot.Id, bidPrice);
+                        }
+                        auctionId = lot.AuctionId;
+                        if (auctionId == null)
+                        {
+                            throw new Exception("AuctionId null");
+                        }
+                    }
+                }
+               
+                //luu endTime max vao actual auction
+                var auction = await _unitOfWork.AuctionRepository.GetByIdAsync(auctionId);
+                if (auction != null)
+                {
+                    auction.ActualEndTime = maxEndTime;
+                    _unitOfWork.AuctionRepository.Update(auction);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+            }
+
+
+        }
+
         public async Task CheckLotStartAsync()
         {
             using (var scope = _serviceProvider.CreateScope())
@@ -82,6 +138,24 @@ namespace WebAPI.Service
         }
 
 
+        //check tu dong : khi khong co ai đấu giá và giá hiện tại vẫn cao hơn giá min và chưa đến giờ end lot thì sẽ tự động giảm giá xuống.
+        public async Task EndTimeReducedBidding(int lotId, Task<BidPrice> bidPrice)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+                string lotGroupName = $"lot-{lotId}";
+                var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+                while (bidPrice == null && lot.CurrentPrice > lot.FinalPriceSold && lot.EndTime > DateTime.UtcNow)
+                {
+                    lot.CurrentPrice = lot.StartPrice - lot.BidIncrement;
+                };       
+                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforReducedBiddingAuto", "Phiên đã kết thúc!");
+
+            }
+           
+        }
 
         private async Task StartLot(int lotId)
         {
