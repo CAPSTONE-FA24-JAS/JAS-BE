@@ -92,7 +92,6 @@ namespace Application.Services
             return response;
         }
 
-
         public async Task<APIResponseModel> AsignShipper(int invoiceId, int shipperId, int status)
         {
             var response = new APIResponseModel();
@@ -470,14 +469,13 @@ namespace Application.Services
         public async Task<APIResponseModel> UpdateAddressToshipForInvoice(UpdateAddressToShipInvoice model)
         {
             var response = new APIResponseModel();
-
             try
             {
-
                 var invoiceExist = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
                 if (invoiceExist != null)
                 {
                     invoiceExist.AddressToShipId = model.AddressToShipId;
+                    invoiceExist.FeeShip = await FindFeeShipByDistanceAsync(model.DistanceToDelivery);
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         response.Message = $"Update Invoice Successfully";
@@ -507,6 +505,17 @@ namespace Application.Services
             }
             return response;
         }
+        internal async Task<float?> FindFeeShipByDistanceAsync(float distance)
+        {
+            var feeShips = await _unitOfWork.FeeShipRepository
+                .GetAllAsync(x => x.From <= distance && x.To >= distance);
+
+            var feeShip = feeShips.FirstOrDefault();
+
+            return (feeShip == null) ? -1 : feeShip.Free;
+        }
+
+
 
         public async Task<APIResponseModel> PaymentInvoiceByWallet(PaymentInvoiceByWalletDTO model)
         {

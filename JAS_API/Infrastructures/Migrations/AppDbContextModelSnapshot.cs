@@ -1525,8 +1525,7 @@ namespace Infrastructures.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressToShipId")
-                        .IsUnique();
+                    b.HasIndex("AddressToShipId");
 
                     b.HasIndex("CustomerId");
 
@@ -3044,8 +3043,8 @@ namespace Infrastructures.Migrations
             modelBuilder.Entity("Domain.Entity.Invoice", b =>
                 {
                     b.HasOne("Domain.Entity.AddressToShip", "AddressToShip")
-                        .WithOne("Invoice")
-                        .HasForeignKey("Domain.Entity.Invoice", "AddressToShipId");
+                        .WithMany("Invoices")
+                        .HasForeignKey("AddressToShipId");
 
                     b.HasOne("Domain.Entity.Customer", "Customer")
                         .WithMany("Invoices")
@@ -3310,7 +3309,7 @@ namespace Infrastructures.Migrations
 
             modelBuilder.Entity("Domain.Entity.AddressToShip", b =>
                 {
-                    b.Navigation("Invoice");
+                    b.Navigation("Invoices");
                 });
 
             modelBuilder.Entity("Domain.Entity.Artist", b =>

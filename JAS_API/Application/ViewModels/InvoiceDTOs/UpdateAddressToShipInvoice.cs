@@ -8,7 +8,8 @@ namespace Application.ViewModels.InvoiceDTOs
 {
     public class UpdateAddressToShipInvoice
     {
-        public int? InvoiceId { get; set; }
-        public int? AddressToShipId { get; set; }
+        public int InvoiceId { get; set; }
+        public int AddressToShipId { get; set; }
+        public float DistanceToDelivery { get; set; }
     }
 }

@@ -15,7 +15,7 @@ namespace Domain.Entity
         //
         public virtual Customer? Customer { get; set; }
         //public virtual Ward? Ward { get; set; }
-        public virtual Invoice? Invoice { get; set; }
+        public virtual IEnumerable<Invoice>? Invoices { get; set; }
         
     }
 }
