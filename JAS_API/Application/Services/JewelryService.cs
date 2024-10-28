@@ -86,7 +86,7 @@ namespace Application.Services
                     response.IsSuccess = false;
                     response.Message = "Mapper failed";
                 }
-                var status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == 6).Name;
+                var status = EnumStatusValuation.FinalValuated.ToString();
                 jewelry.CreationDate = DateTime.Now;
                 var valuation = await _unitOfWork.ValuationRepository.GetByIdAsync(jewelryDTO.ValuationId);
 
@@ -97,6 +97,7 @@ namespace Application.Services
 
                 await _unitOfWork.JewelryRepository.AddAsync(jewelry);
                 await _unitOfWork.SaveChangeAsync();
+                jewelry.Status = EnumStatusJewelry.Watting.ToString();
                 if (jewelryDTO.ImageJewelries != null && jewelryDTO.ImageJewelries.Any())
                 {
                     foreach (var image in jewelryDTO.ImageJewelries)
@@ -162,6 +163,8 @@ namespace Application.Services
                     }
                 }
 
+
+                
                 var finalValuation = _mapper.Map<JewelryDTO>(jewelry);
 
                 response.Message = "Create Jewelry Successfully";
@@ -614,11 +617,13 @@ namespace Application.Services
                 }
                 else
                 {
-                    var status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == 8).Name;
+                    var status = EnumStatusValuation.Authorized.ToString();
                     valuation.Status = status;
                     
                     _unitOfWork.ValuationRepository.Update(valuation);
 
+                    valuation.Jewelry.Status = EnumStatusJewelry.Authorized.ToString();
+                    _unitOfWork.JewelryRepository.Update(valuation.Jewelry);
                     
                     
                     AddHistoryValuation(valuation.Id, status);

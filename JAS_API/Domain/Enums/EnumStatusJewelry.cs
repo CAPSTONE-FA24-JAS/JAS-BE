@@ -8,10 +8,10 @@ namespace Domain.Enums
 {
     public enum EnumStatusJewelry
     {
-        Added = 1,
-        Auctioned = 2,
+        Watting = 1,
+        Authorized = 2,
         Sold = 3,
-        Canceled = 4,
-        Passed = 5
+        Canceled = 4
+       
     }
 }
