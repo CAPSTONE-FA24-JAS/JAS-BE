@@ -19,6 +19,7 @@ using Application.ViewModels.LotDTOs;
 using Application.ViewModels.InvoiceDTOs;
 using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.BidPriceDTOs;
+using Application.ViewModels.TransactionDTOs;
 
 
 namespace Infrastructures
@@ -229,7 +230,8 @@ namespace Infrastructures
             CreateMap<RequestWithdraw, RequestWithdrawDTO>().ReverseMap();
             CreateMap<HistoryStatusCustomerLot, HistoryCustomerLotDTO>().ReverseMap();
             CreateMap<StatusInvoice, StatusInvoiceDTO>().ReverseMap();
-
+            CreateMap<WalletTransaction, ViewWalletTransactionDTO>()
+                .ReverseMap();
 
         }
     }

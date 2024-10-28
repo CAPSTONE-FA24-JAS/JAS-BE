@@ -12,5 +12,9 @@ namespace Application.Interfaces
     {
         Task<APIResponseModel> CreateNewTransaction(WalletTransaction walletTransaction);
         Task<APIResponseModel> UpdateTransaction(string Id);
+        Task<APIResponseModel> ViewTransactionType();
+        Task<APIResponseModel> ViewWalletTransactionsByCustomerId(int customerId);
+        Task<APIResponseModel> FilterWalletTransactionsOfCustomerByTransType(int customerId, int transTypeId);
+
     }
 }

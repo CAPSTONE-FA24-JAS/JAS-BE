@@ -9,6 +9,7 @@ using Domain.Entity;
 using Domain.Enums;
 using Google.Apis.Storage.v1.Data;
 using System.Linq.Expressions;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace Application.Services
 {
@@ -341,85 +342,114 @@ namespace Application.Services
 
         public async Task<APIResponseModel> RegisterToLot(RegisterToLotDTO registerToLotDTO)
         {
-            var reponse = new APIResponseModel();
+            var response = new APIResponseModel();
             try
             {
-                //kiem tra chung minh tai chinh co thoa dieu kien hay khong
-                var checkbidlimit =  await _accountService.CheckBidLimit((int)registerToLotDTO.CustomerId);
-                var depositOfLot = await _unitOfWork.LotRepository.GetByIdAsync(registerToLotDTO.LotId);
-                if (!checkbidlimit.IsSuccess) 
-                { 
-                    return reponse = checkbidlimit;
+                var lotExist = await _unitOfWork.LotRepository.GetByIdAsync(registerToLotDTO.LotId);
+                var checkBidLimit = new APIResponseModel();
+                if (lotExist == null)
+                {
+                    return new APIResponseModel { IsSuccess = false, Message = "Not Found Lot.", Code = 404 };
                 }
-                //kiem tra vi co chua , va so du co du khong
-                var checkWallet = await _walletService.CheckWalletExist((int)registerToLotDTO.CustomerId, (float)depositOfLot.Deposit);
+
+                if (lotExist.HaveFinancialProof == true)
+                {
+                    checkBidLimit = await _accountService.CheckBidLimit((int)registerToLotDTO.CustomerId);
+                    if (!checkBidLimit.IsSuccess)
+                    {
+                        return checkBidLimit;
+                    }
+                }
+
+                var depositOfLot = lotExist.Deposit;
+                var checkWallet = await _walletService.CheckWalletExist((int)registerToLotDTO.CustomerId, (float)depositOfLot);
                 if (!checkWallet.IsSuccess)
                 {
-                    return reponse = checkWallet;
+                    return checkWallet;
                 }
+
                 if (checkWallet.Data is Wallet wallet)
                 {
-                    
-                    var minusDeposit =  await _walletService.UpdateBanlance(wallet.Id, (decimal)depositOfLot.Deposit, false);
-                   
+                    var minusDeposit = await _walletService.UpdateBanlance(wallet.Id, (decimal)depositOfLot, false);
                     if (!minusDeposit.IsSuccess)
                     {
-                        return reponse = minusDeposit;
+                        return minusDeposit;
+                    }
+
+                    var customerLot = _mapper.Map<CustomerLot>(registerToLotDTO);
+                    customerLot.IsDeposit = true;
+
+                    var newTransactionWallet = new WalletTransaction
+                    {
+                        Amount = -depositOfLot,
+                        DocNo = customerLot.Id,
+                        Status = "Completed",
+                        transactionType = EnumTransactionType.DepositWallet.ToString(),
+                        TransactionTime = DateTime.UtcNow,
+                        transactionPerson = (int)registerToLotDTO.CustomerId
+                    };
+
+                    var newTransactionCompany = new Transaction
+                    {
+                        Amount = depositOfLot,
+                        DocNo = customerLot.Id,
+                        TransactionType = EnumTransactionType.DepositWallet.ToString(),
+                        TransactionTime = DateTime.UtcNow,
+                        TransactionPerson = (int)registerToLotDTO.CustomerId
+                    };
+
+                    await _unitOfWork.WalletTransactionRepository.AddAsync(newTransactionWallet);
+                    await _unitOfWork.TransactionRepository.AddAsync(newTransactionCompany);
+
+                    if (checkBidLimit.Data is Customer customer)
+                    {
+                        customerLot.PriceLimit = customer.PriceLimit;
+                        customerLot.ExpireDateOfBidLimit = customer.ExpireDate;
+                    }
+
+                    customerLot.Status = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == 1).Name;
+                    await _unitOfWork.CustomerLotRepository.AddAsync(customerLot);
+
+                    await AddBidPriceIfApplicable(lotExist.LotType, registerToLotDTO);
+
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        response.IsSuccess = true;
+                        response.Message = "Register customer to lot successfully";
+                        response.Code = 200;
                     }
                     else
                     {
-                        var customerLot = _mapper.Map<CustomerLot>(registerToLotDTO);
-                        customerLot.IsDeposit = true;
-                        //tạo trans
-                        var newTransactionWallet = new WalletTransaction()
-                        {
-                            Amount = -depositOfLot.Deposit,
-                            DocNo = customerLot.Id,
-                            Status = "Completed",
-                            transactionType = EnumTransactionType.DepositWallet.ToString(),
-                            TransactionTime = DateTime.UtcNow,
-
-                        };
-                        var newTransactionCompany = new Transaction()
-                        {
-                            Amount = depositOfLot.Deposit,
-                            DocNo = customerLot.Id,
-                            TransactionType = EnumTransactionType.DepositWallet.ToString(),
-                            TransactionTime = DateTime.UtcNow,
-
-                        };
-                        await _unitOfWork.WalletTransactionRepository.AddAsync(newTransactionWallet);
-                        await _unitOfWork.TransactionRepository.AddAsync(newTransactionCompany);
-                        if (checkbidlimit.Data is Customer customer)
-                        {
-                            customerLot.PriceLimit = customer.PriceLimit;
-                            customerLot.ExpireDateOfBidLimit = customer.ExpireDate;
-                        }
-                        customerLot.Status = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == 1).Name;
-                        await _unitOfWork.CustomerLotRepository.AddAsync(customerLot);
-                        if(await _unitOfWork.SaveChangeAsync() > 0)
-                        {
-                            reponse.IsSuccess = true;
-                            reponse.Message = "Register customer to lot successfully";
-                            reponse.Code = 200;
-                        }
-                        else
-                        {
-                            reponse.IsSuccess = false;
-                            reponse.Message = "Register customer to lot faild";
-                            reponse.Code = 400;
-                        }
+                        response.IsSuccess = false;
+                        response.Message = "Failed to register customer to lot";
+                        response.Code = 400;
                     }
                 }
             }
             catch (Exception e)
             {
-                reponse.IsSuccess = true;
-                reponse.Message = e.Message;
+                response.IsSuccess = false;
+                response.Message = "An error occurred: " + e.Message;
+                response.Code = 500;
             }
-            return reponse;
+            return response;
         }
 
+        private async Task AddBidPriceIfApplicable(string lotType, RegisterToLotDTO registerToLotDTO)
+        {
+            var bidPrice = new BidPrice
+            {
+                CustomerId = (int)registerToLotDTO.CustomerId,
+                LotId = (int)registerToLotDTO.LotId,
+                CurrentPrice = registerToLotDTO.CurrentPrice,
+                BidTime = DateTime.UtcNow
+            };
+
+            if (lotType == EnumLotType.Fixed_Price.ToString() || lotType == EnumLotType.Secret_Auction.ToString())
+            {
+                await _unitOfWork.BidPriceRepository.AddAsync(bidPrice);
+            }
+        }
         public async Task<APIResponseModel> GetCustomerLotByLot(int lotId)
         {
             var reponse = new APIResponseModel();
@@ -478,7 +508,6 @@ namespace Application.Services
             }
             return reponse;
         }
-
         public async Task<APIResponseModel> UpdateLotRange(int auctionId)
         {
             var response = new APIResponseModel();
@@ -514,6 +543,11 @@ namespace Application.Services
                 response.ErrorMessages = new List<string> { e.Message };
             }
             return response;
+        }
+
+        public Task<APIResponseModel> CheckEndLot()
+        {
+            throw new NotImplementedException();
         }
     }
 }

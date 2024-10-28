@@ -17,13 +17,15 @@ namespace Application.Services
         private readonly IWalletTransactionService _walletTransactionService;
         private readonly ITransactionService _transactionService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IClaimsService _claimsService;
 
-        public VNPayService(IConfiguration configuration, IWalletTransactionService walletTransactionService, ITransactionService transaction, IUnitOfWork unitOfWork)
+        public VNPayService(IConfiguration configuration, IWalletTransactionService walletTransactionService, ITransactionService transaction, IUnitOfWork unitOfWork, IClaimsService claimsService)
         {
             _configuration = configuration;
             _walletTransactionService = walletTransactionService;
             _transactionService = transaction;
             _unitOfWork = unitOfWork;
+            _claimsService = claimsService;
         }
 
         public async Task<string> CreatePaymentUrl(HttpContext httpContext, VNPaymentRequestDTO model, WalletTransaction walletTransaction)
@@ -50,8 +52,8 @@ namespace Application.Services
             walletTransaction.Status = EnumStatusTransaction.Pending.ToString();
             walletTransaction.Amount = model.Amount;
             walletTransaction.CreationDate = model.CreatedDate;
+            walletTransaction.transactionPerson = _claimsService.GetCurrentUserId;
 
-            
 
             var walletTransactionResult = await _walletTransactionService.CreateNewTransaction(walletTransaction);
 

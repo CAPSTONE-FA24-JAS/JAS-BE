@@ -1490,6 +1490,9 @@ namespace Infrastructures.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("LinkBillTransaction")
+                        .HasColumnType("text");
+
                     b.Property<int?>("ModificationBy")
                         .HasColumnType("integer");
 
@@ -1522,8 +1525,7 @@ namespace Infrastructures.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressToShipId")
-                        .IsUnique();
+                    b.HasIndex("AddressToShipId");
 
                     b.HasIndex("CustomerId");
 
@@ -1727,6 +1729,9 @@ namespace Infrastructures.Migrations
 
                     b.Property<float?>("BidIncrement")
                         .HasColumnType("real");
+
+                    b.Property<DateTime?>("BidIncrementTime")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<float?>("BuyNowPrice")
                         .HasColumnType("real");
@@ -3041,8 +3046,8 @@ namespace Infrastructures.Migrations
             modelBuilder.Entity("Domain.Entity.Invoice", b =>
                 {
                     b.HasOne("Domain.Entity.AddressToShip", "AddressToShip")
-                        .WithOne("Invoice")
-                        .HasForeignKey("Domain.Entity.Invoice", "AddressToShipId");
+                        .WithMany("Invoices")
+                        .HasForeignKey("AddressToShipId");
 
                     b.HasOne("Domain.Entity.Customer", "Customer")
                         .WithMany("Invoices")
@@ -3307,7 +3312,7 @@ namespace Infrastructures.Migrations
 
             modelBuilder.Entity("Domain.Entity.AddressToShip", b =>
                 {
-                    b.Navigation("Invoice");
+                    b.Navigation("Invoices");
                 });
 
             modelBuilder.Entity("Domain.Entity.Artist", b =>

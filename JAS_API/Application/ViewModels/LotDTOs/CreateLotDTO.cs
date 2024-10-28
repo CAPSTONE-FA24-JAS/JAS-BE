@@ -64,6 +64,7 @@ namespace Application.ViewModels.LotDTOs
         public int? StaffId { get; set; }
         public int? JewelryId { get; set; }
         public int? AuctionId { get; set; }
+        public DateTime? BidIncrementTime { get; set; }
     }
 
 

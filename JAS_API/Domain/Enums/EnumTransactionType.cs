@@ -13,6 +13,7 @@ namespace Domain.Enums
         DepositWallet = 3,
         RefundDeposit = 4,
         BuyPay = 5,
-        SellerPay = 6
+        SellerPay = 6,
+        Banktransfer = 7
     }
 }

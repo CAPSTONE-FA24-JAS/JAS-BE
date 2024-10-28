@@ -16,8 +16,9 @@ namespace WebAPI.Controllers
         private readonly IVNPayService _vNPayService;
         private readonly IWalletTransactionService _walletTransactionService;
         private readonly ITransactionService _transactionService;
+        private readonly IClaimsService _claimsService;
         
-        public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService, IVNPayService vNPayService, IWalletTransactionService walletTransactionService, ITransactionService transactionService)
+        public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService, IVNPayService vNPayService, IWalletTransactionService walletTransactionService, ITransactionService transactionService, IClaimsService claimsService)
         {
             _walletService = walletService;
             _vpnService = vpnService;
@@ -25,6 +26,7 @@ namespace WebAPI.Controllers
             _vNPayService = vNPayService;
             _walletTransactionService = walletTransactionService;
             _transactionService = transactionService;
+            _claimsService = claimsService;
         }
 
         [HttpGet]
@@ -117,6 +119,7 @@ namespace WebAPI.Controllers
                             DocNo = trans.DocNo,
                             TransactionTime = trans.TransactionTime,
                             TransactionType = trans.transactionType,
+                            TransactionPerson = _claimsService.GetCurrentUserId
                         };
                         var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
                         if (!transactionResult.IsSuccess)
@@ -143,7 +146,6 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
-
 
         [HttpPatch]
         public async Task<IActionResult> ApproveRequestNewWithdraw(int transId)

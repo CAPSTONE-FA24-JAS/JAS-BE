@@ -54,6 +54,7 @@ namespace Infrastructures
         private readonly IStatusInvoiceRepository _statusInvoiceRepository;
         private readonly IRequestWithdrawRepository _requestWithdrawRepository;
         private readonly IHistoryStatusCustomerLotRepository _historyStatusCustomerLotRepository;
+        private readonly IFeeShipRepository _feeShipRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -76,7 +77,8 @@ namespace Infrastructures
                           IBidPriceRepository bidPriceRepository, IWalletTransactionRepository walletTransactionRepository,
                           IInvoiceRepository invoiceRepository, ITransactionRepository transactionRepository, 
                           IStatusInvoiceRepository statusInvoiceRepository, IRequestWithdrawRepository requestWithdrawRepository,
-                          IHistoryStatusCustomerLotRepository historyStatusCustomerLotRepository)
+                          IHistoryStatusCustomerLotRepository historyStatusCustomerLotRepository,
+                          IFeeShipRepository feeShipRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -123,6 +125,7 @@ namespace Infrastructures
             _statusInvoiceRepository = statusInvoiceRepository;
             _requestWithdrawRepository = requestWithdrawRepository;
             _historyStatusCustomerLotRepository = historyStatusCustomerLotRepository;
+            _feeShipRepository = feeShipRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -191,6 +194,8 @@ namespace Infrastructures
         public IRequestWithdrawRepository RequestWithdrawRepository => _requestWithdrawRepository;
 
         public IHistoryStatusCustomerLotRepository HistoryStatusCustomerLotRepository => _historyStatusCustomerLotRepository;
+
+        public IFeeShipRepository FeeShipRepository => _feeShipRepository;
 
         public async Task<int> SaveChangeAsync()
         {

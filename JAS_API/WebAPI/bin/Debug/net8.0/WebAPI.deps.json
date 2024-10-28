@@ -15,6 +15,8 @@
           "Infrastructures": "1.0.0",
           "Microsoft.AspNetCore.Cors": "2.2.0",
           "Microsoft.AspNetCore.SignalR": "1.1.0",
+          "Microsoft.CodeAnalysis.Analyzers": "3.3.3",
+          "Microsoft.EntityFrameworkCore.Analyzers": "8.0.8",
           "Microsoft.EntityFrameworkCore.Design": "8.0.5",
           "Microsoft.EntityFrameworkCore.Tools": "8.0.5",
           "Microsoft.Extensions.Caching.StackExchangeRedis": "8.0.10",

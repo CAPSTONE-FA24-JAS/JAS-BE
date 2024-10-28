@@ -146,7 +146,7 @@ namespace Application.Services
             var DTOs = new List<ViewAddressToShipDTO>();
             try
             {
-                var listAddressToShip = await _unitOfWork.AddressToShipRepository.GetAllAsync();
+                var listAddressToShip = await _unitOfWork.AddressToShipRepository.GetAllAsync(x => x.IsDeleted == false);
                 if (listAddressToShip != null)
                 {
                     foreach(var a in listAddressToShip)
@@ -193,7 +193,7 @@ namespace Application.Services
             var DTOs = new List<ViewAddressToShipDTO>();
             try
             {
-                var listAddressToShip = await _unitOfWork.AddressToShipRepository.GetAllAsync(condition: x => x.CustomerId == customerId);
+                var listAddressToShip = await _unitOfWork.AddressToShipRepository.GetAllAsync(condition: x => x.CustomerId == customerId && x.IsDeleted == false);
                 if (listAddressToShip != null)
                 {
                     foreach (var a in listAddressToShip)
