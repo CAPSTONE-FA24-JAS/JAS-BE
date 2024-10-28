@@ -29,7 +29,7 @@ namespace Domain.Entity
         public virtual Category? Category { get; set;}
         public virtual IEnumerable<ImageJewelry>? ImageJewelries { get; set; }
         public virtual IEnumerable<KeyCharacteristicDetail>? KeyCharacteristicDetails { get; set; }
-        public virtual Lot? Lot { get; set; }
+        public virtual IEnumerable<Lot>? Lots { get; set; }
         public virtual IEnumerable<MainDiamond>? MainDiamonds { get; set; }
         public virtual IEnumerable<SecondaryDiamond>? SecondaryDiamonds { get; set;}
         public virtual IEnumerable<MainShaphie>? MainShaphies { get; set; }

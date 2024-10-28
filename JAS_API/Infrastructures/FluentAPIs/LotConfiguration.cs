@@ -18,8 +18,8 @@ namespace Infrastructures.FluentAPIs
                 .HasForeignKey(x => x.AuctionId);
 
             builder.HasOne(x => x.Jewelry)
-                .WithOne(x => x.Lot)
-                .HasForeignKey<Lot>(x => x.JewelryId);
+                .WithMany(x => x.Lots)
+                .HasForeignKey(x => x.JewelryId);
 
             builder.HasOne(x => x.Staff)
                 .WithMany(x => x.Lots)
