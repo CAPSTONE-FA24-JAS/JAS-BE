@@ -33,7 +33,7 @@ namespace Infrastructures.Repositories
                                               .Include(x => x.ImageJewelries)
                                               .Include(x => x.KeyCharacteristicDetails)
                                                       .ThenInclude(kc => kc.KeyCharacteristic)
-                                              .Include(x => x.Lot)
+                                              .Include(x => x.Lots)
                                               .Include(x => x.MainDiamonds)
                                                       .ThenInclude(md => md.ImageMainDiamonds)
                                               .Include(x => x.SecondaryDiamonds)
@@ -73,8 +73,8 @@ namespace Infrastructures.Repositories
         public async Task<(IEnumerable<Jewelry> data, int totalItem)> GetAllJewelryNoLotAynsc(int? pageIndex = null, int? pageSize = null)
         {
             var jewelry = _dbContext.Jewelries.Include(x => x.ImageJewelries)                                             
-                                              .Include(x => x.Lot)                                            
-                                              .Where(x =>( x.Status == "Authorized" &&  x.Lot == null) ||( x.Lot.Status == "Passed" && x.Status == "Authorized"));
+                                              .Include(x => x.Lots)                                            
+                                              .Where(x =>( x.Status == "Authorized" &&  x.Lots == null) ||( x.Lots.First().Status == "Passed" && x.Status == "Authorized"));
 
             if (pageIndex.HasValue && pageSize.HasValue)
             {

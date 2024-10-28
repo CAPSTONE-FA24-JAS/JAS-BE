@@ -1806,8 +1806,7 @@ namespace Infrastructures.Migrations
 
                     b.HasIndex("AuctionId");
 
-                    b.HasIndex("JewelryId")
-                        .IsUnique();
+                    b.HasIndex("JewelryId");
 
                     b.HasIndex("SellerId");
 
@@ -3131,8 +3130,8 @@ namespace Infrastructures.Migrations
                         .HasForeignKey("AuctionId");
 
                     b.HasOne("Domain.Entity.Jewelry", "Jewelry")
-                        .WithOne("Lot")
-                        .HasForeignKey("Domain.Entity.Lot", "JewelryId");
+                        .WithMany("Lots")
+                        .HasForeignKey("JewelryId");
 
                     b.HasOne("Domain.Entity.Customer", "Seller")
                         .WithMany("Lots")
@@ -3389,7 +3388,7 @@ namespace Infrastructures.Migrations
 
                     b.Navigation("KeyCharacteristicDetails");
 
-                    b.Navigation("Lot");
+                    b.Navigation("Lots");
 
                     b.Navigation("MainDiamonds");
 
