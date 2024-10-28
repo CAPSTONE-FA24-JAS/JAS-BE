@@ -1730,8 +1730,8 @@ namespace Infrastructures.Migrations
                     b.Property<float?>("BidIncrement")
                         .HasColumnType("real");
 
-                    b.Property<DateTime?>("BidIncrementTime")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<int?>("BidIncrementTime")
+                        .HasColumnType("integer");
 
                     b.Property<float?>("BuyNowPrice")
                         .HasColumnType("real");
