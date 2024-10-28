@@ -74,7 +74,7 @@ namespace Infrastructures.Repositories
         {
             var jewelry = _dbContext.Jewelries.Include(x => x.ImageJewelries)                                             
                                               .Include(x => x.Lot)                                            
-                                              .Where(x =>  x.Lot == null || x.Lot.Status == "Passed");
+                                              .Where(x =>( x.Status == "Authorized" &&  x.Lot == null) ||( x.Lot.Status == "Passed" && x.Status == "Authorized"));
 
             if (pageIndex.HasValue && pageSize.HasValue)
             {
