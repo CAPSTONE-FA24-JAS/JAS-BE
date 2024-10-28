@@ -80,7 +80,7 @@ namespace Application.Services
                             lot.FloorFeePercent = 25;
                             await _unitOfWork.LotRepository.AddAsync(lot);
                             var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(lot.JewelryId);
-                            jewelry.Status = EnumStatusJewelry.Added.ToString();
+                            
                             if (await _unitOfWork.SaveChangeAsync() > 0)
                             {
                             // Lưu lot vào Redis(dung hash)
