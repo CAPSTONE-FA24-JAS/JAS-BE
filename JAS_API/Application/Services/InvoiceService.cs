@@ -6,7 +6,9 @@ using Application.ViewModels.ValuationDTOs;
 using Application.ViewModels.VNPayDTOs;
 using Application.ViewModels.WalletDTOs;
 using AutoMapper;
+using Azure;
 using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Domain.Entity;
 using Domain.Enums;
 using iTextSharp.text;
@@ -32,6 +34,7 @@ namespace Application.Services
         private readonly IVNPayService _vNPayService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWalletService _walletService;
+        private const string Tags = "Backend_BillTranfer";
 
         public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IWalletService walletService)
         {
@@ -50,11 +53,6 @@ namespace Application.Services
 
             try
             {
-
-                
-
-
-
                 var invoices = await _unitOfWork.InvoiceRepository.getInvoicesByStatusForManger(pageSize, pageIndex);
                 List<InvoiceDTO> listInvoiceDTO = new List<InvoiceDTO>();
                 if (invoices.totalItems > 0)
@@ -259,7 +257,7 @@ namespace Application.Services
                         var jewelryOfInvoice = invoiceById.CustomerLot.Lot.Jewelry;
 
                         var invoiceByDTO = _mapper.Map<InvoiceDetailDTO>(invoiceById, x => x.Items["Jewelry"] = jewelryOfInvoice);
-                       
+
 
                         response.Message = $"Add data in StatusInvoice Successfully";
                         response.Code = 200;
@@ -297,7 +295,7 @@ namespace Application.Services
                 {
                     invoiceById.CustomerLot.Status = EnumCustomerLot.Finished.ToString();
 
-                    invoiceById.Status = EnumCustomerLot.Finished.ToString(); 
+                    invoiceById.Status = EnumCustomerLot.Finished.ToString();
                     _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
                     _unitOfWork.InvoiceRepository.Update(invoiceById);
 
@@ -588,9 +586,48 @@ namespace Application.Services
             return response;
         }
 
-        public Task<APIResponseModel> PaymentInvoiceByBankTransfer(PaymentInvoiceByBankTransferDTO model)
+        public async Task<APIResponseModel> PaymentInvoiceByBankTransfer(PaymentInvoiceByBankTransferDTO model)
         {
-            throw new NotImplementedException();
+            var response = new APIResponseModel();
+
+            try
+            {
+                var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
+                if (invoiceById != null)
+                {
+                    var walletTrans = new WalletTransaction()
+                    {
+                        DocNo = model.InvoiceId,
+                        TransactionTime = DateTime.Now,
+                        Amount = (float)-model.Amount,
+                        Status = EnumStatusTransaction.Pending.ToString(),
+                        transactionType = EnumTransactionType.Banktransfer.ToString(),
+                    };
+
+                   await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
+                    
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        response.Message = $"Add transaction Successfully";
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                    }
+                    else
+                    {
+                        response.Message = $"Add transaction Faild";
+                        response.Code = 500;
+                        response.IsSuccess = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
         }
 
         public async Task<APIResponseModel> PaymentInvoiceByVnPay(PaymentInvoiceByVnPayDTO model)
@@ -689,9 +726,9 @@ namespace Application.Services
                         await _unitOfWork.SaveChangeAsync();
 
                         var jewelryOfInvoice = invoiceById.CustomerLot.Lot.Jewelry;
-                       
-                            var invoiceByDTO = _mapper.Map<InvoiceDetailDTO>(invoiceById, x => x.Items["Jewelry"] = jewelryOfInvoice);
-                            
+
+                        var invoiceByDTO = _mapper.Map<InvoiceDetailDTO>(invoiceById, x => x.Items["Jewelry"] = jewelryOfInvoice);
+
 
                         response.Message = $"Add data in StatusInvoice Successfully";
                         response.Code = 200;
@@ -728,7 +765,7 @@ namespace Application.Services
 
                 Expression<Func<Invoice, bool>> filter;
 
-               
+
 
                 var invoices = await _unitOfWork.InvoiceRepository.getInvoicesRecivedByShipper(shipperId, pageIndex, pageSize);
                 List<InvoiceDTO> listInvoiceDTO = new List<InvoiceDTO>();
@@ -768,5 +805,133 @@ namespace Application.Services
             }
             return response;
         }
-    }
+
+        public async Task<APIResponseModel> UploadBillForPaymentInvoiceByBankTransfer(UploadPaymentInvoiceByBankTransferDTO model)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
+                if (invoiceById != null)
+                {
+                    var uploadResult = await _cloudinary.UploadAsync(new ImageUploadParams
+                    {
+                        File = new FileDescription(model.FileBill.FileName,
+                                                   model.FileBill.OpenReadStream()),
+                        Tags = Tags
+                    }).ConfigureAwait(false);
+
+                    if (uploadResult == null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        response.Message = $"Image upload failed." + uploadResult.Error.Message + "";
+                        response.Code = (int)uploadResult.StatusCode;
+                        response.IsSuccess = false;
+                    }
+                    else
+                    {
+                        invoiceById.LinkBillTransaction = uploadResult.SecureUrl.AbsoluteUri;
+                        if (await _unitOfWork.SaveChangeAsync() > 0)
+                        {
+                            response.Message = $"Upload file bill transaction Successfully";
+                            response.Code = 200;
+                            response.IsSuccess = true;
+                        }
+                        else
+                        {
+                            response.Message = $"Upload file bill transaction Faild";
+                            response.Code = 500;
+                            response.IsSuccess = false;
+                        }
+                    }
+                }
+                else
+                {
+                    response.Message = $"not found invoice";
+                    response.Code = 404;
+                    response.IsSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
         }
+
+        public async Task<APIResponseModel> ApproveBillForPaymentInvoiceByBankTransfer(int invoiceId)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
+                if (invoiceById != null)
+                {
+                    var walletTransactions = await _unitOfWork.WalletTransactionRepository.GetAllAsync(x => x.DocNo == invoiceId && x.transactionType == EnumTransactionType.Banktransfer.ToString());
+                    var walletTransaction = walletTransactions.FirstOrDefault();
+                    if (walletTransaction != null)
+                    {
+                        walletTransaction.Status = EnumStatusTransaction.Completed.ToString();
+                        invoiceById.Status = EnumCustomerLot.Paid.ToString();
+                        invoiceById.CustomerLot.Status = EnumCustomerLot.Paid.ToString();
+
+                        var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                        {
+                            CustomerLotId = invoiceById.CustomerLot.Id,
+                            Status = EnumCustomerLot.Paid.ToString(),
+                            CurrentTime = DateTime.UtcNow,
+                        };
+
+                        var trans = new Transaction()
+                        {
+                            Amount = (float)walletTransaction.Amount,
+                            DocNo = walletTransaction.DocNo,
+                            TransactionTime = DateTime.Now,
+                            TransactionType = EnumTransactionType.Banktransfer.ToString(),
+                        };
+
+                        await _unitOfWork.TransactionRepository.AddAsync(trans);
+                        await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
+
+                        if (await _unitOfWork.SaveChangeAsync() > 0)
+                        {
+                            response.Message = "Upload file bill transaction Successfully";
+                            response.Code = 200;
+                            response.IsSuccess = true;
+                        }
+                        else
+                        {
+                            response.Message = "Failed to save changes";
+                            response.Code = 500;
+                            response.IsSuccess = false;
+                        }
+                    }
+                    else
+                    {
+                        response.Message = "Wallet transaction records not found for the specified invoice";
+                        response.Code = 404;
+                        response.IsSuccess = false;
+                    }
+                }
+                else
+                {
+                    response.Message = "Invoice not found";
+                    response.Code = 404;
+                    response.IsSuccess = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "An exception occurred";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+
+    }
+}

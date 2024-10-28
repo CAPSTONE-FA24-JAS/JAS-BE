@@ -80,8 +80,6 @@ namespace Infrastructures
             services.AddScoped<IInvoiceRepository, InvoiceRepository>();
             services.AddSingleton<ShareDB>();
             services.AddScoped<IVNPayService, VNPayService>();
-            services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
-            services.AddScoped<IWalletTransactionService, WalletTransactionService>();
             services.AddScoped<IStatusInvoiceRepository, StatusInvoiceRepository>();
             services.AddScoped<IRequestWithdrawRepository, RequestWithdrawRepository>();
             services.AddScoped<IHistoryStatusCustomerLotRepository, HistoryStatusCustomerLotRepository>();

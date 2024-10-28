@@ -205,5 +205,47 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> paymentInvoiceByBankTransfer(PaymentInvoiceByBankTransferDTO model)
+        {
+            var result = await _invoiceService.PaymentInvoiceByBankTransfer(model);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpPatch]
+        public async Task<IActionResult> UploadBillForInvoice(UploadPaymentInvoiceByBankTransferDTO model)
+        {
+            var result = await _invoiceService.UploadBillForPaymentInvoiceByBankTransfer(model);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApprovePaymentInvoiceByBankTransfer(int invoiceId)
+        {
+            var result = await _invoiceService.ApproveBillForPaymentInvoiceByBankTransfer(invoiceId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
     }
 }

@@ -35,7 +35,8 @@ namespace Application.Interfaces
         Task<APIResponseModel> PaymentInvoiceByWallet(PaymentInvoiceByWalletDTO model);
         Task<APIResponseModel> PaymentInvoiceByBankTransfer(PaymentInvoiceByBankTransferDTO model);
         Task<APIResponseModel> PaymentInvoiceByVnPay(PaymentInvoiceByVnPayDTO model);
-
+        Task<APIResponseModel> UploadBillForPaymentInvoiceByBankTransfer(UploadPaymentInvoiceByBankTransferDTO model);
+        Task<APIResponseModel> ApproveBillForPaymentInvoiceByBankTransfer(int invoiceId);
         Task<APIResponseModel>  GetInvoicesRecivedByShipper(int shipperId, int? pageIndex, int? pageSize);
 
     }
