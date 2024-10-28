@@ -14,6 +14,7 @@ namespace Application.ViewModels.LotDTOs
     public class BaseLot
     {
         public string? Title { get; set; }
+        
     }
   
     public class CreateLotFixedPriceDTO : BaseLot
@@ -64,6 +65,7 @@ namespace Application.ViewModels.LotDTOs
         public int? StaffId { get; set; }
         public int? JewelryId { get; set; }
         public int? AuctionId { get; set; }
+        public int? BidIncrementTime { get; set; }
     }
 
 
