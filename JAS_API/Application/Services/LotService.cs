@@ -386,6 +386,7 @@ namespace Application.Services
                         Status = "Completed",
                         transactionType = EnumTransactionType.DepositWallet.ToString(),
                         TransactionTime = DateTime.UtcNow,
+                        transactionPerson = (int)registerToLotDTO.CustomerId
                     };
 
                     var newTransactionCompany = new Transaction
@@ -394,6 +395,7 @@ namespace Application.Services
                         DocNo = customerLot.Id,
                         TransactionType = EnumTransactionType.DepositWallet.ToString(),
                         TransactionTime = DateTime.UtcNow,
+                        TransactionPerson = (int)registerToLotDTO.CustomerId
                     };
 
                     await _unitOfWork.WalletTransactionRepository.AddAsync(newTransactionWallet);
@@ -541,6 +543,11 @@ namespace Application.Services
                 response.ErrorMessages = new List<string> { e.Message };
             }
             return response;
+        }
+
+        public Task<APIResponseModel> CheckEndLot()
+        {
+            throw new NotImplementedException();
         }
     }
 }
