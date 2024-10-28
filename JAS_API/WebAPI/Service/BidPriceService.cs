@@ -240,43 +240,11 @@ namespace Application.Services
         }
 
 
-        //check tu dong : khi khong co ai đấu giá và giá hiện tại vẫn cao hơn giá min và chưa đến giờ end lot thì sẽ tự động giảm giá xuống.
-        public async Task<APIResponseModel> CheckPriceGraduallyReduced(string connectionId, int lotId)
-        {
-            var reponse = new APIResponseModel();
-            try
-            {
-                if (_shared.connections.TryGetValue(connectionId, out AccountConnection conn))
-                {
-                    string lotGroupName = $"lot-{conn.LotId}";
-                    var bidPrice = _unitOfWork.BidPriceRepository.GetMaxBidPriceByLotIdForReduceBidding(lotId);
-                    var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
-                    while (bidPrice == null && lot.CurrentPrice > lot.FinalPriceSold && lot.EndTime > DateTime.UtcNow)                     
-                        {
-                        lot.CurrentPrice = lot.StartPrice - lot.BidIncrement;
-                        };
-
-                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforReducedBiddingAuto", "Phiên đã kết thúc!");
-                }
-                else
-                {
-                    reponse.IsSuccess = false;
-                    reponse.Code = 404;
-                    reponse.Message = "Not found ConnectionId!";
-                }
-            }
-            catch(Exception ex)
-            {
-                reponse.IsSuccess = false;
-                reponse.Code = 500;
-                reponse.Message = ex.Message;
-            }
-            return reponse;
-
-        }
+       
+       
 
 
-            public async Task<APIResponseModel> PlaceBidingPriceGraduallyReduced(BiddingInputDTO request)
+            public async Task<APIResponseModel> PlaceBidForReducedBidding(BiddingInputDTO request)
         {
             var reponse = new APIResponseModel();
             try
