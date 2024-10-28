@@ -39,7 +39,7 @@ namespace Application.ViewModels.VNPayDTOs
     {
         public int InvoiceId { get; set; }
         public decimal Amount { get; set; }
-        public int CreditCardId { get; set; }
+        //public int CreditCardId { get; set; }
     }
     public class PaymentInvoiceByVnPayDTO
     {

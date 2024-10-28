@@ -14,6 +14,7 @@ namespace Domain.Entity
         public float? FeeShip { get; set; }
         public float? TotalPrice { get; set; }
         public string? TransferInvoice { get; set; }
+        public string? LinkBillTransaction { get; set; }
         public int? CustomerId { get; set; }
         public int? CustomerLotId { get; set; }
         public int? PaymentMethodId { get; set; }

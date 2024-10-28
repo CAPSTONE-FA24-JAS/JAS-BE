@@ -1490,6 +1490,9 @@ namespace Infrastructures.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("LinkBillTransaction")
+                        .HasColumnType("text");
+
                     b.Property<int?>("ModificationBy")
                         .HasColumnType("integer");
 
