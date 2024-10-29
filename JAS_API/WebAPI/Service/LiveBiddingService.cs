@@ -146,14 +146,12 @@ namespace WebAPI.Service
                 var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
                 while (lot.CurrentPrice > lot.FinalPriceSold)
                 {
-
-                    await Task.Delay(30000);
-
                     lot.CurrentPrice = lot.StartPrice - lot.BidIncrement;
                     if(lot.CurrentPrice < lot.FinalPriceSold)
                     {
                         lot.CurrentPrice = lot.FinalPriceSold;
                     }
+                    await Task.Delay(30000);
                 };
 
                 await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionWithReduceBidding", "Giá đã giảm!", lot.CurrentPrice, DateTime.UtcNow);
