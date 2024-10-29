@@ -163,7 +163,7 @@ namespace Application.Services
                 if (!lots.Any())
                 {
                     reponse.Code = 404;
-                    reponse.IsSuccess = false;
+                    reponse.IsSuccess = true;
                     reponse.Message = "Not Found Lots";
                 }
                 else
@@ -227,7 +227,7 @@ namespace Application.Services
                 if (!lotTypes.Any())
                 {
                     reponse.Code = 404;
-                    reponse.IsSuccess = false;
+                    reponse.IsSuccess = true;
                     reponse.Message = "Not Found LotType";
                 }
                 else
@@ -292,7 +292,7 @@ namespace Application.Services
                 if (!lots.Any())
                 {
                     reponse.Code = 404;
-                    reponse.IsSuccess = false;
+                    reponse.IsSuccess = true;
                     reponse.Message = "Not Found Lots";
                 }
                 else
@@ -320,7 +320,7 @@ namespace Application.Services
                 var filters = EnumHelper.GetEnums<EnumStatusLot>();
                 if (filters == null)
                 {
-                    reponse.IsSuccess = false;
+                    reponse.IsSuccess = true;
                     reponse.Message = "Receive Status Of Lot Fail";
                     reponse.Code = 400;
                 }
@@ -407,10 +407,8 @@ namespace Application.Services
                         customerLot.ExpireDateOfBidLimit = customer.ExpireDate;
                     }
 
-                    customerLot.Status = EnumHelper.GetEnums<EnumCustomerLot>().FirstOrDefault(x => x.Value == 1).Name;
+                    customerLot.Status = EnumCustomerLot.Registed.ToString();
                     await _unitOfWork.CustomerLotRepository.AddAsync(customerLot);
-
-                    await AddBidPriceIfApplicable(lotExist.LotType, registerToLotDTO);
 
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
@@ -435,21 +433,7 @@ namespace Application.Services
             return response;
         }
 
-        private async Task AddBidPriceIfApplicable(string lotType, RegisterToLotDTO registerToLotDTO)
-        {
-            var bidPrice = new BidPrice
-            {
-                CustomerId = (int)registerToLotDTO.CustomerId,
-                LotId = (int)registerToLotDTO.LotId,
-                CurrentPrice = registerToLotDTO.CurrentPrice,
-                BidTime = DateTime.UtcNow
-            };
-
-            if (lotType == EnumLotType.Fixed_Price.ToString() || lotType == EnumLotType.Secret_Auction.ToString())
-            {
-                await _unitOfWork.BidPriceRepository.AddAsync(bidPrice);
-            }
-        }
+        
         public async Task<APIResponseModel> GetCustomerLotByLot(int lotId)
         {
             var reponse = new APIResponseModel();
@@ -549,5 +533,111 @@ namespace Application.Services
         {
             throw new NotImplementedException();
         }
+        private async Task AddBidPriceIfApplicable(string lotType, PlaceBidFixedPriceAndSercet model)
+        {
+            var bidPrice = new BidPrice
+            {
+                CustomerId = (int)model.CustomerId,
+                LotId = (int)model.LotId,
+                CurrentPrice = model.CurrentPrice,
+                BidTime = DateTime.UtcNow
+            };
+
+            if (lotType == EnumLotType.Fixed_Price.ToString() || lotType == EnumLotType.Secret_Auction.ToString())
+            {
+                await _unitOfWork.BidPriceRepository.AddAsync(bidPrice);
+            }
+        }
+        private async Task<bool> checkCustomerRegisteredToLot(int customerId, int lotId)
+        {
+            var registered = await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.CustomerId == customerId && x.LotId == lotId);
+            if (registered.Any())
+            {
+                return true;
+            }
+            return false;
+        }
+        private async Task<bool> checkCustomerIntoBidPriceOfFixedPriceAndSercet(int customerId, int lotId)
+        {
+            if ( _unitOfWork.BidPriceRepository.GetAllAsync(x => x.CustomerId == customerId && x.LotId == lotId).Result.Any())
+            {
+                return true;
+            }
+            return false;
+        }
+        public async Task<APIResponseModel> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet model)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                if(!await checkCustomerRegisteredToLot((int)model.CustomerId, (int)model.LotId))
+                {
+                    response.Code = 400;
+                    response.IsSuccess = false;
+                    response.Message = $"The customer is not register into the lot";
+                    return response;
+                }
+                if (await checkCustomerIntoBidPriceOfFixedPriceAndSercet((int)model.CustomerId, (int)model.LotId))
+                {
+                    response.Code = 400;
+                    response.IsSuccess = false;
+                    response.Message = $"The customer auctioned into the lot";
+                    return response;
+                }
+                var lot = await _unitOfWork.LotRepository.GetByIdAsync(model.LotId);
+                if (lot != null)
+                {
+
+                    if (model.CurrentPrice < lot.StartPrice || model.CurrentPrice > lot.FinalPriceSold && lot.LotType == EnumLotType.Secret_Auction.ToString())
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"The Price To Bid Must into the range of lot allow.";
+                        return response;
+                    }
+                    
+                    if(lot.CurrentPrice < model.CurrentPrice || lot.CurrentPrice == null)
+                    {
+                        lot.CurrentPrice = model.CurrentPrice;
+                        foreach (var customerLot in lot.CustomerLots.Where(x => x.CustomerId != model.CustomerId))
+                        {
+                            customerLot.IsWinner = false;
+                        }
+                        lot.CustomerLots.First(x => x.CustomerId == model.CustomerId).IsWinner = true;
+                    }
+                    foreach (var customerLot in lot.CustomerLots.Where(x => x.CustomerId == model.CustomerId))
+                    {
+                        customerLot.CurrentPrice = model.CurrentPrice;
+                    }
+                    await AddBidPriceIfApplicable(lot.LotType, model);
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Message = $"Place Bid Successfuly";
+                    }
+                    else
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"Place Bid Fail When Save";
+                    }
+                }
+                else
+                {
+                    response.Code = 404;
+                    response.IsSuccess = false;
+                    response.Message = $"Not Found Lot";
+                }
+            }
+            catch (Exception e)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.ErrorMessages = new List<string> { e.Message };
+            }
+            return response;
+        }
+        
     }
 }

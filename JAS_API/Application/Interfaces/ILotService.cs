@@ -22,5 +22,6 @@ namespace Application.Interfaces
         Task<APIResponseModel> CheckCustomerInLot(int customerId, int lotId);
         Task<APIResponseModel> UpdateLotRange(int auctionId);
         Task<APIResponseModel> CheckEndLot();
+        Task<APIResponseModel> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet placeBidFixedPriceAndSercetDTO);
     }
 }

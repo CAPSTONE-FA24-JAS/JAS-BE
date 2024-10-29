@@ -310,7 +310,7 @@ namespace Application.Services
                         //cong vao cho wallet seller
                         var walletOfSeller = await _unitOfWork.WalletRepository.GetByCustomerId(sellerId);
 
-                        walletOfSeller.Balance = walletOfSeller.Balance + (decimal?)invoiceById.CustomerLot.Lot.Deposit;
+                        walletOfSeller.Balance = walletOfSeller.Balance + (decimal?)invoiceById.CustomerLot.Lot.CurrentPrice;
 
                         _unitOfWork.WalletRepository.Update(walletOfSeller);
 

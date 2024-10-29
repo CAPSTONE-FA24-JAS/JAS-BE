@@ -159,5 +159,16 @@ namespace WebAPI.Controllers
             }
             return Ok(result);
         }
+        
+        [HttpPost]
+        public async Task<IActionResult> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet placeBidFixedPriceAndSercetDTO)
+        {
+            var result = await _lotService.PlaceBidFixedPriceAndSercet(placeBidFixedPriceAndSercetDTO);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }
