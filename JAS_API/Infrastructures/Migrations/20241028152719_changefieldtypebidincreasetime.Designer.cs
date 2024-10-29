@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructures.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241028090939_addfieldbidincreatimetotableLot")]
-    partial class addfieldbidincreatimetotableLot
+    [Migration("20241028152719_changefieldtypebidincreasetime")]
+    partial class changefieldtypebidincreasetime
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1733,8 +1733,8 @@ namespace Infrastructures.Migrations
                     b.Property<float?>("BidIncrement")
                         .HasColumnType("real");
 
-                    b.Property<DateTime?>("BidIncrementTime")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<int?>("BidIncrementTime")
+                        .HasColumnType("integer");
 
                     b.Property<float?>("BuyNowPrice")
                         .HasColumnType("real");

@@ -24,7 +24,7 @@ namespace Domain.Entity
         public bool? IsExtend { get; set; }
         public bool? HaveFinancialProof { get; set; }
         public string? LotType { get; set; }
-        public DateTime? BidIncrementTime { get; set; }
+        public int? BidIncrementTime { get; set; }
 
         public int? SellerId { get; set; }
         public int? StaffId { get; set; }
