@@ -230,8 +230,8 @@ namespace Infrastructures
             CreateMap<RequestWithdraw, RequestWithdrawDTO>().ReverseMap();
             CreateMap<HistoryStatusCustomerLot, HistoryCustomerLotDTO>().ReverseMap();
             CreateMap<StatusInvoice, StatusInvoiceDTO>().ReverseMap();
-            CreateMap<WalletTransaction, ViewWalletTransactionDTO>()
-                .ReverseMap();
+            CreateMap<WalletTransaction, ViewWalletTransactionDTO>().ReverseMap();
+            CreateMap<Transaction, ViewTransactionDTO>().ReverseMap();    
 
         }
     }
