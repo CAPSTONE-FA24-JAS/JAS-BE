@@ -219,6 +219,30 @@ namespace Application.Services
             }
         }
 
+        //update Status hàng loạt lên redis
+        public void UpdateMultipleLotsStatus(List<Lot> lotIds, string status)
+        {
+            var batch = _cacheDb.CreateBatch();
+
+            foreach (var lot in lotIds)
+            {
+                var lotHashKey = $"lot-{lot.Id}"; // Tạo khóa cho mỗi Lot trong Redis
+                var lotData = _cacheDb.HashGet(lotHashKey, "lot");
+
+                if (lotData.HasValue)
+                {
+                    var lotDes = JsonSerializer.Deserialize<Lot>(lotData);
+                    lotDes.Status = status;
+
+                    var updateLot = JsonSerializer.Serialize(lotDes);
+
+                    // Sử dụng batch để cập nhật hàng loạt
+                    batch.HashSetAsync(lotHashKey, "lot", updateLot);
+                }
+            }
+
+            batch.Execute(); // Thực hiện tất cả các thao tác trong batch
+        }
 
         //get all lot loc theo filter, kieu hash
         public List<Lot> GetHashLots(Func<Lot, bool> filter)

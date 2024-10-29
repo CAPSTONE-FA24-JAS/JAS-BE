@@ -492,7 +492,7 @@ namespace Application.Services
             }
             return reponse;
         }
-        public async Task<APIResponseModel> UpdateLotRange(int auctionId)
+        public async Task<APIResponseModel> UpdateLotRange(int auctionId, string status)
         {
             var response = new APIResponseModel();
             try
@@ -502,10 +502,13 @@ namespace Application.Services
                 {
                     foreach (var lot in lots)
                     {
-                        lot.Status = EnumStatusLot.Ready.ToString();
+                        lot.Status = status;
                     }
 
                     //cho lên redis update staus lot 1 loạt
+                    _cacheService.UpdateMultipleLotsStatus(lots, status);
+
+
                     _unitOfWork.LotRepository.UpdateRange(lots);
                     await _unitOfWork.SaveChangeAsync(); 
                     response.Code = 200;
