@@ -38,6 +38,8 @@ namespace Application.Interfaces
         List<Lot> GetHashLots(Func<Lot, bool> filter);
         void UpdateLotStatus(int lotId, string status);
 
+        void UpdateMultipleLotsStatus(List<Lot> lotIds, string status);
+
         DateTime? GetMaxEndTimeFormSortedSetOfLot();
 
         void UpdateLotActualEndTime(int lotId, DateTime newEndTime);

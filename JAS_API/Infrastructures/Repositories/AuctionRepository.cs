@@ -11,8 +11,29 @@ namespace Infrastructures.Repositories
 {
     public class AuctionRepository : GenericRepository<Auction>, IAuctionRepository
     {
-        public AuctionRepository(AppDbContext context, ICurrentTime timeService, IClaimsService claimsService) : base(context, timeService, claimsService)
+        private readonly AppDbContext _dbContext;
+        public AuctionRepository(
+            AppDbContext context,
+            ICurrentTime timeService,
+            IClaimsService claimsService
+        )
+            : base(context, timeService, claimsService)
         {
+            _dbContext = context;
+        }
+
+
+        public List<Auction> GetAuctionsAsync(string status)
+        {
+            var maxBidPrice = _dbContext.Auctions.Where(x =>  x.Status == status).ToList();
+            if (!maxBidPrice.Any())
+            {
+                return [];
+            }
+            else
+            {
+                return maxBidPrice;
+            }
         }
     }
 }

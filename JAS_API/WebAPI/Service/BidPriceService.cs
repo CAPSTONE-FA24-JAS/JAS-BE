@@ -433,6 +433,7 @@ namespace Application.Services
                     reponse.IsSuccess = true;
                     reponse.Message = "update status lot successfully";
                     reponse.Code = 200;
+                    reponse.Data = statusTranfer;
                 }
                 else
                 {
