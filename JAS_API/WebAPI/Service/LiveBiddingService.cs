@@ -330,6 +330,55 @@ namespace WebAPI.Service
                 await _unitOfWork.SaveChangeAsync();
             }
         }
+
+        private async Task<BidPrice> GetWinnerInFixedPrice(Lot lot)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var maxPriceInLot = lot.BidPrices.Max(x => x.CurrentPrice);
+                var maxBidPriceInLots = lot.BidPrices.Where(x => x.CurrentPrice == maxPriceInLot).ToList();
+                if (maxBidPriceInLots.Count > 1)
+                {
+                    Random random = new Random();
+                    int randomIndex = random.Next(maxBidPriceInLots.Count);
+                    BidPrice randomBidPriceWinner = maxBidPriceInLots[randomIndex];
+                    return randomBidPriceWinner;
+                }
+                else
+                {
+                    return maxBidPriceInLots.FirstOrDefault();
+                }
+
+            }
+        }
+        public async Task CheckLotFixedPriceAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+                var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow && x.LotType == EnumLotType.Fixed_Price.ToString());
+
+                if (lotEnds.Any())
+                {
+                    foreach(var lot in lotEnds)
+                    {
+
+                        string lotGroupName = $"lot-{lot.Id}";
+                        lot.ActualEndTime = DateTime.UtcNow;
+                        lot.Status = EnumStatusLot.Passed.ToString();
+                        var bidPriceWinner = await GetWinnerInFixedPrice(lot);
+                        lot.CurrentPrice = bidPriceWinner.CurrentPrice;
+                        lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).CurrentPrice = bidPriceWinner.CurrentPrice;
+                        lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).IsWinner = true;
+                        await _unitOfWork.SaveChangeAsync();
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforFixedPriceBiddingAuto", "Phiên đã kết thúc!");
+                    }
+                }
+
+
+            }
+        }
     }
     }
 
