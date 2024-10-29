@@ -49,11 +49,13 @@ namespace WebAPI.Controllers
             return BadRequest(result);
         }
 
+
+        //pause,close, open lot
         [HttpPut]
-        public async Task<IActionResult> CloseLot(int lotId)
+        public async Task<IActionResult> CloseLot(int lotId, int? status)
         {
 
-            var result = await _bidPriceService.CloseBid(lotId);
+            var result = await _bidPriceService.UpdateStatusBid(lotId, status);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);

@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
+using Application.Utils;
 using Application.ViewModels.BidPriceDTOs;
 using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.LiveBiddingDTOs;
@@ -411,17 +412,18 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<APIResponseModel> CloseBid(int lotId)
+        public async Task<APIResponseModel> UpdateStatusBid(int lotId, int? status)
         {
             var reponse = new APIResponseModel();
             try
             {
                 string lotGroupName = $"lot-{lotId}";
                 
+                var statusTranfer = EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault( x =>x.Value == status ).Name;
                 var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
                 if(lot != null)
                 {
-                    lot.Status = EnumStatusLot.Canceled.ToString();
+                    lot.Status = statusTranfer;
                     lot.ActualEndTime = DateTime.UtcNow;
 
                     _unitOfWork.LotRepository.Update(lot);
