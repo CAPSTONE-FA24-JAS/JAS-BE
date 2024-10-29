@@ -346,7 +346,7 @@ namespace WebAPI.Service
                 }
                 else
                 {
-                    return maxBidPriceInLots.FirstOrDefault();
+                    return null;
                 }
 
             }
@@ -376,15 +376,18 @@ namespace WebAPI.Service
                 {
                     foreach(var lot in lotEnds)
                     {
-                        string lotGroupName = $"lot-{lot.Id}";
-                        lot.ActualEndTime = DateTime.UtcNow;
-                        lot.Status = EnumStatusLot.Passed.ToString();
                         var bidPriceWinner = await GetWinnerInEndLot(lot);
-                        lot.CurrentPrice = bidPriceWinner.CurrentPrice;
-                        lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).CurrentPrice = bidPriceWinner.CurrentPrice;
-                        lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).IsWinner = true;
-                        await _unitOfWork.SaveChangeAsync();
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforFixedPriceBiddingAuto", "Phiên đã kết thúc!");
+                        if (bidPriceWinner != null)
+                        {
+                            string lotGroupName = $"lot-{lot.Id}";
+                            lot.ActualEndTime = DateTime.UtcNow;
+                            lot.Status = EnumStatusLot.Passed.ToString();
+                            lot.CurrentPrice = bidPriceWinner.CurrentPrice;
+                            lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).CurrentPrice = bidPriceWinner.CurrentPrice;
+                            lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).IsWinner = true;
+                            await _unitOfWork.SaveChangeAsync();
+                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforFixedPriceBiddingAuto", "Phiên đã kết thúc!");
+                        }
                     }
                 }
 
@@ -402,15 +405,18 @@ namespace WebAPI.Service
                 {
                     foreach (var lot in lotEnds)
                     {
-                        string lotGroupName = $"lot-{lot.Id}";
-                        lot.ActualEndTime = DateTime.UtcNow;
-                        lot.Status = EnumStatusLot.Passed.ToString();
                         var bidPriceWinner = await GetWinnerInEndLot(lot);
-                        lot.CurrentPrice = bidPriceWinner.CurrentPrice;
-                        lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).CurrentPrice = bidPriceWinner.CurrentPrice;
-                        lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).IsWinner = true;
-                        await _unitOfWork.SaveChangeAsync();
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforSercetBiddingAuto", "Phiên đã kết thúc!");
+                        if(bidPriceWinner != null)
+                        {
+                            string lotGroupName = $"lot-{lot.Id}";
+                            lot.ActualEndTime = DateTime.UtcNow;
+                            lot.Status = EnumStatusLot.Passed.ToString();
+                            lot.CurrentPrice = bidPriceWinner.CurrentPrice;
+                            lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).CurrentPrice = bidPriceWinner.CurrentPrice;
+                            lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).IsWinner = true;
+                            await _unitOfWork.SaveChangeAsync();
+                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforSercetBiddingAuto", "Phiên đã kết thúc!");
+                        }
                     }
                 }
             }
