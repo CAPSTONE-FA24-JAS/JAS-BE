@@ -9,10 +9,12 @@ namespace WebAPI.Controllers
     public class TransactionController : BaseController
     {
         private readonly IWalletTransactionService _walletTransactionService;
+        private readonly ITransactionService _transactionService;
 
-        public TransactionController(IWalletTransactionService walletTransactionService)
+        public TransactionController(IWalletTransactionService walletTransactionService, ITransactionService transactionService)
         {
             _walletTransactionService = walletTransactionService;
+            _transactionService = transactionService;
         }
 
         [HttpGet]
@@ -47,6 +49,34 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> ViewTransactionType()
         {
             var result = await _walletTransactionService.ViewTransactionType();
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewTransactionsOfCompanyByTransType(int transTypeId)
+        {
+            var result = await _transactionService.GetAllTransactionByTransType(transTypeId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewTransactionsOfCompany()
+        {
+            var result = await _transactionService.GetAllTransaction();
             if (result.IsSuccess)
             {
                 return Ok(result);
