@@ -261,14 +261,14 @@ namespace Application.Services
                         if (limitbid.HasValue && limitbid < request.CurrentPrice)
                         {
                             reponse.Message = "giá đặt cao hơn limit bid";
-                            reponse.Code = 500;
-                            reponse.IsSuccess = false;
+                            reponse.Code = 200;
+                            reponse.IsSuccess = true;
                         }
                         else if (limitbid == null)
                         {
                             reponse.Message = "khong tim thay limit bid trong database";
-                            reponse.Code = 500;
-                            reponse.IsSuccess = false;
+                            reponse.Code = 200;
+                            reponse.IsSuccess = true;
                         }
                         else
                         {
@@ -410,5 +410,45 @@ namespace Application.Services
             }
             return reponse;
         }
+
+        public async Task<APIResponseModel> CloseBid(int lotId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                string lotGroupName = $"lot-{lotId}";
+                
+                var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+                if(lot != null)
+                {
+                    lot.Status = EnumStatusLot.Canceled.ToString();
+                    lot.ActualEndTime = DateTime.UtcNow;
+
+                    _unitOfWork.LotRepository.Update(lot);
+                    await _unitOfWork.SaveChangeAsync();
+                    await _hubContext.Clients.Groups(lotGroupName).SendAsync("Closed Bid!");
+
+                    reponse.IsSuccess = true;
+                    reponse.Message = "update status lot successfully";
+                    reponse.Code = 200;
+                }
+                else
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Code = 200;
+                    reponse.Message = "Khong tim thay lot!";
+                }             
+            }
+            catch (Exception ex)
+            {
+                reponse.IsSuccess = false;
+                reponse.Message = ex.Message;
+                reponse.Code = 500;
+
+            }
+            return reponse;
+        }
+
+
     }
 }

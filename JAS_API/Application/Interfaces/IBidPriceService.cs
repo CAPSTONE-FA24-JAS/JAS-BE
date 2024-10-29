@@ -16,5 +16,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> PlaceBiding(BiddingInputDTO request);
 
         Task<APIResponseModel> PlaceBidForReducedBidding(BiddingInputDTO request);
+
+        Task<APIResponseModel> CloseBid(int lotId);
     }
 }
