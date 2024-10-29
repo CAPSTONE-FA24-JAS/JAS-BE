@@ -13,6 +13,7 @@ namespace Application.ViewModels.InvoiceDTOs
         public int Id { get; set; }
         public string? Status { get; set; }
         public float? TotalPrice { get; set; }
+        public string? LinkBillTransaction { get; set; }
         public int? PaymentMethodId { get; set; }
         public int? AddressToShipId { get; set; }
         public int? ShipperId { get; set; }
@@ -33,6 +34,7 @@ namespace Application.ViewModels.InvoiceDTOs
         public float? Tax { get;  set; }
         public string? Note { get; set; }
         public string? AddressToShip { get; set; }
+        
 
         public IEnumerable<StatusInvoiceDTO>? StatusInvoiceDTOs { get; set; }
     }
