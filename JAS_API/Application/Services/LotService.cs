@@ -46,13 +46,6 @@ namespace Application.Services
                 else
                 {
                     var lot = _mapper.Map<Lot>(lotDTO);
-                    //var check =  (ValueTuple<bool, string>)await CheckExitProperty(lot);
-                    //if (check.Item1 == false)
-                    //{
-                    //    reponse.Code = 402;
-                    //    reponse.IsSuccess = false;
-                    //    reponse.Message = "Jewlry was into another lot";
-                    //}
                     var autionexits =await _unitOfWork.AuctionRepository.GetByIdAsync(lot.AuctionId);
                     if(autionexits != null)
                     {
@@ -658,6 +651,14 @@ namespace Application.Services
 
                 if (lot != null)
                 {
+                    if (lot.LotType != EnumLotType.Public_Auction.ToString())
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"The lost isn't lot public cannot using buy now it.";
+                        return response;
+                    }
+
                     if (lot.EndTime <= DateTime.UtcNow)
                     {
                         response.Code = 400;
@@ -697,6 +698,20 @@ namespace Application.Services
                         BidTime = DateTime.UtcNow
                     };
                     await _unitOfWork.BidPriceRepository.AddAsync(bidPrice);
+
+                    var invoice = new Invoice
+                    {
+                        CustomerId = winnerInLot.CustomerId,
+                        CustomerLotId = lot.CustomerLots.First(x => x.CustomerId == winnerInLot?.CustomerId).Id,
+                        StaffId = lot.StaffId,
+                        Price = winnerInLot.CurrentPrice,
+                        Free = (float?)(winnerInLot.CurrentPrice * 0.25),
+                        TotalPrice = (float?)(winnerInLot.CurrentPrice + winnerInLot.CurrentPrice * 0.25 - lot.Deposit),
+                        CreationDate = DateTime.Now,
+                        Status = EnumCustomerLot.CreateInvoice.ToString()
+                    };
+                    await _unitOfWork.InvoiceRepository.AddAsync(invoice);
+                    await _unitOfWork.SaveChangeAsync();
 
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {

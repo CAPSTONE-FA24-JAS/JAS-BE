@@ -5,8 +5,10 @@ using Application.ViewModels.BidLimitDTOs;
 using Application.ViewModels.WalletDTOs;
 using AutoMapper;
 using Azure;
+using CloudinaryDotNet;
 using Domain.Entity;
 using Domain.Enums;
+using static System.TimeZoneInfo;
 
 namespace Application.Services
 {
@@ -408,6 +410,53 @@ namespace Application.Services
             {
                 reponse.IsSuccess = false;
                 reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> RefundToWalletForUsersAsync(Lot lot)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                foreach (var user in lot.CustomerLots.Where(x => x.IsWinner == false)) 
+                {
+                    //thuc hien hoan vi
+                    var walletOfUser = user.Customer.Wallet;
+                    walletOfUser.Balance += (decimal?)lot.Deposit;
+                    walletOfUser.AvailableBalance += (decimal?)lot.Deposit;
+                    //tao transaction
+                    var transactionCompany = new Transaction()
+                    {
+                        DocNo = user.Id,
+                        Amount = lot.Deposit,
+                        TransactionTime = DateTime.Now,
+                        TransactionType = EnumTransactionType.RefundDeposit.ToString(),
+                        TransactionPerson = user.CustomerId,
+                    };
+
+                    var transactionWallet = new WalletTransaction()
+                    {
+                        DocNo = user.Id,
+                        Amount = lot.Deposit,
+                        TransactionTime = DateTime.Now,
+                        transactionType = EnumTransactionType.RefundDeposit.ToString(),
+                        transactionPerson = (int)user.CustomerId,
+                        Status = EnumStatusTransaction.Completed.ToString(),
+                        WalletId = user.Customer.Wallet.Id
+                    };
+
+                    await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
+                    await _unitOfWork.WalletTransactionRepository.AddAsync(transactionWallet);
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                reponse.ErrorMessages = ex.Message.Split(',').ToList();
+                reponse.Message = "Exception";
+                reponse.Code = 500;
+                reponse.IsSuccess = false;
             }
             return reponse;
         }
