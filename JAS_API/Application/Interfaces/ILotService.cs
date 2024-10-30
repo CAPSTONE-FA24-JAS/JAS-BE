@@ -23,5 +23,6 @@ namespace Application.Interfaces
         Task<APIResponseModel> UpdateLotRange(int auctionId, string status);
         Task<APIResponseModel> CheckEndLot();
         Task<APIResponseModel> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet placeBidFixedPriceAndSercetDTO);
+        Task<APIResponseModel> PlaceBuyNow(PlaceBidBuyNowDTO placeBidBuyNowDTO);
     }
 }
