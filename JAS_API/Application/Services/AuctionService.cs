@@ -22,8 +22,9 @@ namespace Application.Services
         private readonly Cloudinary _cloudinary;
         private const string Tags = "Backend_ImageAuction";
         private readonly ILotService _lotService;
+        private readonly ICacheService _cacheService;
 
-        public AuctionService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService, ICurrentTime currentTime, Cloudinary cloudinary, ILotService lotService)
+        public AuctionService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService, ICurrentTime currentTime, Cloudinary cloudinary, ILotService lotService, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -31,6 +32,7 @@ namespace Application.Services
             _currentTime = currentTime;
             _cloudinary = cloudinary;
             _lotService = lotService;
+            _cacheService = cacheService;
         }
 
         public async Task<APIResponseModel> CreateAuction(CreateAuctionDTO createAuctionDTO)
@@ -328,8 +330,11 @@ namespace Application.Services
                     auctionExisted.Status = EnumStatusAuction.UpComing.ToString();
                     auctionExisted.ModificationDate = DateTime.Now;
                     auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
-                    await _lotService.UpdateLotRange(auctionExisted.Id);
+                    await _lotService.UpdateLotRange(auctionExisted.Id, EnumStatusAuction.UpComing.ToString());
                     _unitOfWork.AuctionRepository.Update(auctionExisted);
+
+                   
+                    
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         reponse.IsSuccess = true;

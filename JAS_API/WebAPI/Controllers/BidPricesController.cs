@@ -17,6 +17,7 @@ namespace WebAPI.Controllers
 
 
         public BidPricesController(IBidPriceService bidPriceService, ILotService lotService)
+        public BidPricesController(IBidPriceService bidPriceService, ILotService lotService)
         {
             _bidPriceService = bidPriceService;
             _lotService = lotService;
@@ -52,14 +53,27 @@ namespace WebAPI.Controllers
             return BadRequest(result);
         }
 
+
+        //pause,close, open lot
         [HttpPut]
-        public async Task<IActionResult> CloseLot(int lotId)
+        public async Task<IActionResult> CloseLot(int lotId, int? status)
         {
 
-            var result = await _bidPriceService.CloseBid(lotId);
+            var result = await _bidPriceService.UpdateStatusBid(lotId, status);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet placeBidFixedPriceAndSercetDTO)
+        {
+            var result = await _lotService.PlaceBidFixedPriceAndSercet(placeBidFixedPriceAndSercetDTO);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
         [HttpPost("place-buy-now")]

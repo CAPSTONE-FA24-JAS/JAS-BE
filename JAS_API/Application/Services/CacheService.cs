@@ -57,11 +57,11 @@ namespace Application.Services
 
         }
 
-        public bool SetSortedSetData<T>(string key, T value, float score)
+        public bool SetSortedSetData<T>(string key, T value, float? score)
         {
 
             //   var expriryTime = expirationTime.DateTime.Subtract(DateTime.Now);
-            var data = _cacheDb.SortedSetAdd(key, JsonSerializer.Serialize(value), score);
+            var data = _cacheDb.SortedSetAdd(key, JsonSerializer.Serialize(value), (double)score);
             if (data)
                 return true;
             return false;
@@ -219,6 +219,46 @@ namespace Application.Services
             }
         }
 
+        public void UpdateLotCurrentPriceForReduceBidding(int lotId, float? currentPrice)
+        {
+            var lotHashKey = $"lot-{lotId}"; // Tạo khóa cho Lot trong Redis
+            var lotData = _cacheDb.HashGet(lotHashKey, "lot");
+
+            if (lotData.HasValue)
+            {
+                var lot = JsonSerializer.Deserialize<Lot>(lotData);
+                lot.CurrentPrice = currentPrice;
+
+                var updateLot = JsonSerializer.Serialize(lot);
+
+                _cacheDb.HashSet(lotHashKey, "lot", updateLot);
+            }
+        }
+
+        //update Status hàng loạt lên redis
+        public void UpdateMultipleLotsStatus(List<Lot> lotIds, string status)
+        {
+            var batch = _cacheDb.CreateBatch();
+
+            foreach (var lot in lotIds)
+            {
+                var lotHashKey = $"lot-{lot.Id}"; // Tạo khóa cho mỗi Lot trong Redis
+                var lotData = _cacheDb.HashGet(lotHashKey, "lot");
+
+                if (lotData.HasValue)
+                {
+                    var lotDes = JsonSerializer.Deserialize<Lot>(lotData);
+                    lotDes.Status = status;
+
+                    var updateLot = JsonSerializer.Serialize(lotDes);
+
+                    // Sử dụng batch để cập nhật hàng loạt
+                    batch.HashSetAsync(lotHashKey, "lot", updateLot);
+                }
+            }
+
+            batch.Execute(); // Thực hiện tất cả các thao tác trong batch
+        }
 
         //get all lot loc theo filter, kieu hash
         public List<Lot> GetHashLots(Func<Lot, bool> filter)

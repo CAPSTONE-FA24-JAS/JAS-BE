@@ -15,7 +15,7 @@ namespace Application.Interfaces
 
         object RemoveData(string key);
 
-        bool SetSortedSetData<T>(string key, T value, float score);
+        bool SetSortedSetData<T>(string key, T value, float? score);
 
         //luu lot và sap xep theo time
         bool SetSortedSetDataForTime<T>(string key, T value, DateTime endTime);
@@ -38,9 +38,13 @@ namespace Application.Interfaces
         List<Lot> GetHashLots(Func<Lot, bool> filter);
         void UpdateLotStatus(int lotId, string status);
 
+        void UpdateMultipleLotsStatus(List<Lot> lotIds, string status);
+
         DateTime? GetMaxEndTimeFormSortedSetOfLot();
 
         void UpdateLotActualEndTime(int lotId, DateTime newEndTime);
+
+        void UpdateLotCurrentPriceForReduceBidding(int lotId, float? currentPrice);
 
 
     }

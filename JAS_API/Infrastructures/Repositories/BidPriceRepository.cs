@@ -53,9 +53,9 @@ namespace Infrastructures.Repositories
         }
 
         //cho hinh thuc 4 dau gia ngc, chac chan chi cos 1 bidPrice
-        public async Task<BidPrice> GetBidPriceByLotIdForReduceBidding(int lotId)
+        public BidPrice GetBidPriceByLotIdForReduceBidding(int lotId)
         {
-            var maxBidPrice = await _dbContext.BidPrices.Where(x => x.LotId == lotId).FirstOrDefaultAsync();
+            var maxBidPrice =  _dbContext.BidPrices.Where(x => x.LotId == lotId).FirstOrDefault();
             if (maxBidPrice == null)
             {
                 return null;

@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
+using Application.Utils;
 using Application.ViewModels.BidPriceDTOs;
 using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.LiveBiddingDTOs;
@@ -159,7 +160,12 @@ namespace Application.Services
                     var customerId = account.Customer.Id;
                     var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
                     var limitbid = customer.PriceLimit;
+                    var lot = _cacheService.GetLotById(conn.LotId);
                     var customerName = customer.LastName +" " + customer.FirstName;
+                    if(request.CurrentPrice > lot.BuyNowPrice)
+                    {
+                        request.CurrentPrice = lot.BuyNowPrice;
+                    }
                     if(limitbid.HasValue && limitbid < request.CurrentPrice)
                     {
                         reponse.Message = "giá đặt cao hơn limit bid";
@@ -174,6 +180,7 @@ namespace Application.Services
                     }
                     else
                     {
+
                         var bidData = new BidPrice
                         {
                             CurrentPrice = request.CurrentPrice,
@@ -198,7 +205,7 @@ namespace Application.Services
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
 
                         // Lấy thời gian kết thúc từ Redis
-                        var lot = _cacheService.GetLotById(conn.LotId);
+                        
                         if (lot.EndTime.HasValue)
                         {
                             DateTime endTime = lot.EndTime.Value;
@@ -290,7 +297,10 @@ namespace Application.Services
                             lotSql.ActualEndTime = request.BidTime;
                             lotSql.CurrentPrice = request.CurrentPrice;
                             _unitOfWork.LotRepository.Update(lotSql);
+                        await _unitOfWork.SaveChangeAsync();
                         _cacheService.UpdateLotEndTime(lotSql.Id, request.BidTime);
+                        _cacheService.UpdateLotStatus(lotSql.Id, lotSql.Status);
+                        _cacheService.UpdateLotCurrentPriceForReduceBidding(lotSql.Id, request.CurrentPrice);
                            
                            
                             
@@ -411,17 +421,18 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<APIResponseModel> CloseBid(int lotId)
+        public async Task<APIResponseModel> UpdateStatusBid(int lotId, int? status)
         {
             var reponse = new APIResponseModel();
             try
             {
                 string lotGroupName = $"lot-{lotId}";
                 
+                var statusTranfer = EnumHelper.GetEnums<EnumStatusLot>().FirstOrDefault( x =>x.Value == status ).Name;
                 var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
                 if(lot != null)
                 {
-                    lot.Status = EnumStatusLot.Canceled.ToString();
+                    lot.Status = statusTranfer;
                     lot.ActualEndTime = DateTime.UtcNow;
 
                     _unitOfWork.LotRepository.Update(lot);
@@ -431,6 +442,7 @@ namespace Application.Services
                     reponse.IsSuccess = true;
                     reponse.Message = "update status lot successfully";
                     reponse.Code = 200;
+                    reponse.Data = statusTranfer;
                 }
                 else
                 {
@@ -440,6 +452,8 @@ namespace Application.Services
                 }             
             }
             catch (Exception ex)
+
+
             {
                 reponse.IsSuccess = false;
                 reponse.Message = ex.Message;

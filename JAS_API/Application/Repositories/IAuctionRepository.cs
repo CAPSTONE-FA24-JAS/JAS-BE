@@ -9,5 +9,6 @@ namespace Application.Repositories
 {
     public interface IAuctionRepository : IGenericRepository<Auction>
     {
+        List<Auction> GetAuctionsAsync(string status);
     }
 }

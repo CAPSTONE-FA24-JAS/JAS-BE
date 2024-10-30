@@ -20,7 +20,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> RegisterToLot(RegisterToLotDTO registerToLotDTO);
         Task<APIResponseModel> GetCustomerLotByLot(int lotId);
         Task<APIResponseModel> CheckCustomerInLot(int customerId, int lotId);
-        Task<APIResponseModel> UpdateLotRange(int auctionId);
+        Task<APIResponseModel> UpdateLotRange(int auctionId, string status);
         Task<APIResponseModel> CheckEndLot();
         Task<APIResponseModel> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet placeBidFixedPriceAndSercetDTO);
         Task<APIResponseModel> PlaceBuyNow(PlaceBidBuyNowDTO placeBidBuyNowDTO);
