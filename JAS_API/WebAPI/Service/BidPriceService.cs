@@ -159,34 +159,90 @@ namespace Application.Services
                     var account = await _unitOfWork.AccountRepository.GetByIdAsync(conn.AccountId);
                     var customerId = account.Customer.Id;
                     var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
-                    var limitbid = customer.PriceLimit;
+                    
                     var lot = _cacheService.GetLotById(conn.LotId);
                     var customerName = customer.LastName +" " + customer.FirstName;
-                    if(request.CurrentPrice > lot.BuyNowPrice)
+                    if(lot.HaveFinancialProof == true)
                     {
-                        request.CurrentPrice = lot.BuyNowPrice;
-                    }
-                    if(limitbid.HasValue && limitbid < request.CurrentPrice)
-                    {
-                        reponse.Message = "giá đặt cao hơn limit bid";
-                        reponse.Code = 500;
-                        reponse.IsSuccess = false;
-                    }
-                    else if(limitbid == null)
-                    {
-                        reponse.Message = "khong tim thay limit bid trong database";
-                        reponse.Code = 500;
-                        reponse.IsSuccess = false;
+                        var limitbid = customer.PriceLimit;
+                        if (request.CurrentPrice > lot.BuyNowPrice)
+                        {
+                            request.CurrentPrice = lot.BuyNowPrice;
+                        }
+                        if (limitbid.HasValue && limitbid < request.CurrentPrice)
+                        {
+                            reponse.Message = "giá đặt cao hơn limit bid";
+                            reponse.Code = 200;
+                            reponse.IsSuccess = false;
+                        }
+                        else if (limitbid == null)
+                        {
+                            reponse.Message = "khong tim thay limit bid trong database";
+                            reponse.Code = 200;
+                            reponse.IsSuccess = false;
+                        }
+                        else
+                        {
+
+                            var bidData = new BidPrice
+                            {
+                                CurrentPrice = request.CurrentPrice,
+                                BidTime = request.BidTime,
+                                CustomerId = customerId,
+                                LotId = conn.LotId
+                            };
+
+                            // Lưu dữ liệu đấu giá vào Redis
+                            _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, request.CurrentPrice);
+
+                            // Truy xuất bảng xếp hạng giảm dần theo giá đấu từ Redis
+                            var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == conn.LotId);
+                            var highestBid = topBidders.FirstOrDefault();
+
+                            string lotGroupName = $"lot-{conn.LotId}";
+                            //trar về name, giá ĐẤU, thời gian
+                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, customerName, request.CurrentPrice, request.BidTime);
+
+                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
+
+                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
+
+                            // Lấy thời gian kết thúc từ Redis
+
+                            if (lot.EndTime.HasValue)
+                            {
+                                DateTime endTime = lot.EndTime.Value;
+
+                                //10s cuối
+                                TimeSpan extendTime = endTime - request.BidTime;
+
+                                // Nếu còn dưới 10 giây thì gia hạn thêm 10 giây
+                                if (extendTime.TotalSeconds < 10)
+                                {
+                                    endTime = endTime.AddSeconds(10);
+                                    _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
+                                }
+                                else
+                                {
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
+                                }
+                            }
+                        }
+                    
+
+                        reponse.IsSuccess = true;
+                        reponse.Code = 200;
+                        reponse.Message = "Place bid successfully!";
                     }
                     else
                     {
-
                         var bidData = new BidPrice
                         {
                             CurrentPrice = request.CurrentPrice,
                             BidTime = request.BidTime,
                             CustomerId = customerId,
-                            LotId = conn.LotId                        
+                            LotId = conn.LotId
                         };
 
                         // Lưu dữ liệu đấu giá vào Redis
@@ -205,7 +261,7 @@ namespace Application.Services
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
 
                         // Lấy thời gian kết thúc từ Redis
-                        
+
                         if (lot.EndTime.HasValue)
                         {
                             DateTime endTime = lot.EndTime.Value;
@@ -223,13 +279,9 @@ namespace Application.Services
                             else
                             {
                                 await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
-                            }                           
+                            }
                         }
-
-                        reponse.IsSuccess = true;
-                        reponse.Code = 200;
-                        reponse.Message = "Place bid successfully!";
-                    }                 
+                    }              
                 }
                 else
                 {
