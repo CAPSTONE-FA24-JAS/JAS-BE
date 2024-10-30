@@ -24,7 +24,6 @@ namespace WebAPI.Service
                     await liveBiddingService.ChecKLotEndReducedBiddingAsync();
                     await liveBiddingService.CheckLotFixedPriceAsync();
                     await liveBiddingService.CheckLotSercetAsync();
-                    await liveBiddingService.CheckLotBuyNowAsync();
                 }
                 await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }

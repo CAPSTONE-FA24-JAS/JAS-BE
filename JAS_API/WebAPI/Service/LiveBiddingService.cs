@@ -421,33 +421,33 @@ namespace WebAPI.Service
                 }
             }
         }
-        public async Task CheckLotBuyNowAsync()
-        {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                // truong hop chua endlot kiem tra co ai dat gia co dinh chua
-                var lotCurrent = await _unitOfWork.LotRepository.GetAllAsync(x => x.Status == EnumStatusLot.Auctioning.ToString());
+        //public async Task CheckLotBuyNowAsync()
+        //{
+        //    using (var scope = _serviceProvider.CreateScope())
+        //    {
+        //        var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        //        // truong hop chua endlot kiem tra co ai dat gia co dinh chua
+        //        var lotCurrent = await _unitOfWork.LotRepository.GetAllAsync(x => x.Status == EnumStatusLot.Auctioning.ToString());
 
-                if (lotCurrent.Any())
-                {
-                    foreach (var lot in lotCurrent)
-                    {
-                        var bidPriceWin = await GetWinnerBuyNowPrice(lot);
-                        if (bidPriceWin != null)
-                        {
-                            string lotGroupName = $"lot-{lot.Id}";
-                            lot.ActualEndTime = DateTime.UtcNow;
-                            lot.CurrentPrice = bidPriceWin.CurrentPrice;
-                            lot.CustomerLots.First(x => x.CustomerId == bidPriceWin?.CustomerId).CurrentPrice = bidPriceWin.CurrentPrice;
-                            lot.CustomerLots.First(x => x.CustomerId == bidPriceWin?.CustomerId).IsWinner = true;
-                            await _unitOfWork.SaveChangeAsync();
-                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforBuyNowPriceBiddingAuto", "Phiên đã kết thúc!");
-                        }
-                    }
-                }
-            }
-        }
+        //        if (lotCurrent.Any())
+        //        {
+        //            foreach (var lot in lotCurrent)
+        //            {
+        //                var bidPriceWin = await GetWinnerBuyNowPrice(lot);
+        //                if (bidPriceWin != null)
+        //                {
+        //                    string lotGroupName = $"lot-{lot.Id}";
+        //                    lot.ActualEndTime = DateTime.UtcNow;
+        //                    lot.CurrentPrice = bidPriceWin.CurrentPrice;
+        //                    lot.CustomerLots.First(x => x.CustomerId == bidPriceWin?.CustomerId).CurrentPrice = bidPriceWin.CurrentPrice;
+        //                    lot.CustomerLots.First(x => x.CustomerId == bidPriceWin?.CustomerId).IsWinner = true;
+        //                    await _unitOfWork.SaveChangeAsync();
+        //                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforBuyNowPriceBiddingAuto", "Phiên đã kết thúc!");
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
     }
 }
