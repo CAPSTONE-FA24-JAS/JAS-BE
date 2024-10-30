@@ -572,7 +572,7 @@ namespace Application.Services
             try
             {
                 var playerJoined = await checkCustomerRegisteredToLot((int)model.CustomerId, (int)model.LotId);
-                if (playerJoined != null)
+                if (playerJoined == null)
                 {
                     response.Code = 400;
                     response.IsSuccess = false;
@@ -668,7 +668,7 @@ namespace Application.Services
                     }
 
                     var playerJoined = await checkCustomerRegisteredToLot((int)placeBidBuyNowDTO.CustomerId, (int)placeBidBuyNowDTO.LotId);
-                    if (playerJoined != null)
+                    if (playerJoined == null)
                     {
                         response.Code = 400;
                         response.IsSuccess = false;
