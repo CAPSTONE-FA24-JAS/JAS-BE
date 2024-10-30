@@ -143,7 +143,7 @@ namespace WebAPI.Service
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string lotGroupName = $"lot-{lotId}";
-                var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+                
             var lot = _cacheService.GetLotById(lotId) ;
                 if(bidPrice == null)
                 {
@@ -164,12 +164,13 @@ namespace WebAPI.Service
                         _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionWithReduceBidding", "Giá đã giảm!", currentPrice, DateTime.UtcNow);
 
-                        bidPrice = _unitOfWork.BidPriceRepository.GetBidPriceByLotIdForReduceBidding(lotId);
+                        var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
                         lotsql.CurrentPrice = currentPrice;
                         _unitOfWork.LotRepository.Update(lotsql);
 
                         await _unitOfWork.SaveChangeAsync();
                         await Task.Delay(30000);
+                        bidPrice = _unitOfWork.BidPriceRepository.GetBidPriceByLotIdForReduceBidding(lotId);
                     };
 
                     
