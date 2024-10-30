@@ -17,8 +17,9 @@ namespace WebAPI.Controllers
         private readonly IWalletTransactionService _walletTransactionService;
         private readonly ITransactionService _transactionService;
         private readonly IClaimsService _claimsService;
+        private readonly IInvoiceService _invoiceService;
         
-        public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService, IVNPayService vNPayService, IWalletTransactionService walletTransactionService, ITransactionService transactionService, IClaimsService claimsService)
+        public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService, IVNPayService vNPayService, IWalletTransactionService walletTransactionService, ITransactionService transactionService, IClaimsService claimsService, IInvoiceService invoiceService)
         {
             _walletService = walletService;
             _vpnService = vpnService;
@@ -27,6 +28,7 @@ namespace WebAPI.Controllers
             _walletTransactionService = walletTransactionService;
             _transactionService = transactionService;
             _claimsService = claimsService;
+            _invoiceService = invoiceService;
         }
 
         [HttpGet]
@@ -159,6 +161,25 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(result);
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RefundToWalletForUsers(int invoiceId)
+        {
+            var lotExist =  _invoiceService.GetLotInInvoice(invoiceId);
+            if(lotExist != null)
+            {
+                var result = await _walletService.RefundToWalletForUsersAsync(lotExist);
+                if (result.IsSuccess)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+            return BadRequest();
         }
     }
 }

@@ -15,6 +15,7 @@ namespace WebAPI.Controllers
         private readonly IBidPriceService _bidPriceService;
         private readonly ILotService _lotService;
 
+
         public BidPricesController(IBidPriceService bidPriceService, ILotService lotService)
         {
             _bidPriceService = bidPriceService;
@@ -72,6 +73,16 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        [HttpPost("place-buy-now")]
+        public async Task<IActionResult> PlaceBuyNow([FromBody] PlaceBidBuyNowDTO request)
+        {
+
+            var result = await _lotService.PlaceBuyNow(request);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
         }
 
     }
