@@ -392,5 +392,55 @@ namespace Application.Services
             }
             return reponse;
         }
+
+        public async Task<APIResponseModel> CancelAuctionAndRangeLot(int auctionId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var auctionExisted = await _unitOfWork.AuctionRepository.GetByIdAsync(auctionId);
+                if (auctionExisted == null)
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Auction Not Found";
+                    reponse.Code = 404;
+                    return reponse;
+                }
+                else
+                {
+
+                    auctionExisted.Status = EnumStatusAuction.Cancelled.ToString();
+                    auctionExisted.ModificationDate = DateTime.Now;
+                    auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
+                    await _lotService.UpdateLotRange(auctionExisted.Id, EnumStatusAuction.Cancelled.ToString());
+                    _unitOfWork.AuctionRepository.Update(auctionExisted);
+
+
+
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        reponse.IsSuccess = true;
+                        reponse.Message = "Auction updated successfully.";
+                        reponse.Code = 201;
+                        reponse.Data = _mapper.Map<AuctionDTO>(auctionExisted);
+                        return reponse;
+                    }
+                    else
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Aution cannt saving because some condition.";
+                    }
+                } 
+               
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.Message = "Exception Eror";
+                reponse.ErrorMessages = new List<string> { e.Message };
+                reponse.Code = 500;
+            }
+            return reponse;
+        }
     }
 }
