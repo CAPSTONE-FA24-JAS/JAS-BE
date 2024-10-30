@@ -162,7 +162,10 @@ namespace Application.Services
                     var limitbid = customer.PriceLimit;
                     var lot = _cacheService.GetLotById(conn.LotId);
                     var customerName = customer.LastName +" " + customer.FirstName;
-                   
+                    if(request.CurrentPrice > lot.BuyNowPrice)
+                    {
+                        request.CurrentPrice = lot.BuyNowPrice;
+                    }
                     if(limitbid.HasValue && limitbid < request.CurrentPrice)
                     {
                         reponse.Message = "giá đặt cao hơn limit bid";

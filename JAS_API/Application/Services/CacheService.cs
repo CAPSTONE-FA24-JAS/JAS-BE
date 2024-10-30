@@ -57,11 +57,11 @@ namespace Application.Services
 
         }
 
-        public bool SetSortedSetData<T>(string key, T value, float score)
+        public bool SetSortedSetData<T>(string key, T value, float? score)
         {
 
             //   var expriryTime = expirationTime.DateTime.Subtract(DateTime.Now);
-            var data = _cacheDb.SortedSetAdd(key, JsonSerializer.Serialize(value), score);
+            var data = _cacheDb.SortedSetAdd(key, JsonSerializer.Serialize(value), (double)score);
             if (data)
                 return true;
             return false;
