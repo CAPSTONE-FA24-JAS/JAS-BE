@@ -92,7 +92,8 @@ namespace Application.Services
                                 Status = lot.Status,
                                 AuctionId = lot.AuctionId,
                                 StartPrice = lot.StartPrice,
-                                FinalPriceSold = lot.FinalPriceSold
+                                FinalPriceSold = lot.FinalPriceSold,
+                                BidIncrement = lot.BidIncrement,
 
 
                             };
