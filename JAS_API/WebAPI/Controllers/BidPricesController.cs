@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Services;
 using Application.ViewModels.CustomerLotDTOs;
+using Application.ViewModels.LotDTOs;
 using Domain.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -12,11 +13,12 @@ namespace WebAPI.Controllers
     {
 
         private readonly IBidPriceService _bidPriceService;
+        private readonly ILotService _lotService;
 
-
-        public BidPricesController(IBidPriceService bidPriceService)
+        public BidPricesController(IBidPriceService bidPriceService, ILotService lotService)
         {
             _bidPriceService = bidPriceService;
+            _lotService = lotService;
         }
 
         [HttpPost("join")]
@@ -59,6 +61,17 @@ namespace WebAPI.Controllers
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet placeBidFixedPriceAndSercetDTO)
+        {
+            var result = await _lotService.PlaceBidFixedPriceAndSercet(placeBidFixedPriceAndSercetDTO);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
     }
