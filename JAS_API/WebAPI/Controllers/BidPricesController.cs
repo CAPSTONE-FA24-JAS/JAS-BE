@@ -17,7 +17,6 @@ namespace WebAPI.Controllers
 
 
         public BidPricesController(IBidPriceService bidPriceService, ILotService lotService)
-        public BidPricesController(IBidPriceService bidPriceService, ILotService lotService)
         {
             _bidPriceService = bidPriceService;
             _lotService = lotService;
