@@ -143,38 +143,39 @@ namespace WebAPI.Service
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string lotGroupName = $"lot-{lotId}";
-                var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+                
             var lot = _cacheService.GetLotById(lotId) ;
-                var currentPrice = lot.StartPrice;
-                
-
-                while (currentPrice > lot.FinalPriceSold && bidPrice == null)
+                if(bidPrice == null)
                 {
-                    currentPrice = currentPrice - lot.BidIncrement;
-                    lot.CurrentPrice = currentPrice;
-                    if(lot.CurrentPrice < lot.FinalPriceSold)
+                    var currentPrice = lot.StartPrice;
+
+
+                    while (currentPrice > lot.FinalPriceSold && bidPrice == null && DateTime.UtcNow > lot.EndTime)
                     {
-                        currentPrice = lot.FinalPriceSold;
-                        lot.CurrentPrice = lot.FinalPriceSold;
+                        currentPrice = currentPrice - lot.BidIncrement;
+                        lot.CurrentPrice = currentPrice;
+                        if (currentPrice < lot.FinalPriceSold)
+                        {
+                            currentPrice = lot.FinalPriceSold;
+                            lot.CurrentPrice = lot.FinalPriceSold;
 
-                    }
+                        }
 
-                    _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
-                    await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionWithReduceBidding", "Giá đã giảm!", currentPrice, DateTime.UtcNow);
+                        _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionWithReduceBidding", "Giá đã giảm!", currentPrice, DateTime.UtcNow);
 
-                    bidPrice = _unitOfWork.BidPriceRepository.GetBidPriceByLotIdForReduceBidding(lotId);
-                    await Task.Delay(30000);
-                };
+                        var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+                        lotsql.CurrentPrice = currentPrice;
+                        _unitOfWork.LotRepository.Update(lotsql);
 
-                lotsql.CurrentPrice = currentPrice;
-                _unitOfWork.LotRepository.Update(lotsql);
+                        await _unitOfWork.SaveChangeAsync();
+                        await Task.Delay(30000);
+                        bidPrice = _unitOfWork.BidPriceRepository.GetBidPriceByLotIdForReduceBidding(lotId);
+                    };
 
-                await _unitOfWork.SaveChangeAsync();
-                
-
-
-            }
-           
+                    
+                }
+            }          
         }
 
         private async Task StartLot(int lotId)
