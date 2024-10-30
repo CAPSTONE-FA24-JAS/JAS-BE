@@ -165,13 +165,14 @@ namespace WebAPI.Service
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionWithReduceBidding", "Giá đã giảm!", currentPrice, DateTime.UtcNow);
 
                         bidPrice = _unitOfWork.BidPriceRepository.GetBidPriceByLotIdForReduceBidding(lotId);
+                        lotsql.CurrentPrice = currentPrice;
+                        _unitOfWork.LotRepository.Update(lotsql);
+
+                        await _unitOfWork.SaveChangeAsync();
                         await Task.Delay(30000);
                     };
 
-                    lotsql.CurrentPrice = currentPrice;
-                    _unitOfWork.LotRepository.Update(lotsql);
-
-                    await _unitOfWork.SaveChangeAsync();
+                    
                 }
             }          
         }
