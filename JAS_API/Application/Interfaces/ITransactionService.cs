@@ -14,5 +14,6 @@ namespace Application.Interfaces
         Task<APIResponseModel> UpdateTransaction(int Id);
         Task<APIResponseModel> GetAllTransaction();
         Task<APIResponseModel> GetAllTransactionByTransType(int transTypeId);
+        
     }
 }

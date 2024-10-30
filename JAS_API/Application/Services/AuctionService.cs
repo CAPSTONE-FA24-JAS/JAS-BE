@@ -256,23 +256,21 @@ namespace Application.Services
                     reponse.Code = 404;
                     return reponse;
                 }
-                if (auctionExisted.StartTime <= _currentTime.GetCurrentTime() && auctionExisted.EndTime >= _currentTime.GetCurrentTime())
+                if(auctionExisted.Status == EnumStatusAuction.Waiting.ToString())
                 {
-                    var starttime = auctionExisted.StartTime;
                     _mapper.Map(updateAuctionDTO, auctionExisted);
-                    auctionExisted.Status = EnumStatusAuction.Live.ToString();
                     auctionExisted.ModificationDate = DateTime.Now;
                     auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
-                    auctionExisted.StartTime = starttime;
+                    auctionExisted.StartTime = updateAuctionDTO.StartTime;
                 }
-                else if (auctionExisted.StartTime > _currentTime.GetCurrentTime())
+                else
                 {
-                    auctionExisted.Status = EnumStatusAuction.UpComing.ToString();
-                    auctionExisted.ModificationDate = DateTime.Now;
-                    auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
-                    await _lotService.UpdateLotRange(auctionExisted.Id, EnumStatusAuction.UpComing.ToString());
-                    _mapper.Map(updateAuctionDTO, auctionExisted);
+                    reponse.IsSuccess = false;
+                    reponse.Message = $"Auction cannot update informaiton. Because aution are {auctionExisted.Status.ToString()} ";
+                    reponse.Code = 400;
+                    return reponse;
                 }
+                
                 if(updateAuctionDTO.FileImage != null)
                 {
                     var uploadResult = await _cloudinary.UploadAsync(new ImageUploadParams
@@ -289,7 +287,9 @@ namespace Application.Services
                     }
                     auctionExisted.ImageLink = uploadResult.SecureUrl.AbsoluteUri;
                 }
+
                 _unitOfWork.AuctionRepository.Update(auctionExisted);
+
                 if (await _unitOfWork.SaveChangeAsync() > 0)
                 {
                     reponse.IsSuccess = true;

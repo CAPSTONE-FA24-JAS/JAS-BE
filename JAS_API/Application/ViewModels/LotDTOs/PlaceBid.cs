@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Application.ViewModels.LotDTOs
 {
-    public class PlaceBid
+    public class PlaceBidBuyNowDTO
     {
+        public int? CustomerId { get; set; }
+        public int? LotId { get; set; }
     }
     public class PlaceBidFixedPriceAndSercet
     {

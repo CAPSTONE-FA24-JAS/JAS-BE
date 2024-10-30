@@ -46,13 +46,6 @@ namespace Application.Services
                 else
                 {
                     var lot = _mapper.Map<Lot>(lotDTO);
-                    //var check =  (ValueTuple<bool, string>)await CheckExitProperty(lot);
-                    //if (check.Item1 == false)
-                    //{
-                    //    reponse.Code = 402;
-                    //    reponse.IsSuccess = false;
-                    //    reponse.Message = "Jewlry was into another lot";
-                    //}
                     var autionexits =await _unitOfWork.AuctionRepository.GetByIdAsync(lot.AuctionId);
                     if(autionexits != null)
                     {
@@ -556,16 +549,16 @@ namespace Application.Services
                 await _unitOfWork.BidPriceRepository.AddAsync(bidPrice);
             }
         }
-        private async Task<bool> checkCustomerRegisteredToLot(int customerId, int lotId)
+        private async Task<CustomerLot> checkCustomerRegisteredToLot(int customerId, int lotId)
         {
             var registered = await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.CustomerId == customerId && x.LotId == lotId);
-            if (registered.Any())
+            if (registered.FirstOrDefault() != null)
             {
-                return true;
+                return registered.FirstOrDefault();
             }
-            return false;
+            return null;
         }
-        private async Task<bool> checkCustomerIntoBidPriceOfFixedPriceAndSercet(int customerId, int lotId)
+        private async Task<bool> checkCustomerIntoBidPrice(int customerId, int lotId)
         {
             if ( _unitOfWork.BidPriceRepository.GetAllAsync(x => x.CustomerId == customerId && x.LotId == lotId).Result.Any())
             {
@@ -573,19 +566,21 @@ namespace Application.Services
             }
             return false;
         }
-        public async Task<APIResponseModel> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet model)
+        public async Task<APIResponseModel> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet model) 
         {
             var response = new APIResponseModel();
             try
             {
-                if(!await checkCustomerRegisteredToLot((int)model.CustomerId, (int)model.LotId))
+                var playerJoined = await checkCustomerRegisteredToLot((int)model.CustomerId, (int)model.LotId);
+                if (playerJoined == null)
                 {
                     response.Code = 400;
                     response.IsSuccess = false;
                     response.Message = $"The customer is not register into the lot";
+                    response.Data = _mapper.Map<CustomerLotDTO>(playerJoined);
                     return response;
                 }
-                if (await checkCustomerIntoBidPriceOfFixedPriceAndSercet((int)model.CustomerId, (int)model.LotId))
+                if (await checkCustomerIntoBidPrice((int)model.CustomerId, (int)model.LotId))
                 {
                     response.Code = 400;
                     response.IsSuccess = false;
@@ -646,6 +641,105 @@ namespace Application.Services
             }
             return response;
         }
-        
+
+        public async Task<APIResponseModel> PlaceBuyNow(PlaceBidBuyNowDTO placeBidBuyNowDTO)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var lot = await _unitOfWork.LotRepository.GetByIdAsync(placeBidBuyNowDTO.LotId);
+
+                if (lot != null)
+                {
+                    if (lot.LotType != EnumLotType.Public_Auction.ToString())
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"The lost isn't lot public cannot using buy now it.";
+                        return response;
+                    }
+
+                    if (lot.EndTime <= DateTime.UtcNow)
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"The Lot IS END.";
+                        return response;
+                    }
+
+                    var playerJoined = await checkCustomerRegisteredToLot((int)placeBidBuyNowDTO.CustomerId, (int)placeBidBuyNowDTO.LotId);
+                    if (playerJoined == null)
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"The customer is not register into the lot";
+                        response.Data = _mapper.Map<CustomerLotDTO>(playerJoined);
+                        return response;
+                    }
+
+                    lot.Status = EnumStatusLot.Sold.ToString();
+                    var winnerInLot = lot.CustomerLots.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId
+                                             && x.LotId == placeBidBuyNowDTO.LotId);
+
+                    winnerInLot.Status = EnumCustomerLot.CreateInvoice.ToString();
+                    winnerInLot.IsWinner = true;
+                    winnerInLot.CurrentPrice = lot.FinalPriceSold;
+                    foreach (var player in lot.CustomerLots.Where(x => x.CustomerId != placeBidBuyNowDTO.CustomerId
+                                             && x.LotId == placeBidBuyNowDTO.LotId).ToList())
+                    {
+                        player.IsWinner = false;
+                    }
+
+                    var bidPrice = new BidPrice
+                    {
+                        CustomerId = (int)placeBidBuyNowDTO.CustomerId,
+                        LotId = (int)placeBidBuyNowDTO.LotId,
+                        CurrentPrice = lot.FinalPriceSold,
+                        BidTime = DateTime.UtcNow
+                    };
+                    await _unitOfWork.BidPriceRepository.AddAsync(bidPrice);
+
+                    var invoice = new Invoice
+                    {
+                        CustomerId = winnerInLot.CustomerId,
+                        CustomerLotId = lot.CustomerLots.First(x => x.CustomerId == winnerInLot?.CustomerId).Id,
+                        StaffId = lot.StaffId,
+                        Price = winnerInLot.CurrentPrice,
+                        Free = (float?)(winnerInLot.CurrentPrice * 0.25),
+                        TotalPrice = (float?)(winnerInLot.CurrentPrice + winnerInLot.CurrentPrice * 0.25 - lot.Deposit),
+                        CreationDate = DateTime.Now,
+                        Status = EnumCustomerLot.CreateInvoice.ToString()
+                    };
+                    await _unitOfWork.InvoiceRepository.AddAsync(invoice);
+                    await _unitOfWork.SaveChangeAsync();
+
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Message = $"Place Bid Successfuly";
+                    }
+                    else
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"Place Bid Fail When Save";
+                    }
+                }
+                else
+                {
+                    response.Code = 404;
+                    response.IsSuccess = false;
+                    response.Message = $"Not Found Lot";
+                }
+            }
+            catch (Exception e)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.ErrorMessages = new List<string> { e.Message };
+            }
+            return response;
+        }
     }
 }
