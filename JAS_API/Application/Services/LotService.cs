@@ -90,7 +90,11 @@ namespace Application.Services
                                 EndTime = lot.EndTime,
                                 Id = lot.Id,
                                 Status = lot.Status,
-                                AuctionId = lot.AuctionId
+                                AuctionId = lot.AuctionId,
+                                StartPrice = lot.StartPrice,
+                                FinalPriceSold = lot.FinalPriceSold
+
+
                             };
                             _cacheService.SetLotInfo(lotRedis);
 
