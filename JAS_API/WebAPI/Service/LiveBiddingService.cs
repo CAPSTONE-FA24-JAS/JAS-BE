@@ -165,7 +165,7 @@ namespace WebAPI.Service
                     var currentPrice = lot.StartPrice;
 
 
-                    while (currentPrice > lot.FinalPriceSold && bidPrice == null && DateTime.UtcNow > lot.EndTime)
+                    while (currentPrice > lot.FinalPriceSold && bidPrice == null && DateTime.UtcNow < lot.EndTime)
                     {
                         currentPrice = currentPrice - lot.BidIncrement;
                         lot.CurrentPrice = currentPrice;
