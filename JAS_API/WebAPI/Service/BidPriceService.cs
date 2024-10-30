@@ -160,7 +160,9 @@ namespace Application.Services
                     var customerId = account.Customer.Id;
                     var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
                     var limitbid = customer.PriceLimit;
+                    var lot = _cacheService.GetLotById(conn.LotId);
                     var customerName = customer.LastName +" " + customer.FirstName;
+                   
                     if(limitbid.HasValue && limitbid < request.CurrentPrice)
                     {
                         reponse.Message = "giá đặt cao hơn limit bid";
@@ -175,6 +177,7 @@ namespace Application.Services
                     }
                     else
                     {
+
                         var bidData = new BidPrice
                         {
                             CurrentPrice = request.CurrentPrice,
@@ -199,7 +202,7 @@ namespace Application.Services
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
 
                         // Lấy thời gian kết thúc từ Redis
-                        var lot = _cacheService.GetLotById(conn.LotId);
+                        
                         if (lot.EndTime.HasValue)
                         {
                             DateTime endTime = lot.EndTime.Value;
