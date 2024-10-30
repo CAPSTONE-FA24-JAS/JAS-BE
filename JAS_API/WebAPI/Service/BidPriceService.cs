@@ -443,6 +443,8 @@ namespace Application.Services
                 }             
             }
             catch (Exception ex)
+
+
             {
                 reponse.IsSuccess = false;
                 reponse.Message = ex.Message;

@@ -44,6 +44,8 @@ namespace Application.Interfaces
 
         void UpdateLotActualEndTime(int lotId, DateTime newEndTime);
 
+        void UpdateLotCurrentPriceForReduceBidding(int lotId, float? currentPrice);
+
 
     }
 }
