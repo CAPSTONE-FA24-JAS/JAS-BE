@@ -10,6 +10,7 @@ using Domain.Enums;
 using Infrastructures;
 using Microsoft.AspNetCore.SignalR;
 using System.Reflection;
+using System.Runtime.InteropServices.Marshalling;
 using System.Security.Claims;
 using WebAPI.Middlewares;
 
@@ -30,37 +31,85 @@ namespace WebAPI.Service
         {
             using (var scope = _serviceProvider.CreateScope())
             {
+               
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
-                //lấy lại max endd time theo tất cả lot của auctionId( nó đang lấy giờ nhỏ nhất)
-                var maxEndTime = _cacheService.GetMaxEndTimeFormSortedSetOfLot();
+                
+                
                 var lotLiveBidding = _cacheService.GetHashLots(l => l.Status == EnumStatusLot.Auctioning.ToString());
-                int? auctionId = 0;
+                List<int?> auctionIdList = new List<int?>();
+                int count = 0;
                 foreach (var lot in lotLiveBidding)
                 {
+                    
                     var endTime = lot.EndTime;
                     if (endTime.HasValue && DateTime.UtcNow > endTime.Value)
                     {
                         await EndLot(lot.Id, endTime.Value);
                     }
-                    auctionId = lot.AuctionId;
-                    if (auctionId == null)
-                    {
-                        throw new Exception("AuctionId null");
-                    }
+                    auctionIdList.Add(lot.AuctionId); 
+                   
                 }
-                //luu endTime max vao actual auction
-                var auction = await _unitOfWork.AuctionRepository.GetByIdAsync(auctionId);
-                if (auction != null)
+                var distinctAuctionIds = auctionIdList.Distinct();
+                foreach (var auctionId in distinctAuctionIds)
                 {
-                    auction.ActualEndTime = maxEndTime;
-                    _unitOfWork.AuctionRepository.Update(auction);
-                    await _unitOfWork.SaveChangeAsync();
-                }
+                    var maxEndTime = _cacheService.GetMaxEndTimeByAuctionId(auctionId);
+                    var auction = await _unitOfWork.AuctionRepository.GetByIdAsync(auctionId);
+                    if(auction != null)
+                    {
+                        auction.ActualEndTime = maxEndTime;
+                        _unitOfWork.AuctionRepository.Update(auction);
+                        await _unitOfWork.SaveChangeAsync();
+
+                        var lotsInAuction = _cacheService.GetHashLots(l => l.AuctionId == auctionId);
+                        bool allLotsEnded = lotsInAuction.All(l => l.Status == EnumStatusLot.Sold.ToString() ||
+                                                              l.Status == EnumStatusLot.Passed.ToString() ||
+                                                              l.Status == EnumStatusLot.Canceled.ToString());
+
+                        if (allLotsEnded)
+                        {
+                            // Nếu tất cả lot đã đóng, cập nhật trạng thái auction
+                            auction.Status = EnumStatusAuction.Past.ToString();
+                            _unitOfWork.AuctionRepository.Update(auction);
+                            await _unitOfWork.SaveChangeAsync();
+                        }
+                    }                    
+                } 
+                
+
             }
 
 
         }
+
+        public async Task ChecKAuctionEndAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+
+                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+
+
+                var AuctionLiveBidding = _cacheService.GetHashLots(l => l.Status == EnumStatusAuction.Live.ToString());
+                
+                foreach (var auction in AuctionLiveBidding)
+                {
+                    var lots = _unitOfWork.LotRepository.GetLotsByAuctionAsync(auction.Id);
+                    foreach(var lot in lots)
+                    {
+
+                    }
+
+                }
+                
+
+
+            }
+
+
+        }
+
 
         public async Task ChecKLotEndReducedBiddingAsync()
         {
@@ -144,7 +193,7 @@ namespace WebAPI.Service
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string lotGroupName = $"lot-{lotId}";
                 
-            var lot = _cacheService.GetLotById(lotId) ;
+            var lot = _cacheService.GetLotByIdInAuction(lotId) ;
                 if(bidPrice == null)
                 {
                     var currentPrice = lot.StartPrice;
@@ -162,7 +211,7 @@ namespace WebAPI.Service
                         }
 
                         _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionWithReduceBidding", "Giá đã giảm!", currentPrice, DateTime.UtcNow);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("ReducePriceBidding", "Giá đã giảm!", currentPrice, DateTime.UtcNow);
 
                         var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
                         lotsql.CurrentPrice = currentPrice;

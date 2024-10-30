@@ -68,7 +68,7 @@ namespace Application.Services
                     return x;
                 }).ToList();
 
-                var lot = _cacheService.GetLotById(request.LotId);
+                var lot = _cacheService.GetLotByIdInAuction(request.LotId);
               //  await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
 
                 
@@ -161,7 +161,7 @@ namespace Application.Services
                     var customerId = account.Customer.Id;
                     var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
                     
-                    var lot = _cacheService.GetLotById(conn.LotId);
+                    var lot = _cacheService.GetLotByIdInAuction(conn.LotId);
                     var customerName = customer.LastName +" " + customer.FirstName;
                     if(lot.HaveFinancialProof == true)
                     {
@@ -221,7 +221,7 @@ namespace Application.Services
                                 if (extendTime.TotalSeconds < 10)
                                 {
                                     endTime = endTime.AddSeconds(10);
-                                    _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                                    _cacheService.UpdateLotEndTimeInAuction(conn.LotId, endTime);
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
                                 }
                                 else
@@ -274,7 +274,7 @@ namespace Application.Services
                             if (extendTime.TotalSeconds < 10)
                             {
                                 endTime = endTime.AddSeconds(10);
-                                _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                                _cacheService.UpdateLotEndTimeInAuction(conn.LotId, endTime);
                                 await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
                             }
                             else
@@ -351,7 +351,7 @@ namespace Application.Services
                             lotSql.CurrentPrice = request.CurrentPrice;
                             _unitOfWork.LotRepository.Update(lotSql);
                         await _unitOfWork.SaveChangeAsync();
-                        _cacheService.UpdateLotEndTime(lotSql.Id, request.BidTime);
+                        _cacheService.UpdateLotEndTimeInAuction(lotSql.Id, request.BidTime);
                         _cacheService.UpdateLotStatus(lotSql.Id, lotSql.Status);
                         _cacheService.UpdateLotCurrentPriceForReduceBidding(lotSql.Id, request.CurrentPrice);
                            

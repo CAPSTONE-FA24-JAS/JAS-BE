@@ -97,7 +97,7 @@ namespace Application.Services
 
 
                             };
-                            _cacheService.SetLotInfo(lotRedis);
+                            _cacheService.SetLotInfoByAuction(lotRedis);
 
                                 reponse.Code = 200;
                                 reponse.IsSuccess = true;

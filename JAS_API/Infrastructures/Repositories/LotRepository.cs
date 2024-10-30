@@ -36,5 +36,18 @@ namespace Infrastructures.Repositories
                 return maxBidPrice;
             }
         }
+
+        public List<Lot> GetLotsByAuctionAsync(int auctionId)
+        {
+            var lots = _dbContext.Lots.Where(x => x.AuctionId == auctionId ).ToList();
+            if (!lots.Any())
+            {
+                return [];
+            }
+            else
+            {
+                return lots;
+            }
+        }
     }
 }

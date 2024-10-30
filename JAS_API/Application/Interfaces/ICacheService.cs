@@ -29,18 +29,18 @@ namespace Application.Interfaces
 
         DateTime GetEndTime(int lotId);
 
-        void SetLotInfo(Lot lot);
+        void SetLotInfoByAuction(Lot lot);
        
-        Lot GetLotById(int lotId);
+        Lot GetLotByIdInAuction(int lotId);
 
-        void UpdateLotEndTime(int lotId, DateTime newEndTime);
+        void UpdateLotEndTimeInAuction(int lotId, DateTime newEndTime);
 
         List<Lot> GetHashLots(Func<Lot, bool> filter);
         void UpdateLotStatus(int lotId, string status);
 
         void UpdateMultipleLotsStatus(List<Lot> lotIds, string status);
 
-        DateTime? GetMaxEndTimeFormSortedSetOfLot();
+        DateTime? GetMaxEndTimeByAuctionId(int? auctionId);
 
         void UpdateLotActualEndTime(int lotId, DateTime newEndTime);
 

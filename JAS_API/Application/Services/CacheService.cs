@@ -143,38 +143,74 @@ namespace Application.Services
 
 
         //lưu thong tin lot vao redis bang hash, còn endTime thi dung sortedSet
-        public void SetLotInfo(Lot lot)
+        //public void SetLotInfo(Lot lot)
+        //{
+        //    var lotHashKey = $"lot-{lot.Id}";
+        //    var lotData = JsonSerializer.Serialize(lot);
+        //    _cacheDb.HashSet(lotHashKey, "lot", lotData);
+        //    if (lot.EndTime.HasValue)
+        //    {
+        //        var timestamp = new DateTimeOffset(lot.EndTime.Value).ToUnixTimeSeconds();
+        //        _cacheDb.SortedSetAdd("LotEndTime", lot.Id.ToString(), timestamp);
+        //    }
+
+
+        //}
+
+        public void SetLotInfoByAuction(Lot lot)
         {
-            var lotHashKey = $"lot-{lot.Id}";
+            // Lưu `lot` với `lotId` làm `key` riêng
+            var lotKey = $"lot-{lot.Id}";
             var lotData = JsonSerializer.Serialize(lot);
-            _cacheDb.HashSet(lotHashKey, "lot", lotData);
+            _cacheDb.StringSet(lotKey, lotData);
+
+            // Lưu `lot` vào `Hash` theo `auctionId` để dễ truy xuất theo nhóm
+            var auctionHashKey = $"auction-{lot.AuctionId}";
+            _cacheDb.HashSet(auctionHashKey, lot.Id.ToString(), lotData);
+
+            // Lưu `EndTime` vào `SortedSet` theo `auctionId` nếu có
             if (lot.EndTime.HasValue)
             {
+                var sortedSetKey = $"LotEndTime-{lot.AuctionId}";
                 var timestamp = new DateTimeOffset(lot.EndTime.Value).ToUnixTimeSeconds();
-                _cacheDb.SortedSetAdd("LotEndTime", lot.Id.ToString(), timestamp);
+                _cacheDb.SortedSetAdd(sortedSetKey, lot.Id.ToString(), timestamp);
             }
-           
-            
         }
+
 
         //get lot theo lot id
-        public Lot GetLotById(int lotId)
-        {
-            var lotHashKey = $"lot-{lotId}"; // Tạo khóa cho Lot trong Redis
-            var lotData = _cacheDb.HashGet(lotHashKey, "lot"); // Lấy dữ liệu Lot từ Redis Hash
+        //public Lot GetLotById(int lotId)
+        //{
+        //    var lotHashKey = $"lot-{lotId}"; // Tạo khóa cho Lot trong Redis
+        //    var lotData = _cacheDb.HashGet(lotHashKey, "lot"); // Lấy dữ liệu Lot từ Redis Hash
 
-            // Kiểm tra xem dữ liệu có tồn tại không
+        //    // Kiểm tra xem dữ liệu có tồn tại không
+        //    if (lotData.HasValue)
+        //    {
+        //        return JsonSerializer.Deserialize<Lot>(lotData); // Chuyển dữ liệu JSON thành đối tượng Lot
+        //    }
+        //    return null; // Trả về null nếu không tìm thấy Lot
+        //}
+
+        public Lot GetLotByIdInAuction(int lotId)
+        {
+            // Lấy dữ liệu `lot` theo `lotId` từ Redis
+            var lotKey = $"lot-{lotId}";
+            var lotData = _cacheDb.StringGet(lotKey);
+
+            // Kiểm tra nếu dữ liệu `lot` tồn tại
             if (lotData.HasValue)
             {
-                return JsonSerializer.Deserialize<Lot>(lotData); // Chuyển dữ liệu JSON thành đối tượng Lot
+                return JsonSerializer.Deserialize<Lot>(lotData);
             }
-            return null; // Trả về null nếu không tìm thấy Lot
+
+            return null; // Trả về `null` nếu không tìm thấy `lot`
         }
 
-        public void UpdateLotEndTime(int lotId, DateTime newEndTime)
+        public void UpdateLotEndTimeInAuction(int lotId, DateTime newEndTime)
         {
             var lotHashKey = $"lot-{lotId}"; // Tạo khóa cho Lot trong Redis
-            var lotData = _cacheDb.HashGet(lotHashKey, "lot");
+            var lotData = _cacheDb.StringGet(lotHashKey);
 
             if (lotData.HasValue)
             {
@@ -183,7 +219,19 @@ namespace Application.Services
 
                 var updateLot = JsonSerializer.Serialize(lot);
 
-                _cacheDb.HashSet(lotHashKey, "lot", updateLot);
+                _cacheDb.StringSet(lotHashKey, updateLot);
+
+                if (lot.AuctionId != null)
+                {
+                    var sortedSetKey = $"LotEndTime-{lot.AuctionId}";
+
+                    // Xóa `endTime` cũ của `lot` khỏi SortedSet nếu tồn tại
+                    _cacheDb.SortedSetRemove(sortedSetKey, lotId);
+
+                    // Thêm `endTime` mới của `lot` vào SortedSet
+                    var timestamp = new DateTimeOffset(newEndTime).ToUnixTimeSeconds();
+                    _cacheDb.SortedSetAdd(sortedSetKey, lotId, timestamp);
+                }
             }
         }
 
@@ -288,13 +336,25 @@ namespace Application.Services
             return lots.Where(filter).ToList();
         }
 
-
-        public DateTime? GetMaxEndTimeFormSortedSetOfLot()
+        //get max time đang lưu theo sortSet key là: lot:{lotId}:endTime
+        public DateTime? GetMaxEndTimeByAuctionId(int? auctionId)
         {
-            var maxEndTime = _cacheDb.SortedSetRangeByRankWithScores("LotEndTime", -1, -1).Select(x => (DateTime?)DateTimeOffset.FromUnixTimeSeconds((long)x.Score).UtcDateTime)
-                           .FirstOrDefault();
-            return maxEndTime;
+            var sortedSetKey = $"LotEndTime:{auctionId}";
+
+            // Lấy giá trị đầu tiên từ SortedSet theo thứ tự giảm dần (max endTime)
+            var maxEntry = _cacheDb.SortedSetRangeByRankWithScores(sortedSetKey, 0, 0, Order.Descending).FirstOrDefault();
+
+            if (maxEntry.Element.HasValue)
+            {
+                // Chuyển Unix timestamp về DateTime
+                var maxTimestamp = (long)maxEntry.Score;
+                return DateTimeOffset.FromUnixTimeSeconds(maxTimestamp).DateTime;
+            }
+
+            // Trả về null nếu không có giá trị nào trong SortedSet
+            return null;
         }
+
 
 
     }
