@@ -143,7 +143,7 @@ namespace WebAPI.Service
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string lotGroupName = $"lot-{lotId}";
-            //    var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+                var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
             var lot = _cacheService.GetLotById(lotId) ;
                 var currentPrice = lot.StartPrice;
                 while (currentPrice > lot.FinalPriceSold)
@@ -162,7 +162,8 @@ namespace WebAPI.Service
                     await Task.Delay(30000);
                 };
 
-                _unitOfWork.LotRepository.Update(lot);
+                lotsql.CurrentPrice = currentPrice;
+                _unitOfWork.LotRepository.Update(lotsql);
 
                 await _unitOfWork.SaveChangeAsync();
                 
