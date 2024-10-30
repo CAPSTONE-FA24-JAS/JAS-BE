@@ -146,7 +146,9 @@ namespace WebAPI.Service
                 var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
             var lot = _cacheService.GetLotById(lotId) ;
                 var currentPrice = lot.StartPrice;
-                while (currentPrice > lot.FinalPriceSold)
+                
+
+                while (currentPrice > lot.FinalPriceSold && bidPrice == null)
                 {
                     currentPrice = currentPrice - lot.BidIncrement;
                     lot.CurrentPrice = currentPrice;
@@ -159,6 +161,8 @@ namespace WebAPI.Service
 
                     _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionWithReduceBidding", "Giá đã giảm!", currentPrice, DateTime.UtcNow);
+
+                    bidPrice = _unitOfWork.BidPriceRepository.GetBidPriceByLotIdForReduceBidding(lotId);
                     await Task.Delay(30000);
                 };
 

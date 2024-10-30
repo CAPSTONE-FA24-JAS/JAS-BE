@@ -297,7 +297,10 @@ namespace Application.Services
                             lotSql.ActualEndTime = request.BidTime;
                             lotSql.CurrentPrice = request.CurrentPrice;
                             _unitOfWork.LotRepository.Update(lotSql);
+                        await _unitOfWork.SaveChangeAsync();
                         _cacheService.UpdateLotEndTime(lotSql.Id, request.BidTime);
+                        _cacheService.UpdateLotStatus(lotSql.Id, lotSql.Status);
+                        _cacheService.UpdateLotCurrentPriceForReduceBidding(lotSql.Id, request.CurrentPrice);
                            
                            
                             
