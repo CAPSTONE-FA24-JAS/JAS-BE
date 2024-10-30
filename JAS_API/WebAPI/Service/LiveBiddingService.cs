@@ -31,36 +31,51 @@ namespace WebAPI.Service
             using (var scope = _serviceProvider.CreateScope())
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
-                //lấy lại max endd time theo tất cả lot của auctionId( nó đang lấy giờ nhỏ nhất)
-                var maxEndTime = _cacheService.GetMaxEndTimeFormSortedSetOfLot();
-                var lotLiveBidding = _cacheService.GetHashLots(l => l.Status == EnumStatusLot.Auctioning.ToString());
-                int? auctionId = 0;
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();   
+                var lotLiveBidding = _cacheService.GetHashLots(l => l.Status == EnumStatusLot.Auctioning.ToString());              
                 foreach (var lot in lotLiveBidding)
                 {
                     var endTime = lot.EndTime;
                     if (endTime.HasValue && DateTime.UtcNow > endTime.Value)
                     {
                         await EndLot(lot.Id, endTime.Value);
-                    }
-                    auctionId = lot.AuctionId;
-                    if (auctionId == null)
-                    {
-                        throw new Exception("AuctionId null");
-                    }
-                }
-                //luu endTime max vao actual auction
-                var auction = await _unitOfWork.AuctionRepository.GetByIdAsync(auctionId);
-                if (auction != null)
+                    }                   
+                }               
+            }
+        }
+
+
+        public async Task ChecKAuctionEndAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+                var auctionLiveBidding = _unitOfWork.AuctionRepository.GetAuctionsAsync(EnumStatusAuction.Live.ToString());
+                foreach (var auction in auctionLiveBidding)
                 {
-                    auction.ActualEndTime = maxEndTime;
-                    _unitOfWork.AuctionRepository.Update(auction);
-                    await _unitOfWork.SaveChangeAsync();
+                    var lotsInAuction = _cacheService.GetHashLots(l => l.AuctionId == auction.Id);
+
+                    
+                    bool allLotsEnded = lotsInAuction.All(lot =>
+                        lot.Status == EnumStatusLot.Sold.ToString() ||
+                        lot.Status == EnumStatusLot.Passed.ToString() ||
+                        lot.Status == EnumStatusLot.Canceled.ToString());
+
+                   
+                    var maxTimeAuction = _cacheService.GetHashLots(x => x.AuctionId == auction.Id).OrderByDescending(x => x.EndTime).FirstOrDefault();
+                    if (allLotsEnded)
+                    {
+                        auction.Status = EnumStatusAuction.Past.ToString();
+                        auction.ActualEndTime = maxTimeAuction.EndTime;
+                        _unitOfWork.AuctionRepository.Update(auction);
+                        await _unitOfWork.SaveChangeAsync();
+                    }
                 }
             }
-
-
         }
+
+
 
         public async Task ChecKLotEndReducedBiddingAsync()
         {
@@ -162,7 +177,7 @@ namespace WebAPI.Service
                         }
 
                         _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionWithReduceBidding", "Giá đã giảm!", currentPrice, DateTime.UtcNow);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("ReducePriceBidding", "Giá đã giảm!", currentPrice, DateTime.UtcNow);
 
                         var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
                         lotsql.CurrentPrice = currentPrice;
