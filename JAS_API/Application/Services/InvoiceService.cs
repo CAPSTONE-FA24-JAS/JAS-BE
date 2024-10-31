@@ -956,7 +956,7 @@ namespace Application.Services
 
             try
             {
-                var invoice = await _unitOfWork.InvoiceRepository.GetAllAsync(condition: x => x.Status == EnumCustomerLot.PendingPayment.ToString() && x.LinkBillTransaction != null);
+                var invoice = await _unitOfWork.InvoiceRepository.GetAllAsync(condition: x => x.Status == EnumCustomerLot.PendingPayment.ToString() && x.InvoiceOfWalletTransaction.transactionType == EnumTransactionType.Banktransfer.ToString()  && x.LinkBillTransaction != null);
                 if (invoice.Count > 0)
                 {
                     var invoicesResponse = _mapper.Map<IEnumerable<ViewCheckInvoiceHaveBill>>(invoice);
