@@ -567,6 +567,37 @@ namespace Application.Services
             }
             return false;
         }
+
+        public async Task<APIResponseModel> CheckCustomerAuctioned(CheckCustomerInLotDTO model)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var CustomerLotExist = checkCustomerRegisteredToLot(model.CustomerId, model.LotId);
+                if (CustomerLotExist != null) 
+                {
+                    reponse.Code = 200;
+                    reponse.Data = true;
+                    reponse.IsSuccess = true;
+                    reponse.Message = $"Customer was joined to lot";
+                }
+                else
+                {
+                    reponse.Code = 400;
+                    reponse.IsSuccess = true;
+                    reponse.Message = $"Customer havent in lot.";
+
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.Code = 500;
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+
         public async Task<APIResponseModel> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet model) 
         {
             var response = new APIResponseModel();
