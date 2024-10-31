@@ -231,8 +231,8 @@ namespace Infrastructures
             CreateMap<HistoryStatusCustomerLot, HistoryCustomerLotDTO>().ReverseMap();
             CreateMap<StatusInvoice, StatusInvoiceDTO>().ReverseMap();
             CreateMap<WalletTransaction, ViewWalletTransactionDTO>().ReverseMap();
-            CreateMap<Transaction, ViewTransactionDTO>().ReverseMap();    
-
+            CreateMap<Transaction, ViewTransactionDTO>().ReverseMap();
+            CreateMap<ViewCheckInvoiceHaveBill, Invoice>().ReverseMap();
         }
     }
 }

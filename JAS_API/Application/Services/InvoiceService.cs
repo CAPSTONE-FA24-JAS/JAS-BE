@@ -947,5 +947,38 @@ namespace Application.Services
             }
             return lotExit;
         }
+
+        public async Task<APIResponseModel> GetListInvoiceForCheckBill()
+        {
+            var response = new APIResponseModel();
+
+            try
+            {
+
+                var invoice = await _unitOfWork.InvoiceRepository.GetAllAsync(condition: x => x.InvoiceOfWalletTransaction.Status == EnumStatusTransaction.Pending.ToString() && x.LinkBillTransaction != null);
+                if (invoice.Count > 0)
+                {
+                    var invoicesResponse = _mapper.Map<IEnumerable<ViewCheckInvoiceHaveBill>>(invoice);
+                    response.Message = $"Received Invoice Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = invoicesResponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have invoice for check bill";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
     }
 }
