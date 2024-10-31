@@ -570,32 +570,44 @@ namespace Application.Services
 
         public async Task<APIResponseModel> CheckCustomerAuctioned(CheckCustomerInLotDTO model)
         {
-            var reponse = new APIResponseModel();
+            var response = new APIResponseModel();
             try
             {
-                var CustomerLotExist = checkCustomerRegisteredToLot(model.CustomerId, model.LotId);
+                var CustomerLotExist = await checkCustomerRegisteredToLot(model.CustomerId, model.LotId);
                 if (CustomerLotExist != null) 
                 {
-                    reponse.Code = 200;
-                    reponse.Data = true;
-                    reponse.IsSuccess = true;
-                    reponse.Message = $"Customer was joined to lot";
+                    var bidPriceExist = CustomerLotExist.Lot.BidPrices.First(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
+                    if (bidPriceExist != null)
+                    {
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Message = $"The customer is auctioned into the lot";
+                        response.Data = _mapper.Map<BidPriceDTO>(bidPriceExist);
+                        return response;
+                    }
+                    else
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = true;
+                        response.Message = $"The customer haven't bid to the lot";
+                        return response;
+                    }
                 }
                 else
                 {
-                    reponse.Code = 400;
-                    reponse.IsSuccess = true;
-                    reponse.Message = $"Customer havent in lot.";
+                    response.Code = 400;
+                    response.IsSuccess = true;
+                    response.Message = $"Customer havent register to lot.";
 
                 }
             }
             catch (Exception e)
             {
-                reponse.Code = 500;
-                reponse.IsSuccess = false;
-                reponse.ErrorMessages = new List<string> { e.Message };
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.ErrorMessages = new List<string> { e.Message };
             }
-            return reponse;
+            return response;
         }
 
         public async Task<APIResponseModel> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet model) 

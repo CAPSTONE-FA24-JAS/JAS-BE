@@ -24,5 +24,6 @@ namespace Application.Interfaces
         Task<APIResponseModel> CheckEndLot();
         Task<APIResponseModel> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet placeBidFixedPriceAndSercetDTO);
         Task<APIResponseModel> PlaceBuyNow(PlaceBidBuyNowDTO placeBidBuyNowDTO);
+        Task<APIResponseModel> CheckCustomerAuctioned(CheckCustomerInLotDTO model);
     }
 }

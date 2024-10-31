@@ -774,12 +774,13 @@ namespace Application.Services
 
 
                 var invoices = await _unitOfWork.InvoiceRepository.getInvoicesRecivedByShipper(shipperId, pageIndex, pageSize);
-                List<InvoiceDTO> listInvoiceDTO = new List<InvoiceDTO>();
+                List<InvoiceDetailDTO> listInvoiceDTO = new List<InvoiceDetailDTO>();
                 if (invoices.totalItems > 0)
                 {
                     foreach (var item in invoices.data)
                     {
-                        var invoicesResponse = _mapper.Map<InvoiceDTO>(item);
+                        var jewelryOfInvoice = item.CustomerLot.Lot.Jewelry;
+                        var invoicesResponse = _mapper.Map<InvoiceDetailDTO>(item, x => x.Items["Jewelry"] = jewelryOfInvoice);
                         listInvoiceDTO.Add(invoicesResponse);
                     };
 
