@@ -102,5 +102,16 @@ namespace WebAPI.Controllers
             }
             return BadRequest(result);
         }
+
+        [HttpPatch]
+        public async Task<IActionResult> CancelAuction(int auctionId)
+        {
+            var result = await _auctionService.CancelAuctionAndRangeLot(auctionId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
     }
 }

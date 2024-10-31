@@ -13,5 +13,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> GetStatusAuction();
         Task<APIResponseModel> GetAuctionByStatus(int valueId);
         Task<APIResponseModel> ApproveAuction(int auctionId);
+
+        Task<APIResponseModel> CancelAuctionAndRangeLot(int auctionId);
     }
 }
