@@ -466,7 +466,7 @@ namespace Application.Services
                     }
                     else
                     {
-                        if(customer.ExpireDate.Value < DateTime.Now) 
+                        if(customer.ExpireDate.Value < DateTime.UtcNow) 
                         {
                             reponse.IsSuccess = false;
                             reponse.Message = "Customer have bidlimt, But BidLimit is outtime, Please register new bidlimit";
