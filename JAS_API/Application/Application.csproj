@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
+		<PackageReference Include="DinkToPdf" Version="1.0.8" />
 		<PackageReference Include="Google.Cloud.Storage.V1" Version="4.10.0" />
 		<PackageReference Include="iTextSharp" Version="5.5.13.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.0" />

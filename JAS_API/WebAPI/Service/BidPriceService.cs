@@ -318,7 +318,8 @@ namespace Application.Services
                         var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
                         var limitbid = customer.PriceLimit;
                         var customerName = customer.LastName + " " + customer.FirstName;
-                        if (limitbid.HasValue && limitbid < request.CurrentPrice)
+                    var lot = _cacheService.GetLotById(conn.LotId);
+                    if (limitbid.HasValue && limitbid < request.CurrentPrice)
                         {
                             reponse.Message = "giá đặt cao hơn limit bid";
                             reponse.Code = 200;
@@ -354,18 +355,21 @@ namespace Application.Services
                         _cacheService.UpdateLotEndTime(lotSql.Id, request.BidTime);
                         _cacheService.UpdateLotStatus(lotSql.Id, lotSql.Status);
                         _cacheService.UpdateLotCurrentPriceForReduceBidding(lotSql.Id, request.CurrentPrice);
-                           
-                           
-                            
-                            //trar về name, giá ĐẤU, thời gian
-                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaffforReducedBidding", "Phiên đã kết thúc!", customerId, customerName, request.CurrentPrice, request.BidTime);
+
+                        DateTime endTime = lot.EndTime.Value;
+
+
+                        //trar về name, giá ĐẤU, thời gian
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaffforReducedBidding", "Phiên đã kết thúc!", customerId, customerName, request.CurrentPrice, request.BidTime);
 
                             await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforReducedBidding", "Phiên đã kết thúc!", customerId, request.CurrentPrice, request.BidTime);
 
-                            //Tự động tạo invoice cho winner, hoàn cọc cho người thua, lưu transaction ví, transaction cty,
-                            //lưu history cho customerLot, đổi trạng thái invoice và customerLot
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
 
-                            var winnerCustomerLot = await _unitOfWork.CustomerLotRepository.GetCustomerLotByCustomerAndLot(customerId, conn.LotId);
+                        //Tự động tạo invoice cho winner, hoàn cọc cho người thua, lưu transaction ví, transaction cty,
+                        //lưu history cho customerLot, đổi trạng thái invoice và customerLot
+
+                        var winnerCustomerLot = await _unitOfWork.CustomerLotRepository.GetCustomerLotByCustomerAndLot(customerId, conn.LotId);
                             winnerCustomerLot.IsWinner = true;
                             winnerCustomerLot.CurrentPrice = request.CurrentPrice;
                             _unitOfWork.CustomerLotRepository.Update(winnerCustomerLot);
