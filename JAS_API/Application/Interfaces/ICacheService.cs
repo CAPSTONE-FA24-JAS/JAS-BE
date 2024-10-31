@@ -40,7 +40,7 @@ namespace Application.Interfaces
 
         void UpdateMultipleLotsStatus(List<Lot> lotIds, string status);
 
-        DateTime? GetMaxEndTimeFormSortedSetOfLot();
+       
 
         void UpdateLotActualEndTime(int lotId, DateTime newEndTime);
 
