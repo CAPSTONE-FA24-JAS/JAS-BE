@@ -558,7 +558,7 @@ namespace Application.Services
 
                             await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
                             await _unitOfWork.TransactionRepository.AddAsync(trans);
-                            await _walletService.RefundToWalletForUsersAsync(invoiceById.CustomerLot.Lot);
+                            await _walletService.RefundToWalletForUsersAsync(invoiceById.CustomerLot.Lot);  
                             if (await _unitOfWork.SaveChangeAsync() > 0)
                             {
                                 response.Message = $"Update Wallet Successfully";
@@ -661,7 +661,7 @@ namespace Application.Services
                     var httpContext = _httpContextAccessor.HttpContext;
                     string paymentUrl = await _vNPayService.CreatePaymentUrl(httpContext, vnPayModel, transaction);
                     // tra về url thanh toán 
-                    // => Fe thanh toán xong gọi api refun
+                    // => Fe thanh toán xong gọi api refund
                     if (!string.IsNullOrEmpty(paymentUrl))
                     {
                         response.Message = $"SucessFull";
