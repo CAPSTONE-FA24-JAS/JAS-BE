@@ -159,7 +159,17 @@ namespace WebAPI.Controllers
             }
             return Ok(result);
         }
-        
-        
+
+        [HttpPost]
+        public async Task<IActionResult> CheckCustomerHaveBidPrice([FromBody]CheckCustomerInLotDTO checkCustomerInLotDTO)
+        {
+            var result = await _lotService.CheckCustomerAuctioned(checkCustomerInLotDTO);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
     }
 }
