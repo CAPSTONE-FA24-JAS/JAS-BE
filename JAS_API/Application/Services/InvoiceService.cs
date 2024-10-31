@@ -821,7 +821,7 @@ namespace Application.Services
                 var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
                 if (invoiceById != null)
                 {
-                    if(invoiceById.InvoiceOfWalletTransaction.transactionType == EnumTransactionType.Banktransfer.ToString())
+                    if(invoiceById.InvoiceOfWalletTransaction.transactionType != EnumTransactionType.Banktransfer.ToString())
                     {
                         response.Message = $"Invoice must using payment method bank transfer for upload bill";
                         response.Code = 400;
