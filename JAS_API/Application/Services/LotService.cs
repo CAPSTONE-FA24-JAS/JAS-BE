@@ -2,6 +2,7 @@ using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.AccountDTOs;
+using Application.ViewModels.BidPriceDTOs;
 using Application.ViewModels.LotDTOs;
 using AutoMapper;
 using Azure;
@@ -577,9 +578,18 @@ namespace Application.Services
                     response.Code = 400;
                     response.IsSuccess = false;
                     response.Message = $"The customer is not register into the lot";
-                    response.Data = _mapper.Map<CustomerLotDTO>(playerJoined);
                     return response;
                 }
+                var bidPriceExist = playerJoined.Lot.BidPrices.First(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
+                if (bidPriceExist != null)
+                {
+                    response.Code = 400;
+                    response.IsSuccess = false;
+                    response.Message = $"The customer is auctioned into the lot";
+                    response.Data = _mapper.Map<BidPriceDTO>(bidPriceExist);
+                    return response;
+                }
+
                 if (await checkCustomerIntoBidPrice((int)model.CustomerId, (int)model.LotId))
                 {
                     response.Code = 400;
@@ -668,12 +678,22 @@ namespace Application.Services
                     }
 
                     var playerJoined = await checkCustomerRegisteredToLot((int)placeBidBuyNowDTO.CustomerId, (int)placeBidBuyNowDTO.LotId);
+
                     if (playerJoined == null)
                     {
                         response.Code = 400;
                         response.IsSuccess = false;
                         response.Message = $"The customer is not register into the lot";
-                        response.Data = _mapper.Map<CustomerLotDTO>(playerJoined);
+                        return response;
+                    }
+
+                    var bidPriceExist = playerJoined.Lot.BidPrices.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId && x.LotId == placeBidBuyNowDTO.LotId);
+                    if (bidPriceExist != null)
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"The customer is auctioned into the lot";
+                        response.Data = _mapper.Map<BidPriceDTO>(bidPriceExist);
                         return response;
                     }
 
