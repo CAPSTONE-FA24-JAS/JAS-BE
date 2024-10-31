@@ -608,8 +608,8 @@ namespace Application.Services
                         Status = EnumStatusTransaction.Pending.ToString(),
                         transactionType = EnumTransactionType.Banktransfer.ToString(),
                     };
-
-                   await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
+                    invoiceById.Status = EnumCustomerLot.PendingPayment.ToString();
+                    await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
                     
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
@@ -836,7 +836,7 @@ namespace Application.Services
                     }
                     else
                     {
-                        invoiceById.Status = EnumCustomerLot.PendingPayment.ToString();
+                        
                         invoiceById.LinkBillTransaction = uploadResult.SecureUrl.AbsoluteUri;
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
