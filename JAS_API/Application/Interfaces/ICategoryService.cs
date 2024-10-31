@@ -14,5 +14,7 @@ namespace Application.Interfaces
         public Task<APIResponseModel> CreateCategoryAsync(CategoryDTO categoryDTO);
 
         public Task<APIResponseModel> getCategoriesAsync();
+
+        
     }
 }

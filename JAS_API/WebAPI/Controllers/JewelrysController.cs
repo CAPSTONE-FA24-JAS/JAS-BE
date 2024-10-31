@@ -116,5 +116,31 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetJewelryByCategoryAsync(int categoryId, int? pageSize, int? pageIndex)
+        {
+            var result = await _jewelryService.GetJewelryByCategoryAsync(categoryId,pageSize, pageIndex);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetJewelryByArtistAsync(int artistId, int? pageSize, int? pageIndex)
+        {
+            var result = await _jewelryService.GetJewelryByArtistAsync(artistId, pageSize, pageIndex);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }

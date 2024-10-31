@@ -13,5 +13,6 @@ namespace Application.Repositories
         Task<(IEnumerable<Jewelry> data, int totalItem)> GetAllJewelryAynsc(int? pageIndex = null, int? pageSize = null);
 
         Task<(IEnumerable<Jewelry> data, int totalItem)> GetAllJewelryNoLotAynsc(int? pageIndex = null, int? pageSize = null);
+        Task<(IEnumerable<Jewelry> data, int totalItem)> GetAllJewelryByCategoryAynsc(int categoryId, int? pageIndex = null, int? pageSize = null);
     }
 }
