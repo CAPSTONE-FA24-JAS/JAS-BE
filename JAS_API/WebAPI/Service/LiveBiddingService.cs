@@ -395,11 +395,11 @@ namespace WebAPI.Service
             using (var scope = _serviceProvider.CreateScope())
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var _foorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();
+                var _foorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();//&& x.Status == EnumStatusLot.Auctioning.ToString()
                 //Xu ly luc tg ket thuc
-                var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow && x.LotType == EnumLotType.Fixed_Price.ToString() && x.Status == EnumStatusLot.Auctioning.ToString());
+                var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow && x.LotType == EnumLotType.Fixed_Price.ToString() && x.LotType == EnumLotType.Secret_Auction.ToString() && x.Status.ToLower().Trim().Equals(EnumStatusLot.Auctioning.ToString().ToLower().Trim()));
                 Invoice invoice;
-                if (lotEnds.Any())
+                if (lotEnds.Count > 0)
                 {
                     foreach(var lot in lotEnds)
                     {
@@ -441,7 +441,7 @@ namespace WebAPI.Service
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _foorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();
-                var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow && x.LotType == EnumLotType.Secret_Auction.ToString() && x.Status == EnumStatusLot.Auctioning.ToString());
+                var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow && x.LotType == EnumLotType.Secret_Auction.ToString() && x.Status.ToLower().Trim().Equals(EnumStatusLot.Auctioning.ToString().ToLower().Trim()));
                 Invoice invoice;
                 if (lotEnds.Any())
                 {

@@ -555,6 +555,14 @@ namespace Application.Services
                                 TransactionTime = DateTime.Now,
                                 TransactionType = EnumTransactionType.BuyPay.ToString(),
                             };
+                            invoiceById.Status = EnumCustomerLot.Paid.ToString();
+                            invoiceById.CustomerLot.Status = EnumCustomerLot.Paid.ToString();
+                            var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                            {
+                                CustomerLotId = invoiceById.CustomerLot.Id,
+                                Status = EnumCustomerLot.Paid.ToString(),
+                                CurrentTime = DateTime.UtcNow,
+                            };
                             invoiceById.PaymentMethod = EnumPaymentType.Wallet.ToString();
                             await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
                             await _unitOfWork.TransactionRepository.AddAsync(trans);
@@ -659,6 +667,7 @@ namespace Application.Services
                         transactionType = EnumTransactionType.BuyPay.ToString(),
                         DocNo = model.InvoiceId,
                     };
+                    invoiceExist.Status = EnumCustomerLot.PendingPayment.ToString();
                     invoiceExist.PaymentMethod = EnumPaymentType.Wallet.ToString();
                     await _unitOfWork.SaveChangeAsync();
                     var httpContext = _httpContextAccessor.HttpContext;

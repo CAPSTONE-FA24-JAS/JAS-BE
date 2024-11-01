@@ -582,7 +582,7 @@ namespace Application.Services
                 var CustomerLotExist = await checkCustomerRegisteredToLot(model.CustomerId, model.LotId);
                 if (CustomerLotExist != null) 
                 {
-                    var bidPriceExist = CustomerLotExist.Lot.BidPrices.First(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
+                    var bidPriceExist = CustomerLotExist.Lot.BidPrices.FirstOrDefault(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
                     if (bidPriceExist != null)
                     {
                         response.Code = 200;
