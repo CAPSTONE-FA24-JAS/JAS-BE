@@ -24,6 +24,7 @@ namespace Application.Repositories
         void Update(TEntity entity);
         void UpdateRange(List<TEntity> entities);
         void SoftRemove(TEntity entity);
+        void Remove(TEntity entity);
         Task AddRangeAsync(List<TEntity> entities);
         void SoftRemoveRange(List<TEntity> entities);
         void SetPropertyModified(TEntity entity, string propertyName);

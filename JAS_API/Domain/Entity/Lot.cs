@@ -37,6 +37,5 @@ namespace Domain.Entity
         public virtual Jewelry? Jewelry { get; set; }
         public virtual IEnumerable<BidPrice>? BidPrices { get; set; }
         public virtual IEnumerable<CustomerLot>? CustomerLots { get; set; }
-        public virtual IEnumerable<Watching>? Watchings { get; set; }
     }
 }

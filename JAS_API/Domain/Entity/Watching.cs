@@ -9,9 +9,9 @@ namespace Domain.Entity
     public class Watching : BaseEntity
     {
         public int? CustomerId { get; set; }
-        public int? LotId { get; set; }
+        public int? JewelryId { get; set; }
         //
         public virtual Customer? Customer { get; set; }
-        public virtual Lot? Lot { get; set; }
+        public virtual Jewelry? Jewelry { get; set; }
     }
 }

@@ -8,8 +8,8 @@ namespace Domain.Enums
 {
     public enum EnumPaymentType
     {
-        COD,
         VnPay,
+        Wallet,
         Transfer
     }
 }

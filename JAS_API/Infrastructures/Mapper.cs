@@ -20,6 +20,8 @@ using Application.ViewModels.InvoiceDTOs;
 using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.BidPriceDTOs;
 using Application.ViewModels.TransactionDTOs;
+using Application.ViewModels.WatchingDTOs;
+using Application.ViewModels.BlogDTOs;
 
 
 namespace Infrastructures
@@ -231,11 +233,30 @@ namespace Infrastructures
             CreateMap<HistoryStatusCustomerLot, HistoryCustomerLotDTO>().ReverseMap();
             CreateMap<StatusInvoice, StatusInvoiceDTO>().ReverseMap();
             CreateMap<WalletTransaction, ViewWalletTransactionDTO>().ReverseMap();
-            CreateMap<Transaction, ViewTransactionDTO>().ReverseMap();  
+
+           
             CreateMap<Valuation, ValuationListDTO>()
                 .ForPath(x => x.Email, x => x.MapFrom( x => x.Seller.Account.Email))
                 .ForPath(x => x.NameJewelry, x => x.MapFrom( x => x.Jewelry.Name))
                 .ReverseMap();
+
+            CreateMap<Transaction, ViewTransactionDTO>().ReverseMap();
+            CreateMap<ViewCheckInvoiceHaveBill, Invoice>().ReverseMap();
+            CreateMap<Transaction, ViewRevenueOfConpanyDTO>()
+                .ForPath(dest => dest.Month , src => src.MapFrom(x => x.TransactionTime.Value.Month))
+                .ReverseMap();
+            CreateMap<IEnumerable<Transaction>, ViewRevenueOfConpanyDTO>()
+                .ForPath(dest => dest.Month, src => src.MapFrom(x => x.First().TransactionTime.Value.Month))
+                .ForPath(dest => dest.TotalRevenue, src => src.MapFrom(x => x.Sum( x => x.Amount)));
+            CreateMap<Watching, CreateWatchingDTO>().ReverseMap();
+            CreateMap<Watching, ViewWatchingDTO>().ReverseMap();
+            CreateMap<Blog, ViewBlogDTO>()
+                .ForMember(dest => dest.imageBlogDTOs, src => src.MapFrom(x => x.ImageBlogs))
+                .ReverseMap();
+            CreateMap<Blog, CreateBlogDTO>().ReverseMap();
+            CreateMap<Blog, UpdateBlogDTO>().ReverseMap();
+            CreateMap<ImageBlog, ImageBlogDTO>().ReverseMap();
+
 
         }
     }

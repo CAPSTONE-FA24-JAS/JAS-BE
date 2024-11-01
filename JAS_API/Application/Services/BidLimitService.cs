@@ -59,7 +59,6 @@ namespace Application.Services
                         reponse.Message = $"File upload Successfull";
                         reponse.Code = 200;
                         reponse.IsSuccess = true;
-                        reponse.Data = _mapper.Map<BidLimitDTO>(enity);
                     }
                 }
             }
@@ -83,16 +82,14 @@ namespace Application.Services
                 foreach (var bidLimit in bidLimits)
                 {
                     BidLimitDTO mapper;
-                    if (bidLimit.StaffId != null)
+                    var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
+                    string staffName = "";
+                    if (staff != null)
                     {
-                        var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
-                        string staffName = staff.FirstName + " " + staff.LastName;
-                         mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
-                        mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
-                        DTOs.Add(mapper);
+                        staffName = staff.FirstName + " " + staff.LastName;
                     }
-                     mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = null);
-                     mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
+                        mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
+                        mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
                      DTOs.Add(mapper);
 
                 }
@@ -195,6 +192,10 @@ namespace Application.Services
                             {
                                 bidLimit.Customer.PriceLimit = bidLimit.PriceLimit;
                                 bidLimit.Customer.ExpireDate = bidLimit.ExpireDate;
+                            }
+                            if (status == EnumStatusBidLimit.Cancel.ToString())
+                            {
+                                bidLimit.Reason = updateBidLimitDTO.Reason;
                             }
                             bidLimit.Status = status;
                             _unitOfWork.BidLimitRepository.Update(bidLimit);
@@ -355,7 +356,11 @@ namespace Application.Services
                 if (bidLimit != null)
                 {
                     var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
-                    string staffName = staff.FirstName + " " + staff.LastName;
+                    string staffName = "";
+                    if (staff != null)
+                    {
+                        staffName = staff.FirstName + " " + staff.LastName;
+                    }
                     var mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
                     mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
                     reponse.Code = 200;
@@ -396,7 +401,11 @@ namespace Application.Services
                         foreach (var bidLimit in bidLimits)
                         {
                             var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
-                            string staffName = staff.FirstName + " " + staff.LastName;
+                            string staffName = "";
+                            if (staff != null)
+                            {
+                                staffName = staff.FirstName + " " + staff.LastName;
+                            }
                             var mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
                             mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
                             DTOs.Add(mapper);

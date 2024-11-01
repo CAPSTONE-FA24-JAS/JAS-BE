@@ -55,6 +55,11 @@ namespace Infrastructures
         private readonly IRequestWithdrawRepository _requestWithdrawRepository;
         private readonly IHistoryStatusCustomerLotRepository _historyStatusCustomerLotRepository;
         private readonly IFeeShipRepository _feeShipRepository;
+        private readonly IFloorFeePersentRepository _floorFeePersentRepository;
+        private readonly IWatchingRepository _watchingRepository;
+        private readonly IBlogRepository _blogRepository;
+        private readonly IImageBlogRepository _imageBlogRepository;
+
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -78,7 +83,8 @@ namespace Infrastructures
                           IInvoiceRepository invoiceRepository, ITransactionRepository transactionRepository, 
                           IStatusInvoiceRepository statusInvoiceRepository, IRequestWithdrawRepository requestWithdrawRepository,
                           IHistoryStatusCustomerLotRepository historyStatusCustomerLotRepository,
-                          IFeeShipRepository feeShipRepository)
+                          IFeeShipRepository feeShipRepository, IFloorFeePersentRepository floorFeePersentRepository,
+                          IWatchingRepository watchingRepository, IBlogRepository blogRepository, IImageBlogRepository imageBlogRepository) 
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -88,7 +94,6 @@ namespace Infrastructures
             _valuationRepository = valuationRepository;
             _addressToShipRepository = addressToShipRepository;
             _wardRepository = wardRepository;
-
             _districtRepository = districtRepository;
             _provinceRepository = provinceRepository;
             _valuationDocumentRepository = valuationDocumentRepository;
@@ -117,7 +122,6 @@ namespace Infrastructures
             _lotRepository = lotRepository; 
             _staffRepository = staffRepository;
             _customerLotRepository = customerLotRepository;
-
             _bidPriceRepository = bidPriceRepository;
             _walletTransactionRepository = walletTransactionRepository;
             _invoiceRepository = invoiceRepository;
@@ -126,6 +130,10 @@ namespace Infrastructures
             _requestWithdrawRepository = requestWithdrawRepository;
             _historyStatusCustomerLotRepository = historyStatusCustomerLotRepository;
             _feeShipRepository = feeShipRepository;
+            _floorFeePersentRepository = floorFeePersentRepository;
+            _watchingRepository = watchingRepository;
+            _blogRepository = blogRepository;
+            _imageBlogRepository = imageBlogRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -196,6 +204,14 @@ namespace Infrastructures
         public IHistoryStatusCustomerLotRepository HistoryStatusCustomerLotRepository => _historyStatusCustomerLotRepository;
 
         public IFeeShipRepository FeeShipRepository => _feeShipRepository;
+
+        public IFloorFeePersentRepository FloorFeePersentRepository => _floorFeePersentRepository;
+
+        public IWatchingRepository WatchingRepository => _watchingRepository;
+
+        public IBlogRepository BlogRepository => _blogRepository;
+
+        public IImageBlogRepository ImageBlogRepository => _imageBlogRepository;
 
         public async Task<int> SaveChangeAsync()
         {

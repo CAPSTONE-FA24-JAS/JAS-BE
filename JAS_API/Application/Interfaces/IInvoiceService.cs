@@ -38,6 +38,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> UploadBillForPaymentInvoiceByBankTransfer(UploadPaymentInvoiceByBankTransferDTO model);
         Task<APIResponseModel> ApproveBillForPaymentInvoiceByBankTransfer(int invoiceId);
         Task<APIResponseModel>  GetInvoicesRecivedByShipper(int shipperId, int? pageIndex, int? pageSize);
+        Task<APIResponseModel> GetListInvoiceForCheckBill();
         Lot GetLotInInvoice(int invoiceId);
 
     }

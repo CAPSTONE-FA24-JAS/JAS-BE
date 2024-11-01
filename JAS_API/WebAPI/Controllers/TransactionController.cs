@@ -86,5 +86,19 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewRevenueOfCompanyByMonth(int month, int year)
+        {
+            var result = await _transactionService.GetRevenueByMonth(month, year);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }

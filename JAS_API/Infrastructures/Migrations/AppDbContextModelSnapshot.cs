@@ -449,9 +449,6 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int?>("ImageBlogId")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -1502,8 +1499,8 @@ namespace Infrastructures.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("text");
 
-                    b.Property<int?>("PaymentMethodId")
-                        .HasColumnType("integer");
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("text");
 
                     b.Property<float?>("Price")
                         .HasColumnType("real");
@@ -1533,8 +1530,6 @@ namespace Infrastructures.Migrations
                         .IsUnique();
 
                     b.HasIndex("InvoiceOfWalletTransactionId");
-
-                    b.HasIndex("PaymentMethodId");
 
                     b.HasIndex("ShipperId");
 
@@ -2002,43 +1997,6 @@ namespace Infrastructures.Migrations
                     b.HasIndex("AccountId");
 
                     b.ToTable("Notifications");
-                });
-
-            modelBuilder.Entity("Domain.Entity.PaymentMethod", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int?>("DeleteBy")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("DeletionDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<int?>("ModificationBy")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("ModificationDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PaymentMethods");
                 });
 
             modelBuilder.Entity("Domain.Entity.Province", b =>
@@ -2790,7 +2748,7 @@ namespace Infrastructures.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("LotId")
+                    b.Property<int?>("JewelryId")
                         .HasColumnType("integer");
 
                     b.Property<int?>("ModificationBy")
@@ -2803,7 +2761,7 @@ namespace Infrastructures.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("LotId");
+                    b.HasIndex("JewelryId");
 
                     b.ToTable("Watchings");
                 });
@@ -3060,10 +3018,6 @@ namespace Infrastructures.Migrations
                         .WithMany()
                         .HasForeignKey("InvoiceOfWalletTransactionId");
 
-                    b.HasOne("Domain.Entity.PaymentMethod", "PaymentMethod")
-                        .WithMany("Invoices")
-                        .HasForeignKey("PaymentMethodId");
-
                     b.HasOne("Domain.Entity.Staff", "Shipper")
                         .WithMany("ShipperInvoices")
                         .HasForeignKey("ShipperId");
@@ -3079,8 +3033,6 @@ namespace Infrastructures.Migrations
                     b.Navigation("CustomerLot");
 
                     b.Navigation("InvoiceOfWalletTransaction");
-
-                    b.Navigation("PaymentMethod");
 
                     b.Navigation("Shipper");
 
@@ -3289,13 +3241,13 @@ namespace Infrastructures.Migrations
                         .WithMany("Watchings")
                         .HasForeignKey("CustomerId");
 
-                    b.HasOne("Domain.Entity.Lot", "Lot")
+                    b.HasOne("Domain.Entity.Jewelry", "Jewelry")
                         .WithMany("Watchings")
-                        .HasForeignKey("LotId");
+                        .HasForeignKey("JewelryId");
 
                     b.Navigation("Customer");
 
-                    b.Navigation("Lot");
+                    b.Navigation("Jewelry");
                 });
 
             modelBuilder.Entity("Domain.Entity.Account", b =>
@@ -3397,6 +3349,8 @@ namespace Infrastructures.Migrations
                     b.Navigation("SecondaryDiamonds");
 
                     b.Navigation("SecondaryShaphies");
+
+                    b.Navigation("Watchings");
                 });
 
             modelBuilder.Entity("Domain.Entity.KeyCharacteristic", b =>
@@ -3409,8 +3363,6 @@ namespace Infrastructures.Migrations
                     b.Navigation("BidPrices");
 
                     b.Navigation("CustomerLots");
-
-                    b.Navigation("Watchings");
                 });
 
             modelBuilder.Entity("Domain.Entity.MainDiamond", b =>
@@ -3425,11 +3377,6 @@ namespace Infrastructures.Migrations
                     b.Navigation("DocumentMainShaphies");
 
                     b.Navigation("ImageMainShaphies");
-                });
-
-            modelBuilder.Entity("Domain.Entity.PaymentMethod", b =>
-                {
-                    b.Navigation("Invoices");
                 });
 
             modelBuilder.Entity("Domain.Entity.Province", b =>
