@@ -32,7 +32,7 @@ namespace WebAPI.Service
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();   
-                var lotLiveBidding = _unitOfWork.LotRepository.GetLotsAsync(EnumLotType.Public_Auction.ToString() , EnumStatusLot.Auctioning.ToString());              
+                var lotLiveBidding = _cacheService.GetHashLots(l => l.LotType == EnumLotType.Public_Auction.ToString() && l.Status == EnumStatusLot.Auctioning.ToString());              
                 foreach (var lot in lotLiveBidding)
                 {
                     var endTime = lot.EndTime;
