@@ -13,6 +13,8 @@ using WebAPI.Service;
 using System.Text.Json.Serialization;
 using StackExchange.Redis;
 using Application.Interfaces;
+using DinkToPdf.Contracts;
+using DinkToPdf;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,7 +40,7 @@ builder.Services.AddSignalR();
 builder.Services.AddSingleton(configuration);
 builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, build =>
 {
-    build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+    build.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
 }));
 
 //builder.WebHost.UseUrls("https://localhost:7251");
@@ -53,6 +55,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
 
 builder.Services.AddSingleton<LiveBiddingService>();
+builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
 //dki background service
 builder.Services.AddHostedService<AuctionMonitorService>();
