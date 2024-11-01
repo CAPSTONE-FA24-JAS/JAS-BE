@@ -17,6 +17,8 @@ namespace Application.ViewModels.ValuationDTOs
         public int? StaffId { get; set; }
         public DateTime CreationDate { get; set; }
         public string? Email { get; set; }
+        public string? FirstNameSeller { get; set; }
+        public string? LastNameSeller { get; set; }
         public string? NameJewelry { get; set; }
     }
 }
