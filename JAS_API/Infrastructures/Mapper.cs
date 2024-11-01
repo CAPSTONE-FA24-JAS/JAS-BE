@@ -238,6 +238,8 @@ namespace Infrastructures
             CreateMap<Valuation, ValuationListDTO>()
                 .ForPath(x => x.Email, x => x.MapFrom( x => x.Seller.Account.Email))
                 .ForPath(x => x.NameJewelry, x => x.MapFrom( x => x.Jewelry.Name))
+                .ForPath(x => x.FirstNameSeller, x => x.MapFrom( x => x.Seller.FirstName))
+                .ForPath(x => x.LastNameSeller, x => x.MapFrom( x => x.Seller.LastName))
                 .ReverseMap();
 
             CreateMap<Transaction, ViewTransactionDTO>().ReverseMap();
