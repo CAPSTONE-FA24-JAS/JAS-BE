@@ -351,6 +351,11 @@ namespace Application.Services
                     return new APIResponseModel { IsSuccess = false, Message = "Not Found Lot.", Code = 404 };
                 }
 
+                if(registerToLotDTO.CustomerId == lotExist.Jewelry.Valuation.SellerId)
+                {
+                    return new APIResponseModel { IsSuccess = false, Message = "Seller Canot Auction Jewelry Of Him/Her.", Code = 400 };
+                }
+
                 if (lotExist.HaveFinancialProof == true)
                 {
                     checkBidLimit = await _accountService.CheckBidLimit((int)registerToLotDTO.CustomerId);
