@@ -321,7 +321,8 @@ namespace Application.Services
                             DocNo = invoiceById.Id,
                             Amount = invoiceById.CustomerLot.Lot.Deposit,
                             TransactionTime = DateTime.Now,
-                            Status = "+"
+                            Status = "Completed",
+                            WalletId = walletOfSeller.Id
                         };
 
                         await _unitOfWork.WalletTransactionRepository.AddAsync(wallerTransaction);
