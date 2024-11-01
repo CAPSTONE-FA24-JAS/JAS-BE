@@ -17,9 +17,9 @@ namespace Infrastructures.FluentAPIs
                 .WithMany(x => x.Watchings)
                 .HasForeignKey(x => x.CustomerId);
 
-            builder.HasOne(x => x.Lot)
+            builder.HasOne(x => x.Jewelry)
                 .WithMany(x => x.Watchings)
-                .HasForeignKey(x => x.LotId);
+                .HasForeignKey(x => x.JewelryId);
         }
     }
 }

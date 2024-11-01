@@ -81,6 +81,11 @@ namespace Infrastructures.Repositories
             _dbSet.Update(entity);
         }
 
+        public void Remove(TEntity entity)
+        {
+            _dbSet.Remove(entity);
+        }
+
         public void Update(TEntity entity)
         {
             entity.ModificationDate = _timeService.GetCurrentTime();

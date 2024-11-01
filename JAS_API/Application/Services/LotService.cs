@@ -2,6 +2,7 @@ using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.AccountDTOs;
+using Application.ViewModels.BidPriceDTOs;
 using Application.ViewModels.LotDTOs;
 using AutoMapper;
 using Azure;
@@ -351,6 +352,11 @@ namespace Application.Services
                     return new APIResponseModel { IsSuccess = false, Message = "Not Found Lot.", Code = 404 };
                 }
 
+                if(registerToLotDTO.CustomerId == lotExist.Jewelry.Valuation.SellerId)
+                {
+                    return new APIResponseModel { IsSuccess = false, Message = "Seller Canot Auction Jewelry Of Him/Her.", Code = 400 };
+                }
+
                 if (lotExist.HaveFinancialProof == true)
                 {
                     checkBidLimit = await _accountService.CheckBidLimit((int)registerToLotDTO.CustomerId);
@@ -567,6 +573,49 @@ namespace Application.Services
             }
             return false;
         }
+
+        public async Task<APIResponseModel> CheckCustomerAuctioned(CheckCustomerInLotDTO model)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var CustomerLotExist = await checkCustomerRegisteredToLot(model.CustomerId, model.LotId);
+                if (CustomerLotExist != null) 
+                {
+                    var bidPriceExist = CustomerLotExist.Lot.BidPrices.First(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
+                    if (bidPriceExist != null)
+                    {
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Message = $"The customer is auctioned into the lot";
+                        response.Data = _mapper.Map<BidPriceDTO>(bidPriceExist);
+                        return response;
+                    }
+                    else
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = true;
+                        response.Message = $"The customer haven't bid to the lot";
+                        return response;
+                    }
+                }
+                else
+                {
+                    response.Code = 400;
+                    response.IsSuccess = true;
+                    response.Message = $"Customer havent register to lot.";
+
+                }
+            }
+            catch (Exception e)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.ErrorMessages = new List<string> { e.Message };
+            }
+            return response;
+        }
+
         public async Task<APIResponseModel> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet model) 
         {
             var response = new APIResponseModel();
@@ -578,9 +627,18 @@ namespace Application.Services
                     response.Code = 400;
                     response.IsSuccess = false;
                     response.Message = $"The customer is not register into the lot";
-                    response.Data = _mapper.Map<CustomerLotDTO>(playerJoined);
                     return response;
                 }
+                var bidPriceExist = playerJoined.Lot.BidPrices.First(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
+                if (bidPriceExist != null)
+                {
+                    response.Code = 400;
+                    response.IsSuccess = false;
+                    response.Message = $"The customer is auctioned into the lot";
+                    response.Data = _mapper.Map<BidPriceDTO>(bidPriceExist);
+                    return response;
+                }
+
                 if (await checkCustomerIntoBidPrice((int)model.CustomerId, (int)model.LotId))
                 {
                     response.Code = 400;
@@ -669,12 +727,22 @@ namespace Application.Services
                     }
 
                     var playerJoined = await checkCustomerRegisteredToLot((int)placeBidBuyNowDTO.CustomerId, (int)placeBidBuyNowDTO.LotId);
+
                     if (playerJoined == null)
                     {
                         response.Code = 400;
                         response.IsSuccess = false;
                         response.Message = $"The customer is not register into the lot";
-                        response.Data = _mapper.Map<CustomerLotDTO>(playerJoined);
+                        return response;
+                    }
+
+                    var bidPriceExist = playerJoined.Lot.BidPrices.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId && x.LotId == placeBidBuyNowDTO.LotId);
+                    if (bidPriceExist != null)
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"The customer is auctioned into the lot";
+                        response.Data = _mapper.Map<BidPriceDTO>(bidPriceExist);
                         return response;
                     }
 

@@ -449,9 +449,6 @@ namespace Infrastructures.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int?>("ImageBlogId")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -2790,7 +2787,7 @@ namespace Infrastructures.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("LotId")
+                    b.Property<int?>("JewelryId")
                         .HasColumnType("integer");
 
                     b.Property<int?>("ModificationBy")
@@ -2803,7 +2800,7 @@ namespace Infrastructures.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("LotId");
+                    b.HasIndex("JewelryId");
 
                     b.ToTable("Watchings");
                 });
@@ -3289,13 +3286,13 @@ namespace Infrastructures.Migrations
                         .WithMany("Watchings")
                         .HasForeignKey("CustomerId");
 
-                    b.HasOne("Domain.Entity.Lot", "Lot")
+                    b.HasOne("Domain.Entity.Jewelry", "Jewelry")
                         .WithMany("Watchings")
-                        .HasForeignKey("LotId");
+                        .HasForeignKey("JewelryId");
 
                     b.Navigation("Customer");
 
-                    b.Navigation("Lot");
+                    b.Navigation("Jewelry");
                 });
 
             modelBuilder.Entity("Domain.Entity.Account", b =>
@@ -3397,6 +3394,8 @@ namespace Infrastructures.Migrations
                     b.Navigation("SecondaryDiamonds");
 
                     b.Navigation("SecondaryShaphies");
+
+                    b.Navigation("Watchings");
                 });
 
             modelBuilder.Entity("Domain.Entity.KeyCharacteristic", b =>
@@ -3409,8 +3408,6 @@ namespace Infrastructures.Migrations
                     b.Navigation("BidPrices");
 
                     b.Navigation("CustomerLots");
-
-                    b.Navigation("Watchings");
                 });
 
             modelBuilder.Entity("Domain.Entity.MainDiamond", b =>

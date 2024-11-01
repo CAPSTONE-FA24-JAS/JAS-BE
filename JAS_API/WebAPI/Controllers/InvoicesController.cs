@@ -37,7 +37,19 @@ namespace WebAPI.Controllers
             }
         }
 
-
+        [HttpGet]
+        public async Task<IActionResult> GetListInvoiceForCheckBill()
+        {
+            var result = await _invoiceService.GetListInvoiceForCheckBill();
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
         //chi dinh shipper
         [HttpPut]
         public async Task<IActionResult> AsignShipperAsync(int invoiceId, int shipperId, int status)

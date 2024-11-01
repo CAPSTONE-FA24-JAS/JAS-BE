@@ -46,16 +46,16 @@ namespace Application
         public ICustomerLotRepository CustomerLotRepository { get; }
         public IWalletTransactionRepository WalletTransactionRepository { get; }
         public IBidPriceRepository BidPriceRepository { get; }
-
         public IInvoiceRepository InvoiceRepository { get; }
-
         public ITransactionRepository TransactionRepository { get; }
-
         public IStatusInvoiceRepository StatusInvoiceRepository { get; }
         public IRequestWithdrawRepository RequestWithdrawRepository { get; }
-
         public IHistoryStatusCustomerLotRepository HistoryStatusCustomerLotRepository { get; }
         public IFeeShipRepository FeeShipRepository { get; }
+        public IFloorFeePersentRepository FloorFeePersentRepository { get; }
+        public IWatchingRepository WatchingRepository { get; }
+        public IBlogRepository BlogRepository { get; }
+        public IImageBlogRepository ImageBlogRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

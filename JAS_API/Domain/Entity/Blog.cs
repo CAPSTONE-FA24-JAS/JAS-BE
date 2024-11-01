@@ -10,9 +10,8 @@ namespace Domain.Entity
     {
         public string? Title { get; set; }
         public string? Content { get; set; }
-        public int? ImageBlogId { get; set; }
         public int? AccountId { get; set; }
         public virtual Account? Account { get; set; }
-        public virtual IEnumerable<ImageBlog>? ImageBlogs { get; set; }
+        public virtual List<ImageBlog>? ImageBlogs { get; set; }
     }
 }

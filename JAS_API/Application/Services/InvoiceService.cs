@@ -558,7 +558,7 @@ namespace Application.Services
 
                             await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
                             await _unitOfWork.TransactionRepository.AddAsync(trans);
-                            await _walletService.RefundToWalletForUsersAsync(invoiceById.CustomerLot.Lot);
+                            await _walletService.RefundToWalletForUsersAsync(invoiceById.CustomerLot.Lot);  
                             if (await _unitOfWork.SaveChangeAsync() > 0)
                             {
                                 response.Message = $"Update Wallet Successfully";
@@ -608,8 +608,8 @@ namespace Application.Services
                         Status = EnumStatusTransaction.Pending.ToString(),
                         transactionType = EnumTransactionType.Banktransfer.ToString(),
                     };
-
-                   await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
+                    invoiceById.Status = EnumCustomerLot.PendingPayment.ToString();
+                    await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
                     
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
@@ -661,7 +661,7 @@ namespace Application.Services
                     var httpContext = _httpContextAccessor.HttpContext;
                     string paymentUrl = await _vNPayService.CreatePaymentUrl(httpContext, vnPayModel, transaction);
                     // tra về url thanh toán 
-                    // => Fe thanh toán xong gọi api refun
+                    // => Fe thanh toán xong gọi api refund
                     if (!string.IsNullOrEmpty(paymentUrl))
                     {
                         response.Message = $"SucessFull";
@@ -774,12 +774,13 @@ namespace Application.Services
 
 
                 var invoices = await _unitOfWork.InvoiceRepository.getInvoicesRecivedByShipper(shipperId, pageIndex, pageSize);
-                List<InvoiceDTO> listInvoiceDTO = new List<InvoiceDTO>();
+                List<InvoiceDetailDTO> listInvoiceDTO = new List<InvoiceDetailDTO>();
                 if (invoices.totalItems > 0)
                 {
                     foreach (var item in invoices.data)
                     {
-                        var invoicesResponse = _mapper.Map<InvoiceDTO>(item);
+                        var jewelryOfInvoice = item.CustomerLot.Lot.Jewelry;
+                        var invoicesResponse = _mapper.Map<InvoiceDetailDTO>(item, x => x.Items["Jewelry"] = jewelryOfInvoice);
                         listInvoiceDTO.Add(invoicesResponse);
                     };
 
@@ -820,6 +821,13 @@ namespace Application.Services
                 var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
                 if (invoiceById != null)
                 {
+                    if(invoiceById.InvoiceOfWalletTransaction.transactionType != EnumTransactionType.Banktransfer.ToString())
+                    {
+                        response.Message = $"Invoice must using payment method bank transfer for upload bill";
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        return response;
+                    }
                     var uploadResult = await _cloudinary.UploadAsync(new ImageUploadParams
                     {
                         File = new FileDescription(model.FileBill.FileName,
@@ -835,6 +843,7 @@ namespace Application.Services
                     }
                     else
                     {
+                        
                         invoiceById.LinkBillTransaction = uploadResult.SecureUrl.AbsoluteUri;
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
@@ -946,6 +955,38 @@ namespace Application.Services
                 return null;
             }
             return lotExit;
+        }
+
+        public async Task<APIResponseModel> GetListInvoiceForCheckBill()
+        {
+            var response = new APIResponseModel();
+
+            try
+            {
+                var invoice = await _unitOfWork.InvoiceRepository.GetAllAsync(condition: x => x.Status == EnumCustomerLot.PendingPayment.ToString() && x.InvoiceOfWalletTransaction.transactionType == EnumTransactionType.Banktransfer.ToString()  && x.LinkBillTransaction != null);
+                if (invoice.Count > 0)
+                {
+                    var invoicesResponse = _mapper.Map<IEnumerable<ViewCheckInvoiceHaveBill>>(invoice);
+                    response.Message = $"Received Invoice Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = invoicesResponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have invoice for check bill";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
         }
     }
 }
