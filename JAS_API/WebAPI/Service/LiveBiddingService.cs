@@ -395,7 +395,7 @@ namespace WebAPI.Service
             using (var scope = _serviceProvider.CreateScope())
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-
+                var _foorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();
                 //Xu ly luc tg ket thuc
                 var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow && x.LotType == EnumLotType.Fixed_Price.ToString() && x.Status == EnumStatusLot.Auctioning.ToString());
                 Invoice invoice;
@@ -409,14 +409,15 @@ namespace WebAPI.Service
                             lot.CurrentPrice = bidPriceWinner.CurrentPrice;
                             lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).CurrentPrice = bidPriceWinner.CurrentPrice;
                             lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).IsWinner = true;
+                            var fee = bidPriceWinner.CurrentPrice * await _foorFeeService.GetPercentFloorFeeOfLot((float)bidPriceWinner.CurrentPrice);
                             invoice = new Invoice
                             {
                                 CustomerId = bidPriceWinner.CustomerId,
                                 CustomerLotId = lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).Id,
                                 StaffId = lot.StaffId,
                                 Price = bidPriceWinner.CurrentPrice,
-                                Free = (float?)(bidPriceWinner.CurrentPrice * 0.25),
-                                TotalPrice = (float?)(bidPriceWinner.CurrentPrice + bidPriceWinner.CurrentPrice * 0.25 - lot.Deposit),
+                                Free = fee,
+                                TotalPrice = bidPriceWinner.CurrentPrice + fee - lot.Deposit,
                                 CreationDate = DateTime.Now,
                                 Status = EnumCustomerLot.CreateInvoice.ToString()
                             };
@@ -452,7 +453,7 @@ namespace WebAPI.Service
                             lot.CurrentPrice = bidPriceWinner.CurrentPrice;
                             lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).CurrentPrice = bidPriceWinner.CurrentPrice;
                             lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).IsWinner = true;
-                            var fee = await _foorFeeService.GetPercentFloorFeeOfLot((float)bidPriceWinner.CurrentPrice);
+                            var fee = bidPriceWinner.CurrentPrice *  await _foorFeeService.GetPercentFloorFeeOfLot((float)bidPriceWinner.CurrentPrice);
                             invoice = new Invoice
                             {
                                 CustomerId = bidPriceWinner.CustomerId,
@@ -460,7 +461,7 @@ namespace WebAPI.Service
                                 StaffId = lot.StaffId,
                                 Price = bidPriceWinner.CurrentPrice,
                                 Free = fee,
-                                TotalPrice = bidPriceWinner.CurrentPrice + fee ,
+                                TotalPrice = bidPriceWinner.CurrentPrice + fee - lot.Deposit,
                                 CreationDate = DateTime.Now,
                                 Status = EnumCustomerLot.CreateInvoice.ToString()
                             };
