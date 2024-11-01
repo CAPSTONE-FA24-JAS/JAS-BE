@@ -1,4 +1,5 @@
 ﻿using Application.ViewModels.ValuationDTOs;
+using DinkToPdf;
 using Domain.Entity;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
@@ -76,5 +77,8 @@ namespace Application.Utils
                 return stream.ToArray();
             }
         }
+
+
+       
     }
 }

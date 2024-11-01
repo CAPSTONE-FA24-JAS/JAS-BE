@@ -38,12 +38,14 @@ namespace Application.Services
         private const string TagsDocumentMainShaphie = "DocumentMainShaphie";
         private const string TagsDocumentSecondShaphie = "DocumentSecondShaphie";
         private const string TagsAuthorized = "FilePDF_Authorized";
+        private readonly IGeneratePDFService _generatePDFService;
 
-        public JewelryService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary)
+        public JewelryService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IGeneratePDFService generatePDFService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinary = cloudinary;
+            _generatePDFService = generatePDFService;
         }
 
         private async Task<UploadResult> uploadImageOnCloudary(IFormFile file, string tag)
@@ -630,7 +632,7 @@ namespace Application.Services
                     AddHistoryValuation(valuation.Id, status);
                     await _unitOfWork.SaveChangeAsync();
 
-                    byte[] pdfBytes = CreateAuthorizedPDFFile.CreateAuthorizedPDF(valuation);
+                    byte[] pdfBytes = _generatePDFService.CreateReceiptPDF(valuation);
 
                     string filePath = $"GiayUyQuyen_{valuation.Id}.pdf";
 
