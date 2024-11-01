@@ -233,6 +233,12 @@ namespace Infrastructures
             CreateMap<WalletTransaction, ViewWalletTransactionDTO>().ReverseMap();
             CreateMap<Transaction, ViewTransactionDTO>().ReverseMap();
             CreateMap<ViewCheckInvoiceHaveBill, Invoice>().ReverseMap();
+            CreateMap<Transaction, ViewRevenueOfConpanyDTO>()
+                .ForPath(dest => dest.Month , src => src.MapFrom(x => x.TransactionTime.Value.Month))
+                .ReverseMap();
+            CreateMap<IEnumerable<Transaction>, ViewRevenueOfConpanyDTO>()
+                .ForPath(dest => dest.Month, src => src.MapFrom(x => x.First().TransactionTime.Value.Month))
+                .ForPath(dest => dest.TotalRevenue, src => src.MapFrom(x => x.Sum( x => x.Amount)));
         }
     }
 }
