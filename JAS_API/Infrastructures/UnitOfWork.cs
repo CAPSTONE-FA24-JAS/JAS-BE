@@ -55,6 +55,7 @@ namespace Infrastructures
         private readonly IRequestWithdrawRepository _requestWithdrawRepository;
         private readonly IHistoryStatusCustomerLotRepository _historyStatusCustomerLotRepository;
         private readonly IFeeShipRepository _feeShipRepository;
+        private readonly IFloorFeePersentRepository _floorFeePersentRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -78,7 +79,7 @@ namespace Infrastructures
                           IInvoiceRepository invoiceRepository, ITransactionRepository transactionRepository, 
                           IStatusInvoiceRepository statusInvoiceRepository, IRequestWithdrawRepository requestWithdrawRepository,
                           IHistoryStatusCustomerLotRepository historyStatusCustomerLotRepository,
-                          IFeeShipRepository feeShipRepository)
+                          IFeeShipRepository feeShipRepository, IFloorFeePersentRepository floorFeePersentRepository)
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -126,6 +127,7 @@ namespace Infrastructures
             _requestWithdrawRepository = requestWithdrawRepository;
             _historyStatusCustomerLotRepository = historyStatusCustomerLotRepository;
             _feeShipRepository = feeShipRepository;
+            _floorFeePersentRepository = floorFeePersentRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -196,6 +198,8 @@ namespace Infrastructures
         public IHistoryStatusCustomerLotRepository HistoryStatusCustomerLotRepository => _historyStatusCustomerLotRepository;
 
         public IFeeShipRepository FeeShipRepository => _feeShipRepository;
+
+        public IFloorFeePersentRepository FloorFeePersentRepository => _floorFeePersentRepository;
 
         public async Task<int> SaveChangeAsync()
         {

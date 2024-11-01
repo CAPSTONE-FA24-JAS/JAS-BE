@@ -84,6 +84,10 @@ namespace Infrastructures
             services.AddScoped<IRequestWithdrawRepository, RequestWithdrawRepository>();
             services.AddScoped<IHistoryStatusCustomerLotRepository, HistoryStatusCustomerLotRepository>();
             services.AddScoped<IFeeShipRepository, FeeShipRepository>();
+            services.AddScoped<IFoorFeePercentService, FoorFeePercentService>();
+            services.AddScoped<IFloorFeePersentRepository, FloorFeePersentRepository>();
+
+
             services.AddDbContext<AppDbContext>(option =>
             {
                 option.UseLazyLoadingProxies().UseNpgsql(databaseConnection);
