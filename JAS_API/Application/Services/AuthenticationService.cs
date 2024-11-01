@@ -140,7 +140,7 @@ namespace Application.Services
                     user.PasswordHash = HashPassword.HashWithSHA256(registerAccountDTO.PasswordHash);
                     await _unitOfWork.AccountRepository.AddAsync(user);
                     //await _unitOfWork.CustomerRepository.AddAsync(user.Customer);    
-                    var confirmationLink = $"http://localhost:7251/api/Authentication/ConfirmEmail/confirm?token={user.ConfirmationToken}&email={user.Email}";
+                    var confirmationLink = $"https://jewelry-auction-system-bwfbbwdecudgfbd4.centralus-01.azurewebsites.net/api/Authentication/ConfirmEmail/confirm?token={user.ConfirmationToken}&email={user.Email}";
                     var emailSent = await SendEmail.SendConfirmationEmail(user.Email, confirmationLink);
                     if (!emailSent)
                     {
