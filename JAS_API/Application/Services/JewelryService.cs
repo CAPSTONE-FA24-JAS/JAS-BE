@@ -438,29 +438,29 @@ namespace Application.Services
             var response = new APIResponseModel();
             try
             {
-                //var jewelrys = await _unitOfWork.JewelryRepository.GetAllPaging(filter: null,
-                //                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
-                //                                                             includeProperties: "Artist,Category,ImageJewelries,KeyCharacteristicDetails,Lot,MainDiamonds,SecondaryDiamonds,MainShaphies,SecondaryShaphies,Valuation",
-                //                                                             pageIndex: pageIndex,
-                //                                                             pageSize: pageSize);
+                var jewelrys = await _unitOfWork.JewelryRepository.GetAllPaging(filter: null,
+                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                                                                             includeProperties: "Valuation,ImageJewelries",
+                                                                             pageIndex: pageIndex,
+                                                                             pageSize: pageSize);
 
-                var jewelrys = await _unitOfWork.JewelryRepository.GetAllJewelryAynsc(pageSize, pageIndex);
-                List<JewelryDTO> listjewelryDTO = new List<JewelryDTO>();
-                if (jewelrys.totalItem > 0)
+            //    var jewelrys = await _unitOfWork.JewelryRepository.GetJewelrysAynsc(pageSize, pageIndex);
+                List<JewelryListDTO> listjewelryDTO = new List<JewelryListDTO>();
+                if (jewelrys.totalItems > 0)
                 {
                     response.Message = $"List consign items Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
                     foreach (var item in jewelrys.data)
                     {
-                        var jewelrysResponse = _mapper.Map<JewelryDTO>(item);
+                        var jewelrysResponse = _mapper.Map<JewelryListDTO>(item);
                         listjewelryDTO.Add(jewelrysResponse);
                     };
 
                     var dataresponse = new
                     {
                         DataResponse = listjewelryDTO,
-                        totalItemRepsone = jewelrys.totalItem
+                        totalItemRepsone = jewelrys.totalItems
                     };
 
                     response.Data = dataresponse;
@@ -729,15 +729,21 @@ namespace Application.Services
             var response = new APIResponseModel();
             try
             {
-                //var jewelrys = await _unitOfWork.JewelryRepository.GetAllPaging(filter: null,
-                //                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
-                //                                                             includeProperties: "Artist,Category,ImageJewelries,KeyCharacteristicDetails,Lot,MainDiamonds,SecondaryDiamonds,MainShaphies,SecondaryShaphies,Valuation",
-                //                                                             pageIndex: pageIndex,
-                //                                                             pageSize: pageSize);
+                Expression<Func<Jewelry, bool>> filter;
 
-                var jewelrys = await _unitOfWork.JewelryRepository.GetAllJewelryByCategoryAynsc(categoryId, pageSize, pageIndex);
+                filter = x => x.CategoryId == categoryId;
+
+
+                var jewelrys = await _unitOfWork.JewelryRepository.GetAllPaging(filter: filter,
+                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                                                                             includeProperties: "Category,ImageJewelries",
+                                                                             pageIndex: pageIndex,
+                                                                             pageSize: pageSize);
+
+
+               
                 List<JewelryListDTO> listjewelryDTO = new List<JewelryListDTO>();
-                if (jewelrys.totalItem > 0)
+                if (jewelrys.totalItems > 0)
                 {
                     response.Message = $"List consign items Successfully";
                     response.Code = 200;
@@ -751,7 +757,7 @@ namespace Application.Services
                     var dataresponse = new
                     {
                         DataResponse = listjewelryDTO,
-                        totalItemRepsone = jewelrys.totalItem
+                        totalItemRepsone = jewelrys.totalItems
                     };
 
                     response.Data = dataresponse;

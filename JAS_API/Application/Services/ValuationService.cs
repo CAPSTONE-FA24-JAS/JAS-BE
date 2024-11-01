@@ -119,10 +119,10 @@ namespace Application.Services
             {
                 var valuations = await _unitOfWork.ValuationRepository.GetAllPaging(filter: null,
                                                                              orderBy: x => x.OrderByDescending(t => t.CreationDate),
-                                                                             includeProperties: "Seller,ImageValuations,ValuationDocuments,Staff,Appraiser",
+                                                                             includeProperties: "Seller,Jewelry",
                                                                              pageIndex: pageIndex,
                                                                              pageSize: pageSize);
-                List<ValuationDTO> listValuationDTO = new List<ValuationDTO>();
+                List<ValuationListDTO> listValuationDTO = new List<ValuationListDTO>();
                 if (valuations.totalItems > 0 )
                 {
                     response.Message = $"List consign items Successfully";
@@ -130,7 +130,7 @@ namespace Application.Services
                     response.IsSuccess = true;
                     foreach (var item in valuations.data)
                     {
-                        var valuationsResponse = _mapper.Map<ValuationDTO>(item);
+                        var valuationsResponse = _mapper.Map<ValuationListDTO>(item);
                         listValuationDTO.Add(valuationsResponse);
                     };                   
                     
