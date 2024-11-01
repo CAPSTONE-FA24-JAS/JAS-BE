@@ -56,6 +56,7 @@ namespace Application
 
         public IHistoryStatusCustomerLotRepository HistoryStatusCustomerLotRepository { get; }
         public IFeeShipRepository FeeShipRepository { get; }
+        public IFloorFeePersentRepository FloorFeePersentRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
