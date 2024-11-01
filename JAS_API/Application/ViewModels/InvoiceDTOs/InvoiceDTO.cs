@@ -14,7 +14,7 @@ namespace Application.ViewModels.InvoiceDTOs
         public string? Status { get; set; }
         public float? TotalPrice { get; set; }
         public string? LinkBillTransaction { get; set; }
-        public int? PaymentMethodId { get; set; }
+        public string? PaymentMethod { get; set; }
         public int? AddressToShipId { get; set; }
         public int? ShipperId { get; set; }
         public DateTime CreationDate { get; set; }
