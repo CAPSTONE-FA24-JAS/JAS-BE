@@ -23,6 +23,12 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
+                var invoiceBankTrans = await _unitOfWork.InvoiceRepository.GetByIdAsync(transaction.DocNo, x => x.Status == EnumCustomerLot.PendingPayment.ToString());
+
+                if(invoiceBankTrans != null)
+                {
+                    invoiceBankTrans.Status = EnumCustomerLot.Paid.ToString();
+                }
                 await _unitOfWork.TransactionRepository.AddAsync(transaction);
                 if (await _unitOfWork.SaveChangeAsync() > 0)
                 {
