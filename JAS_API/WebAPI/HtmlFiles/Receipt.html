@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Confirmation Receipt</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css"
+    />
+    <style>
+      .modal-custom .text-xl {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+      .modal-custom .text-lg {
+        font-size: 1.25rem;
+        font-weight: bold;
+      }
+      .modal-custom .font-bold {
+        font-weight: bold;
+      }
+      .modal-custom .block {
+        display: block;
+      }
+      .modal-custom .mb-2 {
+        margin-bottom: 0.5rem;
+      }
+      .modal-custom .w-full {
+        width: 100%;
+      }
+      .modal-custom .text-center {
+        text-align: center;
+      }
+      .modal-content {
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="modal-custom">
+      <div class="modal-content">
+        <h4 class="text-xl text-center">
+          Cộng hòa xã hội chủ nghĩa Việt Nam<br />Độc lập - Tự do - Hạnh Phúc
+        </h4>
+        <h3 class="text-lg text-center">BIÊN BẢN GIAO NHẬN</h3>
+        <h5 class="font-bold">I. Bên A:</h5>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%">Họ và tên:</label>
+          <input
+            class="w-full mb-2 font-bold text-black"
+            value="Jewelry Auction Company"
+            readonly
+          />
+        </div>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%">Địa chỉ:</label>
+          <input
+            class="w-full mb-2 font-bold text-black"
+            value="S10.05(VHGP), Nguyen Xien Street, Long Binh Ward, Thu Duc District, Ho Chi Minh City"
+            readonly
+          />
+        </div>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%">Email:</label>
+          <input
+            class="w-full mb-2 font-bold text-black"
+            value="ngocnhse160303@fpt.edu.vn"
+            readonly
+          />
+        </div>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%">Điện thoại:</label>
+          <input
+            class="w-full mb-2 font-bold text-black"
+            value="02158945456"
+            readonly
+          />
+        </div>
+
+        <h5 class="font-bold">II. Bên B:</h5>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%">Họ và tên:</label>
+          <input class="w-full mb-2 font-bold" value="{{Seller_name}}" readonly />
+        </div>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%">Địa chỉ:</label>
+          <input
+            class="w-full mb-2 font-bold"
+            value="{{DiaChi_seller}}"
+            readonly
+          />
+        </div>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%">CCCD:</label>
+          <input class="w-full mb-2 font-bold" value="{{CCCD}}" readonly />
+        </div>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%">Ngày cấp:</label>
+          <input class="w-full mb-2 font-bold" value="{{Time_Create}}" readonly />
+        </div>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%">Hết hạn:</label>
+          <input class="w-full mb-2 font-bold" value="{{Time_expire}}" readonly />
+        </div>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%">Điện thoại:</label>
+          <input class="w-full mb-2 font-bold" value="{{Phone_seller}}" readonly />
+        </div>
+
+        <h5 class="font-bold">III. Nội dung xác nhận:</h5>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%"
+            >Jewelry Valuation Name:</label
+          >
+          <input
+            class="w-full mb-2 font-bold"
+            value="Sample Jewelry"
+            readonly
+          />
+        </div>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%">Ngày nhận hàng:</label>
+          <input class="w-full mb-2 font-bold" value="2024-10-31" />
+        </div>
+
+        <div class="row">
+          <label class="col" style="flex: 0 0 15%">Trạng thái sản phẩm:</label>
+          <input class="w-full mb-2 font-bold" value="New Condition" />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -29,11 +29,13 @@ namespace Application.Services
         private readonly Cloudinary _cloudinary;
         private const string Tags = "Backend_ImageValuation";
         private const string Tags_Receipt = "ReceiptPDF";
-        public ValuationService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary)
+        private readonly IGeneratePDFService _generatePDFService;
+        public ValuationService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IGeneratePDFService generatePDFService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinary = cloudinary;
+            _generatePDFService = generatePDFService;
         }
         public async Task<APIResponseModel> ConsignAnItem(ConsignAnItemDTO consignAnItem)
         {
@@ -505,7 +507,7 @@ namespace Application.Services
 
                     AddHistoryValuation(valuationById.Id, valuationById.Status);                    
 
-                    byte[] pdfBytes = CreatePDFFile.CreatePDF(valuationById);
+                    byte[] pdfBytes = _generatePDFService.CreateAuthorizedPDF(valuationById);
 
                     string filePath = $"BienBanXacNhanNhanHang_{valuationById.Id}.pdf";
 
@@ -562,6 +564,7 @@ namespace Application.Services
             }
             return response;
         }
+
 
         public async Task<APIResponseModel> RequestPreliminaryValuationAsync(int id, int status)
         {

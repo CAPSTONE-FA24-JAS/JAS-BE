@@ -9,12 +9,37 @@ namespace Application.Utils
 {
     public class HelperValuation
     {
-        public static string ToHtmlFile(Valuation valuation)
+        public static string ToHtmlFileReceipt(Valuation valuation)
         {
-            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "HtmlFiles", "Receipt");
+            string templatePath = Path.Combine(Directory.GetCurrentDirectory(),  "HtmlFiles", "Receipt.html");
             string templateHtml = File.ReadAllText(templatePath);
-            StringBuilder stringData = new StringBuilder(String.Empty);
-            return stringData.ToString();
+            
+
+            templateHtml = templateHtml.Replace("{{Seller_name}}", valuation.Seller.FirstName + valuation.Seller.LastName)
+                                       .Replace("{{DiaChi_seller}}", valuation.Seller.Address)
+                                       .Replace("{{CCCD}}", valuation.Seller.CitizenIdentificationCard)
+                                       .Replace("{{Time_Create}}", valuation.Seller.IDIssuanceDate.ToString())
+                                       .Replace("{{Time_expire}}", valuation.Seller.IDExpirationDate.ToString())
+                                       .Replace("{{Phone_seller}}", valuation.Seller.Account.PhoneNumber);
+
+
+
+            return templateHtml;
+        }
+
+
+        public static string ToHtmlFileAuthorized(Valuation valuation)
+        {
+            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "HtmlFiles", "UyQuyen.html");
+            string templateHtml = File.ReadAllText(templatePath);
+
+
+            templateHtml = templateHtml.Replace("{{Seller_name}}", valuation.Seller.FirstName + valuation.Seller.LastName)
+                                       .Replace("{{DiaChi_seller}}", valuation.Seller.Address)
+                                       .Replace("{{CCCD}}", valuation.Seller.CitizenIdentificationCard)
+                                       .Replace("{{Time_Create}}", valuation.Seller.IDIssuanceDate.ToString())
+                                       .Replace("{{Time_expire}}", valuation.Seller.IDExpirationDate.ToString());
+            return templateHtml;
         }
     }
 }
