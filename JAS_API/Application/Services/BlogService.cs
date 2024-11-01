@@ -30,6 +30,14 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
+                var user = await _unitOfWork.AccountRepository.GetByIdAsync(createBlogDTO.AccountId);
+                if(user.Role.Name != "Manager")
+                {
+                    reponse.Message = $"User must have role manager can create blog";
+                    reponse.Code = 400;
+                    reponse.IsSuccess = false;
+                    return reponse;
+                }
                 var blog = _mapper.Map<Blog>(createBlogDTO);
                 blog.ImageBlogs = new List<ImageBlog>();
                 if (createBlogDTO.fileImages.Count > 0)
@@ -177,7 +185,8 @@ namespace Application.Services
                 var blog = await _unitOfWork.BlogRepository.GetByIdAsync(updateBlogDTO.BlogId);
                 if (blog != null)
                 {
-                    _mapper.Map(blog, updateBlogDTO);
+                    _mapper.Map(updateBlogDTO, blog);
+                    _unitOfWork.BlogRepository.Update(blog);
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         reponse.Message = $"Update Blog Successfull";
