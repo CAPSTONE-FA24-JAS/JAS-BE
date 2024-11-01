@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -708,6 +709,111 @@ namespace Application.Services
                 else
                 {
                     response.Message = $"Don't have valuations";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> GetJewelryByCategoryAsync(int categoryId, int? pageSize, int? pageIndex)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                //var jewelrys = await _unitOfWork.JewelryRepository.GetAllPaging(filter: null,
+                //                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                //                                                             includeProperties: "Artist,Category,ImageJewelries,KeyCharacteristicDetails,Lot,MainDiamonds,SecondaryDiamonds,MainShaphies,SecondaryShaphies,Valuation",
+                //                                                             pageIndex: pageIndex,
+                //                                                             pageSize: pageSize);
+
+                var jewelrys = await _unitOfWork.JewelryRepository.GetAllJewelryByCategoryAynsc(categoryId, pageSize, pageIndex);
+                List<JewelryListDTO> listjewelryDTO = new List<JewelryListDTO>();
+                if (jewelrys.totalItem > 0)
+                {
+                    response.Message = $"List consign items Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    foreach (var item in jewelrys.data)
+                    {
+                        var jewelrysResponse = _mapper.Map<JewelryListDTO>(item);
+                        listjewelryDTO.Add(jewelrysResponse);
+                    };
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listjewelryDTO,
+                        totalItemRepsone = jewelrys.totalItem
+                    };
+
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have valuations";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> GetJewelryByArtistAsync(int artistId, int? pageSize, int? pageIndex)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                Expression<Func<Jewelry, bool>> filter;
+
+                    filter = x => x.ArtistId == artistId;
+                
+
+                var jewelrys = await _unitOfWork.JewelryRepository.GetAllPaging(filter: filter,
+                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                                                                             includeProperties: "Artist,ImageJewelries",
+                                                                             pageIndex: pageIndex,
+                                                                             pageSize: pageSize);
+
+
+                List<JewelryListDTO> listjewelryDTO = new List<JewelryListDTO>();
+                if (jewelrys.totalItems > 0)
+                {
+                    response.Message = $"List consign items Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    foreach (var item in jewelrys.data)
+                    {
+                        var jewelrysResponse = _mapper.Map<JewelryListDTO>(item);
+                        listjewelryDTO.Add(jewelrysResponse);
+                    };
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listjewelryDTO,
+                        totalItemRepsone = jewelrys.totalItems
+                    };
+
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have jewelry";
                     response.Code = 404;
                     response.IsSuccess = true;
 

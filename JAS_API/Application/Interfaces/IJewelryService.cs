@@ -25,5 +25,9 @@ namespace Application.Interfaces
 
         public Task<APIResponseModel> VerifyOTPForAuthorizedBySellerAsync(int jewelryId, int sellerId, string opt);
 
+        public Task<APIResponseModel> GetJewelryByCategoryAsync(int categoryId, int? pageSize, int? pageIndex);
+
+        public Task<APIResponseModel> GetJewelryByArtistAsync(int artistId, int? pageSize, int? pageIndex);
+
     }
 }

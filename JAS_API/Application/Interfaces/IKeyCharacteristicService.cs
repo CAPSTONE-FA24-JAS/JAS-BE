@@ -1,5 +1,6 @@
 ﻿using Application.ServiceReponse;
 using Application.ViewModels.KeyCharacteristicDTOs;
+using Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,7 @@ namespace Application.Interfaces
         public Task<APIResponseModel> CreateKeyCharacteristicAsync(KeyCharacteristicDTO keyCharacteristicDTO);
 
         public Task<APIResponseModel> getKeyCharacteristicesAsync();
+
+        
     }
 }
