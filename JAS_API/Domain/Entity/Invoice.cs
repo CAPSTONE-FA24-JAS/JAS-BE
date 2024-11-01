@@ -17,7 +17,7 @@ namespace Domain.Entity
         public string? LinkBillTransaction { get; set; }
         public int? CustomerId { get; set; }
         public int? CustomerLotId { get; set; }
-        public int? PaymentMethodId { get; set; }
+        public string? PaymentMethod { get; set; }
         public int? AddressToShipId { get; set; }
         public int? StaffId { get; set; }
         public int? ShipperId { get; set; }
@@ -30,7 +30,6 @@ namespace Domain.Entity
         public virtual Staff? Shipper { get; set; }
         public virtual CustomerLot? CustomerLot { get; set; }
         public virtual WalletTransaction? InvoiceOfWalletTransaction { get; set; } 
-        public virtual PaymentMethod? PaymentMethod { get; set; }
         public virtual IEnumerable<StatusInvoice>? StatusInvoices { get; set; }
     }
 }

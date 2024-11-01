@@ -47,7 +47,6 @@ namespace Infrastructures
         public DbSet<MainDiamond> MainDiamonds { get; set; }
         public DbSet<MainShaphie> MainShaphies { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<Province> Provinces { get; set; }
         public DbSet<RequestWithdraw> RequestWithdraws { get; set; }
         public DbSet<Role> Roles { get; set; }
