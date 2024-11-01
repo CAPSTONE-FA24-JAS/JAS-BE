@@ -59,7 +59,6 @@ namespace Application.Services
                         reponse.Message = $"File upload Successfull";
                         reponse.Code = 200;
                         reponse.IsSuccess = true;
-                        reponse.Data = _mapper.Map<BidLimitDTO>(enity);
                     }
                 }
             }
