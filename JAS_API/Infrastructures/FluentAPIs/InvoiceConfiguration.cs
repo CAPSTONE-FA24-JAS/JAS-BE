@@ -25,10 +25,6 @@ namespace Infrastructures.FluentAPIs
                 .WithMany(x => x.Invoices)
                 .HasForeignKey(x => x.CustomerId);
 
-            builder.HasOne(x => x.PaymentMethod)
-                .WithMany(x => x.Invoices)
-                .HasForeignKey(x => x.PaymentMethodId);
-
             builder.HasOne(x => x.Staff)
                 .WithMany(x => x.StaffInvoices)
                 .HasForeignKey(x => x.StaffId);

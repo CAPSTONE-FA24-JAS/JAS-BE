@@ -555,7 +555,7 @@ namespace Application.Services
                                 TransactionTime = DateTime.Now,
                                 TransactionType = EnumTransactionType.BuyPay.ToString(),
                             };
-
+                            invoiceById.PaymentMethod = EnumPaymentType.Wallet.ToString();
                             await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
                             await _unitOfWork.TransactionRepository.AddAsync(trans);
                             await _walletService.RefundToWalletForUsersAsync(invoiceById.CustomerLot.Lot);  
@@ -608,6 +608,7 @@ namespace Application.Services
                         Status = EnumStatusTransaction.Pending.ToString(),
                         transactionType = EnumTransactionType.Banktransfer.ToString(),
                     };
+                    invoiceById.PaymentMethod = EnumPaymentType.Transfer.ToString();
                     invoiceById.Status = EnumCustomerLot.PendingPayment.ToString();
                     await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
                     
@@ -658,6 +659,8 @@ namespace Application.Services
                         transactionType = EnumTransactionType.BuyPay.ToString(),
                         DocNo = model.InvoiceId,
                     };
+                    invoiceExist.PaymentMethod = EnumPaymentType.Wallet.ToString();
+                    await _unitOfWork.SaveChangeAsync();
                     var httpContext = _httpContextAccessor.HttpContext;
                     string paymentUrl = await _vNPayService.CreatePaymentUrl(httpContext, vnPayModel, transaction);
                     // tra về url thanh toán 
