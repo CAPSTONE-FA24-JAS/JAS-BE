@@ -332,9 +332,6 @@ namespace Application.Services
                     auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
                     await _lotService.UpdateLotRange(auctionExisted.Id, EnumStatusAuction.UpComing.ToString());
                     _unitOfWork.AuctionRepository.Update(auctionExisted);
-
-                   
-                    
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         reponse.IsSuccess = true;
@@ -343,9 +340,21 @@ namespace Application.Services
                         reponse.Data = _mapper.Map<AuctionDTO>(auctionExisted);
                         return reponse;
                     }
+                    else
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Auction updated Faild.";
+                        reponse.Code = 400;
+                        return reponse;
+                    }
                 }
-                reponse.IsSuccess = false;
-                reponse.Message = "Aution cannt saving because some condition.";
+                else
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Message = "The current time has exceeded the start time";
+                    reponse.Code = 400;
+                    return reponse;
+                }
             }
             catch (Exception e)
             {
