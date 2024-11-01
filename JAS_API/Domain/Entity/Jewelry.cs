@@ -35,5 +35,6 @@ namespace Domain.Entity
         public virtual IEnumerable<MainShaphie>? MainShaphies { get; set; }
         public virtual IEnumerable<SecondaryShaphie>? SecondaryShaphies { get; set; }
         public virtual Valuation? Valuation { get; set; }
+        public virtual IEnumerable<Watching> Watchings { get; set; }
     }
 }

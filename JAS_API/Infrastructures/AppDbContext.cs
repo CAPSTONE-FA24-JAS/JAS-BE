@@ -67,6 +67,7 @@ namespace Infrastructures
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new ValuationConfiguration());
             modelBuilder.ApplyConfiguration(new InvoiceConfiguration());
+            modelBuilder.ApplyConfiguration(new ImageBlogConfiguration());
             #region insert data
             //Role
             modelBuilder.Entity<Role>().HasData(

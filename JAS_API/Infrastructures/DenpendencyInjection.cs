@@ -86,7 +86,11 @@ namespace Infrastructures
             services.AddScoped<IFeeShipRepository, FeeShipRepository>();
             services.AddScoped<IFoorFeePercentService, FoorFeePercentService>();
             services.AddScoped<IFloorFeePersentRepository, FloorFeePersentRepository>();
-
+            services.AddScoped<IWatchingService, WatchingService>();
+            services.AddScoped<IWatchingRepository, WatchingRepository>();
+            services.AddScoped<IBlogService, BlogService>();
+            services.AddScoped<IBlogRepository, BlogRepository>();
+            services.AddScoped<IImageBlogRepository, ImageBlogRepository>();
 
             services.AddDbContext<AppDbContext>(option =>
             {

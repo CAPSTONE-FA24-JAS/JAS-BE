@@ -4,14 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entity
+namespace Application.ViewModels.WatchingDTOs
 {
-    public class Watching : BaseEntity
+    public class ViewWatchingDTO
     {
+        public int Id { get; set; }
         public int? CustomerId { get; set; }
         public int? JewelryId { get; set; }
-        //
-        public virtual Customer? Customer { get; set; }
-        public virtual Jewelry? Jewelry { get; set; }
     }
 }

@@ -20,6 +20,8 @@ using Application.ViewModels.InvoiceDTOs;
 using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.BidPriceDTOs;
 using Application.ViewModels.TransactionDTOs;
+using Application.ViewModels.WatchingDTOs;
+using Application.ViewModels.BlogDTOs;
 
 
 namespace Infrastructures
@@ -239,6 +241,15 @@ namespace Infrastructures
             CreateMap<IEnumerable<Transaction>, ViewRevenueOfConpanyDTO>()
                 .ForPath(dest => dest.Month, src => src.MapFrom(x => x.First().TransactionTime.Value.Month))
                 .ForPath(dest => dest.TotalRevenue, src => src.MapFrom(x => x.Sum( x => x.Amount)));
+            CreateMap<Watching, CreateWatchingDTO>().ReverseMap();
+            CreateMap<Watching, ViewWatchingDTO>().ReverseMap();
+            CreateMap<Blog, ViewBlogDTO>()
+                .ForMember(dest => dest.imageBlogDTOs, src => src.MapFrom(x => x.ImageBlogs))
+                .ReverseMap();
+            CreateMap<Blog, CreateBlogDTO>().ReverseMap();
+            CreateMap<Blog, UpdateBlogDTO>().ReverseMap();
+            CreateMap<ImageBlog, ImageBlogDTO>().ReverseMap();
+
         }
     }
 }
