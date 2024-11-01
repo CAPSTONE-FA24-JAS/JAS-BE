@@ -405,7 +405,7 @@ namespace Application.Services
                                 CurrentTime = DateTime.Now,
                             };
                             await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerlot);
-
+                            await _unitOfWork.SaveChangeAsync();
                             //xu ly cho thang thua
                             var losers = _unitOfWork.CustomerLotRepository.GetListCustomerLotByLotId(conn.LotId, winnerCustomerLot.Id);
                             if (losers != null)
@@ -440,7 +440,8 @@ namespace Application.Services
                                         DocNo = loser.Id,
                                         Amount = lotSql.Deposit,
                                         TransactionTime = DateTime.UtcNow,
-                                        Status = "Completed"
+                                        Status = "Completed",
+                                        WalletId = walletOfLoser.Id
                                     };
                                     await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrasaction);
 
