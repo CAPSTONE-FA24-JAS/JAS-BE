@@ -82,16 +82,14 @@ namespace Application.Services
                 foreach (var bidLimit in bidLimits)
                 {
                     BidLimitDTO mapper;
-                    if (bidLimit.StaffId != null)
+                    var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
+                    string staffName = "";
+                    if (staff != null)
                     {
-                        var staff = _unitOfWork.StaffRepository.GetByIdAsync(bidLimit.StaffId).Result;
-                        string staffName = staff.FirstName + " " + staff.LastName;
-                         mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
-                        mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
-                        DTOs.Add(mapper);
+                        staffName = staff.FirstName + " " + staff.LastName;
                     }
-                     mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = null);
-                     mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
+                        mapper = _mapper.Map<BidLimitDTO>(bidLimit, x => x.Items["StaffName"] = staffName);
+                        mapper.CustomerName = bidLimit.Customer.FirstName + " " + bidLimit.Customer.LastName;
                      DTOs.Add(mapper);
 
                 }
@@ -194,6 +192,10 @@ namespace Application.Services
                             {
                                 bidLimit.Customer.PriceLimit = bidLimit.PriceLimit;
                                 bidLimit.Customer.ExpireDate = bidLimit.ExpireDate;
+                            }
+                            if (status == EnumStatusBidLimit.Cancel.ToString())
+                            {
+                                bidLimit.Reason = updateBidLimitDTO.Reason;
                             }
                             bidLimit.Status = status;
                             _unitOfWork.BidLimitRepository.Update(bidLimit);
