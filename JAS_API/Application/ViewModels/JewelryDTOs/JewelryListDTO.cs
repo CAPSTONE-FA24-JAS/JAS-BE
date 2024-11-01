@@ -21,8 +21,9 @@ namespace Application.ViewModels.JewelryDTOs
         public string? Title { get; set; }
         public string? BidForm { get; set; }
         public string? Status { get; set; }
-        public DateTime? Time_Bidding { get; set; }        
-      
+        public DateTime? Time_Bidding { get; set; }
+        public int? ValuationId { get; set; }
+
         public IEnumerable<ImageJewelryDTO>? ImageJewelries { get; set; }
         
     }

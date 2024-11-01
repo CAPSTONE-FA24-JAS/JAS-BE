@@ -233,6 +233,13 @@ namespace Infrastructures
             CreateMap<HistoryStatusCustomerLot, HistoryCustomerLotDTO>().ReverseMap();
             CreateMap<StatusInvoice, StatusInvoiceDTO>().ReverseMap();
             CreateMap<WalletTransaction, ViewWalletTransactionDTO>().ReverseMap();
+
+           
+            CreateMap<Valuation, ValuationListDTO>()
+                .ForPath(x => x.Email, x => x.MapFrom( x => x.Seller.Account.Email))
+                .ForPath(x => x.NameJewelry, x => x.MapFrom( x => x.Jewelry.Name))
+                .ReverseMap();
+
             CreateMap<Transaction, ViewTransactionDTO>().ReverseMap();
             CreateMap<ViewCheckInvoiceHaveBill, Invoice>().ReverseMap();
             CreateMap<Transaction, ViewRevenueOfConpanyDTO>()
@@ -249,6 +256,7 @@ namespace Infrastructures
             CreateMap<Blog, CreateBlogDTO>().ReverseMap();
             CreateMap<Blog, UpdateBlogDTO>().ReverseMap();
             CreateMap<ImageBlog, ImageBlogDTO>().ReverseMap();
+
 
         }
     }
