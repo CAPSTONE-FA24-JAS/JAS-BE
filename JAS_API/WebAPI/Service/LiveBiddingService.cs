@@ -397,7 +397,7 @@ namespace WebAPI.Service
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _foorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();
                 //Xu ly luc tg ket thuc
-                var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow && x.LotType == EnumLotType.Fixed_Price.ToString() && x.Status == EnumStatusLot.Auctioning.ToString());
+                var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime.Value <= DateTime.UtcNow && x.LotType == EnumLotType.Fixed_Price.ToString() && x.Status == EnumStatusLot.Auctioning.ToString());
                 Invoice invoice;
                 if (lotEnds.Any())
                 {
