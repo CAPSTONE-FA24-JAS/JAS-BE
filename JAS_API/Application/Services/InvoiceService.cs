@@ -616,6 +616,7 @@ namespace Application.Services
                         Status = EnumStatusTransaction.Pending.ToString(),
                         transactionType = EnumTransactionType.Banktransfer.ToString(),
                     };
+                    //invoiceById.InvoiceOfWalletTransaction = 
                     invoiceById.PaymentMethod = EnumPaymentType.Transfer.ToString();
                     invoiceById.Status = EnumCustomerLot.PendingPayment.ToString();
                     await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
@@ -833,9 +834,13 @@ namespace Application.Services
                 var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
                 if (invoiceById != null)
                 {
-                    if(invoiceById.InvoiceOfWalletTransaction.transactionType != EnumTransactionType.Banktransfer.ToString())
+                    var checkInvoiceHaveTrans = await _unitOfWork.WalletTransactionRepository
+                                                        .GetAllAsync(x => x.DocNo == model.InvoiceId 
+                                                        && x.Status == EnumStatusTransaction.Pending.ToString()
+                                                        && x.transactionType == EnumTransactionType.Banktransfer.ToString().Trim());
+                    if(checkInvoiceHaveTrans == null) 
                     {
-                        response.Message = $"Invoice must using payment method bank transfer for upload bill";
+                        response.Message = $"Dont have invoice for upload payment with banktransfer";
                         response.Code = 400;
                         response.IsSuccess = false;
                         return response;
