@@ -9,7 +9,7 @@ namespace Application.Interfaces
 {
     public interface IGeneratePDFService
     {
-        byte[] CreateReceiptPDF(Valuation valuation);
+        byte[] CreateReceiptPDF(Valuation valuation, DateTime? recivedDate, string? productRecivedStatus);
         byte[] CreateAuthorizedPDF(Valuation valuation);
     }
 }

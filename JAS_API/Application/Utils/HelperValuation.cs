@@ -9,7 +9,7 @@ namespace Application.Utils
 {
     public class HelperValuation
     {
-        public static string ToHtmlFileReceipt(Valuation valuation)
+        public static string ToHtmlFileReceipt(Valuation valuation, DateTime? recivedDate, string? productRecivedStatus)
         {
             string templatePath = Path.Combine(Directory.GetCurrentDirectory(),  "HtmlFiles", "Receipt.html");
             string templateHtml = File.ReadAllText(templatePath);
@@ -20,7 +20,13 @@ namespace Application.Utils
                                        .Replace("{{CCCD}}", valuation.Seller.CitizenIdentificationCard)
                                        .Replace("{{Time_Create}}", valuation.Seller.IDIssuanceDate.ToString())
                                        .Replace("{{Time_expire}}", valuation.Seller.IDExpirationDate.ToString())
-                                       .Replace("{{Phone_seller}}", valuation.Seller.Account.PhoneNumber);
+                                       .Replace("{{Phone_seller}}", valuation.Seller.Account.PhoneNumber)
+                                       .Replace("{{JewelryName}}", valuation.Name)
+                                       .Replace("{{ReceivingDate}}", recivedDate.ToString())
+                                       .Replace("{{ProductRecivedStatus}}", productRecivedStatus);
+
+
+
 
 
 

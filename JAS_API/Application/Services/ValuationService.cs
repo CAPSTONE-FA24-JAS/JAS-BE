@@ -507,7 +507,7 @@ namespace Application.Services
 
                     AddHistoryValuation(valuationById.Id, valuationById.Status);                    
 
-                    byte[] pdfBytes = _generatePDFService.CreateAuthorizedPDF(valuationById);
+                    byte[] pdfBytes = _generatePDFService.CreateReceiptPDF(valuationById, DateTime.UtcNow, receipt.ActualStatusOfJewelry);
 
                     string filePath = $"BienBanXacNhanNhanHang_{valuationById.Id}.pdf";
 
