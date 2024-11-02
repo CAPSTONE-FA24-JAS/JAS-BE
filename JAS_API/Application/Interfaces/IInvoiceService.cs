@@ -41,5 +41,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> GetListInvoiceForCheckBill();
         Lot GetLotInInvoice(int invoiceId);
 
+        Task<APIResponseModel> getInvoicesDeliveringByShipper(int shipperId, int? pageIndex, int? pageSize);
+
     }
 }

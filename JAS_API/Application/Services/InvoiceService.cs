@@ -1001,5 +1001,59 @@ namespace Application.Services
             }
             return response;
         }
+
+        public async Task<APIResponseModel> getInvoicesDeliveringByShipper(int shipperId, int? pageIndex, int? pageSize)
+        {
+            var response = new APIResponseModel();
+
+            try
+            {
+
+                Expression<Func<Invoice, bool>> filter;
+
+
+
+                var invoices = await _unitOfWork.InvoiceRepository.getInvoicesDeliveringByShipper(shipperId, pageIndex, pageSize);
+                List<InvoiceDetailDTO> listInvoiceDTO = new List<InvoiceDetailDTO>();
+                if (invoices.totalItems > 0)
+                {
+                    foreach (var item in invoices.data)
+                    {
+                        var jewelryOfInvoice = item.CustomerLot.Lot.Jewelry;
+                        var invoicesResponse = _mapper.Map<InvoiceDetailDTO>(item, x => x.Items["Jewelry"] = jewelryOfInvoice);
+                        listInvoiceDTO.Add(invoicesResponse);
+                    };
+
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listInvoiceDTO,
+                        totalItemRepsone = invoices.totalItems
+                    };
+                    response.Message = $"List invoices Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have invoices";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
     }
+
+
 }
