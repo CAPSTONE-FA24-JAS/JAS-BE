@@ -18,7 +18,7 @@ namespace Application.Services
         {
             _converter = converter;
         }
-        public byte[] CreateReceiptPDF(Valuation valuation)
+        public byte[] CreateReceiptPDF(Valuation valuation, DateTime? recivedDate, string? productRecivedStatus)
         {
             string exportsPath = Path.Combine(Directory.GetCurrentDirectory(), "Exports");
             // Tạo thư mục "Exports" nếu chưa tồn tại
@@ -39,7 +39,7 @@ namespace Application.Services
             var objectSettings = new ObjectSettings
             {
                 PagesCount = true,
-                HtmlContent = HelperValuation.ToHtmlFileReceipt(valuation),
+                HtmlContent = HelperValuation.ToHtmlFileReceipt(valuation, recivedDate, productRecivedStatus),
                 WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = null }
             };
 

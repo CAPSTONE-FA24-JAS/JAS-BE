@@ -632,7 +632,7 @@ namespace Application.Services
                     AddHistoryValuation(valuation.Id, status);
                     await _unitOfWork.SaveChangeAsync();
 
-                    byte[] pdfBytes = _generatePDFService.CreateReceiptPDF(valuation);
+                    byte[] pdfBytes = _generatePDFService.CreateAuthorizedPDF(valuation);
 
                     string filePath = $"GiayUyQuyen_{valuation.Id}.pdf";
 
