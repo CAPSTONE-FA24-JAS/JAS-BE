@@ -14,6 +14,8 @@ namespace Application.Repositories
         Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesByStatusForCustomer(int customerId, string? status, int? pageIndex, int? pageSize);
 
         Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesRecivedByShipper(int shipperId, int? pageIndex, int? pageSize);
-       
+        Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesDeliveringByShipper(int shipperId, int? pageIndex, int? pageSize);
+
+
         }
 }
