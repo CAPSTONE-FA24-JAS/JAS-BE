@@ -14,9 +14,11 @@ namespace Application.Services
     public class GeneratePdfService : IGeneratePDFService
     {
         private readonly IConverter _converter;
-        public GeneratePdfService(IConverter converter)
+        private readonly HelperValuation _helperValuation;
+        public GeneratePdfService(IConverter converter, HelperValuation helperValuation)
         {
             _converter = converter;
+            _helperValuation = helperValuation;
         }
         public byte[] CreateReceiptPDF(Valuation valuation, DateTime? recivedDate, string? productRecivedStatus)
         {
@@ -39,7 +41,7 @@ namespace Application.Services
             var objectSettings = new ObjectSettings
             {
                 PagesCount = true,
-                HtmlContent = HelperValuation.ToHtmlFileReceipt(valuation, recivedDate, productRecivedStatus),
+                HtmlContent = _helperValuation.ToHtmlFileReceipt(valuation, recivedDate, productRecivedStatus),
                 WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = null }
             };
 
@@ -82,7 +84,7 @@ namespace Application.Services
             var objectSettings = new ObjectSettings
             {
                 PagesCount = true,
-                HtmlContent = HelperValuation.ToHtmlFileAuthorized(valuation),
+                HtmlContent = _helperValuation.ToHtmlFileAuthorized(valuation),
                 WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = null }
             };
 
