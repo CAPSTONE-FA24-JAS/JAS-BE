@@ -40,7 +40,7 @@ builder.Services.AddSignalR();
 builder.Services.AddSingleton(configuration);
 builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, build =>
 {
-    build.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+    build.WithOrigins("http://localhost:3000", "exp://127.0.0.1:8081").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
 }));
 
 //builder.WebHost.UseUrls("https://localhost:7251");
