@@ -54,7 +54,7 @@ namespace Application.Services
             walletTransaction.CreationDate = model.CreatedDate;
             walletTransaction.transactionPerson = _claimsService.GetCurrentUserId;
 
-
+            walletTransaction.transactionId = tick;
             var walletTransactionResult = await _walletTransactionService.CreateNewTransaction(walletTransaction);
 
             //if (walletTransaction.Status == EnumTransactionType.BuyPay.ToString())

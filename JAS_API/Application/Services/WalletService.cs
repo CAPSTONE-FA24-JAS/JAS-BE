@@ -50,6 +50,7 @@ namespace Application.Services
             {
                 reponse.IsSuccess = false;
                 reponse.ErrorMessages = new List<string> { e.Message };
+                
             }
             return reponse;
         }
@@ -332,6 +333,7 @@ namespace Application.Services
             {
                 reponse.IsSuccess = false;
                 reponse.ErrorMessages = new List<string> { e.Message };
+                reponse.Message = "UpdateBanlance FAILD";
             }
             return reponse;
         }
