@@ -5,9 +5,11 @@ using Application.ServiceReponse;
 using Application.Services;
 using Application.Utils;
 using Application.ViewModels.LiveBiddingDTOs;
+using Castle.Core.Resource;
 using Domain.Entity;
 using Domain.Enums;
 using Infrastructures;
+using iTextSharp.text.pdf.parser.clipper;
 using Microsoft.AspNetCore.SignalR;
 using System.Reflection;
 using System.Security.Claims;
@@ -90,31 +92,20 @@ namespace WebAPI.Service
                 if (lotLiveBidding != null)
                 {
                     foreach (var lot in lotLiveBidding)
-                    {
-                        string lotGroupName = $"lot-{lot.Id}";
-                        var bidPrice = _unitOfWork.BidPriceRepository.GetBidPriceByLotIdForReduceBidding(lot.Id);
+                    {                       
                         var endTime = lot.EndTime;
                         if (endTime.HasValue && DateTime.UtcNow > endTime.Value)
-                        {
-                            
-                            if (bidPrice == null)
-                            {
-                                lot.Status = EnumStatusLot.Passed.ToString();
-                                _unitOfWork.LotRepository.Update(lot);
-                                await _unitOfWork.SaveChangeAsync();
-                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforReducedBiddingAuto", "Phiên đã kết thúc!");
-                            }
+                        {                          
+                          await  EndTimeReducedBidding(lot.Id);
                         }
                         else
                         {
-                           await  EndTimeReducedBidding(lot.Id, bidPrice);
+                            await ReduceTimeBidding(lot.Id);
                         }
                       
                     }
                 }            
             }
-
-
         }
 
         public async Task CheckLotStartAsync()
@@ -151,46 +142,196 @@ namespace WebAPI.Service
 
 
         //check tu dong : khi khong co ai đấu giá và giá hiện tại vẫn cao hơn giá min và chưa đến giờ end lot thì sẽ tự động giảm giá xuống.
-        public async Task EndTimeReducedBidding(int lotId, BidPrice bidPrice)
+        public async Task EndTimeReducedBidding(int lotId)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string lotGroupName = $"lot-{lotId}";
-                
-            var lot = _cacheService.GetLotById(lotId) ;
-                if(bidPrice == null)
+                var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == lotId);
+                var lot = _cacheService.GetLotById(lotId) ;
+                if(bidPrices == null)
                 {
-                    var currentPrice = lot.StartPrice;
+                    //cap nhat trang thai lot sold
+                    lot.ActualEndTime = lot.EndTime;
+                    lot.CurrentPrice = lot.CurrentPrice;
+                    lot.Status = EnumStatusLot.Passed.ToString();
+                    _unitOfWork.LotRepository.Update(lot);
+                    _cacheService.UpdateLotStatus(lotId, lot.Status);
+                    await _unitOfWork.SaveChangeAsync();
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinner", "Phiên đã kết thúc va khong co dau gia");
 
-
-                    while (currentPrice > lot.FinalPriceSold && bidPrice == null && DateTime.UtcNow < lot.EndTime)
-                    {
-                        currentPrice = currentPrice - lot.BidIncrement;
-                        lot.CurrentPrice = currentPrice;
-                        if (currentPrice < lot.FinalPriceSold)
-                        {
-                            currentPrice = lot.FinalPriceSold;
-                            lot.CurrentPrice = lot.FinalPriceSold;
-
-                        }
-
-                        _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("ReducePriceBidding", "Giá đã giảm!", currentPrice, DateTime.UtcNow);
-
-                        var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
-                        lotsql.CurrentPrice = currentPrice;
-                        _unitOfWork.LotRepository.Update(lotsql);
-
-                        await _unitOfWork.SaveChangeAsync();
-                        await Task.Delay(30000);
-                        bidPrice = _unitOfWork.BidPriceRepository.GetBidPriceByLotIdForReduceBidding(lotId);
-                    };
-
-                    
                 }
             }          
+        }
+
+        public async Task ReduceTimeBidding(int lotId)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+                string lotGroupName = $"lot-{lotId}";
+
+                var lot = _cacheService.GetLotById(lotId);
+                
+                //neu  den gio thi check xem co bidprice khong, neu cos  ket thuc phien va random winner
+                // neu k co bidPrice thi tiep tuc giam, cap nhat lai actualEndTime cho den khi 
+                DateTime actualEndTime = lot.EndTime.Value + TimeSpan.FromSeconds(lot.BidIncrement.Value);
+
+                var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == lotId);
+                var currentPrice = lot.StartPrice;
+                while (currentPrice > lot.FinalPriceSold && lot.Status == EnumStatusLot.Auctioning.ToString() && lot.EndTime > DateTime.UtcNow)
+                {
+                    if (actualEndTime == DateTime.UtcNow)
+                    {
+                        if (bidPrices.Count > 0)
+                        {
+                            //cap nhat trang thai lot sold
+                            lot.ActualEndTime = actualEndTime;
+                            lot.CurrentPrice = currentPrice;
+                            lot.Status = EnumStatusLot.Sold.ToString();
+                            _unitOfWork.LotRepository.Update(lot);
+                            _cacheService.UpdateLotStatus(lotId, lot.Status);
+
+
+                           
+
+                            //thuc hien random va xu ly cho nguoi chien thang, nguoi thua
+                            Random random = new Random();
+                            int winnerIndex = random.Next(bidPrices.Count);
+                            var winnerBid = bidPrices[winnerIndex];
+
+                            //update customerLot
+                            var winnerCustomerLot = await _unitOfWork.CustomerLotRepository.GetCustomerLotByCustomerAndLot(winnerBid.CustomerId, lotId);
+                            winnerCustomerLot.IsWinner = true;
+                            winnerCustomerLot.CurrentPrice = currentPrice;
+                            _unitOfWork.CustomerLotRepository.Update(winnerCustomerLot);
+
+                            await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinner", "Phiên đã kết thúc!", winnerBid.CustomerId, winnerBid.CurrentPrice);
+                            //tao invoice cho wwinner
+                            var invoice = new Invoice
+                            {
+                                CustomerId = winnerBid.CustomerId,
+                                CustomerLotId = winnerCustomerLot.Id,
+                                StaffId = winnerCustomerLot.Lot.StaffId,
+                                Price = currentPrice,
+                                Free = (float?)(currentPrice * 0.25),
+                                TotalPrice = (float?)(currentPrice + currentPrice * 0.25 - winnerCustomerLot.Lot.Deposit),
+                                CreationDate = DateTime.Now,
+                                Status = EnumCustomerLot.CreateInvoice.ToString()
+                            };
+
+                            await _unitOfWork.InvoiceRepository.AddAsync(invoice);
+
+                            winnerCustomerLot.Status = EnumCustomerLot.CreateInvoice.ToString();
+                            winnerCustomerLot.IsInvoiced = true;
+                            _unitOfWork.CustomerLotRepository.Update(winnerCustomerLot);
+
+
+                            var historyCustomerlot = new HistoryStatusCustomerLot()
+                            {
+                                Status = winnerCustomerLot.Status,
+                                CustomerLotId = winnerCustomerLot.Id,
+                                CurrentTime = DateTime.Now,
+                            };
+                            await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerlot);
+                            await _unitOfWork.SaveChangeAsync();
+
+                            //lấy ra những thằng thua theo lot(group by theo customerId và lotId,Lấy giá trị đầu tiên của mỗi nhóm (distinct)
+                            var custemerLotGroupBy = bidPrices.GroupBy(b => new { b.CustomerId, b.LotId })
+                                                  .Select(g => g.First())
+                                                  .ToList();
+
+                            //lay ra lisst customerLot theo list customerid vaf lotId
+                            var losers = _unitOfWork.CustomerLotRepository.GetListCustomerLotByCustomerAndLot(custemerLotGroupBy, winnerCustomerLot.Id);
+                            if (losers != null)
+                            {
+                                List<CustomerLot> listCustomerLot = new List<CustomerLot>();
+                                foreach (var loser in losers)
+                                {
+                                    loser.IsWinner = false;
+
+                                    //hoan coc cho loser
+                                    var walletOfLoser = await _unitOfWork.WalletRepository.GetByCustomerId(loser.CustomerId);
+                                    walletOfLoser.Balance = walletOfLoser.Balance + (decimal?)loser.Lot.Deposit;
+                                    _unitOfWork.WalletRepository.Update(walletOfLoser);
+                                    loser.IsRefunded = true;
+                                    loser.Status = EnumCustomerLot.Refunded.ToString();
+
+                                    listCustomerLot.Add(loser);
+                                    //lưu history của loser là refunded
+                                    var historyCustomerlotLoser = new HistoryStatusCustomerLot()
+                                    {
+                                        Status = loser.Status,
+                                        CustomerLotId = loser.Id,
+                                        CurrentTime = DateTime.Now,
+                                    };
+                                    await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerlotLoser);
+
+
+                                    //cap nhat transaction vi
+                                    var walletTrasaction = new WalletTransaction
+                                    {
+                                        transactionType = EnumTransactionType.RefundDeposit.ToString(),
+                                        DocNo = loser.Id,
+                                        Amount = lot.Deposit,
+                                        TransactionTime = DateTime.UtcNow,
+                                        Status = "Completed"
+                                    };
+                                    await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrasaction);
+
+
+                                    //cap nhat transaction cty
+                                    var trasaction = new Transaction
+                                    {
+                                        TransactionType = EnumTransactionType.RefundDeposit.ToString(),
+                                        DocNo = loser.Id,
+                                        Amount = lot.Deposit,
+                                        TransactionTime = DateTime.UtcNow,
+
+                                    };
+                                    await _unitOfWork.TransactionRepository.AddAsync(trasaction);
+                                    await _unitOfWork.SaveChangeAsync();
+                                }
+                                _unitOfWork.CustomerLotRepository.UpdateRange(listCustomerLot);
+                            }
+                        }
+                        else
+                        {
+
+                            //neu k cos bid price thi ha gia va tang actualEndTime len theo bidIncrementTime, sau do doi BidIncrement Time roi lai tiep tuc kiem tra khi den gio endTime thi co bidPrice nao k
+                            currentPrice = currentPrice - lot.BidIncrement;
+                            lot.CurrentPrice = currentPrice;
+                            if (currentPrice < lot.FinalPriceSold)
+                            {
+                                currentPrice = lot.FinalPriceSold;
+                                lot.CurrentPrice = lot.FinalPriceSold;
+
+                            }
+
+                            _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
+                            await _hubContext.Clients.Group(lotGroupName).SendAsync("ReducePriceBidding", "Giá đã giảm!", currentPrice, DateTime.UtcNow);
+
+                            var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+                            lotsql.CurrentPrice = currentPrice;
+                            _unitOfWork.LotRepository.Update(lotsql);
+
+                            await _unitOfWork.SaveChangeAsync();
+                            actualEndTime = actualEndTime + TimeSpan.FromSeconds(lot.BidIncrement.Value);
+                            await Task.Delay((int)lot.BidIncrement);
+                            //lay lai lot tren redis
+                            
+
+
+                        }
+                        lot = _cacheService.GetLotById(lotId);
+                        bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == lotId);
+                    }
+                };
+
+            }
         }
 
         private async Task StartLot(int lotId)
@@ -293,6 +434,7 @@ namespace WebAPI.Service
                             CurrentTime = DateTime.Now,
                         };
                         await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerlot);
+
 
                         //lấy ra những thằng thua theo lot(group by theo customerId và lotId,Lấy giá trị đầu tiên của mỗi nhóm (distinct)
                         var custemerLotGroupBy = bidPrices.GroupBy(b => new { b.CustomerId, b.LotId })
