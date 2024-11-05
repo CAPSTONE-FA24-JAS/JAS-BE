@@ -507,6 +507,7 @@ namespace Application.Services
             }
             return response;
         }
+        
         internal async Task<float?> FindFeeShipByDistanceAsync(float distance)
         {
             var feeShips = await _unitOfWork.FeeShipRepository
@@ -1003,6 +1004,68 @@ namespace Application.Services
                 response.Message = "Exception";
                 response.Code = 500;
                 response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> TotalInvoice()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var totalInvoice = await _unitOfWork.InvoiceRepository.GetAllAsync();
+                if(totalInvoice.Count > 0)
+                {
+                    response.Code = 200;
+                    response.Data = totalInvoice.Count;
+                    response.IsSuccess = true;
+                    response.Message = $"Received Successfully Total Invoice: {totalInvoice.Count}.";
+                }
+                else
+                {
+                    response.Code = 200;
+                    response.Data = totalInvoice.Count;
+                    response.IsSuccess = true;
+                    response.Message = $"Current Time System Haven't Invoice.";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processcing";
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> TotalInvoiceByMonth(int month)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var totalInvoiceByMonth = await _unitOfWork.InvoiceRepository.GetAllAsync(x => x.CreationDate.Month == month);
+                if (totalInvoiceByMonth.Count > 0)
+                {
+                    response.Code = 200;
+                    response.Data = totalInvoiceByMonth.Count;
+                    response.IsSuccess = true;
+                    response.Message = $"Received Successfully Total Invoice By Month {month}: {totalInvoiceByMonth.Count}.";
+                }
+                else
+                {
+                    response.Code = 200;
+                    response.Data = totalInvoiceByMonth.Count;
+                    response.IsSuccess = true;
+                    response.Message = $"In Month {month}, System Haven't Invoice.";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processcing";
             }
             return response;
         }
