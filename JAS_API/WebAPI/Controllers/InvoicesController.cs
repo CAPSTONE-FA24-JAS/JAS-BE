@@ -140,6 +140,21 @@ namespace WebAPI.Controllers
             }
         }
 
+        //lay ra invoice da chi dinh shipper va chua lay hang
+        [HttpGet]
+        public async Task<IActionResult> getDeliveringInvoicesByShipper(int shipperId, int? pageIndex, int? pageSize)
+        {
+            var result = await _invoiceService.getInvoicesDeliveringByShipper(shipperId, pageSize, pageIndex);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
 
         //lay ra invoice da duoc shipper lay hang de di giao( check statusInvoice = recieved)
         [HttpGet]

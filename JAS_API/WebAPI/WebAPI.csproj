@@ -50,4 +50,9 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="wwwroot\HtmlFiles\Receipt.html" />
+	  <None Include="wwwroot\HtmlFiles\UyQuyen.html" />
+	</ItemGroup>
 </Project>

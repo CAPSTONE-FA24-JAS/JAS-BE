@@ -117,5 +117,39 @@ namespace Infrastructures.Repositories
                 return (null, 0);
             }
         }
+
+        public async Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesDeliveringByShipper(int shipperId, int? pageIndex, int? pageSize)
+        {
+            IQueryable<Invoice> invoices;
+
+
+            invoices = _dbContext.Invoices.Include(x => x.StatusInvoices)
+                                         .Where(x => x.ShipperId == shipperId && x.Status == "Delivering" && x.StatusInvoices.All(si => si.InvoiceId == null));
+
+
+
+            if (pageIndex.HasValue && pageSize.HasValue)
+            {
+                int validPageIndex = pageIndex.Value > 0 ? pageIndex.Value - 1 : 0;
+                int validPageSize = pageSize.Value > 0 ? pageSize.Value : 10; // Assuming a default pageSize of 10 if an invalid value is passed
+
+                invoices = invoices.Skip(validPageIndex * validPageSize).Take(validPageSize);
+            }
+
+            var products = await invoices.ToListAsync();
+
+            var totalItems = products.Count;
+
+            if (products != null && products.Any())
+            {
+                return (products, totalItems);
+            }
+            else
+            {
+                return (null, 0);
+            }
+        }
+
+
     }
 }

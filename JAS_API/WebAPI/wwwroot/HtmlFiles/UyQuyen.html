@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giấy Uỷ Quyền</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .text-center {
+      text-align: center;
+    }
+    .text-bold {
+      font-weight: bold;
+    }
+    .text-italic {
+      font-style: italic;
+    }
+    .section-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-top: 1.5em;
+    }
+    .mb-2 {
+      margin-bottom: 0.5em;
+    }
+    .mb-4 {
+      margin-bottom: 1em;
+    }
+    .signature-section {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 2em;
+    }
+    .signature-block {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="text-center text-bold mb-4">
+    <p>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+    <p>Độc lập - Tự do - Hạnh phúc</p>
+  </div>
+
+  <div class="text-center text-bold" style="font-size: 1.5em; margin-bottom: 1em;">
+    GIẤY UỶ QUYỀN
+  </div>
+  <div class="text-center text-italic mb-4">(Dành cho cá nhân)</div>
+
+  <p class="mb-2">
+    - Căn cứ Bộ Luật Dân sự nước Cộng hoà xã hội chủ nghĩa Việt Nam.<br />
+    - Căn cứ vào các văn bản hiến pháp hiện hành.
+  </p>
+
+  <p class="mb-2">TP. Hồ Chí Minh, ngày 12 tháng 12 năm 2024; chúng tôi gồm có:</p>
+
+  <div class="section-title">I. BÊN UỶ QUYỀN</div>
+  <p class="mb-2"><strong>Họ tên:</strong> <span>{{Seller_name}}</span></p>
+  <p class="mb-2"><strong>Địa chỉ:</strong> <span>{{DiaChi_seller}}</span></p>
+  <p class="mb-2"><strong>Số CCCD:</strong> <span>{{CCCD}}</span></p>
+  <p class="mb-2"><strong>Ngày cấp:</strong> <span>{{Time_Create}}</span></p>
+  <p class="mb-2"><strong>Ngày hết hạn:</strong> <span>{{Time_expire}}</span></p>
+
+  <div class="section-title">II. BÊN ĐƯỢC UỶ QUYỀN</div>
+  <p class="mb-2"><strong>Họ tên:</strong> Nguyễn Văn B</p>
+  <p class="mb-2"><strong>Địa chỉ:</strong> S1.01 Vinhomes Grand Park, Tp. Thủ Đức, TP. Hồ Chí Minh</p>
+  <p class="mb-2"><strong>Số CMND:</strong> 9876545678 cấp ngày: 21/01/2018</p>
+  <p class="mb-2"><strong>Nơi cấp:</strong> tại Công an tỉnh Tp. Hồ Chí Minh</p>
+  <p class="mb-4"><strong>Quốc tịch:</strong> Việt Nam</p>
+
+  <div class="section-title">III. NỘI DUNG UỶ QUYỀN</div>
+  <p class="mb-4">
+    Bên Uỷ quyền đồng ý ủy quyền cho Bên Nhận Ủy quyền thực hiện các hành vi sau đây:<br />
+    - Tiếp nhận, định đoạt và định giá tài phẩm từ trang sức do Bên Uỷ quyền gửi.<br />
+    - Được phép kiểm tra và nhận vật phẩm nêu trên khi hoàn thành thủ tục đấu giá.<br />
+    - Nhận tiền hoàn lại từ việc đấu giá.<br />
+    - Thay mặt bên uỷ quyền thực hiện, giám sát toàn bộ thủ tục bàn giao vật phẩm.
+  </p>
+
+  <div class="section-title">IV. CAM KẾT</div>
+  <p class="mb-4">
+    - Hai bên cam kết sẽ hoàn toàn chịu trách nhiệm trước Pháp luật về mọi thông tin uỷ quyền ở trên.<br />
+    - Mọi tranh chấp phát sinh giữa quyền uỷ quyền và bên được uỷ quyền sẽ do hai bên tự giải quyết.
+  </p>
+
+  <div class="signature-section">
+    <div class="signature-block">
+      <p class="text-bold">BÊN ỦY QUYỀN</p>
+      <p class="text-italic mb-4">(Ký, họ tên)</p>
+      <p>{{Seller_name}}</p>
+    </div>
+    <div class="signature-block">
+      <p class="text-bold">BÊN ĐƯỢC ỦY QUYỀN</p>
+      <p class="text-italic mb-4">(Ký, họ tên)</p>
+      <p>Nguyễn Văn B</p>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -36,5 +36,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> TotalInvoice();
         Task<APIResponseModel> TotalInvoiceByMonth(int month);
 
+        Task<APIResponseModel> getInvoicesDeliveringByShipper(int shipperId, int? pageIndex, int? pageSize);
+
     }
 }
