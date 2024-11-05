@@ -205,7 +205,8 @@ namespace WebAPI.Service
                             lot.CurrentPrice = currentPrice;
                             lot.Status = EnumStatusLot.Sold.ToString();
                             _unitOfWork.LotRepository.Update(lot);
-                            _cacheService.UpdateLotStatus(lotId, lot.Status);
+                            await _unitOfWork.SaveChangeAsync();
+                            _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Sold.ToString());
   
 
                             //thuc hien random va xu ly cho nguoi chien thang, nguoi thua
