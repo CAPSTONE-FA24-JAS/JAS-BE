@@ -44,7 +44,7 @@ builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, buil
 }));
 
 //builder.WebHost.UseUrls("https://localhost:7251");
-//builder.WebHost.UseUrls("http://0.0.0.0:7251");
+builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
 
 // Get Redis connection string from appsettings
