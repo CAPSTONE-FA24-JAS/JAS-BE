@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Repositories;
 using Application.Services;
+using Application.ViewModels.AutoBidDTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -8,10 +9,12 @@ namespace WebAPI.Controllers
     public class CustomerLotsController : BaseController
     {
         private readonly ICustomerLotService _customerLotService;
+        private readonly IAutoBidService _autoBidService;
 
-        public CustomerLotsController(ICustomerLotService customerLotService)
+        public CustomerLotsController(ICustomerLotService customerLotService, IAutoBidService autoBidService)
         {
             _customerLotService = customerLotService;
+            _autoBidService = autoBidService;
         }
 
         //lay ra list my bid chua dau hoac dang dau cua customer status registed = 1
@@ -47,6 +50,13 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SetAutoBid(CreateAutoBidDTO createAutoBidDTO)
+        {
+            var result = await _autoBidService.SetAutoBid(createAutoBidDTO);
+            return (result.IsSuccess == true)? Ok(result) : BadRequest(result);
         }
 
     }

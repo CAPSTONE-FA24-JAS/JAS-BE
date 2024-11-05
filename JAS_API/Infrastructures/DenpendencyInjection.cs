@@ -93,6 +93,9 @@ namespace Infrastructures
             services.AddScoped<IImageBlogRepository, ImageBlogRepository>();
             services.AddScoped<IGeneratePDFService, GeneratePdfService>();
             services.AddSingleton<HelperValuation>();
+            services.AddScoped<IAutoBidRepository, AutoBidRepository>();
+            services.AddScoped<IAutoBidService, AutoBidService>();
+
 
             services.AddDbContext<AppDbContext>(option =>
             {

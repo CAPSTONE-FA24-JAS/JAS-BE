@@ -18,11 +18,12 @@ using System.Threading.Tasks;
 
 namespace Application.Services
 {
+
+
     public class CustomerLotService : ICustomerLotService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-       
         
         public CustomerLotService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -89,8 +90,6 @@ namespace Application.Services
             }
             return response;
         }
-
-        
 
         public async Task<APIResponseModel> GetCustomerLotByCustomerAndLot(int customerId, int lotId)
         {
@@ -213,5 +212,73 @@ namespace Application.Services
             }
             return response;
         }
+        public async Task<(bool, float?)> CheckBidPriceTop(int priceFuture)
+        {
+            try
+            {
+                var winnerCurrent = await _unitOfWork.CustomerLotRepository
+                    .GetAllAsync(x => x.IsWinner == true);
+
+                var currentWinner = winnerCurrent?.FirstOrDefault();
+
+                if (currentWinner == null || currentWinner.CurrentPrice < priceFuture)
+                {
+                    return (true, priceFuture); // lấy giá future
+                }
+
+                float? priceCurrentPlusStep = currentWinner.CurrentPrice; // Giá hiện tại + bước tăng
+                return (false, priceCurrentPlusStep);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        public async Task<APIResponseModel> UpdateAutoBidPrice(int customerLotId, float priceCurrent)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var winnerCurrentNew = await _unitOfWork.CustomerLotRepository.GetByIdAsync(customerLotId);
+                var bidPriceNew = new BidPrice()
+                {
+                    BidTime = DateTime.Now,
+                    CurrentPrice = priceCurrent,
+                    CustomerId = winnerCurrentNew.CustomerId,
+                    LotId = winnerCurrentNew.LotId
+                };
+                foreach (var player in await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.CustomerId != winnerCurrentNew.CustomerId))
+                {
+                    player.IsWinner = false;
+                }
+                winnerCurrentNew.IsWinner = true;
+                winnerCurrentNew.CurrentPrice = priceCurrent;
+
+                winnerCurrentNew.Lot.CurrentPrice = priceCurrent;
+                if (await _unitOfWork.SaveChangeAsync() > 0)
+                {
+                    response.Message = $"Update New Winner By AutoBid Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                }
+                else
+                {
+                    response.Message = $"Update New Winner By AutoBid Faild";
+                    response.Code = 400;
+                    response.IsSuccess = false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        
     }
 }
