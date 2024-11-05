@@ -88,7 +88,8 @@ namespace Application.Services
                                 StartPrice = lot.StartPrice,
                                 FinalPriceSold = lot.FinalPriceSold,
                                 BidIncrement = lot.BidIncrement,
-                                LotType = lot.LotType
+                                LotType = lot.LotType,
+                                BidIncrementTime = lot.BidIncrementTime,
 
 
                             };
