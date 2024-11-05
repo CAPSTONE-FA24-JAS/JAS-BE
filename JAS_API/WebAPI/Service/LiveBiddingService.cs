@@ -183,8 +183,11 @@ namespace WebAPI.Service
 
                 var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == lotId);
                 var currentPrice = lot.CurrentPrice ?? lot.StartPrice;
+                _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
+                await _hubContext.Clients.Group(lotGroupName).SendAsync("CurrentPriceForReduceBiddingWhenStartLot", "Giá đã hien tai!", currentPrice, DateTime.UtcNow);
 
-                await Task.Delay(10000);
+
+                await Task.Delay(TimeSpan.FromSeconds((int)lot.BidIncrementTime));
 
                 while (currentPrice > lot.FinalPriceSold && lot.Status == EnumStatusLot.Auctioning.ToString() && lot.EndTime > DateTime.UtcNow)
                 {
@@ -230,7 +233,7 @@ namespace WebAPI.Service
 
                             await _unitOfWork.SaveChangeAsync();
                             
-                            await Task.Delay(10000);
+                            await Task.Delay(TimeSpan.FromSeconds((int)lot.BidIncrementTime));
                            
                         }
                     //lay lai lot tren redis
