@@ -189,6 +189,122 @@ namespace Application.Services
                             // Truy xuất bảng xếp hạng giảm dần theo giá đấu từ Redis
                             var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == conn.LotId);
                             var highestBid = topBidders.FirstOrDefault();
+                            if (highestBid != null)
+                            {
+                                if (request.CurrentPrice <= highestBid.CurrentPrice)
+                                {
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Khong duoc dat gia thap hon hoac bang gia hien tai", highestBid.CurrentPrice);
+                                }
+                                else
+                                {
+
+                                    var bidData = new BidPrice
+                                    {
+                                        CurrentPrice = request.CurrentPrice,
+                                        BidTime = request.BidTime,
+                                        CustomerId = customerId,
+                                        LotId = conn.LotId
+                                    };
+
+                                    // Lưu dữ liệu đấu giá vào Redis
+                                    _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, request.CurrentPrice);
+
+                                    topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == conn.LotId);
+                                    highestBid = topBidders.FirstOrDefault();
+                                    //trar về name, giá ĐẤU, thời gian
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, customerName, request.CurrentPrice, request.BidTime);
+
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
+
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
+
+                                    // Lấy thời gian kết thúc từ Redis
+
+                                    if (lot.EndTime.HasValue)
+                                    {
+                                        DateTime endTime = lot.EndTime.Value;
+
+                                        //10s cuối
+                                        TimeSpan extendTime = endTime - request.BidTime;
+
+                                        // Nếu còn dưới 10 giây thì gia hạn thêm 10 giây
+                                        if (extendTime.TotalSeconds < 10)
+                                        {
+                                            endTime = endTime.AddSeconds(10);
+                                            _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
+                                        }
+                                        else
+                                        {
+                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (request.CurrentPrice <= lot.StartPrice)
+                                {
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Khong duoc dat gia thap hon hoac bang gia hien tai", highestBid.CurrentPrice);
+                                }
+                                else
+                                {
+
+                                    var bidData = new BidPrice
+                                    {
+                                        CurrentPrice = request.CurrentPrice,
+                                        BidTime = request.BidTime,
+                                        CustomerId = customerId,
+                                        LotId = conn.LotId
+                                    };
+
+                                    // Lưu dữ liệu đấu giá vào Redis
+                                    _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, request.CurrentPrice);
+
+                                    topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == conn.LotId);
+                                    highestBid = topBidders.FirstOrDefault();
+                                    //trar về name, giá ĐẤU, thời gian
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, customerName, request.CurrentPrice, request.BidTime);
+
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
+
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
+
+                                    // Lấy thời gian kết thúc từ Redis
+
+                                    if (lot.EndTime.HasValue)
+                                    {
+                                        DateTime endTime = lot.EndTime.Value;
+
+                                        //10s cuối
+                                        TimeSpan extendTime = endTime - request.BidTime;
+
+                                        // Nếu còn dưới 10 giây thì gia hạn thêm 10 giây
+                                        if (extendTime.TotalSeconds < 10)
+                                        {
+                                            endTime = endTime.AddSeconds(10);
+                                            _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
+                                        }
+                                        else
+                                        {
+                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
+                                        }
+                                    }
+                                }                        
+                            }
+                        }
+                        reponse.IsSuccess = true;
+                        reponse.Code = 200;
+                        reponse.Message = "Place bid successfully!";
+                    }
+                    else
+                    {
+                        // Truy xuất bảng xếp hạng giảm dần theo giá đấu từ Redis
+                        var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == conn.LotId);
+                        var highestBid = topBidders.FirstOrDefault();
+                        if( highestBid != null)
+                        {
                             if (request.CurrentPrice <= highestBid.CurrentPrice)
                             {
                                 await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Khong duoc dat gia thap hon hoac bang gia hien tai", highestBid.CurrentPrice);
@@ -206,7 +322,65 @@ namespace Application.Services
 
                                 // Lưu dữ liệu đấu giá vào Redis
                                 _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, request.CurrentPrice);
+                                
 
+                                topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == conn.LotId);
+                                highestBid = topBidders.FirstOrDefault();
+                                //trar về name, giá ĐẤU, thời gian
+                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, customerName, request.CurrentPrice, request.BidTime);
+
+                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
+
+                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
+
+                                // Lấy thời gian kết thúc từ Redis
+
+                                if (lot.EndTime.HasValue)
+                                {
+                                    DateTime endTime = lot.EndTime.Value;
+
+                                    //10s cuối
+                                    TimeSpan extendTime = endTime - request.BidTime;
+
+                                    // Nếu còn dưới 10 giây thì gia hạn thêm 10 giây
+                                    if (extendTime.TotalSeconds < 10)
+                                    {
+                                        endTime = endTime.AddSeconds(10);
+                                        _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
+                                    }
+                                    else
+                                    {
+                                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
+                                    }
+                                }
+                            }
+                            reponse.IsSuccess = true;
+                            reponse.Code = 200;
+                            reponse.Message = "Place bid successfully";
+                        }
+                        else
+                        {
+                            if (request.CurrentPrice <= lot.StartPrice)
+                            {
+                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Khong duoc dat gia thap hon hoac bang gia hien tai", highestBid.CurrentPrice);
+                            }
+                            else
+                            {
+
+                                var bidData = new BidPrice
+                                {
+                                    CurrentPrice = request.CurrentPrice,
+                                    BidTime = request.BidTime,
+                                    CustomerId = customerId,
+                                    LotId = conn.LotId
+                                };
+
+                                // Lưu dữ liệu đấu giá vào Redis
+                                _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, request.CurrentPrice);
+
+                                topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == conn.LotId);
+                                highestBid = topBidders.FirstOrDefault();
 
                                 //trar về name, giá ĐẤU, thời gian
                                 await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, customerName, request.CurrentPrice, request.BidTime);
@@ -237,67 +411,10 @@ namespace Application.Services
                                     }
                                 }
                             }
-                        }
-                        reponse.IsSuccess = true;
-                        reponse.Code = 200;
-                        reponse.Message = "Place bid successfully!";
-                    }
-                    else
-                    {
-                        // Truy xuất bảng xếp hạng giảm dần theo giá đấu từ Redis
-                        var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == conn.LotId);
-                        var highestBid = topBidders.FirstOrDefault();
-                        if (request.CurrentPrice <= highestBid.CurrentPrice)
-                        {
-                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Khong duoc dat gia thap hon hoac bang gia hien tai", highestBid.CurrentPrice);
-                        }
-                        else
-                        {
-
-                            var bidData = new BidPrice
-                            {
-                                CurrentPrice = request.CurrentPrice,
-                                BidTime = request.BidTime,
-                                CustomerId = customerId,
-                                LotId = conn.LotId
-                            };
-
-                            // Lưu dữ liệu đấu giá vào Redis
-                            _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, request.CurrentPrice);
-
-
-                            //trar về name, giá ĐẤU, thời gian
-                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, customerName, request.CurrentPrice, request.BidTime);
-
-                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
-
-                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", highestBid.CurrentPrice, highestBid.BidTime);
-
-                            // Lấy thời gian kết thúc từ Redis
-
-                            if (lot.EndTime.HasValue)
-                            {
-                                DateTime endTime = lot.EndTime.Value;
-
-                                //10s cuối
-                                TimeSpan extendTime = endTime - request.BidTime;
-
-                                // Nếu còn dưới 10 giây thì gia hạn thêm 10 giây
-                                if (extendTime.TotalSeconds < 10)
-                                {
-                                    endTime = endTime.AddSeconds(10);
-                                    _cacheService.UpdateLotEndTime(conn.LotId, endTime);
-                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
-                                }
-                                else
-                                {
-                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
-                                }
-                            }
-                        }
-                        reponse.IsSuccess = true;
-                        reponse.Code = 200;
-                        reponse.Message = "Place bid successfully";
+                            reponse.IsSuccess = true;
+                            reponse.Code = 200;
+                            reponse.Message = "Place bid successfully";
+                        }                     
                     }
                 }
                 else
