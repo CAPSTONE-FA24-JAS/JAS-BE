@@ -200,13 +200,8 @@ namespace WebAPI.Service
                     
                         if (bidPrices.Count > 0)
                         {
-                            //cap nhat trang thai lot sold
-                            lot.ActualEndTime = DateTime.UtcNow;
-                            lot.CurrentPrice = currentPrice;
-                            lot.Status = EnumStatusLot.Sold.ToString();
-                            _unitOfWork.LotRepository.Update(lot);
-                            await _unitOfWork.SaveChangeAsync();
-                            _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Sold.ToString());
+                            
+                            
   
 
                             //thuc hien random va xu ly cho nguoi chien thang, nguoi thua
@@ -214,7 +209,16 @@ namespace WebAPI.Service
                             int winnerIndex = random.Next(bidPrices.Count);
                             var winnerBid = bidPrices[winnerIndex];
 
-                            await HandleWinnerAndLoserLot(lotId, winnerBid);
+                           //cap nhat trang thai lot sold
+                           lot.CurrentPrice = winnerBid.CurrentPrice;
+                            lot.ActualEndTime = DateTime.UtcNow;
+                            lot.Status = EnumStatusLot.Sold.ToString();
+                            _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Sold.ToString());
+                            _unitOfWork.LotRepository.Update(lot);
+                             await _unitOfWork.SaveChangeAsync();
+
+                        //xu ly cho thang thang va thua
+                             await HandleWinnerAndLoserLot(lotId, winnerBid);
                             break;
                         }
                         else
