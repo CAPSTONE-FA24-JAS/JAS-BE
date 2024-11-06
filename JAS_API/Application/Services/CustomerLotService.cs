@@ -223,21 +223,21 @@ namespace Application.Services
                 //lay ra highest bidPrice
                 var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == autoBid.CustomerLot.LotId);
                 var highestBid = topBidders.FirstOrDefault();
-                
-              
 
-           //     var winnerCurrent = await _unitOfWork.CustomerLotRepository
-           //         .GetAllAsync(x => x.IsWinner == true);
-
-          //      var currentWinner = winnerCurrent?.FirstOrDefault();
                 var autobidCurrent = autoBid;
-                if (highestBid == null || highestBid.CurrentPrice < priceFuture && priceFuture >= autobidCurrent.MinPrice && priceFuture <= autobidCurrent.MaxPrice)
+                if (highestBid == null || priceFuture >= autobidCurrent.MinPrice && priceFuture <= autobidCurrent.MaxPrice)
                 {
-                    return (true, priceFuture); // lấy giá future
+                    if (highestBid == null || highestBid.CurrentPrice < priceFuture)
+                    {
+                        return (true, priceFuture); // lấy giá future
+                    }
+                    else
+                    {
+                        float? priceCurrentPlusStep = highestBid.CurrentPrice; // Giá hiện tại
+                        return (false, priceCurrentPlusStep);
+                    }
                 }
-
-                float? priceCurrentPlusStep = highestBid.CurrentPrice; // Giá hiện tại + bước tăng
-                return (false, priceCurrentPlusStep);
+                return (false, null);
             }
             catch (Exception ex)
             {
