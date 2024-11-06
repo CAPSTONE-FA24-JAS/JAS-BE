@@ -24,11 +24,13 @@ namespace Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
         
-        public CustomerLotService(IUnitOfWork unitOfWork, IMapper mapper)
+        public CustomerLotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _cacheService = cacheService;
            
         }
 
@@ -217,18 +219,24 @@ namespace Application.Services
         {
             try
             {
-                //Redis
-                var winnerCurrent = await _unitOfWork.CustomerLotRepository
-                    .GetAllAsync(x => x.IsWinner == true);
 
-                var currentWinner = winnerCurrent?.FirstOrDefault();
+                //lay ra highest bidPrice
+                var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == autoBid.CustomerLot.LotId);
+                var highestBid = topBidders.FirstOrDefault();
+                
+              
+
+           //     var winnerCurrent = await _unitOfWork.CustomerLotRepository
+           //         .GetAllAsync(x => x.IsWinner == true);
+
+          //      var currentWinner = winnerCurrent?.FirstOrDefault();
                 var autobidCurrent = autoBid;
-                if (currentWinner == null || currentWinner.CurrentPrice < priceFuture && priceFuture >= autobidCurrent.MinPrice && priceFuture <= autobidCurrent.MaxPrice)
+                if (highestBid == null || highestBid.CurrentPrice < priceFuture && priceFuture >= autobidCurrent.MinPrice && priceFuture <= autobidCurrent.MaxPrice)
                 {
                     return (true, priceFuture); // lấy giá future
                 }
 
-                float? priceCurrentPlusStep = currentWinner.CurrentPrice; // Giá hiện tại + bước tăng
+                float? priceCurrentPlusStep = highestBid.CurrentPrice; // Giá hiện tại + bước tăng
                 return (false, priceCurrentPlusStep);
             }
             catch (Exception ex)
@@ -257,10 +265,10 @@ namespace Application.Services
                     player.IsWinner = false;
                 }
 
-                winnerCurrentNew.IsWinner = true;
-                winnerCurrentNew.CurrentPrice = priceCurrent;
-                winnerCurrentNew.ModificationDate = DateTime.UtcNow;
-                winnerCurrentNew.Lot.CurrentPrice = priceCurrent;
+                //winnerCurrentNew.IsWinner = true;
+                //winnerCurrentNew.CurrentPrice = priceCurrent;
+                //winnerCurrentNew.ModificationDate = DateTime.UtcNow;
+                //winnerCurrentNew.Lot.CurrentPrice = priceCurrent;
 
                 if (await _unitOfWork.SaveChangeAsync() > 0)
                 {
