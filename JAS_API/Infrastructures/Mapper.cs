@@ -262,6 +262,9 @@ namespace Infrastructures
             CreateMap<ImageBlog, ImageBlogDTO>().ReverseMap();
             CreateMap<AutoBid, CreateAutoBidDTO>().ReverseMap();
             CreateMap<Notification, ViewNotificationDTO>().ReverseMap();
+            CreateMap<CustomerLot,CheckCustomerInLotDTO>()
+                .ForPath(dest => dest.CustomerLotId, src => src.MapFrom(x => x.Id))
+                .ReverseMap();
 
         }
     }
