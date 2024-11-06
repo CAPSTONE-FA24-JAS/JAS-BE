@@ -35,7 +35,7 @@ namespace Application.Interfaces
         Lot GetLotInInvoice(int invoiceId);
         Task<APIResponseModel> TotalInvoice();
         Task<APIResponseModel> TotalInvoiceByMonth(int month);
-
+        Task<APIResponseModel> DashBoardRevenueInYear(int year);
         Task<APIResponseModel> getInvoicesDeliveringByShipper(int shipperId, int? pageIndex, int? pageSize);
 
     }

@@ -59,9 +59,16 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> TotalProfitByMonthWithYear(int month, int year) 
+        public async Task<IActionResult> TotalProfitByMonthWithYear(int month, int year)
         {
             var result = await _transactionService.TotalProfitByMonth(month, year);
+            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DashBoardRevenueInYear(int year)
+        {
+            var result = await _invoiceService.DashBoardRevenueInYear(year);
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
     }

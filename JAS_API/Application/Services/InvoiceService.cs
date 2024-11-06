@@ -14,6 +14,7 @@ using Domain.Enums;
 using iTextSharp.text;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Linq;
@@ -1121,6 +1122,51 @@ namespace Application.Services
             return response;
         }
 
+        public async Task<APIResponseModel> DashBoardRevenueInYear(int year)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var invoiceInYears= await _unitOfWork.InvoiceRepository.GetAllAsync(x => x.Status == EnumCustomerLot.Finished.ToString() && x.CreationDate.Year == year);
+
+                var revenues = new[]
+                {
+                    new { Month = "January", Revenue = await GetRevenueByMonth(invoiceInYears,1)},
+                    new { Month = "Febraury", Revenue = await GetRevenueByMonth(invoiceInYears,2)},
+                    new { Month = "March", Revenue = await GetRevenueByMonth(invoiceInYears,3)},
+                    new { Month = "April", Revenue = await GetRevenueByMonth(invoiceInYears,4)},
+                    new { Month = "May", Revenue = await GetRevenueByMonth(invoiceInYears,5)},
+                    new { Month = "June", Revenue = await GetRevenueByMonth(invoiceInYears,6)},
+                    new { Month = "July", Revenue = await GetRevenueByMonth(invoiceInYears,7)},
+                    new { Month = "August", Revenue = await GetRevenueByMonth(invoiceInYears,8)},
+                    new { Month = "September", Revenue = await GetRevenueByMonth(invoiceInYears,9)},
+                    new { Month = "October", Revenue = await GetRevenueByMonth(invoiceInYears,10)},
+                    new { Month = "November", Revenue = await GetRevenueByMonth(invoiceInYears,11)},
+                    new { Month = "December", Revenue = await GetRevenueByMonth(invoiceInYears,12)},
+                };
+                    response.Code = 200;
+                    response.Data = revenues;
+                    response.IsSuccess = true;
+                    response.Message = $"Received Successfully Revenue In Year {year}";
+
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processcing";
+            }
+            return response;
+        }
+        internal async Task<float?> GetRevenueByMonth(List<Invoice> invoices, int month)
+        {
+            var Revenue = invoices.Where(x => x.CreationDate.Month == month).ToList();
+            if(Revenue.Count > 0)
+            {
+                return Revenue.Sum(x => x.TotalPrice);
+            }
+            return 0;
+        }
     }
 
 
