@@ -577,7 +577,7 @@ namespace Application.Services
             return false;
         }
 
-        public async Task<APIResponseModel> CheckCustomerAuctioned(CheckCustomerInLotDTO model)
+        public async Task<APIResponseModel> CheckCustomerAuctioned(RequestCheckCustomerInLotDTO model)
         {
             var response = new APIResponseModel();
             try
