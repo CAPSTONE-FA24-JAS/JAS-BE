@@ -222,6 +222,7 @@ namespace Infrastructures
             CreateMap<CustomerLot, MyBidDTO>()
                 .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))   
                 .ForMember(dest => dest.HistoryCustomerLots, opt => opt.MapFrom(src => src.HistoryStatusCustomerLots))
+                .ForPath(x => x.yourMaxBidPrice, x => x.MapFrom(x => x.CurrentPrice))
                 .ReverseMap();
             CreateMap<CustomerLot, MyBidDetailDTO>()
                .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))

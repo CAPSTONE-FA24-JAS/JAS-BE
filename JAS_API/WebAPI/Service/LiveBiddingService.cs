@@ -334,9 +334,12 @@ namespace WebAPI.Service
                         walletOfLoser.Balance = walletOfLoser.Balance + (decimal?)loser.Lot.Deposit;
                         _unitOfWork.WalletRepository.Update(walletOfLoser);
                         loser.IsRefunded = true;
-                        loser.Status = EnumCustomerLot.Refunded.ToString();
-
+                        loser.Status = EnumCustomerLot.Refunded.ToString();                       
                         listCustomerLot.Add(loser);
+
+                        var maxBidPriceLoser = await _unitOfWork.BidPriceRepository.GetMaxBidPriceByCustomerIdAndLot(loser.CustomerId, lotId);
+                        loser.CurrentPrice = maxBidPriceLoser.CurrentPrice;
+                        _unitOfWork.CustomerLotRepository.Update(loser);
                         //lưu history của loser là refunded
                         var historyCustomerlotLoser = new HistoryStatusCustomerLot()
                         {
