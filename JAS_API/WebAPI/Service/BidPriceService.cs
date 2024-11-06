@@ -192,7 +192,7 @@ namespace Application.Services
                             var highestBid = topBidders.FirstOrDefault();
                             if (highestBid != null)
                             {
-                                //if (request.CurrentPrice <= highestBid.CurrentPrice && request.BidTime <= highestBid.BidTime)
+                                if (request.CurrentPrice <= highestBid.CurrentPrice && request.BidTime <= highestBid.BidTime)
                                 {
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Khong duoc dat gia thap hon hoac bang gia hien tai", highestBid.CurrentPrice);
                                 }
