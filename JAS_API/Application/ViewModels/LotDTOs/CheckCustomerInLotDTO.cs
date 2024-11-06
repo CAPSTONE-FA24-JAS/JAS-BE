@@ -13,4 +13,9 @@ namespace Application.ViewModels.LotDTOs
         public int CustomerLotId { get; set; }
         public bool Result { get; set; }
     }
+    public class RequestCheckCustomerInLotDTO
+    {
+        public int CustomerId { get; set; }
+        public int LotId { get; set; }
+    }
 }
