@@ -200,21 +200,22 @@ namespace WebAPI.Service
                     
                         if (bidPrices.Count > 0)
                         {
-                            //cap nhat trang thai lot sold
-                            lot.ActualEndTime = DateTime.UtcNow;
-                            lot.CurrentPrice = currentPrice;
-                            lot.Status = EnumStatusLot.Sold.ToString();
-                            _unitOfWork.LotRepository.Update(lot);
-                            await _unitOfWork.SaveChangeAsync();
-                            _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Sold.ToString());
-  
 
                             //thuc hien random va xu ly cho nguoi chien thang, nguoi thua
                             Random random = new Random();
                             int winnerIndex = random.Next(bidPrices.Count);
                             var winnerBid = bidPrices[winnerIndex];
 
-                            await HandleWinnerAndLoserLot(lotId, winnerBid);
+                           //cap nhat trang thai lot sold
+                           lot.CurrentPrice = winnerBid.CurrentPrice;
+                            lot.ActualEndTime = DateTime.UtcNow;
+                            lot.Status = EnumStatusLot.Sold.ToString();
+                            _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Sold.ToString());
+                            _unitOfWork.LotRepository.Update(lot);
+                             await _unitOfWork.SaveChangeAsync();
+
+                        //xu ly cho thang thang va thua
+                             await HandleWinnerAndLoserLot(lotId, winnerBid);
                             break;
                         }
                         else
@@ -563,6 +564,7 @@ namespace WebAPI.Service
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _customerLotService = scope.ServiceProvider.GetRequiredService<ICustomerLotService>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 var customerLots = await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.AutoBids.FirstOrDefault().IsActive == true);
                 try
                 {
@@ -574,7 +576,17 @@ namespace WebAPI.Service
                             var (isFuturePrice, price) = await _customerLotService.CheckBidPriceTop((float)bidPriceFuture, player.AutoBids.FirstOrDefault(x => x.IsActive == true));
                             if (isFuturePrice == true)
                             {
-                                await _customerLotService.UpdateAutoBidPrice(player.Id, (float)price);
+                                //  await _customerLotService.UpdateAutoBidPrice(player.Id, (float)price);
+                                var bidData = new BidPrice
+                                {
+                                    CurrentPrice = bidPriceFuture,
+                                    BidTime = DateTime.UtcNow,
+                                    CustomerId = player.CustomerId,
+                                    LotId = player.LotId,
+                                };
+                                // Lưu dữ liệu đấu giá vào Redis
+                                _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, bidPriceFuture);
+
                                 string lotGroupName = $"lot-{player.LotId}";
                                 await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
                             }
