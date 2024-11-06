@@ -1,4 +1,5 @@
-﻿using Domain.Entity;
+﻿using Application.ViewModels.CustomerLotDTOs;
+using Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,12 +41,13 @@ namespace Application.Interfaces
 
         void UpdateMultipleLotsStatus(List<Lot> lotIds, string status);
 
-       
+        bool SetSortedSetDataForBidPrice<T>(int lotId, T value, float? score) where T : BidPrice;
+ 
 
-        void UpdateLotActualEndTime(int lotId, DateTime newEndTime);
+         void UpdateLotActualEndTime(int lotId, DateTime newEndTime);
 
         void UpdateLotCurrentPriceForReduceBidding(int lotId, float? currentPrice);
 
-
+        bool PlaceBidWithLuaScript(int lotId, BiddingInputDTO request, int customerId);
     }
 }

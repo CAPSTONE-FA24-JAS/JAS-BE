@@ -1,5 +1,6 @@
 ﻿
 using Application.Interfaces;
+using Application.ViewModels.CustomerLotDTOs;
 using Domain.Entity;
 using iTextSharp.text.pdf.parser.clipper;
 using Microsoft.Extensions.Caching.Distributed;
@@ -67,6 +68,36 @@ namespace Application.Services
             return false;
 
         }
+
+        public bool SetSortedSetDataForBidPrice<T>(int lotId, T value, float? score) where T : BidPrice
+        {
+            // Chuỗi hóa đối tượng `BidPrice` để lưu trữ
+            var bidData = JsonSerializer.Serialize(value);
+
+            // Tạo key Redis dựa trên LotId
+            string redisKey = $"BidPrice:{lotId}";
+
+            // Lấy giá đấu cao nhất hiện tại từ Redis
+            var highestBidData = _cacheDb.SortedSetRangeByScore(redisKey, order: Order.Descending, take: 1).FirstOrDefault();
+
+            if (highestBidData.HasValue)
+            {
+                // Giải tuần tự giá đấu cao nhất thành đối tượng `BidPrice`
+                var highestBid = JsonSerializer.Deserialize<BidPrice>(highestBidData.ToString());
+
+                // Kiểm tra điều kiện: giá đấu mới phải cao hơn giá cao nhất hiện tại
+                if (score <= highestBid.CurrentPrice)
+                {
+                    // Giá đấu không hợp lệ nếu giá không cao hơn giá hiện tại
+                    return false;
+                }
+            }
+
+            // Thêm giá đấu vào SortedSet nếu thỏa mãn điều kiện
+            var result = _cacheDb.SortedSetAdd(redisKey, bidData, (double)score);
+            return result;
+        }
+
 
         public bool SetSortedSetDataForTime<T>(string key, T value, DateTime endTime)
         {
@@ -289,8 +320,59 @@ namespace Application.Services
         }
 
 
-        
+        //Lưu vào Redis bằng Lua script với bidPrice
 
+        public bool PlaceBidWithLuaScript(int lotId, BiddingInputDTO request, int customerId)
+        {
+            string script = @"
+    local key = KEYS[1]
+    local newPrice = tonumber(ARGV[1])
+    local newTime = ARGV[2]
+    local bidData = ARGV[3]
+    
+    -- Lấy giá cao nhất hiện tại
+    local highestBid = redis.call('ZRANGE', key, -1, -1, 'WITHSCORES')
+    if #highestBid > 0 then
+        local highestBidData = cjson.decode(highestBid[1])
+        local highestBidPrice = tonumber(highestBid[2])
+        local highestBidTime = highestBidData.BidTime
+
+        -- Kiểm tra điều kiện giá mới phải lớn hơn giá cao nhất
+        if newPrice > highestBidPrice then
+            -- Chấp nhận giá mới và thêm vào SortedSet
+            redis.call('ZADD', key, newPrice, bidData)
+            return 1
+        elseif newPrice == highestBidPrice and newTime > highestBidTime then
+            -- Không chấp nhận giá nếu giá mới bằng và thời gian sau hơn
+            return 0
+        else
+            return 0
+        end
+    else
+        -- Nếu chưa có giá nào, chấp nhận giá đầu tiên
+        redis.call('ZADD', key, newPrice, bidData)
+        return 1
+    end
+";
+
+            // Chuỗi JSON của BidPrice
+            var bidData = JsonSerializer.Serialize(new BidPrice
+            {
+                CurrentPrice = request.CurrentPrice,
+                BidTime = request.BidTime,
+                CustomerId = customerId,
+                LotId = lotId
+            });
+
+            // Key Redis dựa trên LotId
+            string redisKey = $"BidPrice:{lotId}";
+
+            // Thực hiện Lua script trong Redis
+            var result = (int)_cacheDb.ScriptEvaluate(script, new RedisKey[] { redisKey },
+                new RedisValue[] { request.CurrentPrice, request.BidTime.ToString("yyyy-MM-dd HH:mm:ss.fff"), bidData });
+
+            return result == 1;
+        }
 
     }
 }
