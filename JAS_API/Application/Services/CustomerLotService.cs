@@ -217,6 +217,7 @@ namespace Application.Services
         {
             try
             {
+                //Redis
                 var winnerCurrent = await _unitOfWork.CustomerLotRepository
                     .GetAllAsync(x => x.IsWinner == true);
 
@@ -241,6 +242,7 @@ namespace Application.Services
             var response = new APIResponseModel();
             try
             {
+                //Redis
                 var winnerCurrentNew = await _unitOfWork.CustomerLotRepository.GetByIdAsync(customerLotId);
                 var bidPriceNew = new BidPrice()
                 {
@@ -249,6 +251,7 @@ namespace Application.Services
                     CustomerId = winnerCurrentNew.CustomerId,
                     LotId = winnerCurrentNew.LotId
                 };
+                //Redis
                 foreach (var player in await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.CustomerId != winnerCurrentNew.CustomerId))
                 {
                     player.IsWinner = false;
@@ -287,6 +290,7 @@ namespace Application.Services
         {
             try
             {
+                //Redis
                 var playerCurent = await _unitOfWork.CustomerLotRepository
                     .GetByIdAsync(customerLotId);
                 var timeOld = playerCurent.ModificationDate.HasValue ? playerCurent.ModificationDate.Value : playerCurent.CreationDate;
