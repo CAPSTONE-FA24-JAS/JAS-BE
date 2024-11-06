@@ -56,6 +56,7 @@ namespace Application
         public IWatchingRepository WatchingRepository { get; }
         public IBlogRepository BlogRepository { get; }
         public IImageBlogRepository ImageBlogRepository { get; }
+        public IAutoBidRepository AutoBidRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
