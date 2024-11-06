@@ -12,6 +12,7 @@ namespace Application.ViewModels.InvoiceDTOs
     {
         public int Id { get; set; }
         public string? Status { get; set; }
+        public float? Price { get; set; }
         public float? TotalPrice { get; set; }
         public string? LinkBillTransaction { get; set; }
         public string? PaymentMethod { get; set; }
@@ -34,7 +35,6 @@ namespace Application.ViewModels.InvoiceDTOs
         public float? Tax { get;  set; }
         public string? Note { get; set; }
         public string? AddressToShip { get; set; }
-        public float? Price { get; set; }
         public float? Free { get; set; }
         public float? FeeShip { get; set; }
         

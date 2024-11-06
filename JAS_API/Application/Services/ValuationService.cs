@@ -11,6 +11,7 @@ using CloudinaryDotNet.Core;
 using Domain.Entity;
 using Domain.Enums;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Linq;
@@ -182,6 +183,20 @@ namespace Application.Services
                     AddHistoryValuation(id, valuationById.Status);
                  
                     _unitOfWork.ValuationRepository.Update(valuationById);
+
+                    var staff = await _unitOfWork.StaffRepository.GetByIdAsync(staffId);
+                    var notification = new Notification
+                    {
+                        Title = $"Has been Asigned to valuation",
+                        Description = $" Bạn đã được chỉ định cho valuation Id {id}",
+                        Is_Read = false,
+                        NotifiableId = id,  //valuationId
+                        AccountId = staff.AccountId,
+                        CreationDate = DateTime.UtcNow
+                    };
+
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
+
                     await _unitOfWork.SaveChangeAsync();
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
@@ -225,6 +240,18 @@ namespace Application.Services
 
                     AddHistoryValuation(id, valuationById.Status);
                     _unitOfWork.ValuationRepository.Update(valuationById);
+
+                    var notification = new Notification
+                    {
+                        Title = $"Premilinary valuation has been created for valuation Id {id}",
+                        Description = $" valuation {id} của bạn đã được định giá sơ bộ",
+                        Is_Read = false,
+                        NotifiableId = id,  //valuationId
+                        AccountId = valuationById.Seller.AccountId,
+                        CreationDate = DateTime.UtcNow
+                    };
+
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
                     await _unitOfWork.SaveChangeAsync();
 
                     
@@ -422,6 +449,7 @@ namespace Application.Services
 
                     AddHistoryValuation(id, valuationById.Status);
                     _unitOfWork.ValuationRepository.Update(valuationById);
+
                     await _unitOfWork.SaveChangeAsync();
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
@@ -538,6 +566,19 @@ namespace Application.Services
                         };
                         var entity = _mapper.Map<ValuationDocument>(valuationDoc);
                         await _unitOfWork.ValuationDocumentRepository.AddAsync(entity);
+
+                        var notification = new Notification
+                        {
+                            Title = $"Reciept has been created for valuation Id {id}",
+                            Description = $" công ty đã nhận được hàng và biên bản xác nhận đã được tạo cho  valuation Id {id}",
+                            Is_Read = false,
+                            NotifiableId = id,  //valuationId
+                            AccountId = valuationById.Seller.AccountId,
+                            CreationDate = DateTime.UtcNow
+                        };
+
+                        await _unitOfWork.NotificationRepository.AddAsync(notification);
+
                         await _unitOfWork.SaveChangeAsync();
                     }
                     var valuation = _mapper.Map<ValuationDTO>(valuationById);
@@ -578,6 +619,8 @@ namespace Application.Services
 
                     AddHistoryValuation(id, valuationById.Status);
                     _unitOfWork.ValuationRepository.Update(valuationById);
+
+
                     await _unitOfWork.SaveChangeAsync();
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);

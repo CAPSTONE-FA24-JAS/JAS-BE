@@ -95,6 +95,8 @@ namespace Infrastructures
             services.AddSingleton<HelperValuation>();
             services.AddScoped<IAutoBidRepository, AutoBidRepository>();
             services.AddScoped<IAutoBidService, AutoBidService>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<INotificationService, NotificationService>();
 
 
             services.AddDbContext<AppDbContext>(option =>

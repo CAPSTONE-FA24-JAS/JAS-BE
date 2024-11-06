@@ -90,8 +90,12 @@ namespace Application.Services
                                 BidIncrement = lot.BidIncrement,
                                 LotType = lot.LotType,
                                 BidIncrementTime = lot.BidIncrementTime,
-
-
+                                Title = lot.Title,
+                                Deposit = lot.Deposit,
+                                IsExtend = lot.IsExtend,
+                                HaveFinancialProof = lot.HaveFinancialProof,
+                                StaffId = lot.StaffId,
+                                JewelryId = lot.JewelryId,
                             };
                             _cacheService.SetLotInfo(lotRedis);
 

@@ -23,6 +23,7 @@ using Application.ViewModels.TransactionDTOs;
 using Application.ViewModels.WatchingDTOs;
 using Application.ViewModels.BlogDTOs;
 using Application.ViewModels.AutoBidDTOs;
+using Application.ViewModels.NotificationDTOs;
 
 
 namespace Infrastructures
@@ -221,6 +222,7 @@ namespace Infrastructures
             CreateMap<CustomerLot, MyBidDTO>()
                 .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))   
                 .ForMember(dest => dest.HistoryCustomerLots, opt => opt.MapFrom(src => src.HistoryStatusCustomerLots))
+                .ForPath(x => x.yourMaxBidPrice, x => x.MapFrom(x => x.CurrentPrice))
                 .ReverseMap();
             CreateMap<CustomerLot, MyBidDetailDTO>()
                .ForMember(dest => dest.LotDTO, opt => opt.MapFrom(src => src.Lot))
@@ -260,9 +262,11 @@ namespace Infrastructures
             CreateMap<Blog, UpdateBlogDTO>().ReverseMap();
             CreateMap<ImageBlog, ImageBlogDTO>().ReverseMap();
             CreateMap<AutoBid, CreateAutoBidDTO>().ReverseMap();
+            CreateMap<Notification, ViewNotificationDTO>().ReverseMap();
             CreateMap<CustomerLot,CheckCustomerInLotDTO>()
                 .ForPath(dest => dest.CustomerLotId, src => src.MapFrom(x => x.Id))
                 .ReverseMap();
+
         }
     }
 }

@@ -163,7 +163,8 @@ namespace Application.Services
 
                     var lot = _cacheService.GetLotById(conn.LotId);
                     string lotGroupName = $"lot-{conn.LotId}";
-                    var customerName = customer.LastName + " " + customer.FirstName;
+                    var firstName =  customer.FirstName;
+                    var lastname = customer.LastName;
                     if (lot.HaveFinancialProof == true)
                     {
                         var limitbid = customer.PriceLimit;
@@ -191,7 +192,7 @@ namespace Application.Services
                             var highestBid = topBidders.FirstOrDefault();
                             if (highestBid != null)
                             {
-                                if (request.CurrentPrice <= highestBid.CurrentPrice)
+                                if (request.CurrentPrice <= highestBid.CurrentPrice && request.BidTime <= highestBid.BidTime)
                                 {
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Khong duoc dat gia thap hon hoac bang gia hien tai", highestBid.CurrentPrice);
                                 }
@@ -212,7 +213,7 @@ namespace Application.Services
                                     topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == conn.LotId);
                                     highestBid = topBidders.FirstOrDefault();
                                     //trar về name, giá ĐẤU, thời gian
-                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, customerName, request.CurrentPrice, request.BidTime);
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, firstName, lastname, request.CurrentPrice, request.BidTime);
 
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
 
@@ -264,7 +265,7 @@ namespace Application.Services
                                     topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == conn.LotId);
                                     highestBid = topBidders.FirstOrDefault();
                                     //trar về name, giá ĐẤU, thời gian
-                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, customerName, request.CurrentPrice, request.BidTime);
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, firstName, lastname, request.CurrentPrice, request.BidTime);
 
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
 
@@ -327,7 +328,7 @@ namespace Application.Services
                                 topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == conn.LotId);
                                 highestBid = topBidders.FirstOrDefault();
                                 //trar về name, giá ĐẤU, thời gian
-                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, customerName, request.CurrentPrice, request.BidTime);
+                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, firstName, lastname, request.CurrentPrice, request.BidTime);
 
                                 await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
 
@@ -383,7 +384,7 @@ namespace Application.Services
                                 highestBid = topBidders.FirstOrDefault();
 
                                 //trar về name, giá ĐẤU, thời gian
-                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, customerName, request.CurrentPrice, request.BidTime);
+                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, firstName, lastname, request.CurrentPrice, request.BidTime);
 
                                 await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
 
