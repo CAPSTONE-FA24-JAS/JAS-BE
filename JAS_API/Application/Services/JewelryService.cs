@@ -166,8 +166,19 @@ namespace Application.Services
                     }
                 }
 
+                var notification = new Notification
+                {
+                    Title = $"Final valuation Id:  {jewelry.Id} has been create",
+                    Description = $" Thẩm định đã tạo định giá cuối cho valuation Id : {jewelry.Id}",
+                    Is_Read = false,
+                    NotifiableId = jewelry.Id,  //valuationId
+                    AccountId = jewelry.Valuation.Staff.AccountId,
+                    CreationDate = DateTime.UtcNow
+                };
 
-                
+                await _unitOfWork.NotificationRepository.AddAsync(notification);
+                await _unitOfWork.SaveChangeAsync();
+
                 var finalValuation = _mapper.Map<JewelryDTO>(jewelry);
 
                 response.Message = "Create Jewelry Successfully";
@@ -539,7 +550,19 @@ namespace Application.Services
 
                     AddHistoryValuation(jewelryById.Valuation.Id, jewelryById.Valuation.Status);
                     _unitOfWork.JewelryRepository.Update(jewelryById);
+                    var notification = new Notification
+                    {
+                        Title = $"Final valuation Id:  {jewelryById.ValuationId} has been approved by manager",
+                        Description = $"  định giá cuối cho valuation Id : {jewelryById.ValuationId} đã được manager approved",
+                        Is_Read = false,
+                        NotifiableId = jewelryById.ValuationId,  //jewelryId
+                        AccountId = jewelryById.Valuation.Seller.AccountId,
+                        CreationDate = DateTime.UtcNow
+                    };
+
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
                     await _unitOfWork.SaveChangeAsync();
+                   
 
                     var jewelryDTO = _mapper.Map<JewelryDTO>(jewelryById);
 
@@ -663,6 +686,18 @@ namespace Application.Services
                         };
                         var entity = _mapper.Map<ValuationDocument>(valuationDoc);
                         await _unitOfWork.ValuationDocumentRepository.AddAsync(entity);
+
+                        var notification = new Notification
+                        {
+                            Title = $"Final valuation Id:  {valuation.Id} has been authorized by seller ",
+                            Description = $"  định giá cuối cho valuation Id : {valuation.Id} has been authorized by seller",
+                            Is_Read = false,
+                            NotifiableId = valuation.Id,  //jewelryId
+                            AccountId = valuation.Staff.AccountId,
+                            CreationDate = DateTime.UtcNow
+                        };
+
+                        await _unitOfWork.NotificationRepository.AddAsync(notification);
                         await _unitOfWork.SaveChangeAsync();
                     }
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuation);

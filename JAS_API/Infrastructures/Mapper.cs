@@ -23,6 +23,7 @@ using Application.ViewModels.TransactionDTOs;
 using Application.ViewModels.WatchingDTOs;
 using Application.ViewModels.BlogDTOs;
 using Application.ViewModels.AutoBidDTOs;
+using Application.ViewModels.NotificationDTOs;
 
 
 namespace Infrastructures
@@ -260,6 +261,7 @@ namespace Infrastructures
             CreateMap<Blog, UpdateBlogDTO>().ReverseMap();
             CreateMap<ImageBlog, ImageBlogDTO>().ReverseMap();
             CreateMap<AutoBid, CreateAutoBidDTO>().ReverseMap();
+            CreateMap<Notification, ViewNotificationDTO>().ReverseMap();
 
         }
     }

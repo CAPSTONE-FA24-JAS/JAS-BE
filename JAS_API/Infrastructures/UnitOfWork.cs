@@ -60,7 +60,7 @@ namespace Infrastructures
         private readonly IBlogRepository _blogRepository;
         private readonly IImageBlogRepository _imageBlogRepository;
         private readonly IAutoBidRepository _autoBidRepository;
-
+        private readonly INotificationRepository _notificationRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -85,7 +85,8 @@ namespace Infrastructures
                           IStatusInvoiceRepository statusInvoiceRepository, IRequestWithdrawRepository requestWithdrawRepository,
                           IHistoryStatusCustomerLotRepository historyStatusCustomerLotRepository,
                           IFeeShipRepository feeShipRepository, IFloorFeePersentRepository floorFeePersentRepository,
-                          IWatchingRepository watchingRepository, IBlogRepository blogRepository, IImageBlogRepository imageBlogRepository, IAutoBidRepository autoBidRepository) 
+                          IWatchingRepository watchingRepository, IBlogRepository blogRepository, IImageBlogRepository imageBlogRepository, IAutoBidRepository autoBidRepository,
+                          INotificationRepository notificationRepository) 
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -136,6 +137,7 @@ namespace Infrastructures
             _blogRepository = blogRepository;
             _imageBlogRepository = imageBlogRepository;
             _autoBidRepository = autoBidRepository;
+            _notificationRepository = notificationRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -216,6 +218,8 @@ namespace Infrastructures
         public IImageBlogRepository ImageBlogRepository => _imageBlogRepository;
 
         public IAutoBidRepository AutoBidRepository => _autoBidRepository;
+
+        public INotificationRepository NotificationRepository => _notificationRepository;
 
         public async Task<int> SaveChangeAsync()
         {
