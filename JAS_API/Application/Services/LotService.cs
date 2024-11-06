@@ -474,11 +474,13 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var lots = await _unitOfWork.CustomerLotRepository.GetAllAsync(condition: x => x.LotId == lotId && x.CustomerId == customerId);
-                if (lots.Count() > 0)
+                var customerLots = await _unitOfWork.CustomerLotRepository.GetAllAsync(condition: x => x.LotId == lotId && x.CustomerId == customerId);
+                if (customerLots.Count() > 0)
                 {
                     reponse.Code = 200;
-                    reponse.Data = true;
+                    var mapper = _mapper.Map<CheckCustomerInLotDTO>(customerLots.FirstOrDefault());
+                    mapper.Result = true;
+                    reponse.Data = mapper;
                     reponse.IsSuccess = true;
                     reponse.Message = $"Customer was joined to lot";
                 }

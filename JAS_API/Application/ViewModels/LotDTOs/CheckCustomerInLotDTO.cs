@@ -10,5 +10,7 @@ namespace Application.ViewModels.LotDTOs
     {
         public int CustomerId { get; set; }
         public int LotId { get; set; }
+        public int CustomerLotId { get; set; }
+        public bool Result { get; set; }
     }
 }

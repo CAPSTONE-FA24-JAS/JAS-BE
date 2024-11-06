@@ -574,22 +574,27 @@ namespace WebAPI.Service
                         {
                             var bidPriceFuture = player.CurrentPrice + player.AutoBids.FirstOrDefault(x => x.IsActive == true).NumberOfPriceStep;
                             var (isFuturePrice, price) = await _customerLotService.CheckBidPriceTop((float)bidPriceFuture, player.AutoBids.FirstOrDefault(x => x.IsActive == true));
+                            
+                            var bidData = new BidPrice
+                            {
+                                CurrentPrice = bidPriceFuture,
+                                BidTime = DateTime.UtcNow,
+                                CustomerId = player.CustomerId,
+                                LotId = player.LotId,
+                            };
                             if (isFuturePrice == true)
                             {
-                                //  await _customerLotService.UpdateAutoBidPrice(player.Id, (float)price);
-                                var bidData = new BidPrice
-                                {
-                                    CurrentPrice = bidPriceFuture,
-                                    BidTime = DateTime.UtcNow,
-                                    CustomerId = player.CustomerId,
-                                    LotId = player.LotId,
-                                };
-                                // Lưu dữ liệu đấu giá vào Redis
-                                _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, bidPriceFuture);
-
-                                string lotGroupName = $"lot-{player.LotId}";
-                                await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
+                                bidData.CurrentPrice = bidPriceFuture;
                             }
+                            else
+                            {
+                                bidData.CurrentPrice = price;
+                            }
+                            // Lưu dữ liệu đấu giá vào Redis
+                            _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, bidPriceFuture);
+
+                            string lotGroupName = $"lot-{player.LotId}";
+                            await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
                         }
                     }
                 }catch(Exception e)
