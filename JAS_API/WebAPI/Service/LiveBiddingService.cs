@@ -307,7 +307,7 @@ namespace WebAPI.Service
                     Description = $" Bạn đã win lot {lotId} và hệ thống đã tự động taoj invoice cho bạn",
                     Is_Read = false,
                     NotifiableId = invoice.Id,
-                    AccountId = winnerBid.Customer.AccountId,
+                    AccountId = winnerCustomerLot.Customer.AccountId,
                     CreationDate = DateTime.UtcNow
                 };
 
@@ -338,7 +338,15 @@ namespace WebAPI.Service
                         listCustomerLot.Add(loser);
 
                         var maxBidPriceLoser = await _unitOfWork.BidPriceRepository.GetMaxBidPriceByCustomerIdAndLot(loser.CustomerId, lotId);
-                        loser.CurrentPrice = maxBidPriceLoser.CurrentPrice;
+                        if(maxBidPriceLoser == null)
+                        {
+                            loser.CurrentPrice = 0;
+                        }
+                        else
+                        {
+                            loser.CurrentPrice = maxBidPriceLoser.CurrentPrice;
+                        }
+                        
                         _unitOfWork.CustomerLotRepository.Update(loser);
                         //lưu history của loser là refunded
                         var historyCustomerlotLoser = new HistoryStatusCustomerLot()
@@ -356,11 +364,11 @@ namespace WebAPI.Service
                             Description = $" Bạn đã thua lot {lotId} và hệ thống đã tự động hoàn cọc cho bạn",
                             Is_Read = false,
                             NotifiableId = loser.Id,  //cusrtomerLot => dẫn tới myBid
-                            AccountId = winnerBid.Customer.AccountId,
+                            AccountId = loser.Customer.AccountId,
                             CreationDate = DateTime.UtcNow
                         };
 
-                        await _unitOfWork.NotificationRepository.AddAsync(notification);                        
+                        await _unitOfWork.NotificationRepository.AddAsync(notificationloser);                        
 
                         //cap nhat transaction vi
                         var walletTrasaction = new WalletTransaction
@@ -369,7 +377,8 @@ namespace WebAPI.Service
                             DocNo = loser.Id,
                             Amount = winnerCustomerLot.Lot.Deposit,
                             TransactionTime = DateTime.UtcNow,
-                            Status = "Completed"
+                            Status = "Completed",
+                            WalletId = loser.Customer.Wallet.Id
                         };
                         await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrasaction);
 
@@ -384,9 +393,10 @@ namespace WebAPI.Service
 
                         };
                         await _unitOfWork.TransactionRepository.AddAsync(trasaction);
-                        await _unitOfWork.SaveChangeAsync();
+                        
                     }
                     _unitOfWork.CustomerLotRepository.UpdateRange(listCustomerLot);
+                   
                 }
                 await _unitOfWork.SaveChangeAsync();
             }
