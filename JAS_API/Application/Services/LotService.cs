@@ -636,7 +636,7 @@ namespace Application.Services
                     response.Message = $"The customer is not register into the lot";
                     return response;
                 }
-                var bidPriceExist = playerJoined.Lot.BidPrices.First(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
+                var bidPriceExist = playerJoined.Lot.BidPrices.FirstOrDefault(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
                 if (bidPriceExist != null)
                 {
                     response.Code = 400;
