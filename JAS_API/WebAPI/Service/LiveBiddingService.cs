@@ -200,9 +200,6 @@ namespace WebAPI.Service
                     
                         if (bidPrices.Count > 0)
                         {
-                            
-                            
-  
 
                             //thuc hien random va xu ly cho nguoi chien thang, nguoi thua
                             Random random = new Random();
