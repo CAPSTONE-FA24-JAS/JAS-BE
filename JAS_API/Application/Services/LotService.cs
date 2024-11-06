@@ -77,8 +77,27 @@ namespace Application.Services
                             
                             if (await _unitOfWork.SaveChangeAsync() > 0)
                             {
-                           
-                            _cacheService.SetLotInfo(lot);
+                            // Lưu lot vào Redis(dung hash)
+                            var lotRedis = new Lot
+                            {
+                                StartTime = lot.StartTime,
+                                EndTime = lot.EndTime,
+                                Id = lot.Id,
+                                Status = lot.Status,
+                                AuctionId = lot.AuctionId,
+                                StartPrice = lot.StartPrice,
+                                FinalPriceSold = lot.FinalPriceSold,
+                                BidIncrement = lot.BidIncrement,
+                                LotType = lot.LotType,
+                                BidIncrementTime = lot.BidIncrementTime,
+                                Title = lot.Title,
+                                Deposit = lot.Deposit,
+                                IsExtend = lot.IsExtend,
+                                HaveFinancialProof = lot.HaveFinancialProof,
+                                StaffId = lot.StaffId,
+                                JewelryId = lot.JewelryId,
+                            };
+                            _cacheService.SetLotInfo(lotRedis);
 
                                 reponse.Code = 200;
                                 reponse.IsSuccess = true;
