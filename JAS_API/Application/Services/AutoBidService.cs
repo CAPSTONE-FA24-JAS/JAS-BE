@@ -35,7 +35,7 @@ namespace Application.Services
                 }
                 else
                 {
-                    await _unitOfWork.AutoBidRepository.AddAsync(autoBid);
+                    _unitOfWork.AutoBidRepository.AddAsync(autoBid);
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         response.Message = $"Set New AutoBid Successfully";

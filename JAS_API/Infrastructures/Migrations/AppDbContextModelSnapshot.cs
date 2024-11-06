@@ -263,8 +263,8 @@ namespace Infrastructures.Migrations
                     b.Property<float?>("NumberOfPriceStep")
                         .HasColumnType("real");
 
-                    b.Property<DateTime?>("TimeIncrement")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<int?>("TimeIncrement")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

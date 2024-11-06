@@ -135,7 +135,7 @@ namespace Infrastructures
             _watchingRepository = watchingRepository;
             _blogRepository = blogRepository;
             _imageBlogRepository = imageBlogRepository;
-            _auctionRepository = auctionRepository;
+            _autoBidRepository = autoBidRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;

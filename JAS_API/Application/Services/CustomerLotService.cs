@@ -212,7 +212,8 @@ namespace Application.Services
             }
             return response;
         }
-        public async Task<(bool, float?)> CheckBidPriceTop(int priceFuture)
+        
+        public async Task<(bool, float?)> CheckBidPriceTop(float priceFuture, AutoBid autoBid)
         {
             try
             {
@@ -220,8 +221,8 @@ namespace Application.Services
                     .GetAllAsync(x => x.IsWinner == true);
 
                 var currentWinner = winnerCurrent?.FirstOrDefault();
-
-                if (currentWinner == null || currentWinner.CurrentPrice < priceFuture)
+                var autobidCurrent = autoBid;
+                if (currentWinner == null || currentWinner.CurrentPrice < priceFuture && priceFuture >= autobidCurrent.MinPrice && priceFuture <= autobidCurrent.MaxPrice)
                 {
                     return (true, priceFuture); // lấy giá future
                 }
@@ -234,6 +235,7 @@ namespace Application.Services
                 throw;
             }
         }
+        
         public async Task<APIResponseModel> UpdateAutoBidPrice(int customerLotId, float priceCurrent)
         {
             var response = new APIResponseModel();
@@ -251,10 +253,12 @@ namespace Application.Services
                 {
                     player.IsWinner = false;
                 }
+
                 winnerCurrentNew.IsWinner = true;
                 winnerCurrentNew.CurrentPrice = priceCurrent;
-
+                winnerCurrentNew.ModificationDate = DateTime.UtcNow;
                 winnerCurrentNew.Lot.CurrentPrice = priceCurrent;
+
                 if (await _unitOfWork.SaveChangeAsync() > 0)
                 {
                     response.Message = $"Update New Winner By AutoBid Successfully";
@@ -278,7 +282,29 @@ namespace Application.Services
             }
             return response;
         }
-
         
+        public async Task<bool> CheckTimeAutoBid(int customerLotId)
+        {
+            try
+            {
+                var playerCurent = await _unitOfWork.CustomerLotRepository
+                    .GetByIdAsync(customerLotId);
+                var timeOld = playerCurent.ModificationDate.HasValue ? playerCurent.ModificationDate.Value : playerCurent.CreationDate;
+                int timeCount = (int)(DateTime.UtcNow - timeOld).TotalMinutes;
+                var autoBid = playerCurent.AutoBids.FirstOrDefault(x => x.CustomerLotId == customerLotId && x.IsActive == true);
+                int timeIncrement = (int)autoBid.TimeIncrement;
+
+                if (timeCount >= timeIncrement)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
     }
 }
