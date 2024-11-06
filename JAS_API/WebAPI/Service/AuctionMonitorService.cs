@@ -22,10 +22,11 @@ namespace WebAPI.Service
                     await liveBiddingService.CheckLotStartAsync();
                     await liveBiddingService.ChecKLotEndAsync();
                     //await liveBiddingService.ChecKLotEndReducedBiddingAsync();
-                 //   await liveBiddingService.CheckLotBuyNowAsync();                
+                    //await liveBiddingService.CheckLotBuyNowAsync();                
                     await liveBiddingService.CheckLotFixedPriceAsync();
                     await liveBiddingService.CheckLotSercetAsync();
                     await liveBiddingService.ChecKAuctionEndAsync();
+                    await liveBiddingService.AutoBidAsync();
 
                 }
                 await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);

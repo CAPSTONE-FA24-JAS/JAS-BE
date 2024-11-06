@@ -557,7 +557,35 @@ namespace WebAPI.Service
                 }
             }
         }
-       
+        public async Task AutoBidAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _customerLotService = scope.ServiceProvider.GetRequiredService<ICustomerLotService>();
+                var customerLots = await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.AutoBids.FirstOrDefault().IsActive == true);
+                try
+                {
+                    foreach (var player in customerLots) 
+                    {   
+                        if (await _customerLotService.CheckTimeAutoBid(player.Id))
+                        {
+                            var bidPriceFuture = player.CurrentPrice + player.AutoBids.FirstOrDefault(x => x.IsActive == true).NumberOfPriceStep;
+                            var (isFuturePrice, price) = await _customerLotService.CheckBidPriceTop((float)bidPriceFuture, player.AutoBids.FirstOrDefault(x => x.IsActive == true));
+                            if (isFuturePrice == true)
+                            {
+                                await _customerLotService.UpdateAutoBidPrice(player.Id, (float)price);
+                                string lotGroupName = $"lot-{player.LotId}";
+                                await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
+                            }
+                        }
+                    }
+                }catch(Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
+            }
+        }
     }
 }
 
