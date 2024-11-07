@@ -18,9 +18,10 @@ namespace WebAPI.Controllers
         private readonly ITransactionService _transactionService;
         private readonly IClaimsService _claimsService;
         private readonly IInvoiceService _invoiceService;
+        private readonly ILotService _lotService;
          private readonly ILogger<WalletController> _logger;
 
-        public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService, IVNPayService vNPayService, IWalletTransactionService walletTransactionService, ITransactionService transactionService, IClaimsService claimsService, IInvoiceService invoiceService, ILogger<WalletController> logger)
+        public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService, IVNPayService vNPayService, IWalletTransactionService walletTransactionService, ITransactionService transactionService, IClaimsService claimsService, IInvoiceService invoiceService, ILogger<WalletController> logger, ILotService lotService)
         {
             _walletService = walletService;
             _vpnService = vpnService;
@@ -30,6 +31,7 @@ namespace WebAPI.Controllers
             _transactionService = transactionService;
             _claimsService = claimsService;
             _invoiceService = invoiceService;
+            _lotService = lotService;
             _logger = logger;
         }
 
@@ -184,7 +186,8 @@ namespace WebAPI.Controllers
                             };
 
                             var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
-
+                            var invoice = await _invoiceService.GetInvoiceById((int)trans.DocNo);
+                            await _walletService.RefundToWalletForUsersAsync(invoice.CustomerLot.Lot);
                             if (transactionResult.IsSuccess)
                             {
                                 return Ok(result);
@@ -248,23 +251,5 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RefundToWalletForUsers(int invoiceId)
-        {
-            var lotExist =  _invoiceService.GetLotInInvoice(invoiceId);
-            if(lotExist != null)
-            {
-                var result = await _walletService.RefundToWalletForUsersAsync(lotExist);
-                if (result.IsSuccess)
-                {
-                    return Ok(result);
-                }
-                else
-                {
-                    return BadRequest(result);
-                }
-            }
-            return BadRequest();
-        }
     }
 }

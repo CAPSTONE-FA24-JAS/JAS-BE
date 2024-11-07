@@ -40,6 +40,7 @@ namespace Application.Interfaces
 
         Task<APIResponseModel> GetRevenueByMonthWithYear(int month, int year);
         Task<APIResponseModel> TotalRevenue();
+        Task<Invoice?> GetInvoiceById(int id);
 
     }
 }
