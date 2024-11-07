@@ -507,6 +507,7 @@ namespace WebAPI.Service
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _foorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 //Xu ly luc tg ket thuc
                 var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow 
                                                                             && x.LotType == EnumLotType.Fixed_Price.ToString() 
@@ -541,9 +542,8 @@ namespace WebAPI.Service
                         {
                             lot.Status = EnumStatusLot.Passed.ToString();
                         }
-
+                        _cacheService.UpdateLotStatus(lot.Id, lot.Status);
                         lot.ActualEndTime = DateTime.UtcNow;
-                        
                         string lotGroupName = $"lot-{lot.Id}";
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforFixedPriceBiddingAuto", "Phiên đã kết thúc!");
                         await _unitOfWork.SaveChangeAsync();
@@ -559,6 +559,7 @@ namespace WebAPI.Service
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _foorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow && x.LotType == EnumLotType.Secret_Auction.ToString() && x.Status.ToLower().Trim().Equals(EnumStatusLot.Auctioning.ToString().ToLower().Trim()));
                 Invoice invoice;
                 if (lotEnds.Any())
@@ -590,6 +591,8 @@ namespace WebAPI.Service
                         {
                             lot.Status = EnumStatusLot.Passed.ToString();
                         }
+
+                        _cacheService.UpdateLotStatus(lot.Id, lot.Status);
                         string lotGroupName = $"lot-{lot.Id}";
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforSercetBiddingAuto", "Phiên đã kết thúc!");
                         lot.ActualEndTime = DateTime.UtcNow;
