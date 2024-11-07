@@ -38,5 +38,8 @@ namespace Application.Interfaces
         Task<APIResponseModel> DashBoardRevenueInYear(int year);
         Task<APIResponseModel> getInvoicesDeliveringByShipper(int shipperId, int? pageIndex, int? pageSize);
 
+        Task<APIResponseModel> GetRevenueByMonthWithYear(int month, int year);
+        Task<APIResponseModel> TotalRevenue();
+
     }
 }

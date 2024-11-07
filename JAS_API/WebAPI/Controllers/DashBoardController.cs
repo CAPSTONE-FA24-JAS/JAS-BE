@@ -18,14 +18,14 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> TotalRevenue()
         {
-            var result = await _transactionService.TotalRevenue();
+            var result = await _invoiceService.TotalRevenue();
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> TotalRevenueByMonthWithYear(int month, int year)
         {
-            var result = await _transactionService.GetRevenueByMonthWithYear(month, year);
+            var result = await _invoiceService.GetRevenueByMonthWithYear(month, year);
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
 
@@ -45,25 +45,25 @@ namespace WebAPI.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<IActionResult> TotalTransactionBreakDown()
-        {
-            return Ok();
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> TotalTransactionBreakDown()
+        //{
+        //    return Ok();
+        //}
 
-        [HttpGet]
-        public async Task<IActionResult> TotalProfit()
-        {
-            var result = await _transactionService.TotalProfit();
-            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> TotalProfit()
+        //{
+        //    var result = await _transactionService.TotalProfit();
+        //    return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+        //}
 
-        [HttpGet]
-        public async Task<IActionResult> TotalProfitByMonthWithYear(int month, int year)
-        {
-            var result = await _transactionService.TotalProfitByMonth(month, year);
-            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> TotalProfitByMonthWithYear(int month, int year)
+        //{
+        //    var result = await _transactionService.TotalProfitByMonth(month, year);
+        //    return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+        //}
 
         [HttpGet]
         public async Task<IActionResult> DashBoardRevenueInYear(int year)

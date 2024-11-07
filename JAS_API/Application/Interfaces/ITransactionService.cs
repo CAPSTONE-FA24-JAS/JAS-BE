@@ -14,8 +14,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> UpdateTransaction(int Id);
         Task<APIResponseModel> GetAllTransaction();
         Task<APIResponseModel> GetAllTransactionByTransType(int transTypeId);
-        Task<APIResponseModel> GetRevenueByMonthWithYear(int month, int year);
-        Task<APIResponseModel> TotalRevenue();
+        
         Task<APIResponseModel> TotalProfit();
         Task<APIResponseModel> TotalProfitByMonth(int month, int year);
     }

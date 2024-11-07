@@ -158,75 +158,7 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<APIResponseModel> GetRevenueByMonthWithYear(int month, int year)
-        {
-            var reponse = new APIResponseModel();
-            try
-            {
-                var totalTransactionOfCompanyByMonth = await _unitOfWork.TransactionRepository
-                                                        .GetAllAsync(x => x.TransactionTime.Value.Month == month 
-                                                                      && x.TransactionTime.Value.Year == year
-                                                                      && (x.TransactionType == EnumTransactionType.Banktransfer.ToString()
-                                                                      || x.TransactionType == EnumTransactionType.BuyPay.ToString()
-                                                                      || x.TransactionType == EnumTransactionType.AddWallet.ToString()));
-
-                if (!totalTransactionOfCompanyByMonth.Any())
-                {
-                    reponse.Message = $"Revenue of month {month} have nothing.";
-                    reponse.Code = 404;
-                    reponse.IsSuccess = true;
-                }
-                else
-                {
-                    reponse.Message = $"Received Revenue of month {month} successfully";
-                    reponse.Code = 200;
-                    reponse.IsSuccess = true;
-                    reponse.Data = _mapper.Map<ViewRevenueOfConpanyDTO>(totalTransactionOfCompanyByMonth);
-                }
-            }
-            catch (Exception ex)
-            {
-                reponse.ErrorMessages = ex.Message.Split(',').ToList();
-                reponse.Message = "Exception";
-                reponse.Code = 500;
-                reponse.IsSuccess = false;
-            }
-            return reponse;
-        }
-
-        public async Task<APIResponseModel> TotalRevenue()
-        {
-            var response = new APIResponseModel();
-            try
-            {
-                var totalRevenue = await _unitOfWork.TransactionRepository.GetAllAsync(x => (x.TransactionType == EnumTransactionType.Banktransfer.ToString()
-                                                                      || x.TransactionType == EnumTransactionType.BuyPay.ToString()
-                                                                      || x.TransactionType == EnumTransactionType.AddWallet.ToString()));
-                if (totalRevenue.Count > 0)
-                {
-
-                    response.Code = 200;
-                    response.Data = totalRevenue.Sum(x => x.Amount);
-                    response.IsSuccess = true;
-                    response.Message = $"Received Successfully Total Revenue: {totalRevenue.Sum(x => x.Amount)}.";
-                }
-                else
-                {
-                    response.Code = 200;
-                    response.Data = 0;
-                    response.IsSuccess = true;
-                    response.Message = $"Current Time System Haven't Revenue.";
-                }
-
-            }
-            catch (Exception ex)
-            {
-                response.Code = 500;
-                response.IsSuccess = false;
-                response.Message = $"Exception When System Processcing";
-            }
-            return response;
-        }
+        
 
         public async Task<APIResponseModel> TotalProfit()
         {
