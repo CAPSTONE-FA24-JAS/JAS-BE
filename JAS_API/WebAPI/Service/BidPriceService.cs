@@ -433,6 +433,7 @@ namespace Application.Services
                         var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
                         var limitbid = customer.PriceLimit;
                         var customerName = customer.LastName + " " + customer.FirstName;
+                    string redisKey = $"BidPrice:{conn.LotId}";
                     var lot = _cacheService.GetLotById(conn.LotId);
                     if (lot.HaveFinancialProof == true)
                     {
@@ -458,9 +459,9 @@ namespace Application.Services
                                 CustomerId = customerId,
                                 LotId = conn.LotId
                             };
-
+                           
                             // Lưu dữ liệu đấu giá vào Redis
-                            _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, request.CurrentPrice);
+                            _cacheService.SetSortedSetData<BidPrice>(redisKey, bidData, request.CurrentPrice);
 
 
                             //trar về name, giá ĐẤU, thời gian
@@ -486,7 +487,7 @@ namespace Application.Services
                         };
 
                         // Lưu dữ liệu đấu giá vào Redis
-                        _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, request.CurrentPrice);
+                        _cacheService.SetSortedSetData<BidPrice>(redisKey, bidData, request.CurrentPrice);
 
 
                         //trar về name, giá ĐẤU, thời gian
