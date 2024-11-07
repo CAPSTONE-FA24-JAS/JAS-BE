@@ -2,6 +2,7 @@
 using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.InvoiceDTOs;
+using Application.ViewModels.TransactionDTOs;
 using Application.ViewModels.ValuationDTOs;
 using Application.ViewModels.VNPayDTOs;
 using Application.ViewModels.WalletDTOs;
@@ -1166,6 +1167,71 @@ namespace Application.Services
                 return Revenue.Sum(x => x.TotalPrice);
             }
             return 0;
+        }
+
+        public async Task<APIResponseModel> GetRevenueByMonthWithYear(int month, int year)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var totalRevenueOfCompanyByMonth = await _unitOfWork.InvoiceRepository
+                                                        .GetAllAsync(x => x.CreationDate.Month == month
+                                                                      && x.Status == EnumCustomerLot.Finished.ToString());
+
+                if (!totalRevenueOfCompanyByMonth.Any())
+                {
+                    reponse.Message = $"Revenue of month {month} have nothing.";
+                    reponse.Code = 404;
+                    reponse.IsSuccess = true;
+                }
+                else
+                {
+                    reponse.Message = $"Received Revenue of month {month} successfully";
+                    reponse.Code = 200;
+                    reponse.IsSuccess = true;
+                    reponse.Data = _mapper.Map<ViewRevenueOfConpanyDTO>(totalRevenueOfCompanyByMonth);
+                }
+            }
+            catch (Exception ex)
+            {
+                reponse.ErrorMessages = ex.Message.Split(',').ToList();
+                reponse.Message = "Exception";
+                reponse.Code = 500;
+                reponse.IsSuccess = false;
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> TotalRevenue()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var totalRevenue = await _unitOfWork.InvoiceRepository.GetAllAsync(x => x.Status == EnumCustomerLot.Finished.ToString());
+                if (totalRevenue.Count > 0)
+                {
+
+                    response.Code = 200;
+                    response.Data = totalRevenue.Sum(x => x.TotalPrice);
+                    response.IsSuccess = true;
+                    response.Message = $"Received Successfully Total Revenue: {totalRevenue.Sum(x => x.TotalPrice)}.";
+                }
+                else
+                {
+                    response.Code = 200;
+                    response.Data = 0;
+                    response.IsSuccess = true;
+                    response.Message = $"Current Time System Haven't Revenue.";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processcing";
+            }
+            return response;
         }
     }
 

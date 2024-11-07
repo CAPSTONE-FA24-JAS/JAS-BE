@@ -247,8 +247,8 @@ namespace Infrastructures
 
             CreateMap<Transaction, ViewTransactionDTO>().ReverseMap();
             CreateMap<ViewCheckInvoiceHaveBill, Invoice>().ReverseMap();
-            CreateMap<Transaction, ViewRevenueOfConpanyDTO>()
-                .ForPath(dest => dest.Month , src => src.MapFrom(x => x.TransactionTime.Value.Month))
+            CreateMap<Invoice, ViewRevenueOfConpanyDTO>()
+                .ForPath(dest => dest.Month , src => src.MapFrom(x => x.CreationDate.Month))
                 .ReverseMap();
             CreateMap<IEnumerable<Transaction>, ViewRevenueOfConpanyDTO>()
                 .ForPath(dest => dest.Month, src => src.MapFrom(x => x.First().TransactionTime.Value.Month))
