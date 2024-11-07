@@ -1233,6 +1233,11 @@ namespace Application.Services
             }
             return response;
         }
+        public async Task<Invoice?> GetInvoiceById(int id)
+        {
+            var invoice = await _unitOfWork.InvoiceRepository.GetByIdAsync(id);
+            return (invoice != null) ? invoice : null;
+        }
     }
 
 
