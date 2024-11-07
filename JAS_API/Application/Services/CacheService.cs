@@ -345,6 +345,9 @@ namespace Application.Services
         elseif newPrice == highestBidPrice and newTime > highestBidTime then
             -- Không chấp nhận giá nếu giá mới bằng và thời gian sau hơn
             return 0
+        elseif newPrice < highestBidPrice and newTime > highestBidTime then
+            -- Không chấp nhận giá nếu giá mới nho và thời gian sau hơn
+            return 0
         else
             return 0
         end
@@ -369,7 +372,7 @@ namespace Application.Services
 
             // Thực hiện Lua script trong Redis
             var result = (int)_cacheDb.ScriptEvaluate(script, new RedisKey[] { redisKey },
-                new RedisValue[] { request.CurrentPrice, request.BidTime.ToString("yyyy-MM-dd HH:mm:ss.fff"), bidData });
+                new RedisValue[] { request.CurrentPrice, request.BidTime.ToString("yyyy-MM-dd HH:mm:ss"), bidData });
 
             return result == 1;
         }
