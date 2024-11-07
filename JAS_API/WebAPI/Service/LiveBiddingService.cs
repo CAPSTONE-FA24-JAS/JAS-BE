@@ -478,7 +478,7 @@ namespace WebAPI.Service
                     // nếu lot đó k có ai đấu giá thì đổi qua status passed, cập nhật lên cả redis và sql
                     if (bidPrices.Count == 0)
                     {
-
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionPublicEnded", "Phiên đã kết thúc!");
                         lot.Status = EnumStatusLot.Passed.ToString();
                         lot.ActualEndTime = endTime;
 
@@ -496,6 +496,8 @@ namespace WebAPI.Service
                         //nên chỉ cần lấy thằng đầu tiên)
                         //lưu status lot là sold
                         //  cập nhật lên cả redis và sql; cập nhật endLot actual, giá bán được
+
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionPublicEnded", "Phiên đã kết thúc!");
                         var winner = bidPrices.FirstOrDefault();
                         lot.Status = EnumStatusLot.Sold.ToString();
                         lot.ActualEndTime = endTime;
