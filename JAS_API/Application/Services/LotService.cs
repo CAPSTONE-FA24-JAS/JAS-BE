@@ -388,7 +388,8 @@ namespace Application.Services
 
                     var customerLot = _mapper.Map<CustomerLot>(registerToLotDTO);
                     customerLot.IsDeposit = true;
-
+                    await _unitOfWork.CustomerLotRepository.AddAsync(customerLot);
+                    await _unitOfWork.SaveChangeAsync();
                     var newTransactionWallet = new WalletTransaction
                     {
                         Amount = -depositOfLot,
@@ -418,7 +419,6 @@ namespace Application.Services
                     }
 
                     customerLot.Status = EnumCustomerLot.Registed.ToString();
-                    await _unitOfWork.CustomerLotRepository.AddAsync(customerLot);
 
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {

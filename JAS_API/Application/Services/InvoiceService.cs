@@ -550,6 +550,7 @@ namespace Application.Services
                                 Amount = -model.Amount,
                                 Status = EnumStatusTransaction.Completed.ToString(),
                                 transactionType = EnumTransactionType.BuyPay.ToString(),
+                                transactionPerson = model.CustomerId
                             };
 
                             var trans = new Transaction()
@@ -619,6 +620,7 @@ namespace Application.Services
                         Amount = (float)-model.Amount,
                         Status = EnumStatusTransaction.Pending.ToString(),
                         transactionType = EnumTransactionType.Banktransfer.ToString(),
+                        transactionPerson = (int)invoiceById.CustomerId
                     };
                     //invoiceById.InvoiceOfWalletTransaction = 
                     invoiceById.PaymentMethod = EnumPaymentType.Transfer.ToString();
@@ -671,6 +673,7 @@ namespace Application.Services
                     {
                         transactionType = EnumTransactionType.BuyPay.ToString(),
                         DocNo = model.InvoiceId,
+                        transactionPerson = (int)invoiceExist.CustomerId,
                     };
                     invoiceExist.Status = EnumCustomerLot.PendingPayment.ToString();
                     invoiceExist.PaymentMethod = EnumPaymentType.Wallet.ToString();

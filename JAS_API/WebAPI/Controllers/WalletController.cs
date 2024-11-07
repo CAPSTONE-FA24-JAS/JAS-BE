@@ -90,7 +90,7 @@ namespace WebAPI.Controllers
             var transaction = new WalletTransaction()
             {
                 transactionType = EnumTransactionType.AddWallet.ToString(),
-                transactionPerson = topUpWalletDTO.customerId,
+                transactionPerson = topUpWalletDTO.CustomerId,
                 DocNo = topUpWalletDTO.WalletId,
             };
             string paymentUrl = await _vpnService.CreatePaymentUrl(HttpContext, vnPayModel, transaction);
