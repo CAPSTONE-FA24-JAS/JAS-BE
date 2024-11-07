@@ -371,58 +371,6 @@ namespace Application.Services
         }
 
 
-        //        public bool PlaceBidWithLuaScript(int lotId, float bidPrice, DateTime bidTime, string customerId)
-        //        {
-        //            string script = @"
-        //    local key = KEYS[1]
-        //    local newPrice = tonumber(ARGV[1])
-        //    local newTime = ARGV[2]
-        //    local bidData = ARGV[3]
-
-        //    -- Lấy giá cao nhất hiện tại
-        //    local highestBid = redis.call('ZRANGE', key, -1, -1, 'WITHSCORES')
-        //    if #highestBid > 0 then
-        //        local highestBidData = cjson.decode(highestBid[1])
-        //        local highestBidPrice = tonumber(highestBid[2])
-        //        local highestBidTime = highestBidData.BidTime
-
-        //        -- Kiểm tra điều kiện giá mới phải lớn hơn giá cao nhất
-        //        if newPrice > highestBidPrice then
-        //            -- Chấp nhận giá mới và thêm vào SortedSet
-        //            redis.call('ZADD', key, newPrice, bidData)
-        //            return 1
-        //        elseif newPrice == highestBidPrice and newTime > highestBidTime then
-        //            -- Không chấp nhận giá nếu giá mới bằng và thời gian sau hơn
-        //            return 0
-        //        else
-        //            return 0
-        //        end
-        //    else
-        //        -- Nếu chưa có giá nào, chấp nhận giá đầu tiên
-        //        redis.call('ZADD', key, newPrice, bidData)
-        //        return 1
-        //    end
-        //";
-
-        //            // Chuỗi JSON của BidPrice
-        //            var bidData = JsonSerializer.Serialize(new BidPrice
-        //            {
-        //                CurrentPrice = bidPrice,
-        //                BidTime = bidTime,
-        //                CustomerId = customerId,
-        //                LotId = lotId
-        //            });
-
-        //            // Key Redis dựa trên LotId
-        //            string redisKey = $"BidPrice:{lotId}";
-
-        //            // Thực hiện Lua script trong Redis
-        //            var result = (int)_cacheDb.ScriptEvaluate(script, new RedisKey[] { redisKey },
-        //                new RedisValue[] { bidPrice, bidTime.ToString("yyyy-MM-dd HH:mm:ss.fff"), bidData });
-
-        //            return result == 1;
-        //        }
-
 
         private async Task ProcessBidPrice(BiddingInputDTO request, string lotGroupName, int customerId, string firstName, string lastName, int lotId, Lot lot)
         {

@@ -212,6 +212,7 @@ namespace WebAPI.Service
                             lot.ActualEndTime = DateTime.UtcNow;
                             lot.Status = EnumStatusLot.Sold.ToString();
                             _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Sold.ToString());
+                            
                             _unitOfWork.LotRepository.Update(lot);
                              await _unitOfWork.SaveChangeAsync();
 
@@ -436,8 +437,9 @@ namespace WebAPI.Service
                 }
                 else
                 {
+                    string redisKey = $"BidPrice:{lotId}";
                     // Truy xuất dữ liệu bid prices từ redis 
-                    var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == lot.Id);
+                    var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lot.Id);
                     await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
 
                     // nếu lot đó k có ai đấu giá thì đổi qua status passed, cập nhật lên cả redis và sql
