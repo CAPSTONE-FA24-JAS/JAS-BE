@@ -535,10 +535,15 @@ namespace WebAPI.Service
                                 Status = EnumCustomerLot.CreateInvoice.ToString()
                             };
                             await _unitOfWork.InvoiceRepository.AddAsync(invoice);
+                            lot.Status = EnumStatusLot.Sold.ToString();
+                        }
+                        else
+                        {
+                            lot.Status = EnumStatusLot.Passed.ToString();
                         }
 
                         lot.ActualEndTime = DateTime.UtcNow;
-                        lot.Status = EnumStatusLot.Passed.ToString();
+                        
                         string lotGroupName = $"lot-{lot.Id}";
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforFixedPriceBiddingAuto", "Phiên đã kết thúc!");
                         await _unitOfWork.SaveChangeAsync();
@@ -579,8 +584,12 @@ namespace WebAPI.Service
                                 Status = EnumCustomerLot.CreateInvoice.ToString()
                             };
                             await _unitOfWork.InvoiceRepository.AddAsync(invoice);
+                            lot.Status = EnumStatusLot.Sold.ToString();
                         }
-                        lot.Status = EnumStatusLot.Passed.ToString();
+                        else
+                        {
+                            lot.Status = EnumStatusLot.Passed.ToString();
+                        }
                         string lotGroupName = $"lot-{lot.Id}";
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforSercetBiddingAuto", "Phiên đã kết thúc!");
                         lot.ActualEndTime = DateTime.UtcNow;
