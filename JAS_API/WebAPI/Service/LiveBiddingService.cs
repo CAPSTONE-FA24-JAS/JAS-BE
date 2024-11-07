@@ -150,7 +150,8 @@ namespace WebAPI.Service
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string lotGroupName = $"lot-{lotId}";
-                var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == lotId);
+                string redisKey = $"BidPrice:{lotId}";
+                var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
                 var lot = _cacheService.GetLotById(lotId) ;
                 var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId) ;
                 if(bidPrices.Count ==  0)
@@ -182,13 +183,13 @@ namespace WebAPI.Service
                 string lotGroupName = $"lot-{lotId}";
 
                 var lot = _cacheService.GetLotById(lotId);
-                
+
                 //neu  den gio thi check xem co bidprice khong, neu cos  ket thuc phien va random winner
                 // neu k co bidPrice thi tiep tuc giam, cap nhat lai actualEndTime cho den khi 
-                
 
 
-                var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == lotId);
+                string redisKey = $"BidPrice:{lotId}";
+                var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
                 var currentPrice = lot.CurrentPrice ?? lot.StartPrice;
                 _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
                 await _hubContext.Clients.Group(lotGroupName).SendAsync("CurrentPriceForReduceBiddingWhenStartLot", "Giá đã hien tai!", currentPrice, DateTime.UtcNow);
@@ -212,8 +213,13 @@ namespace WebAPI.Service
                             lot.ActualEndTime = DateTime.UtcNow;
                             lot.Status = EnumStatusLot.Sold.ToString();
                             _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Sold.ToString());
-                            
-                            _unitOfWork.LotRepository.Update(lot);
+                            lot = _cacheService.GetLotById(lotId);
+                            var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+                               
+                            lotsql.CurrentPrice = winnerBid.CurrentPrice;
+                            lotsql.ActualEndTime = lot.ActualEndTime;
+                            lotsql.Status = EnumStatusLot.Sold.ToString();
+                            _unitOfWork.LotRepository.Update(lotsql);
                              await _unitOfWork.SaveChangeAsync();
 
                         //xu ly cho thang thang va thua
@@ -248,7 +254,7 @@ namespace WebAPI.Service
                         }
                     //lay lai lot tren redis
                         lot = _cacheService.GetLotById(lotId);
-                        bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == lotId);
+                        bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
                     }
             }
         }
@@ -260,7 +266,8 @@ namespace WebAPI.Service
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
-                var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == lotId);
+                string redisKey = $"BidPrice:{lotId}";
+                var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
 
 
                 //update customerLot
@@ -469,6 +476,7 @@ namespace WebAPI.Service
                         lot.CurrentPrice = winner.CurrentPrice;
                         _unitOfWork.LotRepository.Update(lot);
                         _cacheService.UpdateLotStatus(lotId, lot.Status);
+                        _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, winner.CurrentPrice);
                         await _unitOfWork.SaveChangeAsync();
 
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinner", "Phiên đã kết thúc!", winner.CustomerId, winner.CurrentPrice);
@@ -651,9 +659,9 @@ namespace WebAPI.Service
 
                                     player.Customer.PriceLimit -= bidPriceFuture;
                                     await _unitOfWork.SaveChangeAsync();
-
+                                    string redisKey = $"BidPrice:{player.LotId}";
                                     // Lưu dữ liệu đấu giá vào Redis
-                                    _cacheService.SetSortedSetData<BidPrice>("BidPrice", bidData, bidPriceFuture);
+                                    _cacheService.SetSortedSetData<BidPrice>(redisKey, bidData, bidPriceFuture);
 
                                     string lotGroupName = $"lot-{player.LotId}";
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
