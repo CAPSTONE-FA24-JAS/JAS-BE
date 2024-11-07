@@ -208,7 +208,7 @@ namespace Application.Services
                 var walletExits =  await CheckBalance(requestWithdrawDTO.WalletId);
                 if (walletExits.Data is WalletDTO cs && walletExits.IsSuccess)
                 {
-                    if (cs.Balance < requestWithdrawDTO.Amount)
+                    if ((float)cs.AvailableBalance < requestWithdrawDTO.Amount)
                     {
                         reponse.IsSuccess = false;
                         reponse.Code = 400;
@@ -394,7 +394,7 @@ namespace Application.Services
                         }
                         else
                         {
-                            reponse.Code = 500;
+                            reponse.Code = 400;
                             reponse.Message = "Error when saving";
                             reponse.IsSuccess = false;
                         }

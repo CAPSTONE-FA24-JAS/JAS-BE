@@ -57,31 +57,14 @@ namespace Application.Services
             walletTransaction.transactionId = tick;
             var walletTransactionResult = await _walletTransactionService.CreateNewTransaction(walletTransaction);
 
-            //if (walletTransaction.Status == EnumTransactionType.BuyPay.ToString())
-            //{
-                
-            //    var transactionResult = await _transactionService.CreateNewTransaction(trans);
-
-            //    if (walletTransactionResult.IsSuccess && transactionResult.IsSuccess)
-            //    {
-            //        if(await _unitOfWork.SaveChangeAsync() > 0)
-            //        {
-            //            var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
-            //            return paymentUrl;
-            //        }
-            //    }
-            //}
-            //else
-            //{
-                if (walletTransactionResult.IsSuccess)
+            if (walletTransactionResult.IsSuccess)
+            {
+                if (await _unitOfWork.SaveChangeAsync() > 0)
                 {
-                    if (await _unitOfWork.SaveChangeAsync() > 0)
-                    {
-                        var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
-                        return paymentUrl;
-                    }
+                    var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
+                    return paymentUrl;
                 }
-            //}
+            }
             return "";
         }
 
