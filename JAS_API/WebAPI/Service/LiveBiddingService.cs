@@ -171,6 +171,32 @@ namespace WebAPI.Service
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinner", "Phiên đã kết thúc va khong co dau gia");
 
                 }
+                else
+                {
+                    if(lot.Status == EnumStatusLot.Auctioning.ToString())
+                    {
+                        Random random = new Random();
+                        int winnerIndex = random.Next(bidPrices.Count);
+                        var winnerBid = bidPrices[winnerIndex];
+
+                        //cap nhat trang thai lot sold
+                        lot.CurrentPrice = winnerBid.CurrentPrice;
+                        lot.ActualEndTime = DateTime.UtcNow;
+                        lot.Status = EnumStatusLot.Sold.ToString();
+                        _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Sold.ToString());
+                        lot = _cacheService.GetLotById(lotId);
+                        
+
+                        lotsql.CurrentPrice = winnerBid.CurrentPrice;
+                        lotsql.ActualEndTime = lot.ActualEndTime;
+                        lotsql.Status = EnumStatusLot.Sold.ToString();
+                        _unitOfWork.LotRepository.Update(lotsql);
+                        await _unitOfWork.SaveChangeAsync();
+
+                        //xu ly cho thang thang va thua
+                        await HandleWinnerAndLoserLot(lotId, winnerBid);
+                    }
+                }
             }          
         }
 
