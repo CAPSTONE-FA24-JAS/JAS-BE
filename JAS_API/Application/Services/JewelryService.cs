@@ -129,7 +129,7 @@ namespace Application.Services
                         keyDTO.JewelryId = jewelry.Id;
                         keyCharacteristicDetails.Add(keyDTO);                       
                     }
-                    await _unitOfWork.KeyCharacteristicsDetailRepository.AddRangeAsync(keyCharacteristicDetails);
+                   await _unitOfWork.KeyCharacteristicsDetailRepository.AddRangeAsync(keyCharacteristicDetails);
                     await _unitOfWork.SaveChangeAsync();
                 }
 
