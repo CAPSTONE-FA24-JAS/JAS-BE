@@ -348,6 +348,9 @@ namespace Application.Services
         elseif newPrice < highestBidPrice and newTime > highestBidTime then
             -- Không chấp nhận giá nếu giá mới nho và thời gian sau hơn
             return 0
+        elseif newPrice < highestBidPrice and newTime < highestBidTime then
+            -- Không chấp nhận giá nếu giá mới nho và thời gian sau hơn
+            return 1
         else
             return 0
         end
