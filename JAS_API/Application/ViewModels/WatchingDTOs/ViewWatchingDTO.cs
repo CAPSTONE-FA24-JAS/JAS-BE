@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.ViewModels.JewelryDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,5 +12,6 @@ namespace Application.ViewModels.WatchingDTOs
         public int Id { get; set; }
         public int? CustomerId { get; set; }
         public int? JewelryId { get; set; }
+        public JewelryDTO? jewelryDTO { get; set; }
     }
 }

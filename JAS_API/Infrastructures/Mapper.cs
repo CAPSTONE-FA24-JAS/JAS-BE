@@ -254,7 +254,9 @@ namespace Infrastructures
                 .ForPath(dest => dest.Month, src => src.MapFrom(x => x.First().TransactionTime.Value.Month))
                 .ForPath(dest => dest.TotalRevenue, src => src.MapFrom(x => x.Sum( x => x.Amount)));
             CreateMap<Watching, CreateWatchingDTO>().ReverseMap();
-            CreateMap<Watching, ViewWatchingDTO>().ReverseMap();
+            CreateMap<Watching, ViewWatchingDTO>()
+                .ForMember(dest => dest.jewelryDTO, src => src.MapFrom(x => x.Jewelry))
+                .ReverseMap();
             CreateMap<Blog, ViewBlogDTO>()
                 .ForMember(dest => dest.imageBlogDTOs, src => src.MapFrom(x => x.ImageBlogs))
                 .ReverseMap();
