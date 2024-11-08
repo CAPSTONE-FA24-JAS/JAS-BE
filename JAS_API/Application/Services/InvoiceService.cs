@@ -14,6 +14,7 @@ using Domain.Entity;
 using Domain.Enums;
 using iTextSharp.text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -337,6 +338,7 @@ namespace Application.Services
                             Amount = invoiceById.CustomerLot.Lot.Deposit,
                             TransactionTime = wallerTransaction.TransactionTime,
                             TransactionType = EnumTransactionType.SellerPay.ToString(),
+                            TransactionPerson = invoiceById.CustomerLot.CustomerId
                         };
                         await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
 
