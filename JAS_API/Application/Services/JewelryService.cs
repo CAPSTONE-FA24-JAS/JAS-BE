@@ -171,7 +171,7 @@ namespace Application.Services
                     Title = $"Final valuation Id:  {jewelry.Id} has been create",
                     Description = $" Thẩm định đã tạo định giá cuối cho valuation Id : {jewelry.Id}",
                     Is_Read = false,
-                    NotifiableId = jewelry.Id,  //valuationId
+                    NotifiableId = jewelry.ValuationId,  //valuationId
                     AccountId = jewelry.Valuation.Staff.AccountId,
                     CreationDate = DateTime.UtcNow,
                     Notifi_Type = "FinalValuation"
