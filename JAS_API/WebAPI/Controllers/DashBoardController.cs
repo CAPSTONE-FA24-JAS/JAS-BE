@@ -83,5 +83,12 @@ namespace WebAPI.Controllers
             var result = await _dashboardService.GetTopFiveJewelryAuctionsAsync();
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
+        
+        [HttpGet]
+        public async Task<IActionResult> TopFiveSellersAsync()
+        {
+            var result = await _dashboardService.GetTopFiveSellersAsync();
+            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+        }
     }
 }
