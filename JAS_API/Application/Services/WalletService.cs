@@ -430,36 +430,36 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<APIResponseModel> RefundToWalletForUsersAsync(Lot lot)
+        public async Task<APIResponseModel> RefundToWalletForUsersAsync(List<CustomerLot> customerLot) 
         {
             var reponse = new APIResponseModel();
             try
             {
-                foreach (var user in lot.CustomerLots.Where(x => x.IsWinner == false)) 
+                foreach (var loser in customerLot) 
                 {
                     //thuc hien hoan vi
-                    var walletOfUser = user.Customer.Wallet;
-                    walletOfUser.Balance += (decimal?)lot.Deposit;
-                    walletOfUser.AvailableBalance += (decimal?)lot.Deposit;
+                    var walletOfUser = loser.Customer.Wallet;
+                    walletOfUser.Balance += (decimal?)loser.Lot.Deposit;
+                    walletOfUser.AvailableBalance += (decimal?)loser.Lot.Deposit;
                     //tao transaction
                     var transactionCompany = new Transaction()
                     {
-                        DocNo = user.Id,
-                        Amount = lot.Deposit,
+                        DocNo = loser.Id,
+                        Amount = loser.Lot.Deposit,
                         TransactionTime = DateTime.Now,
                         TransactionType = EnumTransactionType.RefundDeposit.ToString(),
-                        TransactionPerson = user.CustomerId,
+                        TransactionPerson = loser.CustomerId,
                     };
 
                     var transactionWallet = new WalletTransaction()
                     {
-                        DocNo = user.Id,
-                        Amount = lot.Deposit,
+                        DocNo = loser.Id,
+                        Amount = loser.Lot.Deposit,
                         TransactionTime = DateTime.Now,
                         transactionType = EnumTransactionType.RefundDeposit.ToString(),
-                        transactionPerson = (int)user.CustomerId,
+                        transactionPerson = (int)loser.CustomerId,
                         Status = EnumStatusTransaction.Completed.ToString(),
-                        WalletId = user.Customer.Wallet.Id
+                        WalletId = loser.Customer.Wallet.Id
                     };
 
                     await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
