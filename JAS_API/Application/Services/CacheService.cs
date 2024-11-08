@@ -340,7 +340,7 @@ namespace Application.Services
         -- Kiểm tra điều kiện giá mới phải lớn hơn giá cao nhất
         if newPrice > highestBidPrice then
             -- Chấp nhận giá mới và thêm vào SortedSet
-            redis.call('ZADD', key, newPrice, bidData)
+            redis.call('ZADD', key, 'GT', newPrice, bidData)
             return 1
         elseif newPrice == highestBidPrice and newTime > highestBidTime then
             -- Không chấp nhận giá nếu giá mới bằng và thời gian sau hơn
@@ -348,9 +348,6 @@ namespace Application.Services
         elseif newPrice < highestBidPrice and newTime > highestBidTime then
             -- Không chấp nhận giá nếu giá mới nho và thời gian sau hơn
             return 0
-        elseif newPrice < highestBidPrice and newTime < highestBidTime then
-            -- Không chấp nhận giá nếu giá mới nho và thời gian sau hơn
-            return 1
         else
             return 0
         end
@@ -369,13 +366,13 @@ namespace Application.Services
                 CustomerId = customerId,
                 LotId = lotId
             });
-
+            var timestamp = new DateTimeOffset(request.BidTime).ToUnixTimeSeconds();
             // Key Redis dựa trên LotId
             string redisKey = $"BidPrice:{lotId}";
 
             // Thực hiện Lua script trong Redis
             var result = (int)_cacheDb.ScriptEvaluate(script, new RedisKey[] { redisKey },
-                new RedisValue[] { request.CurrentPrice, request.BidTime.ToString("yyyy-MM-dd HH:mm:ss"), bidData });
+                new RedisValue[] { request.CurrentPrice, timestamp, bidData });
 
             return result == 1;
         }

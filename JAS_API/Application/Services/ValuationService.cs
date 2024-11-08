@@ -192,7 +192,8 @@ namespace Application.Services
                         Is_Read = false,
                         NotifiableId = id,  //valuationId
                         AccountId = staff.AccountId,
-                        CreationDate = DateTime.UtcNow
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "Valuation"
                     };
 
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
@@ -248,7 +249,8 @@ namespace Application.Services
                         Is_Read = false,
                         NotifiableId = id,  //valuationId
                         AccountId = valuationById.Seller.AccountId,
-                        CreationDate = DateTime.UtcNow
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "Valuation"
                     };
 
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
@@ -574,7 +576,8 @@ namespace Application.Services
                             Is_Read = false,
                             NotifiableId = id,  //valuationId
                             AccountId = valuationById.Seller.AccountId,
-                            CreationDate = DateTime.UtcNow
+                            CreationDate = DateTime.UtcNow,
+                            Notifi_Type = "Valuation"
                         };
 
                         await _unitOfWork.NotificationRepository.AddAsync(notification);
