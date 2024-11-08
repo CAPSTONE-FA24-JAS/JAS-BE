@@ -216,7 +216,7 @@ namespace WebAPI.Service
 
                 string redisKey = $"BidPrice:{lotId}";
                 var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
-                await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
+                
 
                 var currentPrice = lot.CurrentPrice ?? lot.StartPrice;
                 _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
@@ -230,9 +230,9 @@ namespace WebAPI.Service
                     
                         if (bidPrices.Count > 0)
                         {
-
-                            //thuc hien random va xu ly cho nguoi chien thang, nguoi thua
-                            Random random = new Random();
+                        
+                        //thuc hien random va xu ly cho nguoi chien thang, nguoi thua
+                        Random random = new Random();
                             int winnerIndex = random.Next(bidPrices.Count);
                             var winnerBid = bidPrices[winnerIndex];
 
@@ -248,10 +248,12 @@ namespace WebAPI.Service
                             lotsql.ActualEndTime = DateTime.UtcNow;
                             lotsql.Status = EnumStatusLot.Sold.ToString();
                             _unitOfWork.LotRepository.Update(lotsql);
-                             await _unitOfWork.SaveChangeAsync();
+                            await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
+                            await _unitOfWork.SaveChangeAsync();
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedReduceBidding", "Phien đa ket thuc");
 
                         //xu ly cho thang thang va thua
-                             await HandleWinnerAndLoserLot(lotId, winnerBid);
+                        await HandleWinnerAndLoserLot(lotId, winnerBid);
                             break;
                         }
                         else
