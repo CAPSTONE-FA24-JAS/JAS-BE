@@ -3,12 +3,20 @@
   "WorkspaceRootPath": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\services\\cacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\services\\cacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A79BE9A5-9E19-4DB3-AE25-DB1E19130771}|Domain\\Domain.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\domain\\enums\\enumcustomerlot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A79BE9A5-9E19-4DB3-AE25-DB1E19130771}|Domain\\Domain.csproj|solutionrelative:domain\\enums\\enumcustomerlot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{727B01DE-869A-4B1D-BF21-7C5792481A24}|Infrastructures\\Infrastructures.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\infrastructures\\repositories\\customerlotrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{727B01DE-869A-4B1D-BF21-7C5792481A24}|Infrastructures\\Infrastructures.csproj|solutionrelative:infrastructures\\repositories\\customerlotrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\services\\customerlotservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\services\\customerlotservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\services\\cacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\services\\cacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\services\\invoiceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -27,20 +35,12 @@
       "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\service\\bidpriceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{727B01DE-869A-4B1D-BF21-7C5792481A24}|Infrastructures\\Infrastructures.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\infrastructures\\repositories\\customerlotrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{727B01DE-869A-4B1D-BF21-7C5792481A24}|Infrastructures\\Infrastructures.csproj|solutionrelative:infrastructures\\repositories\\customerlotrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\controllers\\customerlotscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\controllers\\customerlotscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A79BE9A5-9E19-4DB3-AE25-DB1E19130771}|Domain\\Domain.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\domain\\enums\\enumstatuslot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A79BE9A5-9E19-4DB3-AE25-DB1E19130771}|Domain\\Domain.csproj|solutionrelative:domain\\enums\\enumstatuslot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A79BE9A5-9E19-4DB3-AE25-DB1E19130771}|Domain\\Domain.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\domain\\enums\\enumcustomerlot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A79BE9A5-9E19-4DB3-AE25-DB1E19130771}|Domain\\Domain.csproj|solutionrelative:domain\\enums\\enumcustomerlot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\controllers\\bidpricescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -185,7 +185,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 9,
+          "SelectedChildIndex": 15,
           "Children": [
             {
               "$type": "Bookmark",
@@ -221,20 +221,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "CustomerLotService.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Services\\CustomerLotService.cs",
               "RelativeDocumentMoniker": "Application\\Services\\CustomerLotService.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Services\\CustomerLotService.cs",
               "RelativeToolTip": "Application\\Services\\CustomerLotService.cs",
-              "ViewState": "AQIAAKMAAAAAAAAAAAAgwLAAAAAuAAAA",
+              "ViewState": "AQIAAJgAAAAAAAAAAAAYwKkAAABfAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-07T15:55:25.928Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "CacheService.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Services\\CacheService.cs",
               "RelativeDocumentMoniker": "Application\\Services\\CacheService.cs",
@@ -247,20 +247,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "LiveBiddingService.cs",
-              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\LiveBiddingService.cs",
-              "RelativeDocumentMoniker": "WebAPI\\Service\\LiveBiddingService.cs",
-              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\LiveBiddingService.cs",
-              "RelativeToolTip": "WebAPI\\Service\\LiveBiddingService.cs",
-              "ViewState": "AQIAAIwBAAAAAAAAAAAewJMBAAA3AAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-06T05:23:25.485Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "BidPriceService.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\BidPriceService.cs",
               "RelativeDocumentMoniker": "WebAPI\\Service\\BidPriceService.cs",
@@ -273,7 +260,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "ValuationService.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Services\\ValuationService.cs",
               "RelativeDocumentMoniker": "Application\\Services\\ValuationService.cs",
@@ -286,7 +273,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "InvoiceService.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Services\\InvoiceService.cs",
               "RelativeDocumentMoniker": "Application\\Services\\InvoiceService.cs",
@@ -299,20 +286,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 1,
               "Title": "CustomerLotRepository.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Infrastructures\\Repositories\\CustomerLotRepository.cs",
               "RelativeDocumentMoniker": "Infrastructures\\Repositories\\CustomerLotRepository.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Infrastructures\\Repositories\\CustomerLotRepository.cs",
               "RelativeToolTip": "Infrastructures\\Repositories\\CustomerLotRepository.cs",
-              "ViewState": "AQIAAE4AAAAAAAAAAAAowDEAAAAAAAAA",
+              "ViewState": "AQIAADwAAAAAAAAAAAAvwE0AAABfAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-07T16:03:27.289Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "CustomerLotsController.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Controllers\\CustomerLotsController.cs",
               "RelativeDocumentMoniker": "WebAPI\\Controllers\\CustomerLotsController.cs",
@@ -325,7 +312,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 0,
+              "Title": "EnumCustomerLot.cs",
+              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Domain\\Enums\\EnumCustomerLot.cs",
+              "RelativeDocumentMoniker": "Domain\\Enums\\EnumCustomerLot.cs",
+              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Domain\\Enums\\EnumCustomerLot.cs",
+              "RelativeToolTip": "Domain\\Enums\\EnumCustomerLot.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-06T08:32:34.134Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "LiveBiddingService.cs",
+              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\LiveBiddingService.cs",
+              "RelativeDocumentMoniker": "WebAPI\\Service\\LiveBiddingService.cs",
+              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\LiveBiddingService.cs",
+              "RelativeToolTip": "WebAPI\\Service\\LiveBiddingService.cs",
+              "ViewState": "AQIAAIwBAAAAAAAAAAAewJMBAAA3AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-06T05:23:25.485Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
               "Title": "EnumStatusLot.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Domain\\Enums\\EnumStatusLot.cs",
               "RelativeDocumentMoniker": "Domain\\Enums\\EnumStatusLot.cs",
@@ -333,7 +346,8 @@
               "RelativeToolTip": "Domain\\Enums\\EnumStatusLot.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAaAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-07T15:57:51.468Z"
+              "WhenOpened": "2024-11-07T15:57:51.468Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -343,22 +357,10 @@
               "RelativeDocumentMoniker": "WebAPI\\Controllers\\BidPricesController.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Controllers\\BidPricesController.cs",
               "RelativeToolTip": "WebAPI\\Controllers\\BidPricesController.cs",
-              "ViewState": "AQIAABkAAAAAAAAAAAAQwAAAAAAAAAAA",
+              "ViewState": "AQIAABkAAAAAAAAAAAAzwAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-07T15:54:33.902Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "EnumCustomerLot.cs",
-              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Domain\\Enums\\EnumCustomerLot.cs",
-              "RelativeDocumentMoniker": "Domain\\Enums\\EnumCustomerLot.cs",
-              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Domain\\Enums\\EnumCustomerLot.cs",
-              "RelativeToolTip": "Domain\\Enums\\EnumCustomerLot.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-06T08:32:34.134Z"
             },
             {
               "$type": "Document",
@@ -370,7 +372,8 @@
               "RelativeToolTip": "WebAPI\\Controllers\\NotificationsController.cs",
               "ViewState": "AQIAAAgAAAAAAAAAAAAAwCoAAABbAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-07T13:57:36.963Z"
+              "WhenOpened": "2024-11-07T13:57:36.963Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -382,7 +385,8 @@
               "RelativeToolTip": "WebAPI\\Service\\AuctionMonitorService.cs",
               "ViewState": "AQIAAAsAAAAAAAAAAAAUwBcAAAAUAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-05T15:30:21.717Z"
+              "WhenOpened": "2024-11-05T15:30:21.717Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -392,7 +396,7 @@
               "RelativeDocumentMoniker": "Application\\Services\\JewelryService.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Services\\JewelryService.cs",
               "RelativeToolTip": "Application\\Services\\JewelryService.cs",
-              "ViewState": "AQIAAIMAAAAAAAAAAAAAAIMAAAATAAAA",
+              "ViewState": "AQIAAIAAAAAAAAAAAIBJwIMAAAATAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-06T08:45:06.258Z",
               "EditorCaption": ""
@@ -407,7 +411,8 @@
               "RelativeToolTip": "Infrastructures\\Repositories\\JewelryRepository.cs",
               "ViewState": "AQIAADIAAAAAAAAAAAAMwEsAAAAIAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T18:05:23.555Z"
+              "WhenOpened": "2024-11-01T18:05:23.555Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -419,7 +424,8 @@
               "RelativeToolTip": "Application\\Services\\NotificationService.cs",
               "ViewState": "AQIAAJ8AAAAAAAAAAAAswL0AAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-06T07:57:36.502Z"
+              "WhenOpened": "2024-11-06T07:57:36.502Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -457,7 +463,8 @@
               "RelativeToolTip": "Infrastructures\\Mapper.cs",
               "ViewState": "AQIAAL4AAAAAAAAAAAAQwOAAAABTAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T13:27:13.536Z"
+              "WhenOpened": "2024-11-01T13:27:13.536Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -467,9 +474,10 @@
               "RelativeDocumentMoniker": "Application\\Interfaces\\IValuationService.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Interfaces\\IValuationService.cs",
               "RelativeToolTip": "Application\\Interfaces\\IValuationService.cs",
-              "ViewState": "AQIAAA8AAAAAAAAAAAA1wC8AAABZAAAA",
+              "ViewState": "AQIAABAAAAAAAAAAAAAQwC8AAABZAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-06T08:33:18.758Z"
+              "WhenOpened": "2024-11-06T08:33:18.758Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -479,9 +487,10 @@
               "RelativeDocumentMoniker": "Domain\\Entity\\Valuation.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Domain\\Entity\\Valuation.cs",
               "RelativeToolTip": "Domain\\Entity\\Valuation.cs",
-              "ViewState": "AQIAAAYAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "ViewState": "AQIAAAMAAAAAAAAAAIBJwAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-06T08:39:51.339Z"
+              "WhenOpened": "2024-11-06T08:39:51.339Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -493,7 +502,8 @@
               "RelativeToolTip": "Domain\\Entity\\Notification.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAA8AAAArAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-06T08:12:46.582Z"
+              "WhenOpened": "2024-11-06T08:12:46.582Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -518,7 +528,8 @@
               "RelativeToolTip": "WebAPI\\wwwroot\\HtmlFiles\\Receipt.html",
               "ViewState": "AQIAAFIAAAAAAAAAAAAUwHIAAABKAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2024-11-02T04:42:29.629Z"
+              "WhenOpened": "2024-11-02T04:42:29.629Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -530,7 +541,8 @@
               "RelativeToolTip": "Application\\Utils\\HelperValuation.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAuwA4AAAAfAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T14:27:58.565Z"
+              "WhenOpened": "2024-11-01T14:27:58.565Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -542,7 +554,8 @@
               "RelativeToolTip": "WebAPI\\Controllers\\DashBoardController.cs",
               "ViewState": "AQIAAAMAAAAAAAAAAAAhwCMAAAAvAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-05T11:03:27.519Z"
+              "WhenOpened": "2024-11-05T11:03:27.519Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -552,7 +565,8 @@
               "ToolTip": "C:\\Program Files\\dotnet\\sdk\\8.0.303\\Sdks\\Microsoft.NET.Sdk\\targets\\Microsoft.PackageDependencyResolution.targets",
               "ViewState": "AQIAAOgAAAAAAAAAAAAmwAkBAAAEAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
-              "WhenOpened": "2024-11-05T11:03:44.547Z"
+              "WhenOpened": "2024-11-05T11:03:44.547Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -564,7 +578,8 @@
               "RelativeToolTip": "Application\\Services\\GeneratePdfService.cs",
               "ViewState": "AQIAACoAAAAAAAAAAAAYwFYAAAAuAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-02T04:33:22.37Z"
+              "WhenOpened": "2024-11-02T04:33:22.37Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -576,7 +591,8 @@
               "RelativeToolTip": "Application\\Utils\\CreateAuthorizedPDFFile.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-02T04:28:34.008Z"
+              "WhenOpened": "2024-11-02T04:28:34.008Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -588,7 +604,8 @@
               "RelativeToolTip": "Application\\Utils\\CreatePDFFile.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-04T17:35:43.551Z"
+              "WhenOpened": "2024-11-04T17:35:43.551Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -598,9 +615,10 @@
               "RelativeDocumentMoniker": "Domain\\Entity\\Jewelry.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Domain\\Entity\\Jewelry.cs",
               "RelativeToolTip": "Domain\\Entity\\Jewelry.cs",
-              "ViewState": "AQIAAAMAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAIBJwAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-02T04:36:07.302Z"
+              "WhenOpened": "2024-11-02T04:36:07.302Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -612,7 +630,8 @@
               "RelativeToolTip": "Application\\Repositories\\IInvoiceRepository.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAABYAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-02T04:07:32.559Z"
+              "WhenOpened": "2024-11-02T04:07:32.559Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -624,7 +643,8 @@
               "RelativeToolTip": "WebAPI\\GiayUyQuyen_33.pdf",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-11-02T04:17:44.248Z"
+              "WhenOpened": "2024-11-02T04:17:44.248Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -636,7 +656,8 @@
               "RelativeToolTip": "WebAPI\\wwwroot\\HtmlFiles\\UyQuyen.html",
               "ViewState": "AQIAACcAAAAAAAAAAAAuwC8AAAAtAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2024-11-01T20:34:19.987Z"
+              "WhenOpened": "2024-11-01T20:34:19.987Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -648,7 +669,8 @@
               "RelativeToolTip": "Application\\ViewModels\\ValuationDTOs\\ValuationListDTO.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAuwBQAAAAzAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-01T13:21:24.149Z"
+              "WhenOpened": "2024-11-01T13:21:24.149Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -660,7 +682,8 @@
               "RelativeToolTip": "Application\\Interfaces\\IAuctionService.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAAA3AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-30T22:58:57.377Z"
+              "WhenOpened": "2024-10-30T22:58:57.377Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -672,7 +695,8 @@
               "RelativeToolTip": "Domain\\Enums\\EnumTransactionType.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-30T14:30:25.58Z"
+              "WhenOpened": "2024-10-30T14:30:25.58Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -682,9 +706,10 @@
               "RelativeDocumentMoniker": "Application\\Interfaces\\IJewelryService.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Interfaces\\IJewelryService.cs",
               "RelativeToolTip": "Application\\Interfaces\\IJewelryService.cs",
-              "ViewState": "AQIAAAYAAAAAAAAAAAAAAB0AAABKAAAA",
+              "ViewState": "AQIAAAMAAAAAAAAAAIBJwB0AAABKAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-30T23:28:22.78Z"
+              "WhenOpened": "2024-10-30T23:28:22.78Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -694,7 +719,7 @@
               "RelativeDocumentMoniker": "Application\\Services\\AuctionService.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Services\\AuctionService.cs",
               "RelativeToolTip": "Application\\Services\\AuctionService.cs",
-              "ViewState": "AQIAAIMBAAAAAAAAAAAAAIsBAABEAAAA",
+              "ViewState": "AQIAAIABAAAAAAAAAIBJwIsBAAANAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-10-29T18:14:55.607Z",
               "EditorCaption": ""
@@ -709,7 +734,8 @@
               "RelativeToolTip": "Infrastructures\\Repositories\\AuctionRepository.cs",
               "ViewState": "AQIAAAsAAAAAAAAAAAAxwBkAAAAtAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-29T18:48:25.361Z"
+              "WhenOpened": "2024-10-29T18:48:25.361Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -721,7 +747,8 @@
               "RelativeToolTip": "Domain\\Enums\\EnumStatusTransaction.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-30T14:30:18.55Z"
+              "WhenOpened": "2024-10-30T14:30:18.55Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -731,9 +758,10 @@
               "RelativeDocumentMoniker": "Infrastructures\\Repositories\\LotRepository.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Infrastructures\\Repositories\\LotRepository.cs",
               "RelativeToolTip": "Infrastructures\\Repositories\\LotRepository.cs",
-              "ViewState": "AQIAABoAAAAAAAAAAAAwwCcAAAABAAAA",
+              "ViewState": "AQIAABoAAAAAAAAAAAA/wCcAAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-29T18:48:17.987Z"
+              "WhenOpened": "2024-10-29T18:48:17.987Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -745,7 +773,8 @@
               "RelativeToolTip": "Application\\Repositories\\IAuctionRepository.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAuwAsAAAAUAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-29T18:49:38.818Z"
+              "WhenOpened": "2024-10-29T18:49:38.818Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -757,7 +786,8 @@
               "RelativeToolTip": "Application\\Interfaces\\ILotService.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-29T18:54:56.899Z"
+              "WhenOpened": "2024-10-29T18:54:56.899Z",
+              "EditorCaption": ""
             }
           ]
         }
