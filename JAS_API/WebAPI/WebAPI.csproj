@@ -56,4 +56,9 @@
 	  <None Include="wwwroot\HtmlFiles\Receipt.html" />
 	  <None Include="wwwroot\HtmlFiles\UyQuyen.html" />
 	</ItemGroup>
+	<ItemGroup>
+    <None Update="runtimes/win-x86/native/libwkhtmltox.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+</ItemGroup>
 </Project>
