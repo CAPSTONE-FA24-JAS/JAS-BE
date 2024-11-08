@@ -96,11 +96,13 @@ namespace Application.Services
                 if (notificationById != null)
                 {
                     notificationById.Is_Read = true;
-                    var valuation = _mapper.Map<ViewNotificationDTO>(notificationById);
+                    _unitOfWork.NotificationRepository.Update(notificationById);
+                    await _unitOfWork.SaveChangeAsync();
+                    var notification = _mapper.Map<ViewNotificationDTO>(notificationById);
                     response.Message = $"Found notification Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
-                    response.Data = valuation;
+                    response.Data = notification;
                 }
                 else
                 {
