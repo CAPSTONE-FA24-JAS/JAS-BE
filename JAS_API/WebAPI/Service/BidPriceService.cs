@@ -184,9 +184,22 @@ namespace Application.Services
                     }
                     try
                     {
+                        float? highestBidding = 0f;
+                        DateTime? highestBidTime = null;
                         string redisKey = $"BidPrice:{conn.LotId}";
                         var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == conn.LotId);
                         var highestBid = topBidders.FirstOrDefault();
+                        if (highestBid == null)
+                        {
+                            highestBidding = lot.StartPrice;
+                            highestBidTime = lot.StartTime;
+                        }
+                        else
+                        {
+                            highestBidding = highestBid.CurrentPrice;
+                            highestBidTime = highestBid.BidTime;
+                        }
+
                         if (lot.HaveFinancialProof == true)
                         {
                             var limitbid = customer.PriceLimit;
@@ -209,7 +222,7 @@ namespace Application.Services
                             else
                             {
                                 
-                                if(request.CurrentPrice > highestBid.CurrentPrice && request.BidTime > highestBid.BidTime)
+                                if(request.CurrentPrice > highestBidding && request.BidTime > highestBidTime)
                                 {
                                     bool bidPlaced = _cacheService.PlaceBidWithLuaScript(conn.LotId, request, customerId);
                                     if (!bidPlaced)
@@ -234,7 +247,7 @@ namespace Application.Services
                         else
                         {
 
-                            if (request.CurrentPrice > highestBid.CurrentPrice && request.BidTime > highestBid.BidTime)
+                            if (request.CurrentPrice > highestBidding && request.BidTime > highestBidTime)
                             {
                                 bool bidPlaced = _cacheService.PlaceBidWithLuaScript(conn.LotId, request, customerId);
                                 if (!bidPlaced)
