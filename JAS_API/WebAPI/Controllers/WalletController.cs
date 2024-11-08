@@ -188,7 +188,8 @@ namespace WebAPI.Controllers
                                 Amount = trans.Amount,
                                 DocNo = trans.DocNo,
                                 TransactionTime = DateTime.UtcNow,
-                                TransactionType = trans.transactionType
+                                TransactionType = trans.transactionType,
+                                TransactionPerson = trans.transactionPerson,
                             };
                             var historyStatusCustomerLot = new HistoryStatusCustomerLot()
                             {
