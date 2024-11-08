@@ -158,8 +158,6 @@ namespace Application.Services
             return reponse;
         }
 
-        
-
         public async Task<APIResponseModel> TotalProfit()
         {
             var response = new APIResponseModel();

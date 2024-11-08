@@ -327,7 +327,8 @@ namespace Application.Services
                             Amount = invoiceById.CustomerLot.Lot.Deposit,
                             TransactionTime = DateTime.Now,
                             Status = "Completed",
-                            WalletId = walletOfSeller.Id
+                            WalletId = walletOfSeller.Id,
+                            transactionPerson = (int)invoiceById.CustomerId
                         };
 
                         await _unitOfWork.WalletTransactionRepository.AddAsync(wallerTransaction);
@@ -563,6 +564,7 @@ namespace Application.Services
                                 DocNo = model.InvoiceId,
                                 TransactionTime = DateTime.Now,
                                 TransactionType = EnumTransactionType.BuyPay.ToString(),
+                                TransactionPerson = model.CustomerId
                             };
                             invoiceById.Status = EnumCustomerLot.Paid.ToString();
                             invoiceById.CustomerLot.Status = EnumCustomerLot.Paid.ToString();
@@ -933,6 +935,7 @@ namespace Application.Services
                             DocNo = walletTransaction.DocNo,
                             TransactionTime = DateTime.Now,
                             TransactionType = EnumTransactionType.Banktransfer.ToString(),
+                            TransactionPerson = invoiceById.CustomerId
                         };
 
                         await _unitOfWork.TransactionRepository.AddAsync(trans);
