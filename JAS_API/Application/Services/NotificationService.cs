@@ -119,5 +119,125 @@ namespace Application.Services
             }
             return response;
         }
+
+        public async Task<APIResponseModel> getNotificationsByStaffId(int staffId, int? pageIndex = null, int? pageSize = null)
+        {
+            var response = new APIResponseModel();
+
+            try
+            {
+                var staff = await _unitOfWork.StaffRepository.GetByIdAsync(staffId);
+
+                Expression<Func<Notification, bool>> filter;
+
+
+
+                filter = x => x.AccountId == staff.AccountId;
+
+
+                var notifications = await _unitOfWork.NotificationRepository.GetAllPaging(filter: filter,
+                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                                                                             includeProperties: "Account",
+                                                                             pageIndex: pageIndex,
+                                                                             pageSize: pageSize);
+
+                List<ViewNotificationDTO> listNotificationDTO = new List<ViewNotificationDTO>();
+                if (notifications.totalItems > 0)
+                {
+                    foreach (var item in notifications.data)
+                    {
+                        var notificationResponse = _mapper.Map<ViewNotificationDTO>(item);
+                        listNotificationDTO.Add(notificationResponse);
+                    };
+
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listNotificationDTO,
+                        totalItemRepsone = notifications.totalItems
+                    };
+                    response.Message = $"List invoices Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have invoices";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+
+        public async Task<APIResponseModel> getNotificationsByAppraiserId(int appraiserId, int? pageIndex = null, int? pageSize = null)
+        {
+            var response = new APIResponseModel();
+
+            try
+            {
+                var appraiser = await _unitOfWork.StaffRepository.GetByIdAsync(appraiserId);
+
+                Expression<Func<Notification, bool>> filter;
+
+
+
+                filter = x => x.AccountId == appraiser.AccountId;
+
+
+                var notifications = await _unitOfWork.NotificationRepository.GetAllPaging(filter: filter,
+                                                                             orderBy: x => x.OrderByDescending(t => t.CreationDate),
+                                                                             includeProperties: "Account",
+                                                                             pageIndex: pageIndex,
+                                                                             pageSize: pageSize);
+
+                List<ViewNotificationDTO> listNotificationDTO = new List<ViewNotificationDTO>();
+                if (notifications.totalItems > 0)
+                {
+                    foreach (var item in notifications.data)
+                    {
+                        var notificationResponse = _mapper.Map<ViewNotificationDTO>(item);
+                        listNotificationDTO.Add(notificationResponse);
+                    };
+
+
+                    var dataresponse = new
+                    {
+                        DataResponse = listNotificationDTO,
+                        totalItemRepsone = notifications.totalItems
+                    };
+                    response.Message = $"List invoices Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = dataresponse;
+                }
+                else
+                {
+                    response.Message = $"Don't have invoices";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
     }
 }

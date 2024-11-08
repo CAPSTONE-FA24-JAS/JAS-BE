@@ -9,6 +9,7 @@ using CloudinaryDotNet;
 using Domain.Entity;
 using Domain.Enums;
 using iTextSharp.text;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -219,9 +220,9 @@ namespace Application.Services
         {
             try
             {
-
+                string redisKey = $"BidPrice:{autoBid.CustomerLot.LotId}";
                 //lay ra highest bidPrice
-                var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>("BidPrice", l => l.LotId == autoBid.CustomerLot.LotId);
+                var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == autoBid.CustomerLot.LotId);
                 var highestBid = topBidders.FirstOrDefault();
 
                 var autobidCurrent = autoBid;
@@ -260,6 +261,8 @@ namespace Application.Services
                     LotId = winnerCurrentNew.LotId
                 };
                 //Redis
+                string redisKey = $"BidPrice:{winnerCurrentNew.Lot.Id}";
+                _cacheService.SetSortedSetData<BidPrice>(redisKey, bidPriceNew, priceCurrent);
                 foreach (var player in await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.CustomerId != winnerCurrentNew.CustomerId))
                 {
                     player.IsWinner = false;

@@ -28,5 +28,23 @@ namespace WebAPI.Controllers
                 return Ok(result);
             return BadRequest(result);
         }
+        [HttpGet]
+        public async Task<IActionResult> getNotificationsByStaffAsync(int staffId, int? pageIndex = null, int? pageSize = null)
+        {
+            var result = await _notificationService.getNotificationsByStaffId(staffId, pageIndex, pageSize);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> getNotificationsByAppraiserAsync(int appraiserId, int? pageIndex = null, int? pageSize = null)
+        {
+            var result = await _notificationService.getNotificationsByAppraiserId(appraiserId, pageIndex, pageSize);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
     }
 }

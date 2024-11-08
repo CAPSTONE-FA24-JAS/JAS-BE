@@ -11,5 +11,8 @@ namespace Application.Interfaces
     {
         Task<APIResponseModel> getNotificationsByAccountId(int accountId, int? pageIndex = null, int? pageSize = null);
         Task<APIResponseModel> markNotificationAsReadByAccountId(int notificationId);
+        Task<APIResponseModel> getNotificationsByAppraiserId(int appraiserId, int? pageIndex = null, int? pageSize = null);
+
+        Task<APIResponseModel> getNotificationsByStaffId(int staffId, int? pageIndex = null, int? pageSize = null);
     }
 }
