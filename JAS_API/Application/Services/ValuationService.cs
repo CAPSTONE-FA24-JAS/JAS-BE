@@ -193,7 +193,7 @@ namespace Application.Services
                         NotifiableId = id,  //valuationId
                         AccountId = staff.AccountId,
                         CreationDate = DateTime.UtcNow,
-                        Notifi_Type = "Valuation"
+                        Notifi_Type = "Assign"
                     };
 
                     await _unitOfWork.NotificationRepository.AddAsync(notification);

@@ -377,5 +377,15 @@ namespace Application.Services
             return result == 1;
         }
 
+        public async Task<bool> AcquireLockAsync(string lockKey, string token, TimeSpan expiry)
+        {
+            return await _cacheDb.LockTakeAsync(lockKey, token, expiry);
+        }
+
+        public async Task ReleaseLockAsync(string lockKey, string token)
+        {
+            await _cacheDb.LockReleaseAsync(lockKey, token);
+        }
+
     }
 }

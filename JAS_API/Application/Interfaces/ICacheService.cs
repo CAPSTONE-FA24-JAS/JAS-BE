@@ -49,5 +49,8 @@ namespace Application.Interfaces
         void UpdateLotCurrentPriceForReduceBidding(int lotId, float? currentPrice);
 
         bool PlaceBidWithLuaScript(int lotId, BiddingInputDTO request, int customerId);
+
+        Task<bool> AcquireLockAsync(string lockKey, string token, TimeSpan expiry);
+        Task ReleaseLockAsync(string lockKey, string token);
     }
 }
