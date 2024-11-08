@@ -414,7 +414,8 @@ namespace WebAPI.Service
                             Amount = winnerCustomerLot.Lot.Deposit,
                             TransactionTime = DateTime.UtcNow,
                             Status = "Completed",
-                            WalletId = loser.Customer.Wallet.Id
+                            WalletId = loser.Customer.Wallet.Id,
+                            transactionPerson = loser.Customer.Id
                         };
                         await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrasaction);
 
