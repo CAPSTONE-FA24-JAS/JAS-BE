@@ -342,7 +342,8 @@ namespace WebAPI.Service
                     Is_Read = false,
                     NotifiableId = invoice.Id,
                     AccountId = winnerCustomerLot.Customer.AccountId,
-                    CreationDate = DateTime.UtcNow
+                    CreationDate = DateTime.UtcNow,
+                    Notifi_Type = "CustomerLot"
                 };
 
                 await _unitOfWork.NotificationRepository.AddAsync(notification);
@@ -399,7 +400,8 @@ namespace WebAPI.Service
                             Is_Read = false,
                             NotifiableId = loser.Id,  //cusrtomerLot => dẫn tới myBid
                             AccountId = loser.Customer.AccountId,
-                            CreationDate = DateTime.UtcNow
+                            CreationDate = DateTime.UtcNow,
+                            Notifi_Type = "CustomerLot"
                         };
 
                         await _unitOfWork.NotificationRepository.AddAsync(notificationloser);                        
