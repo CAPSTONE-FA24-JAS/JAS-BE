@@ -37,9 +37,10 @@ namespace Application.Services
         private readonly IVNPayService _vNPayService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWalletService _walletService;
+        private readonly ICustomerLotService _customerLotService;
         private const string Tags = "Backend_BillTranfer";
 
-        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IWalletService walletService)
+        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IWalletService walletService, ICustomerLotService customerLotService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -47,6 +48,7 @@ namespace Application.Services
             _vNPayService = vNPayService;
             _httpContextAccessor = httpContextAccessor;
             _walletService = walletService;
+            _customerLotService = customerLotService;
         }
 
         public async Task<APIResponseModel> getInvoicesByStatusForManger(int? pageSize, int? pageIndex)
@@ -571,9 +573,9 @@ namespace Application.Services
                                 CurrentTime = DateTime.UtcNow,
                             };
                             invoiceById.PaymentMethod = EnumPaymentType.Wallet.ToString();
+                            _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
                             await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
                             await _unitOfWork.TransactionRepository.AddAsync(trans);
-                            await _walletService.RefundToWalletForUsersAsync(invoiceById.CustomerLot.Lot);  
                             if (await _unitOfWork.SaveChangeAsync() > 0)
                             {
                                 response.Message = $"Update Wallet Successfully";
@@ -935,7 +937,6 @@ namespace Application.Services
 
                         await _unitOfWork.TransactionRepository.AddAsync(trans);
                         await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
-                        await _walletService.RefundToWalletForUsersAsync(invoiceById.CustomerLot.Lot);
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
                             response.Message = "Upload file bill transaction Successfully";
