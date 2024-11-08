@@ -97,7 +97,7 @@ namespace Infrastructures
             services.AddScoped<IAutoBidService, AutoBidService>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<INotificationService, NotificationService>();
-
+            services.AddScoped<IDashBoardService, DashBoardService>();
 
             services.AddDbContext<AppDbContext>(option =>
             {

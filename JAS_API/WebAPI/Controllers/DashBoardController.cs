@@ -6,26 +6,24 @@ namespace WebAPI.Controllers
 {
     public class DashBoardController : BaseController
     {
-        private readonly IInvoiceService _invoiceService;
-        private readonly ITransactionService _transactionService;
+        private readonly IDashBoardService _dashboardService;
 
-        public DashBoardController(IInvoiceService invoiceService, ITransactionService transactionService)
+        public DashBoardController(IDashBoardService dashboardService)
         {
-            _invoiceService = invoiceService;
-            _transactionService = transactionService;
+            _dashboardService = dashboardService;
         }
 
         [HttpGet]
         public async Task<IActionResult> TotalRevenue()
         {
-            var result = await _invoiceService.TotalRevenue();
+            var result = await _dashboardService.TotalRevenue();
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> TotalRevenueByMonthWithYear(int month, int year)
         {
-            var result = await _invoiceService.GetRevenueByMonthWithYear(month, year);
+            var result = await _dashboardService.GetRevenueByMonthWithYear(month, year);
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
 
@@ -33,14 +31,14 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> TotalInvoice()
         {
-            var result = await _invoiceService.TotalInvoice();
+            var result = await _dashboardService.TotalInvoice();
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> TotalInvoiceByMonth(int month)
         {
-            var result = await _invoiceService.TotalInvoiceByMonth(month);
+            var result = await _dashboardService.TotalInvoiceByMonth(month);
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
 
@@ -64,11 +62,25 @@ namespace WebAPI.Controllers
         //    var result = await _transactionService.TotalProfitByMonth(month, year);
         //    return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         //}
-
+        
         [HttpGet]
         public async Task<IActionResult> DashBoardRevenueInYear(int year)
         {
-            var result = await _invoiceService.DashBoardRevenueInYear(year);
+            var result = await _dashboardService.DashBoardRevenueInYear(year);
+            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DashBoardInvoiceInYear(int year)
+        {
+            var result = await _dashboardService.DashBoardInvoiceInYear(year);
+            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> TopFiveJewelryAuctions()
+        {
+            var result = await _dashboardService.GetTopFiveJewelryAuctionsAsync();
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
     }

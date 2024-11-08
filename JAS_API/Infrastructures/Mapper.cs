@@ -268,7 +268,7 @@ namespace Infrastructures
             CreateMap<CustomerLot,CheckCustomerInLotDTO>()
                 .ForPath(dest => dest.CustomerLotId, src => src.MapFrom(x => x.Id))
                 .ReverseMap();
-
+            
         }
     }
 }
