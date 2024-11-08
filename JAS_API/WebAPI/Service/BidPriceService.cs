@@ -19,6 +19,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using WebAPI.Middlewares;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace Application.Services
 {
@@ -158,6 +159,7 @@ namespace Application.Services
         public async Task<APIResponseModel> PlaceBiding(BiddingInputDTO request)
         {
             var reponse = new APIResponseModel();
+
             try
             {
                 if (_shared.connections.TryGetValue(request.ConnectionId, out AccountConnection conn))
@@ -170,24 +172,61 @@ namespace Application.Services
                     string lotGroupName = $"lot-{conn.LotId}";
                     var firstName = customer.FirstName;
                     var lastname = customer.LastName;
-                    if (lot.HaveFinancialProof == true)
+                    var lockKey = $"lock:lot:{conn.LotId}";
+                    var token = Guid.NewGuid().ToString();
+                    bool lockAcquired = await _cacheService.AcquireLockAsync(lockKey, token, TimeSpan.FromSeconds(1));
+                    if (!lockAcquired)
                     {
-                        var limitbid = customer.PriceLimit;
-                        if (request.CurrentPrice > lot.BuyNowPrice)
+                        reponse.IsSuccess = false;
+                        reponse.Code = 423; // Locked
+                        reponse.Message = "Không thể lấy khóa để thực hiện đặt giá, vui lòng thử lại.";
+                        return reponse;
+                    }
+                    try
+                    {
+                        if (lot.HaveFinancialProof == true)
                         {
-                            request.CurrentPrice = lot.BuyNowPrice;
-                        }
-                        if (limitbid.HasValue && limitbid < request.CurrentPrice)
-                        {
-                            reponse.Message = "giá đặt cao hơn limit bid";
+                            var limitbid = customer.PriceLimit;
+                            if (request.CurrentPrice > lot.BuyNowPrice)
+                            {
+                                request.CurrentPrice = lot.BuyNowPrice;
+                            }
+                            if (limitbid.HasValue && limitbid < request.CurrentPrice)
+                            {
+                                reponse.Message = "giá đặt cao hơn limit bid";
+                                reponse.Code = 200;
+                                reponse.IsSuccess = false;
+                            }
+                            else if (limitbid == null)
+                            {
+                                reponse.Message = "khong tim thay limit bid trong database";
+                                reponse.Code = 200;
+                                reponse.IsSuccess = false;
+                            }
+                            else
+                            {
+                                bool bidPlaced = _cacheService.PlaceBidWithLuaScript(conn.LotId, request, customerId);
+                                if (!bidPlaced)
+                                {
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Không được đặt giá thấp hơn hoặc bằng giá hiện tại", request.CurrentPrice);
+                                    reponse.IsSuccess = false;
+                                    reponse.Code = 200;
+                                    reponse.Message = "Đặt giá không thành công do không thỏa mãn điều kiện";
+                                }
+                                else
+                                {
+                                    // Sau khi đặt giá thành công, xử lý và gửi thông báo
+                                    await ProcessBidPrice(request, lotGroupName, customerId, firstName, lastname, conn.LotId, lot);
+
+                                    reponse.IsSuccess = true;
+                                    reponse.Code = 200;
+                                    reponse.Message = "Đặt giá thành công!";
+                                }
+
+                            }
+                            reponse.IsSuccess = true;
                             reponse.Code = 200;
-                            reponse.IsSuccess = false;
-                        }
-                        else if (limitbid == null)
-                        {
-                            reponse.Message = "khong tim thay limit bid trong database";
-                            reponse.Code = 200;
-                            reponse.IsSuccess = false;
+                            reponse.Message = "Place bid successfully!";
                         }
                         else
                         {
@@ -208,32 +247,12 @@ namespace Application.Services
                                 reponse.Code = 200;
                                 reponse.Message = "Đặt giá thành công!";
                             }
-                            
                         }
-                        reponse.IsSuccess = true;
-                        reponse.Code = 200;
-                        reponse.Message = "Place bid successfully!";
                     }
-                    else
+                    finally
                     {
-                        bool bidPlaced = _cacheService.PlaceBidWithLuaScript(conn.LotId, request, customerId);
-                        if (!bidPlaced)
-                        {
-                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Không được đặt giá thấp hơn hoặc bằng giá hiện tại", request.CurrentPrice);
-                            reponse.IsSuccess = false;
-                            reponse.Code = 200;
-                            reponse.Message = "Đặt giá không thành công do không thỏa mãn điều kiện";
-                        }
-                        else
-                        {
-                            // Sau khi đặt giá thành công, xử lý và gửi thông báo
-                            await ProcessBidPrice(request, lotGroupName, customerId, firstName, lastname, conn.LotId, lot);
-
-                            reponse.IsSuccess = true;
-                            reponse.Code = 200;
-                            reponse.Message = "Đặt giá thành công!";
-                        }
-                    }
+                        await _cacheService.ReleaseLockAsync(lockKey, token);
+                    }                   
                 }
                 else
                 {
