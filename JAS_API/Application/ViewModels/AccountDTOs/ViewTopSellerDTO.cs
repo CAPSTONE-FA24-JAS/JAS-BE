@@ -11,4 +11,10 @@ namespace Application.ViewModels.AccountDTOs
        public CustomerDTO customerDTO {  get; set; }
        public int TotalSellerValuation { get; set; }
     }
+
+    public class ViewTopBuyerDTO
+    {
+        public CustomerDTO customerDTO { get; set; }
+        public int TotalBuyerJewelry { get; set; }
+    }
 }

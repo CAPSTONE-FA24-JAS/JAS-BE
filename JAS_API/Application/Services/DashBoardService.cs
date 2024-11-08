@@ -339,9 +339,48 @@ namespace Application.Services
             return response;
         }
 
-        public Task<APIResponseModel> GetTopFiveBuyersAsync()
+        public async Task<APIResponseModel> GetTopFiveBuyersAsync()
         {
-            throw new NotImplementedException();
+            var response = new APIResponseModel();
+            try
+            {
+                var buyers = await _unitOfWork.CustomerRepository.GetAllAsync(x => x.CustomerLots.Any(x => x.Status == EnumCustomerLot.Paid.ToString()));
+
+                var sortedbuyer = buyers
+                    .Select(buyer => new ViewTopBuyerDTO
+                    {
+                        customerDTO = _mapper.Map<CustomerDTO>(buyer),
+                        TotalBuyerJewelry = buyer.CustomerLots.Count(x => x.Status == EnumCustomerLot.Paid.ToString()),
+                    })
+                    .OrderByDescending(j => j.TotalBuyerJewelry)
+                    .Take(5)
+                    .ToList();
+
+
+                if (sortedbuyer.Count > 0)
+                {
+
+                    response.Code = 200;
+                    response.Data = sortedbuyer;
+                    response.IsSuccess = true;
+                    response.Message = "Received Successfully Buyer Top";
+                }
+                else
+                {
+                    response.Code = 200;
+                    response.Data = 0;
+                    response.IsSuccess = true;
+                    response.Message = "Current Time System Haven't Buyer Top.";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processcing";
+            }
+            return response;
         }
     }
 }
