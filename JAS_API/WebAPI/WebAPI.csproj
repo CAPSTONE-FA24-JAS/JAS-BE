@@ -58,10 +58,4 @@
 	  <None Include="wwwroot\HtmlFiles\Receipt.html" />
 	  <None Include="wwwroot\HtmlFiles\UyQuyen.html" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="libwkhtmltox.dll">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
 </Project>
