@@ -426,6 +426,7 @@ namespace WebAPI.Service
                             DocNo = loser.Id,
                             Amount = winnerCustomerLot.Lot.Deposit,
                             TransactionTime = DateTime.UtcNow,
+                            TransactionPerson = loser.CustomerId
 
                         };
                         await _unitOfWork.TransactionRepository.AddAsync(trasaction);
