@@ -178,6 +178,9 @@ namespace WebAPI.Controllers
 
                         if (trans.transactionId == result.OrderId)
                         {
+                            var invoice = await _invoiceService.GetInvoiceById((int)trans.DocNo);
+                            invoice.Status = EnumCustomerLot.Paid.ToString();
+                            invoice.CustomerLot.Status = EnumCustomerLot.Paid.ToString();
                             var newTrans = new Transaction()
                             {
                                 Amount = trans.Amount,
@@ -185,10 +188,14 @@ namespace WebAPI.Controllers
                                 TransactionTime = DateTime.UtcNow,
                                 TransactionType = trans.transactionType
                             };
-
-                            var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
-                            var invoice = await _invoiceService.GetInvoiceById((int)trans.DocNo);
+                            var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                            {
+                                CustomerLotId = invoice.CustomerLot.Id,
+                                Status = EnumCustomerLot.Paid.ToString(),
+                                CurrentTime = DateTime.UtcNow,
+                            };
                             await _walletService.RefundToWalletForUsersAsync(invoice.CustomerLot.Lot);
+                            var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
                             if (transactionResult.IsSuccess)
                             {
                                 return Ok(result);
