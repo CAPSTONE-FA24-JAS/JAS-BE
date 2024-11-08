@@ -1,4 +1,5 @@
 ﻿using Application.ServiceReponse;
+using Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,6 @@ namespace Application.Interfaces
     public interface IHistoryValuationService
     {
         public Task<APIResponseModel> getDetailHistoryValuation(int id);
+        
     }
 }

@@ -321,5 +321,16 @@ namespace Application.Services
                 throw;
             }
         }
+        public async void CreateHistoryCustomerLot(HistoryStatusCustomerLot model)
+        {
+            try
+            {
+                await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(model);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

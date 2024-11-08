@@ -19,9 +19,10 @@ namespace WebAPI.Controllers
         private readonly IClaimsService _claimsService;
         private readonly IInvoiceService _invoiceService;
         private readonly ILotService _lotService;
+        private readonly ICustomerLotService _customerLotService;
          private readonly ILogger<WalletController> _logger;
 
-        public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService, IVNPayService vNPayService, IWalletTransactionService walletTransactionService, ITransactionService transactionService, IClaimsService claimsService, IInvoiceService invoiceService, ILogger<WalletController> logger, ILotService lotService)
+        public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService, IVNPayService vNPayService, IWalletTransactionService walletTransactionService, ITransactionService transactionService, IClaimsService claimsService, IInvoiceService invoiceService, ILogger<WalletController> logger, ILotService lotService, ICustomerLotService customerLotService)
         {
             _walletService = walletService;
             _vpnService = vpnService;
@@ -33,6 +34,7 @@ namespace WebAPI.Controllers
             _invoiceService = invoiceService;
             _lotService = lotService;
             _logger = logger;
+            _customerLotService = customerLotService;
         }
 
         [HttpGet]
@@ -194,7 +196,8 @@ namespace WebAPI.Controllers
                                 Status = EnumCustomerLot.Paid.ToString(),
                                 CurrentTime = DateTime.UtcNow,
                             };
-                            await _walletService.RefundToWalletForUsersAsync(invoice.CustomerLot.Lot);
+                             _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
+                            //await _walletService.RefundToWalletForUsersAsync(invoice.CustomerLot.Lot);
                             var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
                             if (transactionResult.IsSuccess)
                             {

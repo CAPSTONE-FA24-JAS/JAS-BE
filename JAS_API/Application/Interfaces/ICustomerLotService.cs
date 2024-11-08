@@ -17,6 +17,7 @@ namespace Application.Interfaces
         Task<(bool, float?)> CheckBidPriceTop(float priceFuture, AutoBid autoBid);
         Task<bool> CheckTimeAutoBid(int customerLotId);
         Task<APIResponseModel> UpdateAutoBidPrice(int customerLotId, float priceCurrent);
+        void CreateHistoryCustomerLot(HistoryStatusCustomerLot model);
 
     }
 }
