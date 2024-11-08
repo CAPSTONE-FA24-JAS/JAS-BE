@@ -20,7 +20,7 @@ namespace WebAPI.Controllers
             return BadRequest(result);
         }
 
-        [HttpGet]
+        [HttpPut]
         public async Task<IActionResult> markNotificationAsReadByAccountAsync(int notificationId)
         {
             var result = await _notificationService.markNotificationAsReadByAccountId(notificationId);

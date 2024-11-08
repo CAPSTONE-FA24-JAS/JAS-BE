@@ -216,6 +216,8 @@ namespace WebAPI.Service
 
                 string redisKey = $"BidPrice:{lotId}";
                 var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
+                await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
+
                 var currentPrice = lot.CurrentPrice ?? lot.StartPrice;
                 _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
                 await _hubContext.Clients.Group(lotGroupName).SendAsync("CurrentPriceForReduceBiddingWhenStartLot", "Giá đã hien tai!", currentPrice, DateTime.UtcNow);
@@ -243,7 +245,7 @@ namespace WebAPI.Service
                             var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
                                
                             lotsql.CurrentPrice = winnerBid.CurrentPrice;
-                            lotsql.ActualEndTime = lot.ActualEndTime;
+                            lotsql.ActualEndTime = DateTime.UtcNow;
                             lotsql.Status = EnumStatusLot.Sold.ToString();
                             _unitOfWork.LotRepository.Update(lotsql);
                              await _unitOfWork.SaveChangeAsync();
@@ -304,7 +306,7 @@ namespace WebAPI.Service
                 _unitOfWork.CustomerLotRepository.Update(winnerCustomerLot);
 
 
-                await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinner", "Phiên đã kết thúc!", winnerBid.CustomerId, winnerBid.CurrentPrice);
+                
                 //tao invoice cho wwinner
                 var invoice = new Invoice
                 {
