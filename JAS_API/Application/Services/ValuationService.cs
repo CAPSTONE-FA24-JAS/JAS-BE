@@ -250,7 +250,7 @@ namespace Application.Services
                         NotifiableId = id,  //valuationId
                         AccountId = valuationById.Seller.AccountId,
                         CreationDate = DateTime.UtcNow,
-                        Notifi_Type = "Valuation"
+                        Notifi_Type = "Preliminary"
                     };
 
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
@@ -577,7 +577,7 @@ namespace Application.Services
                             NotifiableId = id,  //valuationId
                             AccountId = valuationById.Seller.AccountId,
                             CreationDate = DateTime.UtcNow,
-                            Notifi_Type = "Valuation"
+                            Notifi_Type = "Preliminary"
                         };
 
                         await _unitOfWork.NotificationRepository.AddAsync(notification);

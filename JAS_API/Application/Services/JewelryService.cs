@@ -173,7 +173,8 @@ namespace Application.Services
                     Is_Read = false,
                     NotifiableId = jewelry.Id,  //valuationId
                     AccountId = jewelry.Valuation.Staff.AccountId,
-                    CreationDate = DateTime.UtcNow
+                    CreationDate = DateTime.UtcNow,
+                    Notifi_Type = "FinalValuation"
                 };
 
                 await _unitOfWork.NotificationRepository.AddAsync(notification);
