@@ -33,13 +33,9 @@ namespace Application.Interfaces
         Task<APIResponseModel>  GetInvoicesRecivedByShipper(int shipperId, int? pageIndex, int? pageSize);
         Task<APIResponseModel> GetListInvoiceForCheckBill();
         Lot GetLotInInvoice(int invoiceId);
-        Task<APIResponseModel> TotalInvoice();
-        Task<APIResponseModel> TotalInvoiceByMonth(int month);
-        Task<APIResponseModel> DashBoardRevenueInYear(int year);
+        
         Task<APIResponseModel> getInvoicesDeliveringByShipper(int shipperId, int? pageIndex, int? pageSize);
-
-        Task<APIResponseModel> GetRevenueByMonthWithYear(int month, int year);
-        Task<APIResponseModel> TotalRevenue();
+        
         Task<Invoice?> GetInvoiceById(int id);
 
     }
