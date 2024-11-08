@@ -1,5 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
+using Application.ViewModels.AccountDTOs;
+using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.InvoiceDTOs;
 using Application.ViewModels.JewelryDTOs;
 using Application.ViewModels.TransactionDTOs;
@@ -253,7 +255,7 @@ namespace Application.Services
                                                                                      && x.Lots.Any(lot => lot.CustomerLots.Any(customerLot => customerLot.Invoice != null)));
 
                 var sortedJewelry = jewelrys
-                    .Select(jewelry => new ViewTopJewelry
+                    .Select(jewelry => new ViewTopJewelryDTO
                     {
                         JewelryDTO = _mapper.Map<JewelryDTO>(jewelry),
                         MaxPriceAuctionEnd = jewelry.Lots
@@ -292,9 +294,49 @@ namespace Application.Services
             return response;
         }
 
-        public Task<APIResponseModel> GetTopFiveSellersAsync()
+        public async Task<APIResponseModel> GetTopFiveSellersAsync()
         {
-            throw new NotImplementedException();
+            var response = new APIResponseModel();
+            try
+            {
+                var sellers = await _unitOfWork.CustomerRepository.GetAllAsync(x => x.SellerValuations.Count() > 0
+                                                                                     && x.SellerValuations.Any(x => x.Status == EnumStatusValuation.ManagerApproved.ToString()));
+
+                var sortedseller = sellers
+                    .Select(seller => new ViewTopSellerDTO
+                    {
+                        customerDTO = _mapper.Map<CustomerDTO>(seller),
+                        TotalSellerValuation = seller.SellerValuations.Count(x => x.Status == EnumStatusValuation.ManagerApproved.ToString()),
+                    })
+                    .OrderByDescending(j => j.TotalSellerValuation)
+                    .Take(5)
+                    .ToList();
+
+
+                if (sortedseller.Count > 0)
+                {
+
+                    response.Code = 200;
+                    response.Data = sortedseller;
+                    response.IsSuccess = true;
+                    response.Message = "Received Successfully Seller Valuation Top";
+                }
+                else
+                {
+                    response.Code = 200;
+                    response.Data = 0;
+                    response.IsSuccess = true;
+                    response.Message = "Current Time System Haven't Seller Valuation Top.";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processcing";
+            }
+            return response;
         }
 
         public Task<APIResponseModel> GetTopFiveBuyersAsync()

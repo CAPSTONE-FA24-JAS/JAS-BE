@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.ViewModels.JewelryDTOs
 {
-    public class ViewTopJewelry
+    public class ViewTopJewelryDTO
     {
         public JewelryDTO JewelryDTO { get; set; }
         public float? MaxPriceAuctionEnd { get; set; }
