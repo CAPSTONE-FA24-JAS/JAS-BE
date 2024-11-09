@@ -461,9 +461,16 @@ namespace Application.Services
                         Status = EnumStatusTransaction.Completed.ToString(),
                         WalletId = loser.Customer.Wallet.Id
                     };
-
+                    var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                    {
+                        CustomerLotId = loser.Id,
+                        Status = EnumCustomerLot.Refunded.ToString(),
+                        CurrentTime = DateTime.UtcNow,
+                    };
+                    await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
                     await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
                     await _unitOfWork.WalletTransactionRepository.AddAsync(transactionWallet);
+                    await _unitOfWork.SaveChangeAsync();
                 }
                 
             }

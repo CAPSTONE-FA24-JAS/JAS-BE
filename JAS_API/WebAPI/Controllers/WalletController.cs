@@ -198,7 +198,6 @@ namespace WebAPI.Controllers
                                 CurrentTime = DateTime.UtcNow,
                             };
                              _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
-                            //await _walletService.RefundToWalletForUsersAsync(invoice.CustomerLot.Lot);
                             var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
                             if (transactionResult.IsSuccess)
                             {
