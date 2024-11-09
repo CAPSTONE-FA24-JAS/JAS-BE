@@ -22,8 +22,9 @@ namespace Application.Services
         private readonly IAccountService _accountService;
         private readonly IWalletService _walletService;
         private readonly IWalletTransactionService _walletTransactionService;
+        private readonly IFoorFeePercentService _foorFeePercentService;
 
-        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IAccountService accountService, IWalletService walletService, IWalletTransactionService walletTransactionService)
+        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IAccountService accountService, IWalletService walletService, IWalletTransactionService walletTransactionService, IFoorFeePercentService foorFeePercentService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -31,6 +32,7 @@ namespace Application.Services
             _accountService = accountService;
             _walletService = walletService;
             _walletTransactionService = walletTransactionService;
+            _foorFeePercentService = foorFeePercentService;
         }
 
         public async Task<APIResponseModel> CreateLot(object lotDTO)
@@ -768,11 +770,14 @@ namespace Application.Services
 
                     winnerInLot.Status = EnumCustomerLot.CreateInvoice.ToString();
                     winnerInLot.IsWinner = true;
+                    winnerInLot.IsInvoiced = true;
                     winnerInLot.CurrentPrice = lot.FinalPriceSold;
                     foreach (var player in lot.CustomerLots.Where(x => x.CustomerId != placeBidBuyNowDTO.CustomerId
                                              && x.LotId == placeBidBuyNowDTO.LotId).ToList())
                     {
                         player.IsWinner = false;
+                        player.IsRefunded = true;
+                        player.Status = EnumCustomerLot.Refunded.ToString();
                     }
 
                     var bidPrice = new BidPrice
@@ -782,6 +787,14 @@ namespace Application.Services
                         CurrentPrice = lot.FinalPriceSold,
                         BidTime = DateTime.UtcNow
                     };
+
+                    var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                    {
+                        CustomerLotId = lot.CustomerLots.First(x => x.CustomerId == placeBidBuyNowDTO?.CustomerId).Id,
+                        Status = EnumCustomerLot.CreateInvoice.ToString(),
+                        CurrentTime = DateTime.UtcNow,
+                    };
+                    await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
                     await _unitOfWork.BidPriceRepository.AddAsync(bidPrice);
 
                     var invoice = new Invoice
@@ -791,10 +804,13 @@ namespace Application.Services
                         StaffId = lot.StaffId,
                         Price = winnerInLot.CurrentPrice,
                         Free = (float?)(winnerInLot.CurrentPrice * 0.25),
-                        TotalPrice = (float?)(winnerInLot.CurrentPrice + winnerInLot.CurrentPrice * 0.25 - lot.Deposit),
+                        TotalPrice = (float?)(winnerInLot.CurrentPrice + await _foorFeePercentService.GetPercentFloorFeeOfLot((float)winnerInLot.CurrentPrice) - lot.Deposit),
                         CreationDate = DateTime.Now,
                         Status = EnumCustomerLot.CreateInvoice.ToString()
                     };
+                    await _walletService.RefundToWalletForUsersAsync(lot.CustomerLots.Where(x => x.CustomerId != placeBidBuyNowDTO.CustomerId
+                                             && x.LotId == placeBidBuyNowDTO.LotId).ToList());
+                    
                     await _unitOfWork.InvoiceRepository.AddAsync(invoice);
                     await _unitOfWork.SaveChangeAsync();
 
