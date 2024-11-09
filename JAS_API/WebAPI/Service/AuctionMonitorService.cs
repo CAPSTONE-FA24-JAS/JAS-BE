@@ -23,8 +23,8 @@ namespace WebAPI.Service
                     await liveBiddingService.ChecKLotEndAsync();
                     await liveBiddingService.ChecKLotEndReducedBiddingAsync();
                     //await liveBiddingService.CheckLotBuyNowAsync();                
-                    await liveBiddingService.CheckLotFixedPriceAsync();
-                    await liveBiddingService.CheckLotSercetAsync();
+                    //await liveBiddingService.CheckLotFixedPriceAsync();
+                    //await liveBiddingService.CheckLotSercetAsync();
                     await liveBiddingService.ChecKAuctionEndAsync();
                     await liveBiddingService.AutoBidAsync();
 
