@@ -530,7 +530,9 @@ namespace WebAPI.Service
             using (var scope = _serviceProvider.CreateScope())
             {
                 var maxPriceInLot = lot.BidPrices.Max(x => x.CurrentPrice);
-                var maxBidPriceInLots = lot.BidPrices.Where(x => (lot.LotType == EnumLotType.Fixed_Price.ToString())? x.CurrentPrice == lot.BuyNowPrice : x.CurrentPrice == maxPriceInLot).ToList();
+                var maxBidPriceInLots = lot.BidPrices.Where(x => 
+                                            (lot.LotType == EnumLotType.Fixed_Price.ToString())? x.CurrentPrice == lot.BuyNowPrice : x.CurrentPrice == maxPriceInLot)
+                                            .ToList();
                 if (maxBidPriceInLots.Count > 1)
                 {
                     Random random = new Random();
@@ -538,11 +540,11 @@ namespace WebAPI.Service
                     BidPrice randomBidPriceWinner = maxBidPriceInLots[randomIndex];
                     return randomBidPriceWinner;
                 }
-                else
+                if (maxBidPriceInLots.Count > 0)
                 {
-                    return null;
+                    return maxBidPriceInLots.FirstOrDefault();
                 }
-
+                return null;
             }
         }
         private async Task<BidPrice> GetWinnerBuyNowPrice(Lot lot)
@@ -570,12 +572,12 @@ namespace WebAPI.Service
                     loser.IsWinner = false;
                     loser.IsRefunded = true;
                     loser.Status = EnumCustomerLot.Refunded.ToString();
-                    var historyStatusCustomerLot = new HistoryStatusCustomerLot()
-                    {
-                        CustomerLotId = loser.Id,
-                        Status = EnumCustomerLot.Refunded.ToString(),
-                        CurrentTime = DateTime.UtcNow,
-                    };
+                    //var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                    //{
+                    //    CustomerLotId = loser.Id,
+                    //    Status = EnumCustomerLot.Refunded.ToString(),
+                    //    CurrentTime = DateTime.UtcNow,
+                    //};
                 }
             }
         }
@@ -635,6 +637,8 @@ namespace WebAPI.Service
                         else
                         {
                             lot.Status = EnumStatusLot.Passed.ToString();
+                            var losers = lot.CustomerLots.Where(x => x.CustomerId != bidPriceWinner.CustomerId).ToList();
+                            await SetLoser(losers);
                         }
 
                         _cacheService.UpdateLotStatus(lot.Id, lot.Status);
@@ -705,6 +709,8 @@ namespace WebAPI.Service
                         {
 
                             lot.Status = EnumStatusLot.Passed.ToString();
+                            var losers = lot.CustomerLots.Where(x => x.CustomerId != bidPriceWinner.CustomerId).ToList();
+                            await SetLoser(losers);
                         }
                         
                         _cacheService.UpdateLotStatus(lot.Id, lot.Status);
