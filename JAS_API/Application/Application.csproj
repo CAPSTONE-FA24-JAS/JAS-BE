@@ -21,8 +21,13 @@
 		<PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
 		<PackageReference Include="Otp.NET" Version="1.4.0" />
 	</ItemGroup>
-
+<ItemGroup>
+    <None Update="runtimes/win-x86/native/libwkhtmltox.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Domain\Domain.csproj" />
 	</ItemGroup>
+	
 </Project>
