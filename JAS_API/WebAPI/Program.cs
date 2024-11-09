@@ -38,21 +38,11 @@ builder.Services.AddSingleton(cloudinary);
 builder.Services.AddSignalR();
 
 builder.Services.AddSingleton(configuration);
-//builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, build =>
-//{
-//    build.WithOrigins("http://localhost:3000", "exp://127.0.0.1:8081").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
-//}));
-
-builder.Services.AddCors(opt =>
+builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, build =>
 {
-    opt.AddPolicy("reactApp", policyBulider =>
-    {
-        policyBulider.WithOrigins("http://localhost:3000/", "exp://127.0.0.1:8081")
-                     .AllowAnyHeader()
-                     .AllowAnyMethod()
-                     .AllowCredentials();
-    });
-});
+    build.WithOrigins("http://localhost:3000", "exp://127.0.0.1:8081").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+}));
+
 
 //builder.WebHost.UseUrls("https://localhost:7251");
 builder.WebHost.UseUrls("http://0.0.0.0:7251");
