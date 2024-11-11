@@ -15,11 +15,11 @@ namespace Application.Services
         public async Task<float?> GetPercentFloorFeeOfLot(float currentPrice)
         {
             var percentCurrent = await _unitOfWork.FloorFeePersentRepository.GetAllAsync(x => x.From <= currentPrice
-                                                                                              && x.To >= currentPrice);
-
-            if(percentCurrent.Count > 0)
+                                                                                              && (x.To == null || x.To >= currentPrice));
+            var bestMatch = percentCurrent.OrderBy(x => x.To ?? float.MaxValue).FirstOrDefault();
+            if (bestMatch != null)
             {
-                return percentCurrent.SingleOrDefault()?.Percent;
+                return bestMatch?.Percent;
             }
             return null;
         }
