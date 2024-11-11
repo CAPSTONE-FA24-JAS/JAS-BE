@@ -171,5 +171,13 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> TotalCustomerInLotFixedPrice(int lotId)
+        {
+            var result = await _lotService.TotalPlayerInLotFixed(lotId);
+            return (!result.IsSuccess)?BadRequest(result):Ok(result);
+
+        }
+
     }
 }

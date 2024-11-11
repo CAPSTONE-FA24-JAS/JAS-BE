@@ -754,16 +754,6 @@ namespace Application.Services
                         return response;
                     }
 
-                    //var bidPriceExist = playerJoined.Lot.BidPrices.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId && x.LotId == placeBidBuyNowDTO.LotId);
-                    //if (bidPriceExist != null)
-                    //{
-                    //    response.Code = 400;
-                    //    response.IsSuccess = false;
-                    //    response.Message = $"The customer is auctioned into the lot";
-                    //    response.Data = _mapper.Map<BidPriceDTO>(bidPriceExist);
-                    //    return response;
-                    //}
-
                     lot.Status = EnumStatusLot.Sold.ToString();
                     var winnerInLot = lot.CustomerLots.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId
                                              && x.LotId == placeBidBuyNowDTO.LotId);
@@ -832,6 +822,46 @@ namespace Application.Services
                     response.Code = 404;
                     response.IsSuccess = false;
                     response.Message = $"Not Found Lot";
+                }
+            }
+            catch (Exception e)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.ErrorMessages = new List<string> { e.Message };
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> TotalPlayerInLotFixed(int lotId)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var lotExist = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+                if (lotExist != null)
+                {
+                    if (lotExist.LotType == EnumLotType.Fixed_Price.ToString())
+                    {
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Data = lotExist.CustomerLots?.Count();
+                        return response;
+                    }
+                    else
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"This lot isn't FixedLot";
+                        return response;
+                    }
+                }
+                else
+                {
+                    response.Code = 400;
+                    response.IsSuccess = true;
+                    response.Message = $"Not Found Lot";
+                    return response;
                 }
             }
             catch (Exception e)
