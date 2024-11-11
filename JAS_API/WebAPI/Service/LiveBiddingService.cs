@@ -72,6 +72,7 @@ namespace WebAPI.Service
                         auction.ActualEndTime = maxTimeAuction.EndTime;
                         _unitOfWork.AuctionRepository.Update(auction);
                         await _unitOfWork.SaveChangeAsync();
+                        await _hubContext.Clients.All.SendAsync("AcutionHasBeenEnd", "Phiên đã được dong", auction.Id);
                     }
                 }
             }
