@@ -14,6 +14,7 @@ namespace Domain.Entity
         public int? NotifiableId { get; set; }
         public string? Notifi_Type { get; set; }
         public int? AccountId { get; set; }
+        public string? ImageLink { get; set; }
 
         //
         public virtual Account? Account { get; set; }

@@ -28,6 +28,7 @@ namespace Application.Interfaces
         public Task<APIResponseModel> GetJewelryByCategoryAsync(int categoryId, int? pageSize, int? pageIndex);
 
         public Task<APIResponseModel> GetJewelryByArtistAsync(int artistId, int? pageSize, int? pageIndex);
+        public Task<APIResponseModel> UpdateJewelryAsync(UpdateJewelryDTO model);
 
     }
 }
