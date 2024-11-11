@@ -470,7 +470,6 @@ namespace Application.Services
                     await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
                     await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
                     await _unitOfWork.WalletTransactionRepository.AddAsync(transactionWallet);
-                    await _unitOfWork.SaveChangeAsync();
                 }
                 
             }
