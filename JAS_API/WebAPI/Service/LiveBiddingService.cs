@@ -568,12 +568,6 @@ namespace WebAPI.Service
                     loser.IsWinner = false;
                     loser.IsRefunded = true;
                     loser.Status = EnumCustomerLot.Refunded.ToString();
-                    //var historyStatusCustomerLot = new HistoryStatusCustomerLot()
-                    //{
-                    //    CustomerLotId = loser.Id,
-                    //    Status = EnumCustomerLot.Refunded.ToString(),
-                    //    CurrentTime = DateTime.UtcNow,
-                    //};
                 }
             }
         }
