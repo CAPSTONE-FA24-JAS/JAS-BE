@@ -1,3 +1,4 @@
+
 ﻿using Infrastructures;
 using Application.Commons;
 using WebAPI;
@@ -43,7 +44,6 @@ builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, buil
     build.WithOrigins("http://localhost:3000", "exp://127.0.0.1:8081").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
 }));
 
-
 //builder.WebHost.UseUrls("https://localhost:7251");
 builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
@@ -56,9 +56,11 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
 
 builder.Services.AddSingleton<LiveBiddingService>();
+
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
 //dki background service
+builder.Services.AddHostedService<ProcessStreamService>();
 builder.Services.AddHostedService<AuctionMonitorService>();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddEndpointsApiExplorer();
@@ -138,5 +140,4 @@ app.MapHub<BiddingHub>("/Auctionning");
 
 app.Run();
 public partial class Program { }
-
 
