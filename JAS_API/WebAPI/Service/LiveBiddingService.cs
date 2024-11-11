@@ -295,6 +295,7 @@ namespace WebAPI.Service
             using (var scope = _serviceProvider.CreateScope())
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _floorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string redisKey = $"BidPrice:{lotId}";
                 var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
@@ -316,8 +317,8 @@ namespace WebAPI.Service
                     CustomerLotId = winnerCustomerLot.Id,
                     StaffId = winnerCustomerLot.Lot.StaffId,
                     Price = winnerBid.CurrentPrice,
-                    Free = (float?)(winnerBid.CurrentPrice * 0.25),
-                    TotalPrice = (float?)(winnerBid.CurrentPrice + winnerBid.CurrentPrice * 0.25 - winnerCustomerLot.Lot.Deposit),
+                    Free = (winnerBid.CurrentPrice * await _floorFeeService.GetPercentFloorFeeOfLot((float)winnerBid.CurrentPrice)),
+                    TotalPrice = (winnerBid.CurrentPrice + (winnerBid.CurrentPrice * await _floorFeeService.GetPercentFloorFeeOfLot((float)winnerBid.CurrentPrice)) - winnerCustomerLot.Lot.Deposit),
                     CreationDate = DateTime.Now,
                     Status = EnumCustomerLot.CreateInvoice.ToString()
                 };
@@ -418,7 +419,8 @@ namespace WebAPI.Service
                             Amount = winnerCustomerLot.Lot.Deposit,
                             TransactionTime = DateTime.UtcNow,
                             Status = "Completed",
-                            WalletId = loser.Customer.Wallet.Id
+                            WalletId = loser.Customer.Wallet.Id,
+                            transactionPerson = loser.Customer.Id
                         };
                         await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrasaction);
 
@@ -529,7 +531,9 @@ namespace WebAPI.Service
             using (var scope = _serviceProvider.CreateScope())
             {
                 var maxPriceInLot = lot.BidPrices.Max(x => x.CurrentPrice);
-                var maxBidPriceInLots = lot.BidPrices.Where(x => (lot.LotType == EnumLotType.Fixed_Price.ToString())? x.CurrentPrice == lot.BuyNowPrice : x.CurrentPrice == maxPriceInLot).ToList();
+                var maxBidPriceInLots = lot.BidPrices.Where(x => 
+                                            (lot.LotType == EnumLotType.Fixed_Price.ToString())? x.CurrentPrice == lot.BuyNowPrice : x.CurrentPrice == maxPriceInLot)
+                                            .ToList();
                 if (maxBidPriceInLots.Count > 1)
                 {
                     Random random = new Random();
@@ -537,11 +541,11 @@ namespace WebAPI.Service
                     BidPrice randomBidPriceWinner = maxBidPriceInLots[randomIndex];
                     return randomBidPriceWinner;
                 }
-                else
+                if (maxBidPriceInLots.Count > 0)
                 {
-                    return null;
+                    return maxBidPriceInLots.FirstOrDefault();
                 }
-
+                return null;
             }
         }
         private async Task<BidPrice> GetWinnerBuyNowPrice(Lot lot)
@@ -556,12 +560,31 @@ namespace WebAPI.Service
             }
             return null;
         }
+
+        private async Task SetLoser(List<CustomerLot> customerLot)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _walletService = scope.ServiceProvider.GetRequiredService<IWalletService>();
+                await _walletService.RefundToWalletForUsersAsync(customerLot);
+                foreach (var loser in customerLot)
+                {
+                    loser.IsWinner = false;
+                    loser.IsRefunded = true;
+                    loser.Status = EnumCustomerLot.Refunded.ToString();
+                }
+            }
+        }
+
         public async Task CheckLotFixedPriceAsync()
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _foorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();
+                var _customerLotService = scope.ServiceProvider.GetRequiredService<ICustomerLotService>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 //Xu ly luc tg ket thuc
                 var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow 
                                                                             && x.LotType == EnumLotType.Fixed_Price.ToString() 
@@ -577,6 +600,8 @@ namespace WebAPI.Service
                             lot.CurrentPrice = bidPriceWinner.CurrentPrice;
                             lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).CurrentPrice = bidPriceWinner.CurrentPrice;
                             lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).IsWinner = true;
+                            lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).IsInvoiced = true;
+                            lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).Status = EnumCustomerLot.CreateInvoice.ToString();
                             var fee = bidPriceWinner.CurrentPrice * await _foorFeeService.GetPercentFloorFeeOfLot((float)bidPriceWinner.CurrentPrice);
                             invoice = new Invoice
                             {
@@ -589,11 +614,30 @@ namespace WebAPI.Service
                                 CreationDate = DateTime.Now,
                                 Status = EnumCustomerLot.CreateInvoice.ToString()
                             };
+
+
+                            var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                            {
+                                CustomerLotId = lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).Id,
+                                Status = EnumCustomerLot.CreateInvoice.ToString(),
+                                CurrentTime = DateTime.UtcNow,
+                            };
+                            _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
                             await _unitOfWork.InvoiceRepository.AddAsync(invoice);
+                            lot.Status = EnumStatusLot.Sold.ToString();
+
+                            var losers = lot.CustomerLots.Where(x => x.CustomerId != bidPriceWinner.CustomerId).ToList();
+                            await SetLoser(losers);
+                        }
+                        else
+                        {
+                            lot.Status = EnumStatusLot.Passed.ToString();
+                            var losers = lot.CustomerLots.Where(x => x.CustomerId != bidPriceWinner.CustomerId).ToList();
+                            await SetLoser(losers);
                         }
 
+                        _cacheService.UpdateLotStatus(lot.Id, lot.Status);
                         lot.ActualEndTime = DateTime.UtcNow;
-                        lot.Status = EnumStatusLot.Passed.ToString();
                         string lotGroupName = $"lot-{lot.Id}";
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforFixedPriceBiddingAuto", "Phiên đã kết thúc!");
                         await _unitOfWork.SaveChangeAsync();
@@ -609,6 +653,8 @@ namespace WebAPI.Service
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _foorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+                var _customerLotService = scope.ServiceProvider.GetRequiredService<ICustomerLotService>();
                 var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow && x.LotType == EnumLotType.Secret_Auction.ToString() && x.Status.ToLower().Trim().Equals(EnumStatusLot.Auctioning.ToString().ToLower().Trim()));
                 Invoice invoice;
                 if (lotEnds.Any())
@@ -621,6 +667,8 @@ namespace WebAPI.Service
                             lot.CurrentPrice = bidPriceWinner.CurrentPrice;
                             lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).CurrentPrice = bidPriceWinner.CurrentPrice;
                             lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).IsWinner = true;
+                            lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).IsInvoiced = true;
+                            lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).Status = EnumCustomerLot.CreateInvoice.ToString();
                             var fee = bidPriceWinner.CurrentPrice *  await _foorFeeService.GetPercentFloorFeeOfLot((float)bidPriceWinner.CurrentPrice);
                             invoice = new Invoice
                             {
@@ -633,9 +681,34 @@ namespace WebAPI.Service
                                 CreationDate = DateTime.Now,
                                 Status = EnumCustomerLot.CreateInvoice.ToString()
                             };
+                            //tao mới historystatuscustomerlot
+                            var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                            {
+                                CustomerLotId = lot.CustomerLots.First(x => x.CustomerId == bidPriceWinner?.CustomerId).Id,
+                                Status = EnumCustomerLot.CreateInvoice.ToString(),
+                                CurrentTime = DateTime.UtcNow,
+                            };
+                            _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
                             await _unitOfWork.InvoiceRepository.AddAsync(invoice);
+                            lot.Status = EnumStatusLot.Sold.ToString();
+
+                            var losers = lot.CustomerLots.Where(x => x.CustomerId != bidPriceWinner.CustomerId).ToList();
+                            await SetLoser(losers);
+                            //Người THUA Nè
+                            //nếu thua cập nhật is winner == false
+                            //refurn và cập nhật is refurn == true
+                            //cập nhật status customerlot là refuned 
+                            //tao moi history status customer trạng thái refurn 
                         }
-                        lot.Status = EnumStatusLot.Passed.ToString();
+                        else
+                        {
+
+                            lot.Status = EnumStatusLot.Passed.ToString();
+                            var losers = lot.CustomerLots.Where(x => x.CustomerId != bidPriceWinner.CustomerId).ToList();
+                            await SetLoser(losers);
+                        }
+                        
+                        _cacheService.UpdateLotStatus(lot.Id, lot.Status);
                         string lotGroupName = $"lot-{lot.Id}";
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforSercetBiddingAuto", "Phiên đã kết thúc!");
                         lot.ActualEndTime = DateTime.UtcNow;

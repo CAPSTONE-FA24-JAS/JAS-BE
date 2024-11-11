@@ -22,8 +22,9 @@ namespace Application.Services
         private readonly IAccountService _accountService;
         private readonly IWalletService _walletService;
         private readonly IWalletTransactionService _walletTransactionService;
+        private readonly IFoorFeePercentService _foorFeePercentService;
 
-        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IAccountService accountService, IWalletService walletService, IWalletTransactionService walletTransactionService)
+        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IAccountService accountService, IWalletService walletService, IWalletTransactionService walletTransactionService, IFoorFeePercentService foorFeePercentService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -31,6 +32,7 @@ namespace Application.Services
             _accountService = accountService;
             _walletService = walletService;
             _walletTransactionService = walletTransactionService;
+            _foorFeePercentService = foorFeePercentService;
         }
 
         public async Task<APIResponseModel> CreateLot(object lotDTO)
@@ -388,7 +390,8 @@ namespace Application.Services
 
                     var customerLot = _mapper.Map<CustomerLot>(registerToLotDTO);
                     customerLot.IsDeposit = true;
-
+                    await _unitOfWork.CustomerLotRepository.AddAsync(customerLot);
+                    await _unitOfWork.SaveChangeAsync();
                     var newTransactionWallet = new WalletTransaction
                     {
                         Amount = -depositOfLot,
@@ -418,7 +421,6 @@ namespace Application.Services
                     }
 
                     customerLot.Status = EnumCustomerLot.Registed.ToString();
-                    await _unitOfWork.CustomerLotRepository.AddAsync(customerLot);
 
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
@@ -581,7 +583,7 @@ namespace Application.Services
             return false;
         }
 
-        public async Task<APIResponseModel> CheckCustomerAuctioned(CheckCustomerInLotDTO model)
+        public async Task<APIResponseModel> CheckCustomerAuctioned(RequestCheckCustomerInLotDTO model)
         {
             var response = new APIResponseModel();
             try
@@ -636,7 +638,7 @@ namespace Application.Services
                     response.Message = $"The customer is not register into the lot";
                     return response;
                 }
-                var bidPriceExist = playerJoined.Lot.BidPrices.First(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
+                var bidPriceExist = playerJoined.Lot.BidPrices.FirstOrDefault(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
                 if (bidPriceExist != null)
                 {
                     response.Code = 400;
@@ -657,6 +659,15 @@ namespace Application.Services
                 if (lot != null)
                 {
 
+                    var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(model.CustomerId);
+                    if(customer != null && customer.Wallet.AvailableBalance < (decimal?)model.CurrentPrice)
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"Customer dont enought money available with current price for bid.";
+                        return response;
+
+                    }
                     if (model.CurrentPrice < lot.StartPrice || model.CurrentPrice > lot.FinalPriceSold && lot.LotType == EnumLotType.Secret_Auction.ToString())
                     {
                         response.Code = 400;
@@ -743,15 +754,15 @@ namespace Application.Services
                         return response;
                     }
 
-                    var bidPriceExist = playerJoined.Lot.BidPrices.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId && x.LotId == placeBidBuyNowDTO.LotId);
-                    if (bidPriceExist != null)
-                    {
-                        response.Code = 400;
-                        response.IsSuccess = false;
-                        response.Message = $"The customer is auctioned into the lot";
-                        response.Data = _mapper.Map<BidPriceDTO>(bidPriceExist);
-                        return response;
-                    }
+                    //var bidPriceExist = playerJoined.Lot.BidPrices.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId && x.LotId == placeBidBuyNowDTO.LotId);
+                    //if (bidPriceExist != null)
+                    //{
+                    //    response.Code = 400;
+                    //    response.IsSuccess = false;
+                    //    response.Message = $"The customer is auctioned into the lot";
+                    //    response.Data = _mapper.Map<BidPriceDTO>(bidPriceExist);
+                    //    return response;
+                    //}
 
                     lot.Status = EnumStatusLot.Sold.ToString();
                     var winnerInLot = lot.CustomerLots.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId
@@ -759,11 +770,14 @@ namespace Application.Services
 
                     winnerInLot.Status = EnumCustomerLot.CreateInvoice.ToString();
                     winnerInLot.IsWinner = true;
+                    winnerInLot.IsInvoiced = true;
                     winnerInLot.CurrentPrice = lot.FinalPriceSold;
                     foreach (var player in lot.CustomerLots.Where(x => x.CustomerId != placeBidBuyNowDTO.CustomerId
                                              && x.LotId == placeBidBuyNowDTO.LotId).ToList())
                     {
                         player.IsWinner = false;
+                        player.IsRefunded = true;
+                        player.Status = EnumCustomerLot.Refunded.ToString();
                     }
 
                     var bidPrice = new BidPrice
@@ -773,21 +787,32 @@ namespace Application.Services
                         CurrentPrice = lot.FinalPriceSold,
                         BidTime = DateTime.UtcNow
                     };
-                    await _unitOfWork.BidPriceRepository.AddAsync(bidPrice);
 
+                    var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                    {
+                        CustomerLotId = lot.CustomerLots.First(x => x.CustomerId == placeBidBuyNowDTO?.CustomerId).Id,
+                        Status = EnumCustomerLot.CreateInvoice.ToString(),
+                        CurrentTime = DateTime.UtcNow,
+                    };
+                    await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
+                    await _unitOfWork.BidPriceRepository.AddAsync(bidPrice);
+                    var totalprice = (float?)(winnerInLot.CurrentPrice + (winnerInLot.CurrentPrice * await _foorFeePercentService.GetPercentFloorFeeOfLot((float)winnerInLot.CurrentPrice)) - lot.Deposit);
                     var invoice = new Invoice
                     {
+
                         CustomerId = winnerInLot.CustomerId,
                         CustomerLotId = lot.CustomerLots.First(x => x.CustomerId == winnerInLot?.CustomerId).Id,
                         StaffId = lot.StaffId,
                         Price = winnerInLot.CurrentPrice,
-                        Free = (float?)(winnerInLot.CurrentPrice * 0.25),
-                        TotalPrice = (float?)(winnerInLot.CurrentPrice + winnerInLot.CurrentPrice * 0.25 - lot.Deposit),
+                        Free = winnerInLot.CurrentPrice  * await _foorFeePercentService.GetPercentFloorFeeOfLot((float)winnerInLot.CurrentPrice),
+                        TotalPrice = totalprice,
                         CreationDate = DateTime.Now,
                         Status = EnumCustomerLot.CreateInvoice.ToString()
                     };
+                    await _walletService.RefundToWalletForUsersAsync(lot.CustomerLots.Where(x => x.CustomerId != placeBidBuyNowDTO.CustomerId
+                                             && x.LotId == placeBidBuyNowDTO.LotId).ToList());
+                    
                     await _unitOfWork.InvoiceRepository.AddAsync(invoice);
-                    await _unitOfWork.SaveChangeAsync();
 
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {

@@ -247,14 +247,16 @@ namespace Infrastructures
 
             CreateMap<Transaction, ViewTransactionDTO>().ReverseMap();
             CreateMap<ViewCheckInvoiceHaveBill, Invoice>().ReverseMap();
-            CreateMap<Transaction, ViewRevenueOfConpanyDTO>()
-                .ForPath(dest => dest.Month , src => src.MapFrom(x => x.TransactionTime.Value.Month))
+            CreateMap<Invoice, ViewRevenueOfConpanyDTO>()
+                .ForPath(dest => dest.Month , src => src.MapFrom(x => x.CreationDate.Month))
                 .ReverseMap();
             CreateMap<IEnumerable<Transaction>, ViewRevenueOfConpanyDTO>()
                 .ForPath(dest => dest.Month, src => src.MapFrom(x => x.First().TransactionTime.Value.Month))
                 .ForPath(dest => dest.TotalRevenue, src => src.MapFrom(x => x.Sum( x => x.Amount)));
             CreateMap<Watching, CreateWatchingDTO>().ReverseMap();
-            CreateMap<Watching, ViewWatchingDTO>().ReverseMap();
+            CreateMap<Watching, ViewWatchingDTO>()
+                .ForMember(dest => dest.jewelryDTO, src => src.MapFrom(x => x.Jewelry))
+                .ReverseMap();
             CreateMap<Blog, ViewBlogDTO>()
                 .ForMember(dest => dest.imageBlogDTOs, src => src.MapFrom(x => x.ImageBlogs))
                 .ReverseMap();
@@ -266,7 +268,7 @@ namespace Infrastructures
             CreateMap<CustomerLot,CheckCustomerInLotDTO>()
                 .ForPath(dest => dest.CustomerLotId, src => src.MapFrom(x => x.Id))
                 .ReverseMap();
-
+            
         }
     }
 }

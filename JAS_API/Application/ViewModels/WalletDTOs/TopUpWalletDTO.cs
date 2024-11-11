@@ -8,6 +8,7 @@ namespace Application.ViewModels.WalletDTOs
 {
     public class TopUpWalletDTO
     {
+        public int CustomerId { get; set; }
         public int WalletId { get; set; }
         public float Amount { get; set; }
     }

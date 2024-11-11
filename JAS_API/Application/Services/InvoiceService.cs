@@ -2,6 +2,7 @@
 using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.InvoiceDTOs;
+using Application.ViewModels.TransactionDTOs;
 using Application.ViewModels.ValuationDTOs;
 using Application.ViewModels.VNPayDTOs;
 using Application.ViewModels.WalletDTOs;
@@ -15,6 +16,7 @@ using iTextSharp.text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Linq;
@@ -35,9 +37,10 @@ namespace Application.Services
         private readonly IVNPayService _vNPayService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWalletService _walletService;
+        private readonly ICustomerLotService _customerLotService;
         private const string Tags = "Backend_BillTranfer";
 
-        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IWalletService walletService)
+        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IWalletService walletService, ICustomerLotService customerLotService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -45,6 +48,7 @@ namespace Application.Services
             _vNPayService = vNPayService;
             _httpContextAccessor = httpContextAccessor;
             _walletService = walletService;
+            _customerLotService = customerLotService;
         }
 
         public async Task<APIResponseModel> getInvoicesByStatusForManger(int? pageSize, int? pageIndex)
@@ -323,7 +327,8 @@ namespace Application.Services
                             Amount = invoiceById.CustomerLot.Lot.Deposit,
                             TransactionTime = DateTime.Now,
                             Status = "Completed",
-                            WalletId = walletOfSeller.Id
+                            WalletId = walletOfSeller.Id,
+                            transactionPerson = (int)invoiceById.CustomerId
                         };
 
                         await _unitOfWork.WalletTransactionRepository.AddAsync(wallerTransaction);
@@ -550,6 +555,7 @@ namespace Application.Services
                                 Amount = -model.Amount,
                                 Status = EnumStatusTransaction.Completed.ToString(),
                                 transactionType = EnumTransactionType.BuyPay.ToString(),
+                                transactionPerson = model.CustomerId
                             };
 
                             var trans = new Transaction()
@@ -558,6 +564,7 @@ namespace Application.Services
                                 DocNo = model.InvoiceId,
                                 TransactionTime = DateTime.Now,
                                 TransactionType = EnumTransactionType.BuyPay.ToString(),
+                                TransactionPerson = model.CustomerId
                             };
                             invoiceById.Status = EnumCustomerLot.Paid.ToString();
                             invoiceById.CustomerLot.Status = EnumCustomerLot.Paid.ToString();
@@ -568,9 +575,9 @@ namespace Application.Services
                                 CurrentTime = DateTime.UtcNow,
                             };
                             invoiceById.PaymentMethod = EnumPaymentType.Wallet.ToString();
+                            _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
                             await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
                             await _unitOfWork.TransactionRepository.AddAsync(trans);
-                            await _walletService.RefundToWalletForUsersAsync(invoiceById.CustomerLot.Lot);  
                             if (await _unitOfWork.SaveChangeAsync() > 0)
                             {
                                 response.Message = $"Update Wallet Successfully";
@@ -619,6 +626,7 @@ namespace Application.Services
                         Amount = (float)-model.Amount,
                         Status = EnumStatusTransaction.Pending.ToString(),
                         transactionType = EnumTransactionType.Banktransfer.ToString(),
+                        transactionPerson = (int)invoiceById.CustomerId
                     };
                     //invoiceById.InvoiceOfWalletTransaction = 
                     invoiceById.PaymentMethod = EnumPaymentType.Transfer.ToString();
@@ -671,6 +679,7 @@ namespace Application.Services
                     {
                         transactionType = EnumTransactionType.BuyPay.ToString(),
                         DocNo = model.InvoiceId,
+                        transactionPerson = (int)invoiceExist.CustomerId,
                     };
                     invoiceExist.Status = EnumCustomerLot.PendingPayment.ToString();
                     invoiceExist.PaymentMethod = EnumPaymentType.Wallet.ToString();
@@ -926,11 +935,11 @@ namespace Application.Services
                             DocNo = walletTransaction.DocNo,
                             TransactionTime = DateTime.Now,
                             TransactionType = EnumTransactionType.Banktransfer.ToString(),
+                            TransactionPerson = invoiceById.CustomerId
                         };
 
                         await _unitOfWork.TransactionRepository.AddAsync(trans);
                         await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
-                        await _walletService.RefundToWalletForUsersAsync(invoiceById.CustomerLot.Lot);
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
                             response.Message = "Upload file bill transaction Successfully";
@@ -1010,66 +1019,10 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> TotalInvoice()
+        public async Task<Invoice?> GetInvoiceById(int id)
         {
-            var response = new APIResponseModel();
-            try
-            {
-                var totalInvoice = await _unitOfWork.InvoiceRepository.GetAllAsync();
-                if(totalInvoice.Count > 0)
-                {
-                    response.Code = 200;
-                    response.Data = totalInvoice.Count;
-                    response.IsSuccess = true;
-                    response.Message = $"Received Successfully Total Invoice: {totalInvoice.Count}.";
-                }
-                else
-                {
-                    response.Code = 200;
-                    response.Data = totalInvoice.Count;
-                    response.IsSuccess = true;
-                    response.Message = $"Current Time System Haven't Invoice.";
-                }
-
-            }
-            catch (Exception ex)
-            {
-                response.Code = 500;
-                response.IsSuccess = false;
-                response.Message = $"Exception When System Processcing";
-            }
-            return response;
-        }
-
-        public async Task<APIResponseModel> TotalInvoiceByMonth(int month)
-        {
-            var response = new APIResponseModel();
-            try
-            {
-                var totalInvoiceByMonth = await _unitOfWork.InvoiceRepository.GetAllAsync(x => x.CreationDate.Month == month);
-                if (totalInvoiceByMonth.Count > 0)
-                {
-                    response.Code = 200;
-                    response.Data = totalInvoiceByMonth.Count;
-                    response.IsSuccess = true;
-                    response.Message = $"Received Successfully Total Invoice By Month {month}: {totalInvoiceByMonth.Count}.";
-                }
-                else
-                {
-                    response.Code = 200;
-                    response.Data = totalInvoiceByMonth.Count;
-                    response.IsSuccess = true;
-                    response.Message = $"In Month {month}, System Haven't Invoice.";
-                }
-
-            }
-            catch (Exception ex)
-            {
-                response.Code = 500;
-                response.IsSuccess = false;
-                response.Message = $"Exception When System Processcing";
-            }
-            return response;
+            var invoice = await _unitOfWork.InvoiceRepository.GetByIdAsync(id);
+            return (invoice != null) ? invoice : null;
         }
 
         public async Task<APIResponseModel> getInvoicesDeliveringByShipper(int shipperId, int? pageIndex, int? pageSize)
@@ -1122,7 +1075,6 @@ namespace Application.Services
             }
             return response;
         }
-
     }
 
 

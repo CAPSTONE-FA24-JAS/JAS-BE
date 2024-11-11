@@ -161,7 +161,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CheckCustomerHaveBidPrice([FromBody]CheckCustomerInLotDTO checkCustomerInLotDTO)
+        public async Task<IActionResult> CheckCustomerHaveBidPrice([FromBody]RequestCheckCustomerInLotDTO checkCustomerInLotDTO)
         {
             var result = await _lotService.CheckCustomerAuctioned(checkCustomerInLotDTO);
             if (!result.IsSuccess)

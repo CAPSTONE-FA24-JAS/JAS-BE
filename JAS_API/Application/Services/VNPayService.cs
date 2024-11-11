@@ -52,36 +52,16 @@ namespace Application.Services
             walletTransaction.Status = EnumStatusTransaction.Pending.ToString();
             walletTransaction.Amount = model.Amount;
             walletTransaction.CreationDate = model.CreatedDate;
-            walletTransaction.transactionPerson = _claimsService.GetCurrentUserId;
 
             walletTransaction.transactionId = tick;
-            var walletTransactionResult = await _walletTransactionService.CreateNewTransaction(walletTransaction);
 
-            //if (walletTransaction.Status == EnumTransactionType.BuyPay.ToString())
-            //{
-                
-            //    var transactionResult = await _transactionService.CreateNewTransaction(trans);
+            await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
 
-            //    if (walletTransactionResult.IsSuccess && transactionResult.IsSuccess)
-            //    {
-            //        if(await _unitOfWork.SaveChangeAsync() > 0)
-            //        {
-            //            var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
-            //            return paymentUrl;
-            //        }
-            //    }
-            //}
-            //else
-            //{
-                if (walletTransactionResult.IsSuccess)
-                {
-                    if (await _unitOfWork.SaveChangeAsync() > 0)
-                    {
-                        var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
-                        return paymentUrl;
-                    }
-                }
-            //}
+            if (await _unitOfWork.SaveChangeAsync() > 0)
+            {
+                var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
+                return paymentUrl;
+            }
             return "";
         }
 

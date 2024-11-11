@@ -1,9 +1,12 @@
 ﻿
 using Application.Interfaces;
+using Application.ViewModels.BidPriceDTOs;
 using Application.ViewModels.CustomerLotDTOs;
+using CloudinaryDotNet;
 using Domain.Entity;
 using iTextSharp.text.pdf.parser.clipper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
 using System;
@@ -389,12 +392,16 @@ local entries = redis.call('XREAD', 'COUNT', 1, 'STREAMS', stream_key, '0')
 if not entries or #entries == 0 then
     return nil -- Không có giá đấu nào trong Stream
 else
+redis.call('SET', 'debug:entities', cjson.encode(entries))
  local entry_id = entries[1][2][1][1]
  local bid_data = entries[1][2][1][2]
 redis.call('SET', 'debug:entry_id', cjson.encode(entry_id))
 redis.call('SET', 'debug:bid_data', cjson.encode(bid_data))
-local newPrice = tonumber(bid_data[2])
-local newTime = tonumber(bid_data[4])
+
+local bid_data = cjson.decode(bid_data[2])  -- Decode the JSON data
+local newPrice = tonumber(bid_data.CurrentPrice)  -- Extract the new price
+local newTime = bid_data.BidTime
+
 redis.call('SET', 'debug:newPrice', cjson.encode(newPrice))
 
 -- Lấy giá đấu cao nhất hiện tại từ Sorted Set
@@ -404,15 +411,25 @@ local highestBidTime = 0
 
 if #highestBid > 0 then
     highestBidPrice = tonumber(highestBid[2])
-    highestBidTime = tonumber(cjson.decode(highestBid[1]).BidTime)
+    highestBidTime = cjson.decode(highestBid[1]).BidTime
 
     -- Kiểm tra điều kiện giá mới
-    if newPrice > highestBidPrice and newTime > highestBidTime then
+    if newPrice > highestBidPrice then
+        bid_data.Status = ""Success""
         redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
         redis.call('XDEL', stream_key, entry_id) -- Xóa khỏi Stream nếu đạt điều kiện    
+    elseif newPrice == highestBidPrice and newTime > highestBidTime then
+        bid_data.Status = ""Failded""
+        redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
+        redis.call('XDEL', stream_key, entry_id)
+    elseif newPrice < highestBidPrice and newTime > highestBidTime then
+        bid_data.Status = ""Failded""
+        redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
+        redis.call('XDEL', stream_key, entry_id)
     end
 else
     -- Chấp nhận giá đầu tiên nếu chưa có giá nào
+    bid_data.Status = ""Success""
     redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
     redis.call('XDEL', stream_key, entry_id) -- Xóa khỏi Stream   
 end
@@ -420,14 +437,15 @@ end
 
 highestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
 if #highestBid > 0 then
-    return {tonumber(highestBid[2]), cjson.encode(bid_data)}
+    return {highestBid[2], cjson.encode(bid_data)}
 else
     return nil
 end
 end
-";
+"
+            ;
 
-
+           
 
             // Key Redis dựa trên LotId
             string streamKey = $"BidStream:{lotId}";
@@ -440,21 +458,22 @@ end
                 {
                     var resultArray = (RedisResult[])result;
 
-                    if (resultArray.Length > 0)
+                    // Kiểm tra có đủ 2 phần tử trong kết quả trả về
+                    if (resultArray.Length == 2)
                     {
-                        var resultJson = resultArray[0].ToString();
-                        Console.WriteLine(resultJson);
-                        if (!string.IsNullOrEmpty(resultJson) && resultJson != "{}")
-                        {
-                            var resultObj = JsonSerializer.Deserialize<BidResult[]>(resultJson);
+                        var highestBid = (float?)Convert.ToDouble(resultArray[0]);  // Giá đấu cao nhất
+                        var bidDataJson = (string)resultArray[1]; // Chuỗi JSON của bid_data
 
-                            if (resultObj != null)
-                            {
-                                var bidPrice = resultObj[0].BidPrice;
-                                var highestBid = resultObj[1].HighestBid;
-                                return (true, bidPrice, highestBid); // Trả về giá đấu và giá đấu cao nhất
-                            }
+                        if (!string.IsNullOrEmpty(bidDataJson))
+                        {
+                            // Giải mã bid_data thành đối tượng BidPriceDTO
+                            BidPrice bidPrice = JsonSerializer.Deserialize<BidPrice>(bidDataJson);
+                            return (true, bidPrice, highestBid); // Trả về kết quả
                         }
+                    }
+                    else
+                    {
+                        return (false, null, null); // Nếu không có kết quả hợp lệ
                     }
                 }
                 catch(JsonException ex)
@@ -499,12 +518,18 @@ end
         {
             var streamKey = $"BidStream:{lotId}";
             var timestamp = new DateTimeOffset(request.BidTime).ToUnixTimeSeconds();
+            var bidPrice = new BidPrice
+            {
+                CurrentPrice = request.CurrentPrice,
+                BidTime = request.BidTime,
+                Status = "Processing",
+                CustomerId = customerId,
+                LotId = lotId
+            };
+            var serializedBidPrice = JsonSerializer.Serialize(bidPrice);
             var entryId = _cacheDb.StreamAddAsync(streamKey, new NameValueEntry[]
             {
-                new("CurrentPrice", request.CurrentPrice),
-                new("BidTime", timestamp),
-                new("CustomerId", customerId),
-                new("LotId", lotId)
+             new NameValueEntry("BidPrice", serializedBidPrice)  // Store the serialized BidPrice object
             });
         }
 

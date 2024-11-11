@@ -208,7 +208,7 @@ namespace Application.Services
                 var walletExits =  await CheckBalance(requestWithdrawDTO.WalletId);
                 if (walletExits.Data is WalletDTO cs && walletExits.IsSuccess)
                 {
-                    if (cs.Balance < requestWithdrawDTO.Amount)
+                    if ((float)cs.AvailableBalance < requestWithdrawDTO.Amount)
                     {
                         reponse.IsSuccess = false;
                         reponse.Code = 400;
@@ -217,15 +217,17 @@ namespace Application.Services
                     else
                     {
                         var request = _mapper.Map<RequestWithdraw>(requestWithdrawDTO);
+                        await _unitOfWork.RequestWithdrawRepository.AddAsync(request);
+                        await _unitOfWork.SaveChangeAsync();
                         var trans = new WalletTransaction()
                         {
                             Amount = -requestWithdrawDTO.Amount,
                             transactionType = EnumTransactionType.WithDrawWallet.ToString(),
-                            DocNo = requestWithdrawDTO.WalletId,
+                            DocNo = request.Id,
                             TransactionTime = DateTime.UtcNow,
                             Status = EnumStatusTransaction.Pending.ToString(),
                             WalletId = requestWithdrawDTO.WalletId,
-                            transactionPerson = _claimsService.GetCurrentUserId
+                            transactionPerson = requestWithdrawDTO.CustomerId
                         };
                         
                         if (!await LockFundsForWithdrawal(requestWithdrawDTO.WalletId, (decimal)requestWithdrawDTO.Amount))
@@ -236,7 +238,8 @@ namespace Application.Services
                         }
                         else
                         {
-                            await _unitOfWork.RequestWithdrawRepository.AddAsync(request);
+                            await _unitOfWork.WalletTransactionRepository.AddAsync(trans);
+                            
                             if (await _unitOfWork.SaveChangeAsync() > 0)
                             {
                                 trans.DocNo = request.Id;
@@ -371,7 +374,8 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var transExist = await _unitOfWork.WalletTransactionRepository.GetByIdAsync(transId);
+                var transExist = await _unitOfWork.WalletTransactionRepository.GetByIdAsync(transId, x =>  x.Status == EnumStatusTransaction.Pending.ToString() 
+                                                                                                && x.transactionType == EnumTransactionType.WithDrawWallet.ToString());
                 if (transExist == null)
                 {
                     reponse.Code = 404;
@@ -383,9 +387,19 @@ namespace Application.Services
                     var requestexist = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(transExist.DocNo);
                     if (requestexist != null)
                     {
+                        var transOfCompany = new Transaction()
+                        {
+                            Amount = requestexist.Amount,
+                            DocNo = requestexist.Id,
+                            TransactionPerson = requestexist.Wallet.CustomerId,
+                            TransactionTime = DateTime.Now,
+                            TransactionType = EnumTransactionType.WithDrawWallet.ToString(),
+                        };
+
                         requestexist.Wallet.FrozenBalance -= (decimal)requestexist.Amount;
                         requestexist.Wallet.Balance -= (decimal)requestexist.Amount;
                         transExist.Status = EnumStatusTransaction.Completed.ToString();
+                        await _unitOfWork.TransactionRepository.AddAsync(transOfCompany);
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
                             reponse.IsSuccess = true;
@@ -394,7 +408,7 @@ namespace Application.Services
                         }
                         else
                         {
-                            reponse.Code = 500;
+                            reponse.Code = 400;
                             reponse.Message = "Error when saving";
                             reponse.IsSuccess = false;
                         }
@@ -416,38 +430,44 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<APIResponseModel> RefundToWalletForUsersAsync(Lot lot)
+        public async Task<APIResponseModel> RefundToWalletForUsersAsync(List<CustomerLot> customerLot) 
         {
             var reponse = new APIResponseModel();
             try
             {
-                foreach (var user in lot.CustomerLots.Where(x => x.IsWinner == false)) 
+                foreach (var loser in customerLot) 
                 {
                     //thuc hien hoan vi
-                    var walletOfUser = user.Customer.Wallet;
-                    walletOfUser.Balance += (decimal?)lot.Deposit;
-                    walletOfUser.AvailableBalance += (decimal?)lot.Deposit;
+                    var walletOfUser = loser.Customer.Wallet;
+                    walletOfUser.Balance += (decimal?)loser.Lot.Deposit;
+                    walletOfUser.AvailableBalance += (decimal?)loser.Lot.Deposit;
                     //tao transaction
                     var transactionCompany = new Transaction()
                     {
-                        DocNo = user.Id,
-                        Amount = lot.Deposit,
+                        DocNo = loser.Id,
+                        Amount = loser.Lot.Deposit,
                         TransactionTime = DateTime.Now,
                         TransactionType = EnumTransactionType.RefundDeposit.ToString(),
-                        TransactionPerson = user.CustomerId,
+                        TransactionPerson = loser.CustomerId,
                     };
 
                     var transactionWallet = new WalletTransaction()
                     {
-                        DocNo = user.Id,
-                        Amount = lot.Deposit,
+                        DocNo = loser.Id,
+                        Amount = loser.Lot.Deposit,
                         TransactionTime = DateTime.Now,
                         transactionType = EnumTransactionType.RefundDeposit.ToString(),
-                        transactionPerson = (int)user.CustomerId,
+                        transactionPerson = (int)loser.CustomerId,
                         Status = EnumStatusTransaction.Completed.ToString(),
-                        WalletId = user.Customer.Wallet.Id
+                        WalletId = loser.Customer.Wallet.Id
                     };
-
+                    var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                    {
+                        CustomerLotId = loser.Id,
+                        Status = EnumCustomerLot.Refunded.ToString(),
+                        CurrentTime = DateTime.UtcNow,
+                    };
+                    await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
                     await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
                     await _unitOfWork.WalletTransactionRepository.AddAsync(transactionWallet);
                 }
