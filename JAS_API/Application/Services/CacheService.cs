@@ -419,11 +419,11 @@ if #highestBid > 0 then
         redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
         redis.call('XDEL', stream_key, entry_id) -- Xóa khỏi Stream nếu đạt điều kiện    
     elseif newPrice == highestBidPrice and newTime > highestBidTime then
-        bid_data.Status = ""Failded""
+        bid_data.Status = ""Failed""
         redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
         redis.call('XDEL', stream_key, entry_id)
     elseif newPrice < highestBidPrice and newTime > highestBidTime then
-        bid_data.Status = ""Failded""
+        bid_data.Status = ""Failed""
         redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
         redis.call('XDEL', stream_key, entry_id)
     end
