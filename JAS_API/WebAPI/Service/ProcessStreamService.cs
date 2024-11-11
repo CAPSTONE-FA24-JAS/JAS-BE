@@ -86,9 +86,9 @@ namespace WebAPI.Service
                         var lastname = customer.LastName;
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", result.highestBid);
                         //trar về name, giá ĐẤU, thời gian
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", result.bidPrice.CustomerId, firstName, lastname, result.bidPrice.CurrentPrice, result.bidPrice.BidTime);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", result.bidPrice.CustomerId, firstName, lastname, result.bidPrice.CurrentPrice, result.bidPrice.BidTime, result.bidPrice.Status);
 
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", result.bidPrice.CustomerId, result.bidPrice.CurrentPrice, result.bidPrice.BidTime);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", result.bidPrice.CustomerId, result.bidPrice.CurrentPrice, result.bidPrice.BidTime, result.bidPrice.Status);
                     }
                 }catch(TaskCanceledException)
                 {
