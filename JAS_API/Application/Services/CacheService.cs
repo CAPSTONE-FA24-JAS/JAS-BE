@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Application.ViewModels.CustomerLotDTOs;
 using Domain.Entity;
 using iTextSharp.text.pdf.parser.clipper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
 using System;
@@ -322,70 +323,192 @@ namespace Application.Services
 
         //Lưu vào Redis bằng Lua script với bidPrice
 
-        public bool PlaceBidWithLuaScript(int lotId, BiddingInputDTO request, int customerId)
+        //        public bool PlaceBidWithLuaScript(int lotId, BiddingInputDTO request, int customerId)
+        //        {
+        //            string script = @"
+        //    local key = KEYS[1]
+        //    local newPrice = tonumber(ARGV[1])
+        //    local newTime = ARGV[2]
+        //    local bidData = ARGV[3]
+
+        //    -- Lấy giá cao nhất hiện tại
+        //    local highestBid = redis.call('ZRANGE', key, -1, -1, 'WITHSCORES')
+        //    if #highestBid > 0 then
+        //        local highestBidData = cjson.decode(highestBid[1])
+        //        local highestBidPrice = tonumber(highestBid[2])
+        //        local highestBidTime = highestBidData.BidTime
+
+        //        -- Kiểm tra điều kiện giá mới phải lớn hơn giá cao nhất
+        //        if newPrice > highestBidPrice then
+        //            -- Chấp nhận giá mới và thêm vào SortedSet
+        //            redis.call('ZADD', key, 'GT', newPrice, bidData)
+        //            return 1
+        //        elseif newPrice == highestBidPrice and newTime > highestBidTime then
+        //            -- Không chấp nhận giá nếu giá mới bằng và thời gian sau hơn
+        //            return 0
+        //        elseif newPrice < highestBidPrice and newTime > highestBidTime then
+        //            -- Không chấp nhận giá nếu giá mới nho và thời gian sau hơn
+        //            return 0
+        //        else
+        //            return 0
+        //        end
+        //    else
+        //        -- Nếu chưa có giá nào, chấp nhận giá đầu tiên
+        //        redis.call('ZADD', key, newPrice, bidData)
+        //        return 1
+        //    end
+        //";
+
+        //            // Chuỗi JSON của BidPrice
+        //            var bidData = JsonSerializer.Serialize(new BidPrice
+        //            {
+        //                CurrentPrice = request.CurrentPrice,
+        //                BidTime = request.BidTime,
+        //                CustomerId = customerId,
+        //                LotId = lotId
+        //            });
+        //            var timestamp = new DateTimeOffset(request.BidTime).ToUnixTimeSeconds();
+        //            // Key Redis dựa trên LotId
+        //            string redisKey = $"BidPrice:{lotId}";
+
+        //            // Thực hiện Lua script trong Redis
+        //            var result = (int)_cacheDb.ScriptEvaluate(script, new RedisKey[] { redisKey },
+        //                new RedisValue[] { request.CurrentPrice, timestamp, bidData });
+
+        //            return result == 1;
+        //        }
+
+        public (bool result, BidPrice? bidPrice, float? highestBid) PlaceBidWithLuaScript(int lotId)
         {
             string script = @"
-    local key = KEYS[1]
-    local newPrice = tonumber(ARGV[1])
-    local newTime = ARGV[2]
-    local bidData = ARGV[3]
-    
-    -- Lấy giá cao nhất hiện tại
-    local highestBid = redis.call('ZRANGE', key, -1, -1, 'WITHSCORES')
-    if #highestBid > 0 then
-        local highestBidData = cjson.decode(highestBid[1])
-        local highestBidPrice = tonumber(highestBid[2])
-        local highestBidTime = highestBidData.BidTime
+local stream_key = KEYS[1]
+local sorted_set_key = KEYS[2]
 
-        -- Kiểm tra điều kiện giá mới phải lớn hơn giá cao nhất
-        if newPrice > highestBidPrice then
-            -- Chấp nhận giá mới và thêm vào SortedSet
-            redis.call('ZADD', key, 'GT', newPrice, bidData)
-            return 1
-        elseif newPrice == highestBidPrice and newTime > highestBidTime then
-            -- Không chấp nhận giá nếu giá mới bằng và thời gian sau hơn
-            return 0
-        elseif newPrice < highestBidPrice and newTime > highestBidTime then
-            -- Không chấp nhận giá nếu giá mới nho và thời gian sau hơn
-            return 0
-        else
-            return 0
-        end
-    else
-        -- Nếu chưa có giá nào, chấp nhận giá đầu tiên
-        redis.call('ZADD', key, newPrice, bidData)
-        return 1
+-- Lấy giá đấu đầu tiên từ Stream
+local entries = redis.call('XREAD', 'COUNT', 1, 'STREAMS', stream_key, '0')
+if not entries or #entries == 0 then
+    return nil -- Không có giá đấu nào trong Stream
+else
+ local entry_id = entries[1][2][1][1]
+ local bid_data = entries[1][2][1][2]
+redis.call('SET', 'debug:entry_id', cjson.encode(entry_id))
+redis.call('SET', 'debug:bid_data', cjson.encode(bid_data))
+local newPrice = tonumber(bid_data[2])
+local newTime = tonumber(bid_data[4])
+redis.call('SET', 'debug:newPrice', cjson.encode(newPrice))
+
+-- Lấy giá đấu cao nhất hiện tại từ Sorted Set
+local highestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
+local highestBidPrice = 0
+local highestBidTime = 0
+
+if #highestBid > 0 then
+    highestBidPrice = tonumber(highestBid[2])
+    highestBidTime = tonumber(cjson.decode(highestBid[1]).BidTime)
+
+    -- Kiểm tra điều kiện giá mới
+    if newPrice > highestBidPrice and newTime > highestBidTime then
+        redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
+        redis.call('XDEL', stream_key, entry_id) -- Xóa khỏi Stream nếu đạt điều kiện    
     end
+else
+    -- Chấp nhận giá đầu tiên nếu chưa có giá nào
+    redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
+    redis.call('XDEL', stream_key, entry_id) -- Xóa khỏi Stream   
+end
+
+
+highestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
+if #highestBid > 0 then
+    return {tonumber(highestBid[2]), cjson.encode(bid_data)}
+else
+    return nil
+end
+end
 ";
 
-            // Chuỗi JSON của BidPrice
-            var bidData = JsonSerializer.Serialize(new BidPrice
-            {
-                CurrentPrice = request.CurrentPrice,
-                BidTime = request.BidTime,
-                CustomerId = customerId,
-                LotId = lotId
-            });
-            var timestamp = new DateTimeOffset(request.BidTime).ToUnixTimeSeconds();
+
+
             // Key Redis dựa trên LotId
-            string redisKey = $"BidPrice:{lotId}";
+            string streamKey = $"BidStream:{lotId}";
+            string sortedSetKey = $"BidPrice:{lotId}";
+            var result = _cacheDb.ScriptEvaluate(script, new RedisKey[] { streamKey, sortedSetKey });
 
-            // Thực hiện Lua script trong Redis
-            var result = (int)_cacheDb.ScriptEvaluate(script, new RedisKey[] { redisKey },
-                new RedisValue[] { request.CurrentPrice, timestamp, bidData });
+            if (result.Type == ResultType.MultiBulk)
+            {
+                try
+                {
+                    var resultArray = (RedisResult[])result;
 
-            return result == 1;
+                    if (resultArray.Length > 0)
+                    {
+                        var resultJson = resultArray[0].ToString();
+                        Console.WriteLine(resultJson);
+                        if (!string.IsNullOrEmpty(resultJson) && resultJson != "{}")
+                        {
+                            var resultObj = JsonSerializer.Deserialize<BidResult[]>(resultJson);
+
+                            if (resultObj != null)
+                            {
+                                var bidPrice = resultObj[0].BidPrice;
+                                var highestBid = resultObj[1].HighestBid;
+                                return (true, bidPrice, highestBid); // Trả về giá đấu và giá đấu cao nhất
+                            }
+                        }
+                    }
+                }
+                catch(JsonException ex)
+                {
+                    Console.WriteLine($"Error deserializing resultJson: {ex.Message}");
+                }
+                // RedisResult sẽ là một mảng, nhưng nếu chỉ có một phần tử thì kết quả chỉ có một phần tử
+                
+            }
+            else if (result.Type == ResultType.BulkString)
+            {
+                // Trường hợp result là một chuỗi JSON đơn
+                var resultJson = result.ToString();
+
+                if (!string.IsNullOrEmpty(resultJson) && resultJson != "{}")
+                {
+                    // Deserialize JSON thành đối tượng
+                    var resultObj = JsonSerializer.Deserialize<BidResult[]>(resultJson);
+
+                    if (resultObj != null)
+                    {
+                        var bidPrice = resultObj[0].BidPrice;
+                        var highestBid = resultObj[1].HighestBid;
+                        return (true, bidPrice, highestBid); // Trả về giá đấu và giá đấu cao nhất
+                    }
+                }
+            }
+
+            // Trường hợp không hợp lệ
+            return (false, null, null);
+
+
         }
 
-        public async Task<bool> AcquireLockAsync(string lockKey, string token, TimeSpan expiry)
+
+        public class BidResult
+        {           
+            public float? HighestBid { get; set; }
+            public BidPrice? BidPrice { get; set; }
+        }
+        public void AddToStream(int lotId, BiddingInputDTO request, int customerId)
         {
-            return await _cacheDb.LockTakeAsync(lockKey, token, expiry);
+            var streamKey = $"BidStream:{lotId}";
+            var timestamp = new DateTimeOffset(request.BidTime).ToUnixTimeSeconds();
+            var entryId = _cacheDb.StreamAddAsync(streamKey, new NameValueEntry[]
+            {
+                new("CurrentPrice", request.CurrentPrice),
+                new("BidTime", timestamp),
+                new("CustomerId", customerId),
+                new("LotId", lotId)
+            });
         }
 
-        public async Task ReleaseLockAsync(string lockKey, string token)
-        {
-            await _cacheDb.LockReleaseAsync(lockKey, token);
-        }
 
+       
     }
 }

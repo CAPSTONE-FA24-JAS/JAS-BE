@@ -55,10 +55,12 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
 
 builder.Services.AddSingleton<LiveBiddingService>();
+
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
 //dki background service
 builder.Services.AddHostedService<AuctionMonitorService>();
+builder.Services.AddHostedService<ProcessStreamService>();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
