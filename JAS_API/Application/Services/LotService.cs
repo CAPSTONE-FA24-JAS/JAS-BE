@@ -796,15 +796,16 @@ namespace Application.Services
                     };
                     await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
                     await _unitOfWork.BidPriceRepository.AddAsync(bidPrice);
-
+                    var totalprice = (float?)(winnerInLot.CurrentPrice + (winnerInLot.CurrentPrice * await _foorFeePercentService.GetPercentFloorFeeOfLot((float)winnerInLot.CurrentPrice)) - lot.Deposit);
                     var invoice = new Invoice
                     {
+
                         CustomerId = winnerInLot.CustomerId,
                         CustomerLotId = lot.CustomerLots.First(x => x.CustomerId == winnerInLot?.CustomerId).Id,
                         StaffId = lot.StaffId,
                         Price = winnerInLot.CurrentPrice,
-                        Free = await _foorFeePercentService.GetPercentFloorFeeOfLot((float)winnerInLot.CurrentPrice),
-                        TotalPrice = (float?)(winnerInLot.CurrentPrice + await _foorFeePercentService.GetPercentFloorFeeOfLot((float)winnerInLot.CurrentPrice) - lot.Deposit),
+                        Free = winnerInLot.CurrentPrice  * await _foorFeePercentService.GetPercentFloorFeeOfLot((float)winnerInLot.CurrentPrice),
+                        TotalPrice = totalprice,
                         CreationDate = DateTime.Now,
                         Status = EnumCustomerLot.CreateInvoice.ToString()
                     };

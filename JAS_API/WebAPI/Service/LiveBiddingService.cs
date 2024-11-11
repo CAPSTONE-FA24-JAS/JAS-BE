@@ -295,6 +295,7 @@ namespace WebAPI.Service
             using (var scope = _serviceProvider.CreateScope())
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _floorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string redisKey = $"BidPrice:{lotId}";
                 var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
@@ -316,8 +317,8 @@ namespace WebAPI.Service
                     CustomerLotId = winnerCustomerLot.Id,
                     StaffId = winnerCustomerLot.Lot.StaffId,
                     Price = winnerBid.CurrentPrice,
-                    Free = (float?)(winnerBid.CurrentPrice * 0.25),
-                    TotalPrice = (float?)(winnerBid.CurrentPrice + winnerBid.CurrentPrice * 0.25 - winnerCustomerLot.Lot.Deposit),
+                    Free = (winnerBid.CurrentPrice * await _floorFeeService.GetPercentFloorFeeOfLot((float)winnerBid.CurrentPrice)),
+                    TotalPrice = (winnerBid.CurrentPrice + (winnerBid.CurrentPrice * await _floorFeeService.GetPercentFloorFeeOfLot((float)winnerBid.CurrentPrice)) - winnerCustomerLot.Lot.Deposit),
                     CreationDate = DateTime.Now,
                     Status = EnumCustomerLot.CreateInvoice.ToString()
                 };
