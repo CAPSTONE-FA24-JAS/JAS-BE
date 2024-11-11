@@ -754,15 +754,15 @@ namespace Application.Services
                         return response;
                     }
 
-                    var bidPriceExist = playerJoined.Lot.BidPrices.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId && x.LotId == placeBidBuyNowDTO.LotId);
-                    if (bidPriceExist != null)
-                    {
-                        response.Code = 400;
-                        response.IsSuccess = false;
-                        response.Message = $"The customer is auctioned into the lot";
-                        response.Data = _mapper.Map<BidPriceDTO>(bidPriceExist);
-                        return response;
-                    }
+                    //var bidPriceExist = playerJoined.Lot.BidPrices.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId && x.LotId == placeBidBuyNowDTO.LotId);
+                    //if (bidPriceExist != null)
+                    //{
+                    //    response.Code = 400;
+                    //    response.IsSuccess = false;
+                    //    response.Message = $"The customer is auctioned into the lot";
+                    //    response.Data = _mapper.Map<BidPriceDTO>(bidPriceExist);
+                    //    return response;
+                    //}
 
                     lot.Status = EnumStatusLot.Sold.ToString();
                     var winnerInLot = lot.CustomerLots.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId
@@ -803,7 +803,7 @@ namespace Application.Services
                         CustomerLotId = lot.CustomerLots.First(x => x.CustomerId == winnerInLot?.CustomerId).Id,
                         StaffId = lot.StaffId,
                         Price = winnerInLot.CurrentPrice,
-                        Free = (float?)(winnerInLot.CurrentPrice * 0.25),
+                        Free = await _foorFeePercentService.GetPercentFloorFeeOfLot((float)winnerInLot.CurrentPrice),
                         TotalPrice = (float?)(winnerInLot.CurrentPrice + await _foorFeePercentService.GetPercentFloorFeeOfLot((float)winnerInLot.CurrentPrice) - lot.Deposit),
                         CreationDate = DateTime.Now,
                         Status = EnumCustomerLot.CreateInvoice.ToString()
@@ -812,7 +812,6 @@ namespace Application.Services
                                              && x.LotId == placeBidBuyNowDTO.LotId).ToList());
                     
                     await _unitOfWork.InvoiceRepository.AddAsync(invoice);
-                    await _unitOfWork.SaveChangeAsync();
 
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {

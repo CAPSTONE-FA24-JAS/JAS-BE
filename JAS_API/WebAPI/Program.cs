@@ -43,6 +43,7 @@ builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, buil
     build.WithOrigins("http://localhost:3000", "exp://127.0.0.1:8081").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
 }));
 
+
 //builder.WebHost.UseUrls("https://localhost:7251");
 builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
