@@ -197,7 +197,6 @@ namespace Application.Services
             return response;
         }
 
-
         private async Task AddMainDiamondAsync(CreateDiamondDTO diamondDTO, int jewelryId)
         {
 
@@ -260,7 +259,6 @@ namespace Application.Services
 
         }
 
-
         private async Task AddSecondDiamondAsync(CreateDiamondDTO diamondDTO, int jewelryId)
         {
             var diamond = _mapper.Map<SecondaryDiamond>(diamondDTO);
@@ -271,6 +269,7 @@ namespace Application.Services
 
             await AddImageandDocumentsSecondDiamondAsync(diamondDTO.ImageDiamonds, diamondDTO.DocumentDiamonds, diamond.Id);
         }
+
         private async Task AddImageandDocumentsSecondDiamondAsync(IEnumerable<IFormFile>? images, IEnumerable<IFormFile>? documents, int diamondId)
         {
             if (images != null)
@@ -321,7 +320,6 @@ namespace Application.Services
             }
 
         }
-
 
         private async Task AddMainShaphieAsync(CreateShaphieDTO shaphieDTO, int jewelryId)
         {
@@ -872,5 +870,286 @@ namespace Application.Services
             }
             return response;
         }
+
+        public async Task<APIResponseModel> UpdateJewelryAsync(UpdateJewelryDTO model)
+        {
+            var response = new APIResponseModel(); 
+            try
+            {
+                var jewelryExist = await _unitOfWork.JewelryRepository.GetByIdAsync(model.Id);
+                if(jewelryExist == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = $"Not Found Jewelry With Id {model.Id}";
+                    response.Code = 400;
+                    return response;
+                }
+                else
+                {
+                    CovertForUpdate(model, jewelryExist);
+                    foreach(var imagesdto in model.UpdateImageJewelryDTOs)
+                    {
+                        var checkImageExist = jewelryExist.ImageJewelries.FirstOrDefault(x => x.Id == imagesdto.Id);
+                        if (checkImageExist != null)
+                        {
+                            var uploadResultImageLink = await uploadImageOnCloudary(imagesdto.ImageLink, TagsImageJewelry);
+                            checkImageExist.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
+
+                            var uploadResultThumbnailImage = await uploadImageOnCloudary(imagesdto.ThumbnailImage, TagsImageJewelry);
+                            checkImageExist.ThumbnailImage = uploadResultThumbnailImage.SecureUrl.AbsoluteUri;
+
+                            CovertForUpdate(imagesdto, checkImageExist);
+                        }
+                        else
+                        {
+                            var imageEntity = _mapper.Map<ImageJewelry>(imagesdto);
+
+                            var uploadResultImageLink = await uploadImageOnCloudary(imagesdto.ImageLink, TagsImageJewelry);
+                            imageEntity.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
+
+                            var uploadResultThumbnailImage = await uploadImageOnCloudary(imagesdto.ThumbnailImage, TagsImageJewelry);
+                            imageEntity.ThumbnailImage = uploadResultThumbnailImage.SecureUrl.AbsoluteUri;
+
+                            await _unitOfWork.ImageJewelryRepository.AddAsync(imageEntity);
+                        }
+                    }
+                    foreach (var keydto in model.UpdateKeyCharacteristicDetailDTOs)
+                    {
+                        var checkKeyExist = jewelryExist.KeyCharacteristicDetails.FirstOrDefault(x => x.Id == keydto.Id);
+                        if (checkKeyExist != null)
+                        {
+                            CovertForUpdate(keydto, checkKeyExist);
+                        }
+                        else
+                        {
+                            var keyEntity = _mapper.Map<KeyCharacteristicDetail>(keydto);
+                            await _unitOfWork.KeyCharacteristicsDetailRepository.AddAsync(keyEntity);
+                        }
+                    }
+                    foreach (var mainDiamondDto in model.UpdateMainDiamondDTOs)
+                    {
+                        var checkmainDiamondExist = jewelryExist.MainDiamonds.FirstOrDefault(x => x.Id == mainDiamondDto.Id);
+                        if (checkmainDiamondExist != null)
+                        {
+                            foreach (var docdto in mainDiamondDto.UpdateDocumentMainDiamondDTOs)
+                            {
+                                var checkdocExist = checkmainDiamondExist.DocumentMainDiamonds.FirstOrDefault(x => x.Id == docdto.Id);
+                                if (checkdocExist != null)
+                                {
+                                    CovertForUpdate(docdto, checkdocExist);
+                                }
+                                else
+                                {
+                                    var docEntity = _mapper.Map<DocumentMainDiamond>(docdto);
+                                    await _unitOfWork.DocumentMainDiamondRepository.AddAsync(docEntity);
+                                }
+                            }
+
+                            foreach (var imagedto in mainDiamondDto.UpdateImageMainDiamondDTOs)
+                            {
+                                var checkimageExist = checkmainDiamondExist.ImageMainDiamonds.FirstOrDefault(x => x.Id == imagedto.Id);
+                                if (checkimageExist != null)
+                                {
+                                    var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
+                                    checkimageExist.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
+                                    CovertForUpdate(imagedto, checkimageExist);
+                                }
+                                else
+                                {
+                                    var imageEntity = _mapper.Map<ImageMainDiamond>(imagedto);
+
+                                    var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
+                                    imageEntity.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
+                                    
+                                    await _unitOfWork.ImageMainDiamondRepository.AddAsync(imageEntity);
+                                }
+                            }
+                            CovertForUpdate(mainDiamondDto, checkmainDiamondExist);
+                        }
+                        else
+                        {
+                            var mainDiamondEntity = _mapper.Map<MainDiamond>(mainDiamondDto);
+                            await _unitOfWork.MainDiamondRepository.AddAsync(mainDiamondEntity);
+                        }
+
+
+                    }
+                    foreach (var secondDiamondDto in model.UpdateSecondaryDiamondDTOs)
+                    {
+                        var checkSecondDiamondExist = jewelryExist.SecondaryDiamonds.FirstOrDefault(x => x.Id == secondDiamondDto.Id);
+                        if (checkSecondDiamondExist != null)
+                        {
+                            foreach (var docdto in secondDiamondDto.UpdateDocumentSecondaryDiamondDTOs)
+                            {
+                                var checkdocExist = checkSecondDiamondExist.DocumentSecondaryDiamonds.FirstOrDefault(x => x.Id == docdto.Id);
+                                if (checkdocExist != null)
+                                {
+                                    CovertForUpdate(docdto, checkdocExist);
+                                }
+                                else
+                                {
+                                    var docEntity = _mapper.Map<DocumentSecondaryDiamond>(docdto);
+                                    await _unitOfWork.DocumentSecondaryDiamondRepository.AddAsync(docEntity);
+                                }
+                            }
+
+                            foreach (var imagedto in secondDiamondDto.UpdateImageSecondaryDiamondDTOs)
+                            {
+                                var checkimageExist = checkSecondDiamondExist.ImageSecondaryDiamonds.FirstOrDefault(x => x.Id == imagedto.Id);
+                                if (checkimageExist != null)
+                                {
+                                    var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
+                                    checkimageExist.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
+                                    CovertForUpdate(imagedto, checkimageExist);
+                                }
+                                else
+                                {
+                                    var imageEntity = _mapper.Map<ImageSecondaryDiamond>(imagedto);
+
+                                    var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
+                                    imageEntity.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
+
+                                    await _unitOfWork.ImageSecondDiamondRepository.AddAsync(imageEntity);
+                                }
+                            }
+                            CovertForUpdate(secondDiamondDto, checkSecondDiamondExist);
+                        }
+                        else
+                        {
+                            var secondDiamondEntity = _mapper.Map<SecondaryDiamond>(secondDiamondDto);
+                            await _unitOfWork.SecondDiamondRepository.AddAsync(secondDiamondEntity);
+                        }
+
+
+                    }
+                    foreach (var mainShaphieDto in model.UpdateMainShaphieDTOs)
+                    {
+                        var checkMainShaphieExist = jewelryExist.MainShaphies.FirstOrDefault(x => x.Id == mainShaphieDto.Id);
+                        if (checkMainShaphieExist != null)
+                        {
+                            foreach (var docdto in mainShaphieDto.UpdateeDocumentMainShaphieDTOs)
+                            {
+                                var checkdocExist = checkMainShaphieExist.DocumentMainShaphies.FirstOrDefault(x => x.Id == docdto.Id);
+                                if (checkdocExist != null)
+                                {
+                                    CovertForUpdate(docdto, checkdocExist);
+                                }
+                                else
+                                {
+                                    var docEntity = _mapper.Map<DocumentMainShaphie>(docdto);
+                                    await _unitOfWork.DocumentMainShaphieRepository.AddAsync(docEntity);
+                                }
+                            }
+
+                            foreach (var imagedto in mainShaphieDto.UpdateImageMainShaphieDTOs)
+                            {
+                                var checkimageExist = checkMainShaphieExist.ImageMainShaphies.FirstOrDefault(x => x.Id == imagedto.Id);
+                                if (checkimageExist != null)
+                                {
+                                    var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
+                                    checkimageExist.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
+                                    CovertForUpdate(imagedto, checkimageExist);
+                                }
+                                else
+                                {
+                                    var imageEntity = _mapper.Map<ImageMainShaphie>(imagedto);
+
+                                    var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
+                                    imageEntity.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
+                                    
+                                    await _unitOfWork.ImageMainShaphieRepository.AddAsync(imageEntity);
+                                }
+                            }
+                            CovertForUpdate(mainShaphieDto, checkMainShaphieExist);
+                        }
+                        else
+                        {
+                            var mainShaphieEntity = _mapper.Map<MainShaphie>(mainShaphieDto);
+                            await _unitOfWork.MainShaphieRepository.AddAsync(mainShaphieEntity);
+                        }
+
+
+                    }
+                    foreach (var secondShaphieDto in model.UpdateSecondaryShaphieDTOs)
+                    {
+                        var checkSecondShaphieExist = jewelryExist.SecondaryShaphies.FirstOrDefault(x => x.Id == secondShaphieDto.Id);
+                        if (checkSecondShaphieExist != null)
+                        {
+                            foreach (var docdto in secondShaphieDto.UpdateDocumentSecondaryShaphieDTOs)
+                            {
+                                var checkdocExist = checkSecondShaphieExist.DocumentSecondaryShaphies.FirstOrDefault(x => x.Id == docdto.Id);
+                                if (checkdocExist != null)
+                                {
+                                    CovertForUpdate(docdto, checkdocExist);
+                                }
+                                else
+                                {
+                                    var docEntity = _mapper.Map<DocumentSecondaryShaphie>(docdto);
+                                    await _unitOfWork.DocumentSecondaryShaphieRepository.AddAsync(docEntity);
+                                }
+                            }
+
+                            foreach (var imagedto in secondShaphieDto.UpdateImageSecondaryShaphieDTOs)
+                            {
+                                var checkimageExist = checkSecondShaphieExist.ImageSecondaryShaphies.FirstOrDefault(x => x.Id == imagedto.Id);
+                                if (checkimageExist != null)
+                                {
+                                    var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
+                                    checkimageExist.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
+                                    CovertForUpdate(imagedto, checkimageExist);
+                                }
+                                else
+                                {
+                                    var imageEntity = _mapper.Map<ImageSecondaryShaphie>(imagedto);
+
+                                    var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
+                                    imageEntity.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
+
+                                    await _unitOfWork.ImageSecondaryShaphieRepository.AddAsync(imageEntity);
+                                }
+                            }
+                            CovertForUpdate(secondShaphieDto, checkSecondShaphieExist);
+                        }
+                        else
+                        {
+                            var secondShaphieEntity = _mapper.Map<SecondaryShaphie>(secondShaphieDto);
+                            await _unitOfWork.SecondaryShaphieRepository.AddAsync(secondShaphieEntity);
+                        }
+                    }
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        response.IsSuccess = true;
+                        response.Message = $"Update Jewelry Successfully";
+                        response.Code = 200;
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = $"Update Jewelry Faild When Saving To Database";
+                        response.Code = 404;
+                    }
+                }
+            }catch(Exception e)
+            {
+                response.ErrorMessages = new List<string> { e.Message };
+                response.IsSuccess = false;
+                response.Message = $"Exception {e.Message}";
+                response.Code = 500;
+            }
+            return response;
+        }
+        internal void CovertForUpdate<TDto, TEntity>(TDto dto, TEntity entity) where TDto : UpdateBaseEntity
+                                                                                            where TEntity : class
+        {
+            try
+            {
+                var mapper = _mapper.Map(dto, entity);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error during conversion: {e.Message}", e);
+            }
+        }
+
     }
 }

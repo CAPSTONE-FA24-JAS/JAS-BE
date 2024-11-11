@@ -268,7 +268,25 @@ namespace Infrastructures
             CreateMap<CustomerLot,CheckCustomerInLotDTO>()
                 .ForPath(dest => dest.CustomerLotId, src => src.MapFrom(x => x.Id))
                 .ReverseMap();
-            
+
+            //Update jewelry
+            CreateMap<UpdateJewelryDTO, Jewelry>().ReverseMap()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<UpdateImageJewelryDTO, ImageJewelry >().ReverseMap();
+            CreateMap<UpdateKeyCharacteristicDetailDTO, KeyCharacteristicDetail>().ReverseMap();
+            CreateMap<UpdateMainDiamondDTO, MainDiamond>().ReverseMap();
+            CreateMap<UpdateDocumentMainDiamondDTO, DocumentMainDiamond>().ReverseMap();
+            CreateMap<UpdateImageMainDiamondDTO, ImageMainDiamond>().ReverseMap();
+            CreateMap<UpdateSecondaryDiamondDTO, SecondaryDiamond>().ReverseMap();
+            CreateMap<UpdateDocumentSecondaryDiamondDTO, DocumentSecondaryDiamond>().ReverseMap();
+            CreateMap<UpdateImageSecondaryDiamondDTO, ImageSecondaryDiamond>().ReverseMap();
+
+            CreateMap<UpdateMainShaphieDTO, MainShaphie>().ReverseMap();
+            CreateMap<UpdateeDocumentMainShaphieDTO, DocumentMainShaphie>().ReverseMap();
+            CreateMap<UpdateImageMainShaphieDTO, ImageMainShaphie>().ReverseMap();
+            CreateMap<UpdateSecondaryShaphieDTO, SecondaryShaphie>().ReverseMap();
+            CreateMap<UpdateDocumentSecondaryShaphieDTO, DocumentSecondaryShaphie>().ReverseMap();
+            CreateMap<UpdateImageSecondaryShaphieDTO, ImageSecondaryShaphie>().ReverseMap();
         }
     }
 }

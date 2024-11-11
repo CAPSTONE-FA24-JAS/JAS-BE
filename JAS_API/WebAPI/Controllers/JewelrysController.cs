@@ -2,6 +2,7 @@
 using Application.Services;
 using Application.ViewModels.ArtistDTOs;
 using Application.ViewModels.JewelryDTOs;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -141,6 +142,13 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(result);
             }
+        }
+        
+        [HttpPut]
+        public async Task<IActionResult> UpdateJewelry([FromForm]UpdateJewelryDTO model)
+        {
+            var result = await _jewelryService.UpdateJewelryAsync(model);
+            return (result.IsSuccess)?Ok(result):BadRequest(result);
         }
     }
 }

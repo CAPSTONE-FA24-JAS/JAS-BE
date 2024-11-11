@@ -13,6 +13,5 @@ namespace Application.ViewModels.JewelryDTOs
         public string? ThumbnailImage { get; set; }
 
         public int? JewelryId { get; set; }
-
     }
 }
