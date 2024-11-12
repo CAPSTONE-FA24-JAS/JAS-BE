@@ -15,6 +15,7 @@ namespace Domain.Entity
         public string? Notifi_Type { get; set; }
         public int? AccountId { get; set; }
         public string? ImageLink { get; set; }
+        public string? StatusOfValuation { get; set; }
 
         //
         public virtual Account? Account { get; set; }
