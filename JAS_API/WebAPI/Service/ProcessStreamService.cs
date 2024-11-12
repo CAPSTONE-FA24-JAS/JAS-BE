@@ -47,7 +47,6 @@ namespace WebAPI.Service
                 }
                 await Task.Delay(10, stoppingToken);
             }
-            await Task.WhenAll(runningTasks);
         }
 
         public async Task ProcessBids(Lot lot)
