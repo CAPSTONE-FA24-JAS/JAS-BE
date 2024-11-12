@@ -34,7 +34,7 @@ jobs:
       - name: Copy libwkhtmltox.dll
         run: |
           mkdir -p ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-          cp /mnt/data/libwkhtmltox.dll ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          cp ./JAS_API/libwkhtmltox.dll ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
           
       - name: Deployment
         uses: azure/webapps-deploy@v2
