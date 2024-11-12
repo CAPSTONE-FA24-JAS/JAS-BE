@@ -33,17 +33,22 @@ namespace WebAPI.Service
                     var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                     var lotLiveBidding = _cacheService.GetHashLots(x => x.LotType == EnumLotType.Public_Auction.ToString() && x.Status ==  EnumStatusLot.Auctioning.ToString());
 
-
-                    foreach (var lot in lotLiveBidding)
+                    if(lotLiveBidding == null)
                     {
-                        // Khởi chạy từng tác vụ ProcessBids độc lập và thêm vào danh sách runningTasks
-                        var task = Task.Run(() => ProcessBids(lot), stoppingToken);
-                        runningTasks.Add(task);
+                        await Task.Delay(100, stoppingToken);
                     }
+                    else
+                    {
+                        foreach (var lot in lotLiveBidding)
+                        {
+                            // Khởi chạy từng tác vụ ProcessBids độc lập và thêm vào danh sách runningTasks
+                            var task = Task.Run(() => ProcessBids(lot), stoppingToken);
+                            runningTasks.Add(task);
+                        }
 
-                    // Xóa các tác vụ đã hoàn thành khỏi danh sách để tránh tràn bộ nhớ
-                    runningTasks.RemoveAll(t => t.IsCompleted);
-
+                        // Xóa các tác vụ đã hoàn thành khỏi danh sách để tránh tràn bộ nhớ
+                        runningTasks.RemoveAll(t => t.IsCompleted);
+                    }                   
                 }
                 await Task.Delay(10, stoppingToken);
             }
