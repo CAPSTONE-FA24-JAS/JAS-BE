@@ -144,5 +144,3 @@ app.MapHub<BiddingHub>("/Auctionning");
 
 app.Run();
 public partial class Program { }
-
-

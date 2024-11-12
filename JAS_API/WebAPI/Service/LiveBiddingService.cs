@@ -72,6 +72,7 @@ namespace WebAPI.Service
                         auction.ActualEndTime = maxTimeAuction.EndTime;
                         _unitOfWork.AuctionRepository.Update(auction);
                         await _unitOfWork.SaveChangeAsync();
+                        await _hubContext.Clients.All.SendAsync("AcutionHasBeenEnd", "Phiên đã được dong", auction.Id);
                     }
                 }
             }
@@ -299,7 +300,7 @@ namespace WebAPI.Service
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string redisKey = $"BidPrice:{lotId}";
                 var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
-
+                var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
 
                 //update customerLot
                 var winnerCustomerLot = await _unitOfWork.CustomerLotRepository.GetCustomerLotByCustomerAndLot(winnerBid.CustomerId, lotId);
@@ -348,7 +349,9 @@ namespace WebAPI.Service
                     NotifiableId = invoice.Id,
                     AccountId = winnerCustomerLot.Customer.AccountId,
                     CreationDate = DateTime.UtcNow,
-                    Notifi_Type = "CustomerLot"
+                    Notifi_Type = "CustomerLot",
+                    ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+                    
                 };
 
                 await _unitOfWork.NotificationRepository.AddAsync(notification);
@@ -406,7 +409,8 @@ namespace WebAPI.Service
                             NotifiableId = loser.Id,  //cusrtomerLot => dẫn tới myBid
                             AccountId = loser.Customer.AccountId,
                             CreationDate = DateTime.UtcNow,
-                            Notifi_Type = "CustomerLot"
+                            Notifi_Type = "CustomerLot",
+                            ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
                         };
 
                         await _unitOfWork.NotificationRepository.AddAsync(notificationloser);                        
