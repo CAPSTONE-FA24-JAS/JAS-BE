@@ -150,5 +150,12 @@ namespace WebAPI.Controllers
             var result = await _jewelryService.UpdateJewelryAsync(model);
             return (result.IsSuccess)?Ok(result):BadRequest(result);
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteJewelry(int jewelryId)
+        {
+            var result = await _jewelryService.DeleteJewelryAsync(jewelryId);
+            return (result.IsSuccess) ? Ok(result) : BadRequest(result);
+        }
     }
 }
