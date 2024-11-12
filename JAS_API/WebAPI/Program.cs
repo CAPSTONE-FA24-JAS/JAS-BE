@@ -15,6 +15,8 @@ using StackExchange.Redis;
 using Application.Interfaces;
 using DinkToPdf.Contracts;
 using DinkToPdf;
+using Swashbuckle.AspNetCore;
+using Application.Utils;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +24,10 @@ var MyAllowSpecificOrigins = "JASCORS";
 var configuration = builder.Configuration.Get<AppConfiguration>() ?? new AppConfiguration();
 builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
+
+var distanceMatrixApiKey = builder.Configuration.GetSection("DistanceMatrixai:ApiKey").Value;
+GetDistanceMatrix.Initialize(distanceMatrixApiKey);
+
 //Cloudinary
 var cloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
 var cloudinary = new Cloudinary(new Account(
