@@ -50,7 +50,7 @@ namespace WebAPI.Service
                         runningTasks.RemoveAll(t => t.IsCompleted);
                     }                   
                 }
-                await Task.Delay(10, stoppingToken);
+                await Task.Delay(1000, stoppingToken);
             }
         }
 

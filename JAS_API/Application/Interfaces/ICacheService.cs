@@ -50,7 +50,7 @@ namespace Application.Interfaces
 
    //     bool PlaceBidWithLuaScript(int lotId, BiddingInputDTO request, int customerId);
 
-        public void AddToStream(int lotId, BiddingInputDTO request, int customerId);
+        public BidPrice AddToStream(int lotId, BiddingInputDTO request, int customerId);
 
         (bool result, BidPrice? bidPrice, float? highestBid) PlaceBidWithLuaScript(int lotId);
     }
