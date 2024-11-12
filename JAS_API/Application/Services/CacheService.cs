@@ -392,18 +392,12 @@ local entries = redis.call('XREAD', 'COUNT', 1, 'STREAMS', stream_key, '0')
 if not entries or #entries == 0 then
     return nil -- Không có giá đấu nào trong Stream
 else
-redis.call('SET', 'debug:entities', cjson.encode(entries))
  local entry_id = entries[1][2][1][1]
  local bid_data = entries[1][2][1][2]
-redis.call('SET', 'debug:entry_id', cjson.encode(entry_id))
-redis.call('SET', 'debug:bid_data', cjson.encode(bid_data))
 
 local bid_data = cjson.decode(bid_data[2])  -- Decode the JSON data
 local newPrice = tonumber(bid_data.CurrentPrice)  -- Extract the new price
 local newTime = bid_data.BidTime
-
-redis.call('SET', 'debug:newPrice', cjson.encode(newPrice))
-redis.call('SET', 'debug:newTime', cjson.encode(newTime))
 
 -- Lấy giá đấu cao nhất hiện tại từ Sorted Set
 local highestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
@@ -413,25 +407,16 @@ local highestBidTime = 0
 if #highestBid > 0 then
     highestBidPrice = tonumber(highestBid[2])
     highestBidTime = cjson.decode(highestBid[1]).BidTime
-redis.call('SET', 'debug:highestBidTime', cjson.encode(highestBidTime))
     -- Kiểm tra điều kiện giá mới
     if newPrice > highestBidPrice then
         bid_data.Status = ""Success""
         redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
         redis.call('XDEL', stream_key, entry_id) -- Xóa khỏi Stream nếu đạt điều kiện    
-    elseif newPrice == highestBidPrice and newTime > highestBidTime then
+    elseif newPrice == highestBidPrice then
         bid_data.Status = ""Failed""
         redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
         redis.call('XDEL', stream_key, entry_id)
     elseif newPrice < highestBidPrice then
-        bid_data.Status = ""Failed""
-        redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
-        redis.call('XDEL', stream_key, entry_id)
-    elseif newPrice == highestBidPrice and newTime < highestBidTime then
-        bid_data.Status = ""Failed""
-        redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
-        redis.call('XDEL', stream_key, entry_id)
-    elseif newPrice == highestBidPrice and newTime == highestBidTime then
         bid_data.Status = ""Failed""
         redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
         redis.call('XDEL', stream_key, entry_id)
@@ -523,7 +508,7 @@ end
             public float? HighestBid { get; set; }
             public BidPrice? BidPrice { get; set; }
         }
-        public void AddToStream(int lotId, BiddingInputDTO request, int customerId)
+        public BidPrice AddToStream(int lotId, BiddingInputDTO request, int customerId)
         {
             var streamKey = $"BidStream:{lotId}";
             var timestamp = new DateTimeOffset(request.BidTime).ToUnixTimeSeconds();
@@ -540,6 +525,7 @@ end
             {
              new NameValueEntry("BidPrice", serializedBidPrice)  // Store the serialized BidPrice object
             });
+            return bidPrice;
         }
 
 
