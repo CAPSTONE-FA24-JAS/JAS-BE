@@ -423,7 +423,7 @@ redis.call('SET', 'debug:highestBidTime', cjson.encode(highestBidTime))
         bid_data.Status = ""Failed""
         redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
         redis.call('XDEL', stream_key, entry_id)
-    elseif newPrice < highestBidPrice and newTime > highestBidTime then
+    elseif newPrice < highestBidPrice then
         bid_data.Status = ""Failed""
         redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
         redis.call('XDEL', stream_key, entry_id)
@@ -530,7 +530,7 @@ end
             var bidPrice = new BidPrice
             {
                 CurrentPrice = request.CurrentPrice,
-                BidTime = request.BidTime,
+                BidTime = DateTime.UtcNow,
                 Status = "Processing",
                 CustomerId = customerId,
                 LotId = lotId
