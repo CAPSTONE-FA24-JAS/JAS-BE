@@ -86,6 +86,17 @@ namespace Infrastructures.Repositories
             _dbSet.Remove(entity);
         }
 
+        public void RemoveRange(List<TEntity> entities)
+        {
+            if(entities.Count > 0 || entities != null)
+            {
+                foreach (var entity in entities)
+                {
+                    _dbSet.Remove(entity);
+                }
+            }
+        }
+
         public void Update(TEntity entity)
         {
             entity.ModificationDate = _timeService.GetCurrentTime();

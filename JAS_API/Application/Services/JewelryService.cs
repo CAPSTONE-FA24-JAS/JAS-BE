@@ -1160,5 +1160,65 @@ namespace Application.Services
             }
         }
 
+        public async Task<APIResponseModel> DeleteJewelryAsync(int jewelryId)
+        {
+            var response = new APIResponseModel();
+            try {
+                var jewelryExist = await _unitOfWork.JewelryRepository.GetByIdAsync(jewelryId);
+                if(jewelryExist == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Not Found Jewelry For Delete";
+                    response.Code = 400;
+                }else if (jewelryExist != null && jewelryExist.IsDeleted == true)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Jewelry Is Soft Remove.";
+                    response.Code = 400;
+                }
+                else
+                {
+                    _unitOfWork.JewelryRepository.Remove(jewelryExist);
+
+                    if (jewelryExist.ImageJewelries != null)
+                        _unitOfWork.ImageJewelryRepository.RemoveRange(jewelryExist.ImageJewelries.ToList());
+
+                    if (jewelryExist.KeyCharacteristicDetails != null)
+                        _unitOfWork.KeyCharacteristicsDetailRepository.RemoveRange(jewelryExist.KeyCharacteristicDetails.ToList());
+
+                    if (jewelryExist.MainDiamonds != null)
+                        _unitOfWork.MainDiamondRepository.RemoveRange(jewelryExist.MainDiamonds.ToList());
+
+                    if (jewelryExist.SecondaryDiamonds != null)
+                        _unitOfWork.SecondDiamondRepository.RemoveRange(jewelryExist.SecondaryDiamonds.ToList());
+
+                    if (jewelryExist.MainShaphies != null)
+                        _unitOfWork.MainShaphieRepository.RemoveRange(jewelryExist.MainShaphies.ToList());
+
+                    if (jewelryExist.SecondaryShaphies != null)
+                        _unitOfWork.SecondaryShaphieRepository.RemoveRange(jewelryExist.SecondaryShaphies.ToList());
+
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        response.IsSuccess = true;
+                        response.Message = $"Delete Jewelry Successfully";
+                        response.Code = 200;
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = $"Delete Jewelry Faild When Saving To Database";
+                        response.Code = 404;
+                    }
+                }
+
+            } catch (Exception e)
+            {
+                response.IsSuccess = false;
+                response.ErrorMessages = new List<string>{e.InnerException.Message};
+                response.Code = 500;
+            }
+            return response;
+        }
     }
 }
