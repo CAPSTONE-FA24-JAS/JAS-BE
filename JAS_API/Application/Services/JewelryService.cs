@@ -887,9 +887,9 @@ namespace Application.Services
                 else
                 {
                     CovertForUpdate(model, jewelryExist);
-                    foreach(var imagesdto in model.UpdateImageJewelryDTOs)
+                    foreach(var imagesdto in model.UpdateImageJewelryDTOs ?? Enumerable.Empty<UpdateImageJewelryDTO>())
                     {
-                        var checkImageExist = jewelryExist.ImageJewelries.FirstOrDefault(x => x.Id == imagesdto.Id);
+                        var checkImageExist = jewelryExist.ImageJewelries?.FirstOrDefault(x => x.Id == imagesdto.Id);
                         if (checkImageExist != null)
                         {
                             var uploadResultImageLink = await uploadImageOnCloudary(imagesdto.ImageLink, TagsImageJewelry);
@@ -903,7 +903,7 @@ namespace Application.Services
                         else
                         {
                             var imageEntity = _mapper.Map<ImageJewelry>(imagesdto);
-
+                            imageEntity.JewelryId = model.Id;
                             var uploadResultImageLink = await uploadImageOnCloudary(imagesdto.ImageLink, TagsImageJewelry);
                             imageEntity.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
 
@@ -913,9 +913,9 @@ namespace Application.Services
                             await _unitOfWork.ImageJewelryRepository.AddAsync(imageEntity);
                         }
                     }
-                    foreach (var keydto in model.UpdateKeyCharacteristicDetailDTOs)
+                    foreach (var keydto in model.UpdateKeyCharacteristicDetailDTOs ?? Enumerable.Empty<UpdateKeyCharacteristicDetailDTO>())
                     {
-                        var checkKeyExist = jewelryExist.KeyCharacteristicDetails.FirstOrDefault(x => x.Id == keydto.Id);
+                        var checkKeyExist = jewelryExist.KeyCharacteristicDetails?.FirstOrDefault(x => x.Id == keydto.Id);
                         if (checkKeyExist != null)
                         {
                             CovertForUpdate(keydto, checkKeyExist);
@@ -923,17 +923,18 @@ namespace Application.Services
                         else
                         {
                             var keyEntity = _mapper.Map<KeyCharacteristicDetail>(keydto);
+                            keyEntity.JewelryId = model.Id;
                             await _unitOfWork.KeyCharacteristicsDetailRepository.AddAsync(keyEntity);
                         }
                     }
-                    foreach (var mainDiamondDto in model.UpdateMainDiamondDTOs)
+                    foreach (var mainDiamondDto in model.UpdateMainDiamondDTOs ?? Enumerable.Empty<UpdateMainDiamondDTO>())
                     {
-                        var checkmainDiamondExist = jewelryExist.MainDiamonds.FirstOrDefault(x => x.Id == mainDiamondDto.Id);
+                        var checkmainDiamondExist = jewelryExist.MainDiamonds?.FirstOrDefault(x => x.Id == mainDiamondDto.Id);
                         if (checkmainDiamondExist != null)
                         {
-                            foreach (var docdto in mainDiamondDto.UpdateDocumentMainDiamondDTOs)
+                            foreach (var docdto in mainDiamondDto.UpdateDocumentMainDiamondDTOs ?? Enumerable.Empty<UpdateDocumentMainDiamondDTO>())
                             {
-                                var checkdocExist = checkmainDiamondExist.DocumentMainDiamonds.FirstOrDefault(x => x.Id == docdto.Id);
+                                var checkdocExist = checkmainDiamondExist.DocumentMainDiamonds?.FirstOrDefault(x => x.Id == docdto.Id);
                                 if (checkdocExist != null)
                                 {
                                     CovertForUpdate(docdto, checkdocExist);
@@ -941,13 +942,14 @@ namespace Application.Services
                                 else
                                 {
                                     var docEntity = _mapper.Map<DocumentMainDiamond>(docdto);
+                                    docEntity.MainDiamondId = checkmainDiamondExist.Id;
                                     await _unitOfWork.DocumentMainDiamondRepository.AddAsync(docEntity);
                                 }
                             }
 
-                            foreach (var imagedto in mainDiamondDto.UpdateImageMainDiamondDTOs)
+                            foreach (var imagedto in mainDiamondDto.UpdateImageMainDiamondDTOs ?? Enumerable.Empty<UpdateImageMainDiamondDTO>())
                             {
-                                var checkimageExist = checkmainDiamondExist.ImageMainDiamonds.FirstOrDefault(x => x.Id == imagedto.Id);
+                                var checkimageExist = checkmainDiamondExist.ImageMainDiamonds?.FirstOrDefault(x => x.Id == imagedto.Id);
                                 if (checkimageExist != null)
                                 {
                                     var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
@@ -957,7 +959,7 @@ namespace Application.Services
                                 else
                                 {
                                     var imageEntity = _mapper.Map<ImageMainDiamond>(imagedto);
-
+                                    imageEntity.MainDiamondId = checkmainDiamondExist.Id;
                                     var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
                                     imageEntity.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
                                     
@@ -969,19 +971,20 @@ namespace Application.Services
                         else
                         {
                             var mainDiamondEntity = _mapper.Map<MainDiamond>(mainDiamondDto);
+                            mainDiamondEntity.JewelryId = jewelryExist.Id;
                             await _unitOfWork.MainDiamondRepository.AddAsync(mainDiamondEntity);
                         }
 
 
                     }
-                    foreach (var secondDiamondDto in model.UpdateSecondaryDiamondDTOs)
+                    foreach (var secondDiamondDto in model.UpdateSecondaryDiamondDTOs ?? Enumerable.Empty<UpdateSecondaryDiamondDTO>())
                     {
-                        var checkSecondDiamondExist = jewelryExist.SecondaryDiamonds.FirstOrDefault(x => x.Id == secondDiamondDto.Id);
+                        var checkSecondDiamondExist = jewelryExist.SecondaryDiamonds?.FirstOrDefault(x => x.Id == secondDiamondDto.Id);
                         if (checkSecondDiamondExist != null)
                         {
-                            foreach (var docdto in secondDiamondDto.UpdateDocumentSecondaryDiamondDTOs)
+                            foreach (var docdto in secondDiamondDto.UpdateDocumentSecondaryDiamondDTOs ?? Enumerable.Empty<UpdateDocumentSecondaryDiamondDTO>())
                             {
-                                var checkdocExist = checkSecondDiamondExist.DocumentSecondaryDiamonds.FirstOrDefault(x => x.Id == docdto.Id);
+                                var checkdocExist = checkSecondDiamondExist.DocumentSecondaryDiamonds?.FirstOrDefault(x => x.Id == docdto.Id);
                                 if (checkdocExist != null)
                                 {
                                     CovertForUpdate(docdto, checkdocExist);
@@ -989,13 +992,14 @@ namespace Application.Services
                                 else
                                 {
                                     var docEntity = _mapper.Map<DocumentSecondaryDiamond>(docdto);
+                                    docEntity.SecondaryDiamondId = checkSecondDiamondExist.Id;
                                     await _unitOfWork.DocumentSecondaryDiamondRepository.AddAsync(docEntity);
                                 }
                             }
 
-                            foreach (var imagedto in secondDiamondDto.UpdateImageSecondaryDiamondDTOs)
+                            foreach (var imagedto in secondDiamondDto.UpdateImageSecondaryDiamondDTOs ?? Enumerable.Empty<UpdateImageSecondaryDiamondDTO>())
                             {
-                                var checkimageExist = checkSecondDiamondExist.ImageSecondaryDiamonds.FirstOrDefault(x => x.Id == imagedto.Id);
+                                var checkimageExist = checkSecondDiamondExist.ImageSecondaryDiamonds?.FirstOrDefault(x => x.Id == imagedto.Id);
                                 if (checkimageExist != null)
                                 {
                                     var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
@@ -1005,7 +1009,7 @@ namespace Application.Services
                                 else
                                 {
                                     var imageEntity = _mapper.Map<ImageSecondaryDiamond>(imagedto);
-
+                                    imageEntity.SecondaryDiamondId = checkSecondDiamondExist.Id;
                                     var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
                                     imageEntity.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
 
@@ -1017,19 +1021,20 @@ namespace Application.Services
                         else
                         {
                             var secondDiamondEntity = _mapper.Map<SecondaryDiamond>(secondDiamondDto);
+                            secondDiamondEntity.JewelryId = jewelryExist.Id;
                             await _unitOfWork.SecondDiamondRepository.AddAsync(secondDiamondEntity);
                         }
 
 
                     }
-                    foreach (var mainShaphieDto in model.UpdateMainShaphieDTOs)
+                    foreach (var mainShaphieDto in model.UpdateMainShaphieDTOs ?? Enumerable.Empty<UpdateMainShaphieDTO>())
                     {
-                        var checkMainShaphieExist = jewelryExist.MainShaphies.FirstOrDefault(x => x.Id == mainShaphieDto.Id);
+                        var checkMainShaphieExist = jewelryExist.MainShaphies?.FirstOrDefault(x => x.Id == mainShaphieDto.Id);
                         if (checkMainShaphieExist != null)
                         {
-                            foreach (var docdto in mainShaphieDto.UpdateeDocumentMainShaphieDTOs)
+                            foreach (var docdto in mainShaphieDto.UpdateeDocumentMainShaphieDTOs ?? Enumerable.Empty<UpdateeDocumentMainShaphieDTO>())
                             {
-                                var checkdocExist = checkMainShaphieExist.DocumentMainShaphies.FirstOrDefault(x => x.Id == docdto.Id);
+                                var checkdocExist = checkMainShaphieExist.DocumentMainShaphies?.FirstOrDefault(x => x.Id == docdto.Id);
                                 if (checkdocExist != null)
                                 {
                                     CovertForUpdate(docdto, checkdocExist);
@@ -1037,13 +1042,14 @@ namespace Application.Services
                                 else
                                 {
                                     var docEntity = _mapper.Map<DocumentMainShaphie>(docdto);
+                                    docEntity.MainShaphieId = checkMainShaphieExist.Id;
                                     await _unitOfWork.DocumentMainShaphieRepository.AddAsync(docEntity);
                                 }
                             }
 
-                            foreach (var imagedto in mainShaphieDto.UpdateImageMainShaphieDTOs)
+                            foreach (var imagedto in mainShaphieDto.UpdateImageMainShaphieDTOs ?? Enumerable.Empty<UpdateImageMainShaphieDTO>())
                             {
-                                var checkimageExist = checkMainShaphieExist.ImageMainShaphies.FirstOrDefault(x => x.Id == imagedto.Id);
+                                var checkimageExist = checkMainShaphieExist.ImageMainShaphies?.FirstOrDefault(x => x.Id == imagedto.Id);
                                 if (checkimageExist != null)
                                 {
                                     var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
@@ -1053,7 +1059,7 @@ namespace Application.Services
                                 else
                                 {
                                     var imageEntity = _mapper.Map<ImageMainShaphie>(imagedto);
-
+                                    imageEntity.MainShaphieId = checkMainShaphieExist.Id;
                                     var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
                                     imageEntity.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
                                     
@@ -1065,19 +1071,20 @@ namespace Application.Services
                         else
                         {
                             var mainShaphieEntity = _mapper.Map<MainShaphie>(mainShaphieDto);
+                            mainShaphieEntity.JewelryId = jewelryExist.Id;
                             await _unitOfWork.MainShaphieRepository.AddAsync(mainShaphieEntity);
                         }
 
 
                     }
-                    foreach (var secondShaphieDto in model.UpdateSecondaryShaphieDTOs)
+                    foreach (var secondShaphieDto in model.UpdateSecondaryShaphieDTOs ?? Enumerable.Empty<UpdateSecondaryShaphieDTO>())
                     {
-                        var checkSecondShaphieExist = jewelryExist.SecondaryShaphies.FirstOrDefault(x => x.Id == secondShaphieDto.Id);
+                        var checkSecondShaphieExist = jewelryExist.SecondaryShaphies?.FirstOrDefault(x => x.Id == secondShaphieDto.Id);
                         if (checkSecondShaphieExist != null)
                         {
-                            foreach (var docdto in secondShaphieDto.UpdateDocumentSecondaryShaphieDTOs)
+                            foreach (var docdto in secondShaphieDto.UpdateDocumentSecondaryShaphieDTOs ?? Enumerable.Empty<UpdateDocumentSecondaryShaphieDTO>())
                             {
-                                var checkdocExist = checkSecondShaphieExist.DocumentSecondaryShaphies.FirstOrDefault(x => x.Id == docdto.Id);
+                                var checkdocExist = checkSecondShaphieExist.DocumentSecondaryShaphies?.FirstOrDefault(x => x.Id == docdto.Id);
                                 if (checkdocExist != null)
                                 {
                                     CovertForUpdate(docdto, checkdocExist);
@@ -1085,13 +1092,14 @@ namespace Application.Services
                                 else
                                 {
                                     var docEntity = _mapper.Map<DocumentSecondaryShaphie>(docdto);
+                                    docEntity.SecondaryShaphieId = checkSecondShaphieExist.Id;
                                     await _unitOfWork.DocumentSecondaryShaphieRepository.AddAsync(docEntity);
                                 }
                             }
 
-                            foreach (var imagedto in secondShaphieDto.UpdateImageSecondaryShaphieDTOs)
+                            foreach (var imagedto in secondShaphieDto.UpdateImageSecondaryShaphieDTOs ?? Enumerable.Empty<UpdateImageSecondaryShaphieDTO>())
                             {
-                                var checkimageExist = checkSecondShaphieExist.ImageSecondaryShaphies.FirstOrDefault(x => x.Id == imagedto.Id);
+                                var checkimageExist = checkSecondShaphieExist.ImageSecondaryShaphies?.FirstOrDefault(x => x.Id == imagedto.Id);
                                 if (checkimageExist != null)
                                 {
                                     var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
@@ -1101,7 +1109,7 @@ namespace Application.Services
                                 else
                                 {
                                     var imageEntity = _mapper.Map<ImageSecondaryShaphie>(imagedto);
-
+                                    imageEntity.SecondaryShaphieId = checkSecondShaphieExist.Id;
                                     var uploadResultImageLink = await uploadImageOnCloudary(imagedto.ImageLink, TagsImageJewelry);
                                     imageEntity.ImageLink = uploadResultImageLink.SecureUrl.AbsoluteUri;
 
@@ -1113,6 +1121,7 @@ namespace Application.Services
                         else
                         {
                             var secondShaphieEntity = _mapper.Map<SecondaryShaphie>(secondShaphieDto);
+                            secondShaphieEntity.JewelryId = jewelryExist.Id;
                             await _unitOfWork.SecondaryShaphieRepository.AddAsync(secondShaphieEntity);
                         }
                     }
