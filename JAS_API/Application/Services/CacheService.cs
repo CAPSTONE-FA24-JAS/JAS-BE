@@ -403,6 +403,7 @@ local newPrice = tonumber(bid_data.CurrentPrice)  -- Extract the new price
 local newTime = bid_data.BidTime
 
 redis.call('SET', 'debug:newPrice', cjson.encode(newPrice))
+redis.call('SET', 'debug:newTime', cjson.encode(newTime))
 
 -- Lấy giá đấu cao nhất hiện tại từ Sorted Set
 local highestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
@@ -412,7 +413,7 @@ local highestBidTime = 0
 if #highestBid > 0 then
     highestBidPrice = tonumber(highestBid[2])
     highestBidTime = cjson.decode(highestBid[1]).BidTime
-
+redis.call('SET', 'debug:highestBidTime', cjson.encode(highestBidTime))
     -- Kiểm tra điều kiện giá mới
     if newPrice > highestBidPrice then
         bid_data.Status = ""Success""
@@ -423,6 +424,14 @@ if #highestBid > 0 then
         redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
         redis.call('XDEL', stream_key, entry_id)
     elseif newPrice < highestBidPrice and newTime > highestBidTime then
+        bid_data.Status = ""Failed""
+        redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
+        redis.call('XDEL', stream_key, entry_id)
+    elseif newPrice == highestBidPrice and newTime < highestBidTime then
+        bid_data.Status = ""Failed""
+        redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
+        redis.call('XDEL', stream_key, entry_id)
+    elseif newPrice == highestBidPrice and newTime == highestBidTime then
         bid_data.Status = ""Failed""
         redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
         redis.call('XDEL', stream_key, entry_id)
