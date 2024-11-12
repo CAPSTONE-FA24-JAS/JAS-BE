@@ -1,4 +1,3 @@
-
 ﻿using Infrastructures;
 using Application.Commons;
 using WebAPI;
@@ -16,6 +15,8 @@ using StackExchange.Redis;
 using Application.Interfaces;
 using DinkToPdf.Contracts;
 using DinkToPdf;
+using Swashbuckle.AspNetCore;
+using Application.Utils;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,10 @@ var MyAllowSpecificOrigins = "JASCORS";
 var configuration = builder.Configuration.Get<AppConfiguration>() ?? new AppConfiguration();
 builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
+
+var distanceMatrixApiKey = builder.Configuration.GetSection("DistanceMatrixai:ApiKey").Value;
+GetDistanceMatrix.Initialize(distanceMatrixApiKey);
+
 //Cloudinary
 var cloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
 var cloudinary = new Cloudinary(new Account(
@@ -44,6 +49,7 @@ builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, buil
     build.WithOrigins("http://localhost:3000", "exp://127.0.0.1:8081").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
 }));
 
+
 //builder.WebHost.UseUrls("https://localhost:7251");
 builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
@@ -56,11 +62,9 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
 
 builder.Services.AddSingleton<LiveBiddingService>();
-
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
 //dki background service
-builder.Services.AddHostedService<ProcessStreamService>();
 builder.Services.AddHostedService<AuctionMonitorService>();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddEndpointsApiExplorer();
@@ -140,4 +144,3 @@ app.MapHub<BiddingHub>("/Auctionning");
 
 app.Run();
 public partial class Program { }
-

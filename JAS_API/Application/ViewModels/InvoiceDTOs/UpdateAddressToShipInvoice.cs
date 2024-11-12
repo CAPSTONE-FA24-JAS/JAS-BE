@@ -10,6 +10,5 @@ namespace Application.ViewModels.InvoiceDTOs
     {
         public int InvoiceId { get; set; }
         public int AddressToShipId { get; set; }
-        public float DistanceToDelivery { get; set; }
     }
 }
