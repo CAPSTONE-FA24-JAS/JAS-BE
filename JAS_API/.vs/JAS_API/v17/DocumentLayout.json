@@ -3,20 +3,72 @@
   "WorkspaceRootPath": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\services\\cacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\services\\cacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\service\\valuationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\service\\valuationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\service\\generatepdfservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\service\\generatepdfservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\controllers\\valuationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\controllers\\valuationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\webapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\webapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\service\\processstreamservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\service\\processstreamservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A79BE9A5-9E19-4DB3-AE25-DB1E19130771}|Domain\\Domain.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\domain\\entity\\notification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A79BE9A5-9E19-4DB3-AE25-DB1E19130771}|Domain\\Domain.csproj|solutionrelative:domain\\entity\\notification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\utils\\helpervaluation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\utils\\helpervaluation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{727B01DE-869A-4B1D-BF21-7C5792481A24}|Infrastructures\\Infrastructures.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\infrastructures\\denpendencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{727B01DE-869A-4B1D-BF21-7C5792481A24}|Infrastructures\\Infrastructures.csproj|solutionrelative:infrastructures\\denpendencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\service\\bidpriceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\service\\bidpriceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\service\\livebiddingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\service\\livebiddingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\application.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\application.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\services\\cacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\services\\cacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\interfaces\\icacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\interfaces\\icacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\controllers\\bidpricescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\controllers\\bidpricescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\service\\auctionmonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\service\\auctionmonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A79BE9A5-9E19-4DB3-AE25-DB1E19130771}|Domain\\Domain.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\domain\\entity\\notification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A79BE9A5-9E19-4DB3-AE25-DB1E19130771}|Domain\\Domain.csproj|solutionrelative:domain\\entity\\notification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\viewmodels\\lotdtos\\lotdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -27,36 +79,12 @@
       "RelativeMoniker": "D:0:0:{A79BE9A5-9E19-4DB3-AE25-DB1E19130771}|Domain\\Domain.csproj|solutionrelative:domain\\entity\\lot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\service\\bidpriceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\service\\bidpriceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\controllers\\bidpricescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\controllers\\bidpricescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\service\\auctionmonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\service\\auctionmonitorservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\viewmodels\\bidpricedtos\\bidpricedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\viewmodels\\bidpricedtos\\bidpricedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\webapi\\libwkhtmltox.dll||{177559E0-D141-11D0-92DF-00A0C9138C45}",
-      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\libwkhtmltox.dll||{177559E0-D141-11D0-92DF-00A0C9138C45}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\capstone\\source_code\\be\\jas-be\\jas_api\\application\\interfaces\\icacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\interfaces\\icacheservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -66,7 +94,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 21,
+          "SelectedChildIndex": 10,
           "Children": [
             {
               "$type": "Bookmark",
@@ -103,6 +131,109 @@
             {
               "$type": "Document",
               "DocumentIndex": 4,
+              "Title": "WebAPI",
+              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\WebAPI.csproj",
+              "RelativeDocumentMoniker": "WebAPI\\WebAPI.csproj",
+              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\WebAPI.csproj*",
+              "RelativeToolTip": "WebAPI\\WebAPI.csproj*",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAEQAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-11-13T08:49:42.893Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GeneratePdfService.cs",
+              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\GeneratePdfService.cs",
+              "RelativeDocumentMoniker": "WebAPI\\Service\\GeneratePdfService.cs",
+              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\GeneratePdfService.cs",
+              "RelativeToolTip": "WebAPI\\Service\\GeneratePdfService.cs",
+              "ViewState": "AQIAAA0AAAAAAAAAAAAAADUAAAAMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T08:47:40.75Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ValuationService.cs",
+              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\ValuationService.cs",
+              "RelativeDocumentMoniker": "WebAPI\\Service\\ValuationService.cs",
+              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\ValuationService.cs",
+              "RelativeToolTip": "WebAPI\\Service\\ValuationService.cs",
+              "ViewState": "AQIAAEACAAAAAAAAAAAYwFkCAAAMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T08:47:14.194Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ValuationsController.cs",
+              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Controllers\\ValuationsController.cs",
+              "RelativeDocumentMoniker": "WebAPI\\Controllers\\ValuationsController.cs",
+              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Controllers\\ValuationsController.cs",
+              "RelativeToolTip": "WebAPI\\Controllers\\ValuationsController.cs",
+              "ViewState": "AQIAAIEAAAAAAAAAAAAiwJoAAAAMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T08:45:22.955Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "HelperValuation.cs",
+              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Utils\\HelperValuation.cs",
+              "RelativeDocumentMoniker": "Application\\Utils\\HelperValuation.cs",
+              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Utils\\HelperValuation.cs",
+              "RelativeToolTip": "Application\\Utils\\HelperValuation.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T08:44:27.498Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "DependencyInjection.cs",
+              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\DependencyInjection.cs",
+              "RelativeDocumentMoniker": "WebAPI\\DependencyInjection.cs",
+              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\DependencyInjection.cs",
+              "RelativeToolTip": "WebAPI\\DependencyInjection.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABQAAAAlAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T08:43:36.391Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "DenpendencyInjection.cs",
+              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Infrastructures\\DenpendencyInjection.cs",
+              "RelativeDocumentMoniker": "Infrastructures\\DenpendencyInjection.cs",
+              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Infrastructures\\DenpendencyInjection.cs",
+              "RelativeToolTip": "Infrastructures\\DenpendencyInjection.cs",
+              "ViewState": "AQIAADoAAAAAAAAAAAAQwF0AAAALAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-13T08:43:28.529Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Application",
+              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Application.csproj",
+              "RelativeDocumentMoniker": "Application\\Application.csproj",
+              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Application.csproj",
+              "RelativeToolTip": "Application\\Application.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-11-13T08:26:57.175Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
               "Title": "LotDTO.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\ViewModels\\LotDTOs\\LotDTO.cs",
               "RelativeDocumentMoniker": "Application\\ViewModels\\LotDTOs\\LotDTO.cs",
@@ -110,12 +241,11 @@
               "RelativeToolTip": "Application\\ViewModels\\LotDTOs\\LotDTO.cs",
               "ViewState": "AQIAAAwAAAAAAAAAAAAowBgAAAAnAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-12T12:18:31.02Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-12T12:18:31.02Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 18,
               "Title": "Lot.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Domain\\Entity\\Lot.cs",
               "RelativeDocumentMoniker": "Domain\\Entity\\Lot.cs",
@@ -123,25 +253,24 @@
               "RelativeToolTip": "Domain\\Entity\\Lot.cs",
               "ViewState": "AQIAAAkAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-12T12:18:01.922Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-12T12:18:01.922Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 10,
               "Title": "LiveBiddingService.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\LiveBiddingService.cs",
               "RelativeDocumentMoniker": "WebAPI\\Service\\LiveBiddingService.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\LiveBiddingService.cs",
               "RelativeToolTip": "WebAPI\\Service\\LiveBiddingService.cs",
-              "ViewState": "AQIAAEgBAAAAAAAAAAAkwFcBAAAzAAAA",
+              "ViewState": "AQIAAM4AAAAAAAAAAAAgwN8AAAB4AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-12T12:14:20.917Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 19,
               "Title": "NotificationService.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Services\\NotificationService.cs",
               "RelativeDocumentMoniker": "Application\\Services\\NotificationService.cs",
@@ -153,7 +282,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 16,
               "Title": "Notification.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Domain\\Entity\\Notification.cs",
               "RelativeDocumentMoniker": "Domain\\Entity\\Notification.cs",
@@ -161,23 +290,11 @@
               "RelativeToolTip": "Domain\\Entity\\Notification.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAuwBYAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-11T16:05:10.695Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-11T16:05:10.695Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "libwkhtmltox.dll",
-              "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\libwkhtmltox.dll",
-              "RelativeDocumentMoniker": "WebAPI\\libwkhtmltox.dll",
-              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\libwkhtmltox.dll",
-              "RelativeToolTip": "WebAPI\\libwkhtmltox.dll",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001697|",
-              "WhenOpened": "2024-11-11T10:08:05.992Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 20,
               "Title": "BidPriceDTO.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\ViewModels\\BidPriceDTOs\\BidPriceDTO.cs",
               "RelativeDocumentMoniker": "Application\\ViewModels\\BidPriceDTOs\\BidPriceDTO.cs",
@@ -189,38 +306,38 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 14,
               "Title": "BidPricesController.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Controllers\\BidPricesController.cs",
               "RelativeDocumentMoniker": "WebAPI\\Controllers\\BidPricesController.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Controllers\\BidPricesController.cs",
               "RelativeToolTip": "WebAPI\\Controllers\\BidPricesController.cs",
-              "ViewState": "AQIAABwAAAAAAAAAAAArwCoAAAAIAAAA",
+              "ViewState": "AQIAACEAAAAAAAAAAAAkwCoAAAAIAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-11T07:41:34.584Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-11T07:41:34.584Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 3,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Program.cs",
               "RelativeDocumentMoniker": "WebAPI\\Program.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Program.cs",
               "RelativeToolTip": "WebAPI\\Program.cs",
-              "ViewState": "AQIAAGwAAAAAAAAAAAAvwIwAAAAAAAAA",
+              "ViewState": "AQIAAHMAAAAAAAAAAAAYwIwAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-10T20:15:07.594Z"
+              "WhenOpened": "2024-11-10T20:15:07.594Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 15,
               "Title": "AuctionMonitorService.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\AuctionMonitorService.cs",
               "RelativeDocumentMoniker": "WebAPI\\Service\\AuctionMonitorService.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\AuctionMonitorService.cs",
               "RelativeToolTip": "WebAPI\\Service\\AuctionMonitorService.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAB8AAABKAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-10T20:48:20.287Z"
             },
@@ -232,45 +349,45 @@
               "RelativeDocumentMoniker": "Application\\Interfaces\\ICacheService.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Interfaces\\ICacheService.cs",
               "RelativeToolTip": "Application\\Interfaces\\ICacheService.cs",
-              "ViewState": "AQIAABoAAAAAAAAAAIAywDQAAAAUAAAA",
+              "ViewState": "AQIAABoAAAAAAAAAAAA5wCQAAAA+AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-10T17:17:15.773Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 9,
               "Title": "BidPriceService.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\BidPriceService.cs",
               "RelativeDocumentMoniker": "WebAPI\\Service\\BidPriceService.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\BidPriceService.cs",
               "RelativeToolTip": "WebAPI\\Service\\BidPriceService.cs",
-              "ViewState": "AQIAAFMBAAAAAAAAAAAnwHwBAAAIAAAA",
+              "ViewState": "AQIAAAsAAAAAAAAAAAAAAGYBAAAcAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-10T14:45:58.434Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 5,
               "Title": "ProcessStreamService.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\ProcessStreamService.cs",
               "RelativeDocumentMoniker": "WebAPI\\Service\\ProcessStreamService.cs",
               "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\WebAPI\\Service\\ProcessStreamService.cs",
               "RelativeToolTip": "WebAPI\\Service\\ProcessStreamService.cs",
-              "ViewState": "AQIAACEAAAAAAAAAAAAQwDkAAAAIAAAA",
+              "ViewState": "AQIAADMAAAAAAAAAAAAYwDkAAAAIAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-10T09:19:18.811Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 12,
               "Title": "CacheService.cs",
               "DocumentMoniker": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Services\\CacheService.cs",
               "RelativeDocumentMoniker": "Application\\Services\\CacheService.cs",
-              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Services\\CacheService.cs*",
-              "RelativeToolTip": "Application\\Services\\CacheService.cs*",
-              "ViewState": "AQIAAJQBAAAAAAAAAAAYwK0BAAA0AAAA",
+              "ToolTip": "D:\\CAPSTONE\\Source_code\\BE\\JAS-BE\\JAS_API\\Application\\Services\\CacheService.cs",
+              "RelativeToolTip": "Application\\Services\\CacheService.cs",
+              "ViewState": "AQIAAPIBAAAAAAAAAAAuwBACAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-06T16:50:28.505Z",
               "EditorCaption": ""

@@ -26,7 +26,7 @@ namespace Infrastructures
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IImageValuationRepository, ImageValuationRepository>();
             services.AddScoped<IValuationRepository, ValuationRepository>();
-            services.AddScoped<IValuationService, ValuationService>();
+            
             services.AddScoped<IAddressToShipService,AddressToShipService>();
             services.AddScoped<IAddressToShipRepository, AddressToShipRepository>();
             services.AddScoped<IWardService, WardService>();
@@ -39,7 +39,7 @@ namespace Infrastructures
             services.AddScoped<IHistoryValuationRepository, HistoryValuationRepository>();
             services.AddScoped<IHistoryValuationService, HistoryValuationService>();
             services.AddScoped<IJewelryRepository, JewelryRepository>();
-            services.AddScoped<IJewelryService, JewelryService>();
+            
             services.AddScoped<IKeyCharacteristicRepository, KeyCharacterisicRepository>();
             services.AddScoped<IKeyCharacteristicService, KeyCharacteristicService>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -91,7 +91,7 @@ namespace Infrastructures
             services.AddScoped<IBlogService, BlogService>();
             services.AddScoped<IBlogRepository, BlogRepository>();
             services.AddScoped<IImageBlogRepository, ImageBlogRepository>();
-            services.AddScoped<IGeneratePDFService, GeneratePdfService>();
+           
             services.AddSingleton<HelperValuation>();
             services.AddScoped<IAutoBidRepository, AutoBidRepository>();
             services.AddScoped<IAutoBidService, AutoBidService>();
