@@ -65,6 +65,7 @@ builder.Services.AddSingleton<LiveBiddingService>();
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
 //dki background service
+builder.Services.AddHostedService<ProcessStreamService>();
 builder.Services.AddHostedService<AuctionMonitorService>();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddEndpointsApiExplorer();
@@ -144,5 +145,3 @@ app.MapHub<BiddingHub>("/Auctionning");
 
 app.Run();
 public partial class Program { }
-
-
