@@ -3,13 +3,18 @@ using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.AccountDTOs;
 using Application.ViewModels.BidPriceDTOs;
+using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.LotDTOs;
 using AutoMapper;
 using Azure;
+using Castle.Core.Resource;
 using Domain.Entity;
 using Domain.Enums;
 using Google.Apis.Storage.v1.Data;
+using Microsoft.AspNetCore.SignalR;
 using System.Linq.Expressions;
+using System.Reflection;
+using WebAPI.Middlewares;
 using static Google.Apis.Requests.BatchRequest;
 
 namespace Application.Services
@@ -23,8 +28,10 @@ namespace Application.Services
         private readonly IWalletService _walletService;
         private readonly IWalletTransactionService _walletTransactionService;
         private readonly IFoorFeePercentService _foorFeePercentService;
+        private readonly IHubContext<BiddingHub> _hubContext;
 
-        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IAccountService accountService, IWalletService walletService, IWalletTransactionService walletTransactionService, IFoorFeePercentService foorFeePercentService)
+        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IAccountService accountService, IWalletService walletService, 
+            IWalletTransactionService walletTransactionService, IFoorFeePercentService foorFeePercentService, IHubContext<BiddingHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -33,6 +40,7 @@ namespace Application.Services
             _walletService = walletService;
             _walletTransactionService = walletTransactionService;
             _foorFeePercentService = foorFeePercentService;
+            _hubContext = hubContext;
         }
 
         public async Task<APIResponseModel> CreateLot(object lotDTO)
@@ -725,7 +733,7 @@ namespace Application.Services
             try
             {
                 var lot = await _unitOfWork.LotRepository.GetByIdAsync(placeBidBuyNowDTO.LotId);
-
+                string lotGroupName = $"lot-{placeBidBuyNowDTO.LotId}";
                 if (lot != null)
                 {
                     if (lot.LotType != EnumLotType.Public_Auction.ToString())
@@ -753,6 +761,22 @@ namespace Application.Services
                         response.Message = $"The customer is not register into the lot";
                         return response;
                     }
+                    var bidData = new BiddingInputDTO
+                    {
+                        CurrentPrice = playerJoined.Lot.BuyNowPrice,
+                        BidTime = DateTime.UtcNow
+                        
+                    };            
+                    var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(placeBidBuyNowDTO.CustomerId);                   
+                    var firstName = customer.FirstName;
+                    var lastname = customer.LastName;
+
+
+                    // Lưu dữ liệu đấu giá vào Redis stream
+                    var bidPriceStream = _cacheService.AddToStream((int)placeBidBuyNowDTO.LotId, bidData, (int)placeBidBuyNowDTO.CustomerId);
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", bidPriceStream.CustomerId, firstName, lastname, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", bidPriceStream.CustomerId, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinnerPublic", "Phiên đã kết thúc!", placeBidBuyNowDTO.CustomerId, playerJoined.Lot.BuyNowPrice);
 
                     lot.Status = EnumStatusLot.Sold.ToString();
                     var winnerInLot = lot.CustomerLots.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId
