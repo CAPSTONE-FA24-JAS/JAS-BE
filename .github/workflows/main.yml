@@ -21,7 +21,12 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
-
+          
+      - name: Copy libwkhtmltox.dll
+        run: |
+          mkdir -p ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          cp ./JAS_API/libwkhtmltox.dll ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          
       - name: Restore
         run: dotnet restore ./JAS_API/JAS_API.sln
 
