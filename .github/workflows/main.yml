@@ -43,10 +43,10 @@ jobs:
         run: dotnet restore ./JAS_API/JAS_API.sln
 
       - name: Build
-        run: dotnet build ./JAS_API/JAS_API.sln --configuration Release --no-restore
+        run: dotnet build ./JAS_API/JAS_API.sln --configuration Release --no-restore 
 
       - name: Publish
-        run: dotnet publish ./JAS_API/JAS_API.sln --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+        run: dotnet publish ./JAS_API/JAS_API.sln --configuration Release --no-build --output .\JAS_API\WebAPI\publish_output
           
       - name: Deployment
         uses: azure/webapps-deploy@v2
