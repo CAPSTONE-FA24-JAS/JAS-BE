@@ -65,7 +65,7 @@ namespace Infrastructures
             services.AddScoped<IWalletRepository, WalletRepository>();
             services.AddScoped<IAuctionService, AuctionService>();
             services.AddScoped<IAuctionRepository, AuctionRepository>();
-            services.AddScoped<ILotService, LotService>();
+            
             services.AddScoped<ILotRepository, LotRepository>();
             services.AddScoped<IStaffRepository, StaffRepository>();
             services.AddScoped<ICustomerLotRepository, CustomerLotRepository>();

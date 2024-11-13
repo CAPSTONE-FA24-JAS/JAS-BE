@@ -4,7 +4,9 @@ using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Services;
 using Application.Utils;
+using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.LiveBiddingDTOs;
+using Application.ViewModels.LotDTOs;
 using Castle.Core.Resource;
 using Domain.Entity;
 using Domain.Enums;
@@ -491,7 +493,7 @@ namespace WebAPI.Service
                     // nếu lot đó k có ai đấu giá thì đổi qua status passed, cập nhật lên cả redis và sql
                     if (bidPrices.Count == 0)
                     {
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionPublicEnded", "Phiên đã kết thúc!");
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionPublicEnded", "Phiên đã kết thúc va khong co ai dau gia!");
                         lot.Status = EnumStatusLot.Passed.ToString();
                         lot.ActualEndTime = endTime;
 
@@ -500,7 +502,7 @@ namespace WebAPI.Service
                         _cacheService.UpdateLotStatus(lotId, lot.Status);
                         _cacheService.UpdateLotActualEndTime(lotId, endTime);
                         await _unitOfWork.SaveChangeAsync();
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEnded", "Phiên đã kết thúc va khong co ai dau gia!");
+                      
 
                     }
                     else
@@ -520,7 +522,7 @@ namespace WebAPI.Service
                         _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, winner.CurrentPrice);
                         await _unitOfWork.SaveChangeAsync();
 
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinner", "Phiên đã kết thúc!", winner.CustomerId, winner.CurrentPrice);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinnerPublic", "Phiên đã kết thúc!", winner.CustomerId, winner.CurrentPrice);
 
                         //xu ly cho thang thắng va thua                       
                         await   HandleWinnerAndLoserLot(lot.Id, winner);
@@ -752,22 +754,27 @@ namespace WebAPI.Service
                                 //kiểm tra bidLimit của customer có đủ điều kiện để đấu với giá này hay không
                                 if (player.Customer.PriceLimit >= bidPriceFuture)
                                 {
-                                    var bidData = new BidPrice
+                                    var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(player.CustomerId);
+                                    var firstName = customer.FirstName;
+                                    var lastname = customer.LastName;
+                                    //luu vao hang doi
+                                    var bidData = new BiddingInputDTO
                                     {
                                         CurrentPrice = bidPriceFuture,
-                                        BidTime = DateTime.UtcNow,
-                                        CustomerId = player.CustomerId,
-                                        LotId = player.LotId,
+                                        BidTime = DateTime.UtcNow
+
                                     };
 
-                                    player.Customer.PriceLimit -= bidPriceFuture;
+                                    string lotGroupName = $"lot-{player.LotId}";
+                                    // Lưu dữ liệu đấu giá vào Redis stream
+                                    var bidPriceStream = _cacheService.AddToStream((int)player.Lot.Id, bidData, (int)player.CustomerId);
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", bidPriceStream.CustomerId, firstName, lastname, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", bidPriceStream.CustomerId, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
+                                    
+                                    //bỏ dòng này nè danh vì khi nào bán được sản phẩm đó mới trừ bidLimit
+                                   // player.Customer.PriceLimit -= bidPriceFuture;
                                     await _unitOfWork.SaveChangeAsync();
                                     string redisKey = $"BidPrice:{player.LotId}";
-                                    // Lưu dữ liệu đấu giá vào Redis
-                                    _cacheService.SetSortedSetData<BidPrice>(redisKey, bidData, bidPriceFuture);
-
-                                    string lotGroupName = $"lot-{player.LotId}";
-                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
                                 }
                             }
                             //không làm gì cả không lưu redis
