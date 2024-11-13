@@ -24,14 +24,14 @@ jobs:
           
       - name: Check contents of wwwroot
         run: |
-           Get-ChildItem -Path .\JAS_API\WebAPI\wwwroot
+           Get-ChildItem -Path .\JAS_API\WebAPI
         shell: pwsh
    
       - name: Copy libwkhtmltox.dll directly to publish_output
         run: |
-           New-Item -ItemType Directory -Path .\JAS_API\WebAPI\wwwroot\publish_output -Force
+           New-Item -ItemType Directory -Path .\JAS_API\WebAPI\publish_output -Force
            
-           Copy-Item -Path .\JAS_API\WebAPI\wwwroot\libwkhtmltox.dll -Destination .\JAS_API\WebAPI\wwwroot\publish_output -Force
+           Copy-Item -Path .\JAS_API\WebAPI\libwkhtmltox.dll -Destination .\JAS_API\WebAPI\publish_output -Force
         shell: pwsh
 
           
