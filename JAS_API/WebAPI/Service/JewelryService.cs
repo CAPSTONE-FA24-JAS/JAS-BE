@@ -1147,6 +1147,7 @@ namespace Application.Services
             }
             return response;
         }
+
         internal void CovertForUpdate<TDto, TEntity>(TDto dto, TEntity entity) where TDto : UpdateBaseEntity
                                                                                             where TEntity : class
         {
@@ -1217,6 +1218,35 @@ namespace Application.Services
                 response.IsSuccess = false;
                 response.ErrorMessages = new List<string>{e.InnerException.Message};
                 response.Code = 500;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> GetJewelrysIsSoldOut()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var jewelrysSoldOut = await _unitOfWork.JewelryRepository.GetAllAsync(x => x.Lots.Any(x => x.Status == EnumStatusLot.Sold.ToString()));
+
+                if (!jewelrysSoldOut.Any())
+                {
+                    response.IsSuccess = true;
+                    response.Code = 200;
+                    response.Message = "Current Time Not Jewelry Is Sold Out In System.";
+                }
+                else
+                {
+                    response.Data = _mapper.Map<IEnumerable<JewelryListDTO>>(jewelrysSoldOut);
+                    response.IsSuccess = true;
+                    response.Code = 200;
+                    response.Message = $"Received Successfully, Have {jewelrysSoldOut.Count()}";
+                }
+            }catch(Exception e)
+            {
+                response.ErrorMessages = new List<string> { e.Message };
+                response.Code = 500;
+                response.IsSuccess= false;
             }
             return response;
         }
