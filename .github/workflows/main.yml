@@ -1,6 +1,6 @@
 name: Publish
 
-on: 
+on:
   workflow_dispatch:
   push:
     branches:
@@ -9,28 +9,30 @@ on:
 env:
   AZURE_WEBAPP_NAME: JAS
   AZURE_WEBAPP_PACKAGE_PATH: "./publish"
-  
+
 jobs:
   publish:
     runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
-          
+
       - name: Check contents of wwwroot
         run: |
            Get-ChildItem -Path .\JAS_API\WebAPI
         shell: pwsh
-   
+
       - name: Copy libwkhtmltox.dll directly to publish_output
         run: |
+           # Tạo thư mục publish_output nếu chưa có
            New-Item -ItemType Directory -Path .\JAS_API\WebAPI\publish_output -Force
            
+           # Sao chép libwkhtmltox.dll vào thư mục publish_output
            Copy-Item -Path .\JAS_API\WebAPI\libwkhtmltox.dll -Destination .\JAS_API\WebAPI\publish_output -Force
         shell: pwsh
 
@@ -38,19 +40,19 @@ jobs:
         run: |
            Get-ChildItem -Path .\JAS_API\WebAPI\publish_output
         shell: pwsh
-          
+
       - name: Restore
         run: dotnet restore ./JAS_API/JAS_API.sln
 
       - name: Build
-        run: dotnet build ./JAS_API/JAS_API.sln --configuration Release --no-restore 
+        run: dotnet build ./JAS_API/JAS_API.sln --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish ./JAS_API/JAS_API.sln --configuration Release --no-build --output .\JAS_API\WebAPI\publish_output
-          
+        run: dotnet publish ./JAS_API/JAS_API.sln --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+
       - name: Deployment
         uses: azure/webapps-deploy@v2
         with:
            app-name: ${{ env.AZURE_WEBAPP_NAME }}
            publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-           package: .
+           package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
