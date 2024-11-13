@@ -34,6 +34,10 @@ jobs:
            Copy-Item -Path .\JAS_API\WebAPI\libwkhtmltox.dll -Destination .\JAS_API\WebAPI\publish_output -Force
         shell: pwsh
 
+      - name: Check contents of publish_output
+        run: |
+           Get-ChildItem -Path .\JAS_API\WebAPI\publish_output
+        shell: pwsh
           
       - name: Restore
         run: dotnet restore ./JAS_API/JAS_API.sln
