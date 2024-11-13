@@ -29,9 +29,9 @@ jobs:
    
       - name: Copy libwkhtmltox.dll directly to publish_output
         run: |
-           New-Item -ItemType Directory -Path "D:\CAPSTONE\Source_code\BE\JAS-BE\JAS_API\WebAPI\publish_output" -Force
+           New-Item -ItemType Directory -Path .\JAS_API\WebAPI\wwwroot\publish_output -Force
            
-           Copy-Item -Path "D:\CAPSTONE\Source_code\BE\JAS-BE\JAS_API\WebAPI\wwwroot\libwkhtmltox.dll" -Destination "D:\CAPSTONE\Source_code\BE\JAS-BE\JAS_API\WebAPI\publish_output\" -Force
+           Copy-Item -Path .\JAS_API\WebAPI\wwwroot\libwkhtmltox.dll -Destination .\JAS_API\WebAPI\wwwroot\publish_output -Force
         shell: pwsh
 
           
