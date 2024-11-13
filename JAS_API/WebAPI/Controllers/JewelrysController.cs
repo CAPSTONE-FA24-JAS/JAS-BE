@@ -157,5 +157,13 @@ namespace WebAPI.Controllers
             var result = await _jewelryService.DeleteJewelryAsync(jewelryId);
             return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
+        
+
+        [HttpGet]
+        public async Task<IActionResult> ViewJewelryIsSoldOut()
+        {
+            var result = await _jewelryService.GetJewelrysIsSoldOut();
+            return (result.IsSuccess) ? Ok(result) : BadRequest(result);
+        }
     }
 }
