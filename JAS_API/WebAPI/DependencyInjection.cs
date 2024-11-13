@@ -26,7 +26,9 @@ namespace WebAPI
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IClaimsService, ClaimsService>();
             services.AddScoped<IBidPriceService, BidPriceService>();
-
+            services.AddScoped<IValuationService, ValuationService>();
+            services.AddScoped<IJewelryService, JewelryService>();
+            services.AddScoped<IGeneratePDFService, GeneratePdfService>();
 
             services.AddHttpContextAccessor();
             services.AddFluentValidationAutoValidation();
