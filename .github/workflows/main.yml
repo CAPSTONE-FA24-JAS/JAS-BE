@@ -22,10 +22,11 @@ jobs:
         with:
           dotnet-version: '8.0.x'
           
-      - name: Copy libwkhtmltox.dll
+      - name: Copy libwkhtmltox.dll directly to publish_output
         run: |
-          mkdir -p ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-          cp D:\CAPSTONE\Source_code\BE\JAS-BE\JAS_API\WebAPI\libwkhtmltox.dll ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          New-Item -ItemType Directory -Path WebAPI\publish_output\D:\CAPSTONE\Source_code\BE\JAS-BE\JAS_API\WebAPI\libwkhtmltox.dll -Force
+          Copy-Item -Path ./JAS_API/WebAPI/libwkhtmltox.dll -Destination WebAPI\publish_output\D:\CAPSTONE\Source_code\BE\JAS-BE\JAS_API\WebAPI\libwkhtmltox.dll
+        shell: pwsh
           
       - name: Restore
         run: dotnet restore ./JAS_API/JAS_API.sln
