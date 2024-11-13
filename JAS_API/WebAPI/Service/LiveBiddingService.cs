@@ -221,7 +221,7 @@ namespace WebAPI.Service
 
                 var currentPrice = lot.CurrentPrice ?? lot.StartPrice;
                 _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, currentPrice);
-                await _hubContext.Clients.Group(lotGroupName).SendAsync("CurrentPriceForReduceBiddingWhenStartLot", "Giá đã hien tai!", currentPrice, DateTime.UtcNow);
+                await _hubContext.Clients.Group(lotGroupName).SendAsync("CurrentPriceForReduceBiddingWhenStartLot", "Giá hien tai!", currentPrice, DateTime.UtcNow);
 
 
                 await Task.Delay(TimeSpan.FromSeconds((int)lot.BidIncrementTime));
