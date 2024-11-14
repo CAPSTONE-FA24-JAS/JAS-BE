@@ -783,14 +783,11 @@ namespace WebAPI.Service
                                     var firstName = customer.FirstName;
                                     var lastname = customer.LastName;
                                     //luu vao hang doi
-                                    var bidData = new BiddingInputDTO
+                                   
                                     BiddingInputDTO bidData = new BiddingInputDTO
                                     {
                                         CurrentPrice = bidPriceFuture,
-                                        BidTime = DateTime.UtcNow
-
-                                        BidTime = DateTime.UtcNow,
-                                        ConnectionId = ""
+                                        BidTime = DateTime.UtcNow                              
                                     };
 
                                     string lotGroupName = $"lot-{player.LotId}";
@@ -802,14 +799,6 @@ namespace WebAPI.Service
                                     //bỏ dòng này nè danh vì khi nào bán được sản phẩm đó mới trừ bidLimit
                                    // player.Customer.PriceLimit -= bidPriceFuture;
                                     await _unitOfWork.SaveChangeAsync();
-                                    string redisKey = $"BidPrice:{player.LotId}";
-                                    // Lưu dữ liệu đấu giá vào Redis
-                                    _cacheService.AddToStream((int)player.LotId, bidData, (int)player.CustomerId);
-                                    string lotGroupName = $"lot-{player.LotId}";
-                                    //await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, firstName, lastname, request.CurrentPrice, request.BidTime);
-                                    //await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
-
-                                    
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
                                 }
                             }
