@@ -8,10 +8,6 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="libwkhtmltox.dll" />
-  </ItemGroup>
-
 	<ItemGroup>
 		<PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
 		<PackageReference Include="DinkToPdfIncludesDependencies" Version="1.0.8" />
@@ -56,7 +52,7 @@
 	  </Content>
 	</ItemGroup>
 <ItemGroup>
-    <None Update="runtimes/win-x64/native/libwkhtmltox.dll">
+    <None Update="runtimes/win-x84/native/libwkhtmltox.dll">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 </ItemGroup>

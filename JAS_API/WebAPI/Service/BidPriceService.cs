@@ -312,10 +312,10 @@ namespace Application.Services
                                 }
                                 else
                                 {
-                                    _cacheService.AddToStream(conn.LotId, request, customerId);
+                                    var bidPrice =  _cacheService.AddToStream(conn.LotId, request, customerId);
 
-                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, firstName, lastname, request.CurrentPrice, request.BidTime);
-                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, firstName, lastname, request.CurrentPrice, bidPrice.BidTime);
+                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, bidPrice.BidTime);
                                     reponse.IsSuccess = true;
                                     reponse.Code = 200;
                                     reponse.Message = "Đã thêm giá vào hàng đợi stream";
