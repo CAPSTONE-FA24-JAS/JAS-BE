@@ -298,9 +298,7 @@ namespace Application.Services
                             reponse.IsSuccess = false;
                         }
                         else
-                        {
-
-                            
+                        {                           
                             if(highestBid != null)
                             {
                                 if (request.CurrentPrice < highestBid.CurrentPrice)
@@ -316,6 +314,25 @@ namespace Application.Services
 
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, firstName, lastname, request.CurrentPrice, bidPrice.BidTime);
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, bidPrice.BidTime);
+                                    if (lot.EndTime.HasValue)
+                                    {
+                                        DateTime endTime = lot.EndTime.Value;
+
+                                        //10s cuối
+                                        TimeSpan extendTime = endTime - request.BidTime;
+
+                                        // Nếu còn dưới 10 giây thì gia hạn thêm 10 giây
+                                        if (extendTime.TotalSeconds < 10)
+                                        {
+                                            endTime = endTime.AddSeconds(10);
+                                            _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
+                                        }
+                                        else
+                                        {
+                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
+                                        }
+                                    }
                                     reponse.IsSuccess = true;
                                     reponse.Code = 200;
                                     reponse.Message = "Đã thêm giá vào hàng đợi stream";
@@ -326,6 +343,25 @@ namespace Application.Services
                             {
 
                                 _cacheService.AddToStream(conn.LotId, request, customerId);
+                                if (lot.EndTime.HasValue)
+                                {
+                                    DateTime endTime = lot.EndTime.Value;
+
+                                    //10s cuối
+                                    TimeSpan extendTime = endTime - request.BidTime;
+
+                                    // Nếu còn dưới 10 giây thì gia hạn thêm 10 giây
+                                    if (extendTime.TotalSeconds < 10)
+                                    {
+                                        endTime = endTime.AddSeconds(10);
+                                        _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
+                                    }
+                                    else
+                                    {
+                                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
+                                    }
+                                }
                                 reponse.IsSuccess = true;
                                 reponse.Code = 200;
                                 reponse.Message = "Đã thêm giá vào hàng đợi stream";
