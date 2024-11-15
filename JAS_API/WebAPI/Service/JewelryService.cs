@@ -1250,5 +1250,10 @@ namespace Application.Services
             }
             return response;
         }
+
+        public Task<APIResponseModel> SearchJewelry(string input)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

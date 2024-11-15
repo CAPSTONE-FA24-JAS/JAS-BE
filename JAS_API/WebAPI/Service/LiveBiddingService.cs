@@ -784,7 +784,8 @@ namespace WebAPI.Service
                                     var lastname = customer.LastName;
                                     //luu vao hang doi
 
-                                    var bidData = new BiddingInputDTO
+
+                                    BiddingInputDTO bidData = new BiddingInputDTO
                                     {
                                         CurrentPrice = bidPriceFuture,
                                         BidTime = DateTime.UtcNow
@@ -799,7 +800,6 @@ namespace WebAPI.Service
                                     //bỏ dòng này nè danh vì khi nào bán được sản phẩm đó mới trừ bidLimit
                                    // player.Customer.PriceLimit -= bidPriceFuture;
                                     await _unitOfWork.SaveChangeAsync();
-
                                     string redisKey = $"BidPrice:{player.LotId}";
                                     // Lưu dữ liệu đấu giá vào Redis
                                     _cacheService.AddToStream((int)player.LotId, bidData, (int)player.CustomerId);
