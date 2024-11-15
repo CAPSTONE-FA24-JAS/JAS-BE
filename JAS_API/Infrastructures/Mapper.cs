@@ -287,6 +287,14 @@ namespace Infrastructures
             CreateMap<UpdateSecondaryShaphieDTO, SecondaryShaphie>().ReverseMap();
             CreateMap<UpdateDocumentSecondaryShaphieDTO, DocumentSecondaryShaphie>().ReverseMap();
             CreateMap<UpdateImageSecondaryShaphieDTO, ImageSecondaryShaphie>().ReverseMap();
+
+            CreateMap<ViewPlayerInLotDTO, CustomerLot>()
+                .ReverseMap()
+                .ForPath(dest => dest.BidPrice, src => src.MapFrom(x => x.CurrentPrice??null))
+                .ForPath(dest => dest.CustomerName, src => src.MapFrom(x => x.Customer.FirstName + " " + x.Customer.LastName??""))
+                .ForPath(dest => dest.BidPrice, src => src.MapFrom(x => x.CurrentPrice ?? null)) ;
+
+                
         }
     }
 }

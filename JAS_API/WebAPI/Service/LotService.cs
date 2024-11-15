@@ -896,5 +896,43 @@ namespace Application.Services
             }
             return response;
         }
+
+        public async Task<APIResponseModel> GetPlayerInLotFixedAndSercet(int lotId)
+        {
+            var reponse = new APIResponseModel();
+            var DTOs = new List<ViewPlayerInLotDTO>();
+            try
+            {
+                var playersInLot = await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.LotId == lotId);
+                if (playersInLot == null)
+                {
+                    reponse.Code = 404;
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Current Time In Lot Haven't Player Register";
+                }
+                else
+                {
+                    foreach (var player in playersInLot)
+                    {
+
+                        var mapper = _mapper.Map<ViewPlayerInLotDTO>(player);
+                        var bidTime = await _unitOfWork.BidPriceRepository.GetAllAsync(x => x.CurrentPrice == player.CurrentPrice && x.CustomerId == player.CustomerId && x.LotId == lotId);
+                        mapper.BidTime = (bidTime.FirstOrDefault() != null)?(DateTime?)bidTime.FirstOrDefault().CreationDate: null;
+                        DTOs.Add(mapper);
+                    }
+                    reponse.Code = 200;
+                    reponse.IsSuccess = true;
+                    reponse.Message = $"Current Time In Lot Haven {playersInLot.Count} Player Register";
+                    reponse.Data = DTOs;
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.Code = 500;
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
     }
 }

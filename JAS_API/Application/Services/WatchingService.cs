@@ -28,7 +28,12 @@ namespace Application.Services
             var response = new APIResponseModel();
             try
             {
-
+                if( _unitOfWork.WatchingRepository.GetAllAsync(x => x.CustomerId == model.CustomerId && x.JewelryId == model.JewelryId).Result.Any())
+                {
+                    response.IsSuccess = false;
+                    response.Message = "You Are Watched This Jewelry.";
+                    return response;
+                }
                 var watching = _mapper.Map<Watching>(model);
                 if (watching == null)
                 {
@@ -50,6 +55,38 @@ namespace Application.Services
                         response.Code = 400;
                         response.IsSuccess = false;
                     }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> checkIsWatchingJewelryOfCustomeṛ̣(CreateWatchingDTO model)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+
+                var ExitsWatchings = await _unitOfWork.WatchingRepository.GetAllAsync(x => x.CustomerId == model.CustomerId && x.JewelryId == model.JewelryId);
+                if (ExitsWatchings.Any())
+                {
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Message = "Customer is watched this jewelry";
+                    response.Data = _mapper.Map<ViewWatchingDTO>(ExitsWatchings.FirstOrDefault());
+                }
+                else
+                {
+                    response.Message = $"Customer isn't watching this jewelry";
+                    response.Code = 400;
+                    response.IsSuccess = true;
                 }
 
             }

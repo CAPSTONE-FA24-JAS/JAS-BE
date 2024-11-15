@@ -26,6 +26,7 @@ namespace Application.ViewModels.JewelryDTOs
         public string? Title { get; set; }
         public string? BidForm { get; set; }
         public DateTime? Time_Bidding { get; set; }
+        public string? Status { get; set; }
         public int? ArtistId { get; set; }
         
         public int? CategoryId { get; set; }
