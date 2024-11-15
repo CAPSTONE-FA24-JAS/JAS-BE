@@ -10,6 +10,7 @@ using CloudinaryDotNet.Actions;
 using CloudinaryDotNet.Core;
 using Domain.Entity;
 using Domain.Enums;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using WebAPI.Middlewares;
 
 namespace Application.Services
 {
@@ -31,12 +33,14 @@ namespace Application.Services
         private const string Tags = "Backend_ImageValuation";
         private const string Tags_Receipt = "ReceiptPDF";
         private readonly IGeneratePDFService _generatePDFService;
-        public ValuationService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IGeneratePDFService generatePDFService)
+        private readonly IHubContext<BiddingHub> _hubContext;
+        public ValuationService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IGeneratePDFService generatePDFService, IHubContext<BiddingHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinary = cloudinary;
             _generatePDFService = generatePDFService;
+            _hubContext = hubContext;
         }
         public async Task<APIResponseModel> ConsignAnItem(ConsignAnItemDTO consignAnItem)
         {
@@ -193,13 +197,15 @@ namespace Application.Services
                         NotifiableId = id,  //valuationId
                         AccountId = staff.AccountId,
                         CreationDate = DateTime.UtcNow,
-                        Notifi_Type = "Assign"
+                        Notifi_Type = "Assign",
+                        StatusOfValuation = "1"
                     };
 
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
 
                     await _unitOfWork.SaveChangeAsync();
 
+                    await _hubContext.Clients.All.SendAsync("NewNotificationReceived", "Có thông báo mới!");
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
@@ -250,13 +256,14 @@ namespace Application.Services
                         NotifiableId = id,  //valuationId
                         AccountId = valuationById.Seller.AccountId,
                         CreationDate = DateTime.UtcNow,
-                        Notifi_Type = "Preliminary"
+                        Notifi_Type = "Preliminary",
+                        StatusOfValuation = "2"
                     };
 
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
                     await _unitOfWork.SaveChangeAsync();
+                    await _hubContext.Clients.All.SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
-                    
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
 
@@ -577,12 +584,14 @@ namespace Application.Services
                             NotifiableId = id,  //valuationId
                             AccountId = valuationById.Seller.AccountId,
                             CreationDate = DateTime.UtcNow,
-                            Notifi_Type = "Preliminary"
+                            Notifi_Type = "Preliminary",
+                            StatusOfValuation = "3"
                         };
 
                         await _unitOfWork.NotificationRepository.AddAsync(notification);
 
                         await _unitOfWork.SaveChangeAsync();
+                        await _hubContext.Clients.All.SendAsync("NewNotificationReceived", "Có thông báo mới!");
                     }
                     var valuation = _mapper.Map<ValuationDTO>(valuationById);
 

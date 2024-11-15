@@ -339,7 +339,7 @@ namespace WebAPI.Service
                 {
                     Status = winnerCustomerLot.Status,
                     CustomerLotId = winnerCustomerLot.Id,
-                    CurrentTime = DateTime.Now,
+                    CurrentTime = DateTime.UtcNow,
                 };
                 await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerlot);
                 await _unitOfWork.SaveChangeAsync();
@@ -362,13 +362,9 @@ namespace WebAPI.Service
                 await _unitOfWork.SaveChangeAsync();
 
 
-                //lấy ra những thằng thua theo lot(group by theo customerId và lotId,Lấy giá trị đầu tiên của mỗi nhóm (distinct)
-                var custemerLotGroupBy = bidPrices.GroupBy(b => new { b.CustomerId, b.LotId })
-                                      .Select(g => g.First())
-                                      .ToList();
-
-                //lay ra lisst customerLot theo list customerid vaf lotId
-                var losers = _unitOfWork.CustomerLotRepository.GetListCustomerLotByCustomerAndLot(custemerLotGroupBy, winnerCustomerLot.Id);
+                
+                //lay ra list customerLot theo  lotId trừ thằng thắng
+                var losers = _unitOfWork.CustomerLotRepository.GetListCustomerLotByCustomerAndLot(lotId, winnerCustomerLot.Id);
                 if (losers != null)
                 {
                     List<CustomerLot> listCustomerLot = new List<CustomerLot>();
