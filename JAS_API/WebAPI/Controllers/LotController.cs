@@ -178,6 +178,14 @@ namespace WebAPI.Controllers
             return (!result.IsSuccess)?BadRequest(result):Ok(result);
 
         }
+        
+       [HttpGet]
+        public async Task<IActionResult> GetPlayerInLotFixedAndSercet(int lotId)
+        {
+            var result = await _lotService.GetPlayerInLotFixedAndSercet(lotId);
+            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+
+        }
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.ServiceReponse;
 using Application.ViewModels.WatchingDTOs;
+using Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Application.Interfaces
     {
         Task<APIResponseModel> GetWatchingByCustomer(int customerId);
         Task<APIResponseModel> RemoveWatching(int watchingId);
-        Task<APIResponseModel> AddNewWatching(CreateWatchingDTO model); 
+        Task<APIResponseModel> AddNewWatching(CreateWatchingDTO model);
+        Task<APIResponseModel> checkIsWatchingJewelryOfCustomeṛ̣(CreateWatchingDTO model);
     }
 }

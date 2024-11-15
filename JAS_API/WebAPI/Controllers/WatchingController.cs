@@ -26,6 +26,13 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> CheckIsWatchingJewelryOfCustomeṛ̣(CreateWatchingDTO createWatchingDTO)
+        {
+            var result = await _watchingService.checkIsWatchingJewelryOfCustomeṛ̣(createWatchingDTO);
+            return (!result.IsSuccess)?BadRequest(result): Ok(result); ;
+        }
+        
+        [HttpPost]
         public async Task<IActionResult> AddNewWatchingForCustomer(CreateWatchingDTO createWatchingDTO)
         {
             var result = await _watchingService.AddNewWatching(createWatchingDTO);
