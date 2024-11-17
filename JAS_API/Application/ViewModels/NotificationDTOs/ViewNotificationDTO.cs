@@ -15,5 +15,6 @@ namespace Application.ViewModels.NotificationDTOs
         public int? NotifiableId { get; set; }
         public string? Notifi_Type { get; set; }
         public int? AccountId { get; set; }
+        public DateTime CreationDate { get; set; }
     }
 }

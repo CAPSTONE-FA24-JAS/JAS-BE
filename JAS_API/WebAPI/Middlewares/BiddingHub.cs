@@ -1,6 +1,7 @@
 ﻿using Application;
 using Application.Interfaces;
 using Application.Services;
+using Application.ViewModels.CustomerLotDTOs;
 using Domain.Entity;
 using Microsoft.AspNetCore.SignalR;
 
