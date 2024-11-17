@@ -763,7 +763,7 @@ namespace Application.Services
                     }
                     var bidData = new BiddingInputDTO
                     {
-                        CurrentPrice = playerJoined.Lot.BuyNowPrice,
+                        CurrentPrice = playerJoined.Lot.FinalPriceSold,
                         BidTime = DateTime.UtcNow
                         
                     };            
