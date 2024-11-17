@@ -354,7 +354,7 @@ namespace WebAPI.Service
                     AccountId = winnerCustomerLot.Customer.AccountId,
                     CreationDate = DateTime.UtcNow,
                     Notifi_Type = "CustomerLot",
-                    ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+                  //  ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
                     
                 };
 
