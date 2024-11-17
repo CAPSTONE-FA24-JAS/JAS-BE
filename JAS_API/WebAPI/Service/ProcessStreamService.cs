@@ -78,7 +78,7 @@ namespace WebAPI.Service
 
                         if (result.result == false)
                         {
-                            _logger.LogInformation($"Không còn giá nào trong Stream cho Lot {lot.Id}");
+                          //  _logger.LogInformation($"Không còn giá nào trong Stream cho Lot {lot.Id}");
                             // Đợi 100ms trước khi kiểm tra lại
                             await Task.Delay(100);
                             continue;
