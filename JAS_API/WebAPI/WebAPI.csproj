@@ -52,7 +52,7 @@
 	  </Content>
 	</ItemGroup>
 <ItemGroup>
-    <None Update="runtimes/win-x84/native/libwkhtmltox.dll">
+    <None Update="runtimes/win-x64/native/libwkhtmltox.dll">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
 </ItemGroup>

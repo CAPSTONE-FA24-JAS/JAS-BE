@@ -633,11 +633,11 @@ namespace Application.Services
                 var seller = await _unitOfWork.CustomerRepository.GetByIdAsync(sellerId);
                 var valuation = await _unitOfWork.ValuationRepository.GetByIdAsync(valuationId);
                 var statusResult = OtpService.ValidateOtpForAuthorized(seller.Account.ConfirmationToken, valuationId, sellerId, opt);
-                dynamic validationResult = statusResult;
-                if (!validationResult.status)
+                
+                if (!statusResult)
                 {
                     response.IsSuccess = false;
-                    response.Message = validationResult.msg + validationResult.timeStepMatched;
+                    response.Message = "Verify OTP failed!";
                     return response;
                 }
                 else
