@@ -636,7 +636,10 @@ namespace WebAPI.Service
                         else
                         {
                             lot.Status = EnumStatusLot.Passed.ToString();
-                            var losers = lot.CustomerLots.Where(x => x.CustomerId != bidPriceWinner.CustomerId).ToList();
+                            var losers = lot.CustomerLots
+                                         .Where(x => x.CustomerId != (bidPriceWinner?.CustomerId ?? -1))
+                                         .ToList();
+
                             await SetLoser(losers);
                         }
 
@@ -647,8 +650,6 @@ namespace WebAPI.Service
                         await _unitOfWork.SaveChangeAsync();
                     }
                 }
-
-
             }
         }
         public async Task CheckLotSercetAsync()
