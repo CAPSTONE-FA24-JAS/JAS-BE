@@ -763,21 +763,24 @@ namespace WebAPI.Service
                             var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == player.CustomerId);
                             
                                 var autobidAvaiable = player.AutoBids?.FirstOrDefault(x => x.IsActive == true && x.MinPrice <= highestBidOfLot.CurrentPrice.Value && x.MaxPrice >= highestBidOfLot.CurrentPrice.Value);
+                            if(currentPriceOfPlayer.CurrentPrice >= highestBidOfLot.CurrentPrice || highestBidOfLot == null)
+                            {
+                                continue;
+                            }
 
                             if (player.Lot == null || player.Customer == null || highestBidOfLot == null)
                             {
                                 continue; 
                             }
-                            Console.WriteLine($"CurrentPrice is not null: {highestBidOfLot.CurrentPrice.Value}");
+
                             if( highestBidOfLot.CurrentPrice.HasValue && currentPriceOfPlayer.CurrentPrice.Value > highestBidOfLot.CurrentPrice.Value)
                             {
-                                Console.WriteLine("Player's current price is higher than highest bid, continue to next player.");
                                 continue;
                             }
 
                             if (autobidAvaiable != null)
                             {
-                                var bidPriceFuture = currentPriceOfPlayer.CurrentPrice ?? 0 + (player.Lot.BidIncrement + currentPriceOfPlayer.CurrentPrice ?? 0);
+                                var bidPriceFuture = currentPriceOfPlayer.CurrentPrice + (player.Lot.BidIncrement * autobidAvaiable.NumberOfPriceStep);
                                 //nếu giá đấu tương lai lớn hơn giá bán cuối của lot thì ko làm gì cả
                                 if(bidPriceFuture > player.Lot.FinalPriceSold)
                                 {
@@ -788,7 +791,7 @@ namespace WebAPI.Service
                                 // Nếu giá đấu hiện tại cao hơn, hãy tiếp tục kiểm tra với giá hiện tại
                                 if (!isFuturePrice && price != null)
                                 {
-                                    bidPriceFuture = (float)(price + player.Lot.BidIncrement * currentPriceOfPlayer.CurrentPrice ?? 0);
+                                    bidPriceFuture = (float)(price + player.Lot.BidIncrement * autobidAvaiable.NumberOfPriceStep);
                                     (isFuturePrice, price) = await _customerLotService.CheckBidPriceTop((float)bidPriceFuture, autobidAvaiable);
                                 }
 
