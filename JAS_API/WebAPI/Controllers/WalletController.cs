@@ -93,6 +93,7 @@ namespace WebAPI.Controllers
             {
                 transactionType = EnumTransactionType.AddWallet.ToString(),
                 transactionPerson = topUpWalletDTO.CustomerId,
+                TransactionTime = DateTime.UtcNow,
                 DocNo = topUpWalletDTO.WalletId,
             };
             string paymentUrl = await _vpnService.CreatePaymentUrl(HttpContext, vnPayModel, transaction);
@@ -167,8 +168,16 @@ namespace WebAPI.Controllers
                         if (trans.transactionType == EnumTransactionType.AddWallet.ToString())
                         {
                             var walletUpdate = await _walletService.UpdateBanlance((int)trans.DocNo, (decimal)trans.Amount, true);
-
-                            if (walletUpdate.IsSuccess)
+                            var newTrans = new Transaction()
+                            {
+                                Amount = trans.Amount,
+                                DocNo = trans.DocNo,
+                                TransactionTime = DateTime.UtcNow,
+                                TransactionType = trans.transactionType,
+                                TransactionPerson = trans.transactionPerson,
+                            };
+                            var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
+                            if (walletUpdate.IsSuccess && transactionResult.IsSuccess)
                             {
                                 return Ok(result);
                             }
