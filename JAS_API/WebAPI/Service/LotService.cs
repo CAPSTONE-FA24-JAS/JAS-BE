@@ -668,14 +668,7 @@ namespace Application.Services
                 {
 
                     var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(model.CustomerId);
-                    if(customer != null && customer.Wallet.AvailableBalance < (decimal?)model.CurrentPrice)
-                    {
-                        response.Code = 400;
-                        response.IsSuccess = false;
-                        response.Message = $"Customer dont enought money available with current price for bid.";
-                        return response;
-
-                    }
+                    
                     if (model.CurrentPrice < lot.StartPrice || model.CurrentPrice > lot.FinalPriceSold && lot.LotType == EnumLotType.Secret_Auction.ToString())
                     {
                         response.Code = 400;
