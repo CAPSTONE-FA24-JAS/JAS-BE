@@ -509,7 +509,7 @@ namespace Application.Services
                             await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
 
 
-                            
+                            await CountCustomerBidded(conn.LotId);
                             reponse.IsSuccess = true;
                             reponse.Code = 200;
                             reponse.Message = "Place bid successfully!";
@@ -534,7 +534,7 @@ namespace Application.Services
 
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
 
-
+                        await CountCustomerBidded(conn.LotId);
 
                         reponse.IsSuccess = true;
                         reponse.Code = 200;
@@ -559,6 +559,13 @@ namespace Application.Services
             return reponse;
         }
 
+        public async Task CountCustomerBidded(int lotId)
+        {
+            string redisKey = $"BidPrice:{lotId}";
+            var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, x => x.LotId == lotId);
+            var amountCustomerBidded = bidPrices.Distinct().Count();
+            await _hubContext.Clients.All.SendAsync("SendAmountCustomerBid", "So luong nguoi da dau gia la: ", amountCustomerBidded);
+        }
         public async Task<APIResponseModel> UpdateStatusBid(int lotId, int? status)
         {
             var reponse = new APIResponseModel();

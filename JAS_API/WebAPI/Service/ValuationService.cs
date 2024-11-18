@@ -198,7 +198,8 @@ namespace Application.Services
                         AccountId = staff.AccountId,
                         CreationDate = DateTime.UtcNow,
                         Notifi_Type = "Assign",
-                        StatusOfValuation = "1"
+                        StatusOfValuation = "1",
+                        ImageLink = valuationById.ImageValuations.FirstOrDefault().ImageLink
                     };
 
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
