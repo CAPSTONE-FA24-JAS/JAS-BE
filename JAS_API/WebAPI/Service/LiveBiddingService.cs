@@ -734,8 +734,6 @@ namespace WebAPI.Service
                 var _customerLotService = scope.ServiceProvider.GetRequiredService<ICustomerLotService>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
 
-
-
                 // x.AutoBids.FirstOrDefault().IsActive == true 
                 var customerLotActives = await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.Lot.Status == EnumStatusLot.Auctioning.ToString());
                 //get hight price right now

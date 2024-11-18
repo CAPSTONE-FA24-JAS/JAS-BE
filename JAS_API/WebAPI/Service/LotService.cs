@@ -599,7 +599,7 @@ namespace Application.Services
                 var CustomerLotExist = await checkCustomerRegisteredToLot(model.CustomerId, model.LotId);
                 if (CustomerLotExist != null) 
                 {
-                    var bidPriceExist = CustomerLotExist.Lot.BidPrices.FirstOrDefault(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
+                    var bidPriceExist = CustomerLotExist?.Lot?.BidPrices?.FirstOrDefault(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
                     if (bidPriceExist != null)
                     {
                         response.Code = 200;
@@ -620,7 +620,7 @@ namespace Application.Services
                 {
                     response.Code = 400;
                     response.IsSuccess = true;
-                    response.Message = $"Customer havent register to lot.";
+                    response.Message = $"Customer haven't register to lot.";
 
                 }
             }
