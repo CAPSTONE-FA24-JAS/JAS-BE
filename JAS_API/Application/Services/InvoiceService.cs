@@ -324,7 +324,7 @@ namespace Application.Services
                         {
                             transactionType = EnumTransactionType.SellerPay.ToString(),
                             DocNo = invoiceById.Id,
-                            Amount = invoiceById.CustomerLot.Lot.Deposit,
+                            Amount = invoiceById.Price,
                             TransactionTime = DateTime.Now,
                             Status = "Completed",
                             WalletId = walletOfSeller.Id,
@@ -338,7 +338,7 @@ namespace Application.Services
                         var transactionCompany = new Transaction
                         {
                             DocNo = invoiceById.Id,
-                            Amount = invoiceById.CustomerLot.Lot.Deposit,
+                            Amount = invoiceById.Price,
                             TransactionTime = wallerTransaction.TransactionTime,
                             TransactionType = EnumTransactionType.SellerPay.ToString(),
                             TransactionPerson = invoiceById.CustomerLot.CustomerId
