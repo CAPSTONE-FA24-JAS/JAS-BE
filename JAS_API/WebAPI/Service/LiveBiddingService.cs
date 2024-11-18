@@ -756,64 +756,87 @@ namespace WebAPI.Service
                             //lay ra highest bidPrice
                             var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == player.LotId);
                             var highestBidOfLot = topBidders.FirstOrDefault();
+                            Console.WriteLine($"HighestBidOfLot after initialization: {highestBidOfLot?.CurrentPrice}");
 
-                            var autobidAvaiable = player.AutoBids.FirstOrDefault(x => x.IsActive == true && x.MinPrice <= highestBidOfLot.CurrentPrice && x.MaxPrice >= highestBidOfLot.CurrentPrice);
+                            var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == player.CustomerId);
+                            
+                                var autobidAvaiable = player.AutoBids?.FirstOrDefault(x => x.IsActive == true && x.MinPrice <= highestBidOfLot.CurrentPrice.Value && x.MaxPrice >= highestBidOfLot.CurrentPrice.Value);
 
-                            var bidPriceFuture = player.CurrentPrice + (player.Lot.BidIncrement * autobidAvaiable.NumberOfPriceStep);
-                            var (isFuturePrice, price) = await _customerLotService.CheckBidPriceTop((float)bidPriceFuture, autobidAvaiable);
-
-                            // Nếu giá đấu hiện tại cao hơn, hãy tiếp tục kiểm tra với giá hiện tại
-                            if (!isFuturePrice && price != null)
+                            if (player.Lot == null || player.Customer == null || highestBidOfLot == null)
                             {
-                                bidPriceFuture = (float)(price + player.Lot.BidIncrement * autobidAvaiable.NumberOfPriceStep);
-                                (isFuturePrice, price) = await _customerLotService.CheckBidPriceTop((float)bidPriceFuture, autobidAvaiable);
+                                continue; 
                             }
-
-                            // Nếu giá đấu hiện tại bé hơn, thì lấy bidPriceFuture luôn, không cânf kt lại
-                            if (isFuturePrice && price != null)
+                            Console.WriteLine($"CurrentPrice is not null: {highestBidOfLot.CurrentPrice.Value}");
+                            if( highestBidOfLot.CurrentPrice.HasValue && currentPriceOfPlayer.CurrentPrice.Value > highestBidOfLot.CurrentPrice.Value)
                             {
-
-                                //kiểm tra bidLimit của customer có đủ điều kiện để đấu với giá này hay không
-                                if (player.Customer.PriceLimit >= bidPriceFuture)
-                                {
-                                    var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(player.CustomerId);
-                                    var firstName = customer.FirstName;
-                                    var lastname = customer.LastName;
-                                    //luu vao hang doi
-
-
-                                    BiddingInputDTO bidData = new BiddingInputDTO
-                                    {
-                                        CurrentPrice = bidPriceFuture,
-                                        BidTime = DateTime.UtcNow
-                                    };
-
-                                    string lotGroupName = $"lot-{player.LotId}";
-                                    // Lưu dữ liệu đấu giá vào Redis stream
-                                    var bidPriceStream = _cacheService.AddToStream((int)player.Lot.Id, bidData, (int)player.CustomerId);
-                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", bidPriceStream.CustomerId, firstName, lastname, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
-                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", bidPriceStream.CustomerId, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
-                                    
-                                    //bỏ dòng này nè danh vì khi nào bán được sản phẩm đó mới trừ bidLimit
-                                   // player.Customer.PriceLimit -= bidPriceFuture;
-                                    await _unitOfWork.SaveChangeAsync();
-                                    string redisKey = $"BidPrice:{player.LotId}";
-                                    // Lưu dữ liệu đấu giá vào Redis
-                                    _cacheService.AddToStream((int)player.LotId, bidData, (int)player.CustomerId);
-
-                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
-                                }
-                            }
-                            //không làm gì cả không lưu redis
-                            if (!isFuturePrice && price == null)
-                            {
+                                Console.WriteLine("Player's current price is higher than highest bid, continue to next player.");
                                 continue;
                             }
+
+                            if (autobidAvaiable != null)
+                            {
+                                var bidPriceFuture = currentPriceOfPlayer.CurrentPrice ?? 0 + (player.Lot.BidIncrement + currentPriceOfPlayer.CurrentPrice ?? 0);
+                                //nếu giá đấu tương lai lớn hơn giá bán cuối của lot thì ko làm gì cả
+                                if(bidPriceFuture > player.Lot.FinalPriceSold)
+                                {
+                                    continue;
+                                }
+                                var (isFuturePrice, price) = await _customerLotService.CheckBidPriceTop((float)bidPriceFuture, autobidAvaiable);
+
+                                // Nếu giá đấu hiện tại cao hơn, hãy tiếp tục kiểm tra với giá hiện tại
+                                if (!isFuturePrice && price != null)
+                                {
+                                    bidPriceFuture = (float)(price + player.Lot.BidIncrement * currentPriceOfPlayer.CurrentPrice ?? 0);
+                                    (isFuturePrice, price) = await _customerLotService.CheckBidPriceTop((float)bidPriceFuture, autobidAvaiable);
+                                }
+
+                                // Nếu giá đấu hiện tại bé hơn, thì lấy bidPriceFuture luôn, không cânf kt lại
+                                if (isFuturePrice && price != null)
+                                {
+
+                                    //kiểm tra bidLimit của customer có đủ điều kiện để đấu với giá này hay không
+                                    if (player.Customer.PriceLimit >= bidPriceFuture)
+                                    {
+                                        var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(player.CustomerId);
+                                        var firstName = customer.FirstName;
+                                        var lastname = customer.LastName;
+                                        //luu vao hang doi
+                                        player.CurrentPrice = bidPriceFuture;
+
+                                        BiddingInputDTO bidData = new BiddingInputDTO
+                                        {
+                                            CurrentPrice = bidPriceFuture,
+                                            BidTime = DateTime.UtcNow
+                                        };
+
+                                        string lotGroupName = $"lot-{player.LotId}";
+                                        // Lưu dữ liệu đấu giá vào Redis stream
+                                        var bidPriceStream = _cacheService.AddToStream((int)player.Lot.Id, bidData, (int)player.CustomerId);
+                                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", bidPriceStream.CustomerId, firstName, lastname, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
+                                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", bidPriceStream.CustomerId, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
+
+                                        //bỏ dòng này nè danh vì khi nào bán được sản phẩm đó mới trừ bidLimit
+                                        // player.Customer.PriceLimit -= bidPriceFuture;
+                                        await _unitOfWork.SaveChangeAsync();
+                                        string redisKey = $"BidPrice:{player.LotId}";
+                                        // Lưu dữ liệu đấu giá vào Redis
+                                        _cacheService.AddToStream((int)player.LotId, bidData, (int)player.CustomerId);
+
+                                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
+                                    }
+                                }
+                                //không làm gì cả không lưu redis
+                                if (!isFuturePrice && price == null)
+                                {
+                                    continue;
+                                }
+                            }
+                            
                         }
                     }
                 }catch(Exception e)
                 {
-                    throw new Exception(e.Message);
+                    throw;
                 }
             }
         }
