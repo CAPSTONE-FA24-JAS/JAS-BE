@@ -487,7 +487,7 @@ namespace Application.Services
                     var addressToShip = await _unitOfWork.AddressToShipRepository.GetByIdAsync(model.AddressToShipId);
                     var distanceOfOrder = GetDistanceMatrix.GetDistanceAsync("Hồ Chí Minh", addressToShip.AddressLine.ToString());
                     invoiceExist.FeeShip = await FindFeeShipByDistanceAsync(distanceOfOrder.Result);
-                    invoiceExist.TotalPrice = invoiceExist.Price + invoiceExist.Free + invoiceExist.FeeShip;
+                    invoiceExist.TotalPrice = invoiceExist.Price + invoiceExist.Free + invoiceExist.FeeShip - invoiceExist.CustomerLot.Lot.Deposit;
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         response.Message = $"Update Invoice Successfully";
