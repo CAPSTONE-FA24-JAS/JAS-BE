@@ -38,7 +38,7 @@ namespace WebAPI.Service
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();   
-                var lotLiveBidding = _cacheService.GetHashLots(l => l.LotType == EnumLotType.Public_Auction.ToString() && l.Status == EnumStatusLot.Auctioning.ToString());              
+                var lotLiveBidding = await _unitOfWork.LotRepository.GetAllAsync(x => x.LotType == EnumLotType.Public_Auction.ToString() && x.Status == EnumStatusLot.Auctioning.ToString());
                 foreach (var lot in lotLiveBidding)
                 {
                     var endTime = lot.EndTime;
@@ -60,7 +60,7 @@ namespace WebAPI.Service
                 var auctionLiveBidding = _unitOfWork.AuctionRepository.GetAuctionsAsync(EnumStatusAuction.Live.ToString());
                 foreach (var auction in auctionLiveBidding)
                 {
-                    var lotsInAuction = _cacheService.GetHashLots(l => l.AuctionId == auction.Id);
+                    var lotsInAuction = await _unitOfWork.LotRepository.GetAllAsync( x=> x.AuctionId == auction.Id);
 
                     
                     bool allLotsEnded = lotsInAuction.All(lot =>
