@@ -631,9 +631,18 @@ namespace Application.Services
                         transactionType = EnumTransactionType.Banktransfer.ToString(),
                         transactionPerson = (int)invoiceById.CustomerId
                     };
+                    invoiceById.CustomerLot.Status = EnumCustomerLot.PendingPayment.ToString();
+
+                    var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                    {
+                        CustomerLotId = invoiceById.CustomerLot.Id,
+                        Status = EnumCustomerLot.PendingPayment.ToString(),
+                        CurrentTime = DateTime.UtcNow,
+                    };
                     //invoiceById.InvoiceOfWalletTransaction = 
                     invoiceById.PaymentMethod = EnumPaymentType.Transfer.ToString();
                     invoiceById.Status = EnumCustomerLot.PendingPayment.ToString();
+                    await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
                     await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
                     
                     if (await _unitOfWork.SaveChangeAsync() > 0)
@@ -878,6 +887,7 @@ namespace Application.Services
                     {
                         
                         invoiceById.LinkBillTransaction = uploadResult.SecureUrl.AbsoluteUri;
+                        
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
                             response.Message = $"Upload file bill transaction Successfully";
