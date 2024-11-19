@@ -647,13 +647,12 @@ namespace Application.Services
 
                     byte[] pdfBytes = _generatePDFService.CreateAuthorizedPDF(valuation);
 
-                    string filePath = $"GiayUyQuyen_{valuation.Id}.pdf";
+                    using var memoryStream = new MemoryStream(pdfBytes);
 
-                    await File.WriteAllBytesAsync(filePath, pdfBytes);
 
                     var uploadFile = await _cloudinary.UploadAsync(new RawUploadParams
                     {
-                        File = new FileDescription(filePath),
+                        File = new FileDescription($"GiayUyQuyen_{valuation.Id}.pdf", memoryStream),
                         Tags = TagsAuthorized,
                         Type = "upload"
 
