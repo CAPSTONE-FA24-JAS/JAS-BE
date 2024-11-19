@@ -205,6 +205,14 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
+                var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(requestWithdrawDTO.CustomerId);
+                if (customer == null || customer.CreditCard != null)
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Code = 400;
+                    reponse.Message = "Customer Haven't Credit Card For Withdraw, Please Add New Credit Card";
+                    return reponse;
+                }
                 var walletExits =  await CheckBalance(requestWithdrawDTO.WalletId);
                 if (walletExits.Data is WalletDTO cs && walletExits.IsSuccess)
                 {
