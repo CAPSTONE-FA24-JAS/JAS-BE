@@ -296,7 +296,10 @@ namespace Infrastructures
                 .ForPath(dest => dest.BidPrice, src => src.MapFrom(x => x.CurrentPrice ?? null)) ;
             CreateMap<ViewCreditCardDTO, CreditCard>().ReverseMap();
             CreateMap<CreateCreditCardDTO, CreditCard>().ReverseMap();
-                
+            CreateMap<ViewRequestWithdrawDTO, RequestWithdraw>().ReverseMap()
+                .ForPath(dest => dest.CustomerId, src => src.MapFrom(x => x.Wallet.CustomerId))
+                .ForPath(dest => dest.ViewCreditCardDTO, src => src.MapFrom(x => x.Wallet.Customer.CreditCard));
+
         }
     }
 }
