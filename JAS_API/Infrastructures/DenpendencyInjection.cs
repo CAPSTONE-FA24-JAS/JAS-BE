@@ -99,6 +99,8 @@ namespace Infrastructures
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IDashBoardService, DashBoardService>();
 
+            services.AddScoped<ICreditCardRepository, CreditCardRepository>();
+
             services.AddDbContext<AppDbContext>(option =>
             {
                 option.UseLazyLoadingProxies().UseNpgsql(databaseConnection);

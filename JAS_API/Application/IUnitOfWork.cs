@@ -58,6 +58,7 @@ namespace Application
         public IImageBlogRepository ImageBlogRepository { get; }
         public IAutoBidRepository AutoBidRepository { get; }
         public INotificationRepository NotificationRepository { get; }
+        public ICreditCardRepository CreditCardRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

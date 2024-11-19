@@ -61,6 +61,7 @@ namespace Infrastructures
         private readonly IImageBlogRepository _imageBlogRepository;
         private readonly IAutoBidRepository _autoBidRepository;
         private readonly INotificationRepository _notificationRepository;
+        private readonly ICreditCardRepository _creditCardRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IRoleRepository roleRepository,
 
@@ -86,7 +87,7 @@ namespace Infrastructures
                           IHistoryStatusCustomerLotRepository historyStatusCustomerLotRepository,
                           IFeeShipRepository feeShipRepository, IFloorFeePersentRepository floorFeePersentRepository,
                           IWatchingRepository watchingRepository, IBlogRepository blogRepository, IImageBlogRepository imageBlogRepository, IAutoBidRepository autoBidRepository,
-                          INotificationRepository notificationRepository) 
+                          INotificationRepository notificationRepository, ICreditCardRepository creditCardRepository) 
         {
             _dbContext = dbContext;
             _accountRepository = accountRepository;
@@ -138,6 +139,7 @@ namespace Infrastructures
             _imageBlogRepository = imageBlogRepository;
             _autoBidRepository = autoBidRepository;
             _notificationRepository = notificationRepository;
+            _creditCardRepository = creditCardRepository;
         }
 
         public IAccountRepository AccountRepository => _accountRepository;
@@ -220,6 +222,8 @@ namespace Infrastructures
         public IAutoBidRepository AutoBidRepository => _autoBidRepository;
 
         public INotificationRepository NotificationRepository => _notificationRepository;
+
+        public ICreditCardRepository CreditCardRepository => _creditCardRepository;
 
         public async Task<int> SaveChangeAsync()
         {

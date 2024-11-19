@@ -1,5 +1,6 @@
 ﻿using Application.ServiceReponse;
 using Application.ViewModels.AccountDTOs;
+using Application.ViewModels.CreditCardDTOs;
 namespace Application.Interfaces
 {
     public interface IAccountService
@@ -16,6 +17,8 @@ namespace Application.Interfaces
         public Task<APIResponseModel> FilterAccount(int filter);
         public Task<APIResponseModel> FilterAccountByRole(int role);
         public Task<APIResponseModel> CheckBidLimit(int customerId);
+        Task<APIResponseModel> GetCreditCardByCustomerAsync(int customerId);
+        Task<APIResponseModel> CreateNewCreditCardAsync(CreateCreditCardDTO model);
 
     }
 }

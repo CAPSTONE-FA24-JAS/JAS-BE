@@ -2,6 +2,7 @@
 using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.AccountDTOs;
+using Application.ViewModels.CreditCardDTOs;
 using AutoMapper;
 using Azure;
 using CloudinaryDotNet;
@@ -485,6 +486,77 @@ namespace Application.Services
                 reponse.Message = e.Message;
             }
             return reponse;
+        }
+
+        public async Task<APIResponseModel> GetCreditCardByCustomerAsync(int customerId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var creditCards = await _unitOfWork.CreditCardRepository.GetAllAsync(x => x.CustomerId == customerId);
+
+                if (!creditCards.Any())
+                {
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Customer haven't credit Card, please add new credit Card";
+                    reponse.Code = 200;
+                    return reponse;
+                }
+                else
+                {
+                    reponse.IsSuccess = true;
+                    reponse.Data = _mapper.Map<IEnumerable<ViewCreditCardDTO>>(creditCards);
+                    reponse.Message = "Received Successfuly";
+                    reponse.Code = 200;
+                    return reponse;
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.Message = e.Message;
+                return reponse;
+            }
+        }
+
+        public async Task<APIResponseModel> CreateNewCreditCardAsync(CreateCreditCardDTO model)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var card = _mapper.Map<CreditCard>(model);
+                if(card != null)
+                {
+                    await _unitOfWork.CreditCardRepository.AddAsync(card);
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        reponse.IsSuccess = true;
+                        reponse.Message = "Add Sucessfuly";
+                        reponse.Code = 200;
+                        return reponse;
+                    }
+                    else
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Received Faild";
+                        reponse.Code = 400;
+                        return reponse;
+                    }
+                }
+                else
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Mapping Faild, Check Properti Input";
+                    reponse.Code = 400;
+                    return reponse;
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.Message = e.Message;
+                return reponse;
+            }
         }
     }
 }
