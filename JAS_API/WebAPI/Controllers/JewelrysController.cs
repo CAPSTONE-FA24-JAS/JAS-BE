@@ -165,5 +165,33 @@ namespace WebAPI.Controllers
             var result = await _jewelryService.GetJewelrysIsSoldOut();
             return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewEnumColorShapphies()
+        {
+            var result = await _jewelryService.GetEnumColorsShape();
+            return (result.IsSuccess) ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewEnumColorDiamonds()
+        {
+            var result = await _jewelryService.GetEnumColorsDiamond();
+            return (result.IsSuccess) ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewEnumCuts()
+        {
+            var result = await _jewelryService.GetEnumCuts();
+            return (result.IsSuccess) ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewEnumClarities()
+        {
+            var result = await _jewelryService.GetEnumClarities();
+            return (result.IsSuccess) ? Ok(result) : BadRequest(result);
+        }
     }
 }
