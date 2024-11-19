@@ -36,5 +36,11 @@ namespace Application.Interfaces
         public Task<APIResponseModel> GetJewelrysIsSoldOut();
         public Task<APIResponseModel> SearchJewelry(string input);
 
+        Task<APIResponseModel> GetEnumColorsShape();
+        Task<APIResponseModel> GetEnumColorsDiamond();
+        Task<APIResponseModel> GetEnumShapes();
+        Task<APIResponseModel> GetEnumClarities();
+        Task<APIResponseModel> GetEnumCuts();
+
     }
 }

@@ -1,8 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
-using Application.ViewModels.AccountDTOs;
-using Application.ViewModels.ArtistDTOs;
 using Application.ViewModels.JewelryDTOs;
 using Application.ViewModels.ValuationDTOs;
 using AutoMapper;
@@ -11,15 +9,8 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Domain.Entity;
 using Domain.Enums;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Drawing;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Application.Services
 {
@@ -1254,6 +1245,151 @@ namespace Application.Services
         public Task<APIResponseModel> SearchJewelry(string input)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<APIResponseModel> GetEnumColorsShape()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var enumColor = EnumHelper.GetEnums<EnumColorShapphie>();
+                if (!enumColor.Any())
+                {
+                    response.IsSuccess = false;
+                    response.Code = 400;
+                    response.Message = "Not Found";
+                }
+                else
+                {
+                    response.Data = enumColor;
+                    response.IsSuccess = true;
+                    response.Code = 200;
+                    response.Message = "Received Successfully";
+                }
+            }
+            catch (Exception e)
+            {
+                response.ErrorMessages = new List<string> { e.Message };
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> GetEnumShapes()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var enumColor = EnumHelper.GetEnums<EnumShape>();
+                if (!enumColor.Any())
+                {
+                    response.IsSuccess = false;
+                    response.Code = 400;
+                    response.Message = "Not Found";
+                }
+                else
+                {
+                    response.Data = enumColor;
+                    response.IsSuccess = true;
+                    response.Code = 200;
+                    response.Message = "Received Successfully";
+                }
+            }
+            catch (Exception e)
+            {
+                response.ErrorMessages = new List<string> { e.Message };
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> GetEnumClarities()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var enumColor = EnumHelper.GetEnums<EnumClarity>();
+                if (!enumColor.Any())
+                {
+                    response.IsSuccess = false;
+                    response.Code = 400;
+                    response.Message = "Not Found";
+                }
+                else
+                {
+                    response.Data = enumColor;
+                    response.IsSuccess = true;
+                    response.Code = 200;
+                    response.Message = "Received Successfully";
+                }
+            }
+            catch (Exception e)
+            {
+                response.ErrorMessages = new List<string> { e.Message };
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> GetEnumCuts()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var enumColor = EnumHelper.GetEnums<EnumCut>();
+                if (!enumColor.Any())
+                {
+                    response.IsSuccess = false;
+                    response.Code = 400;
+                    response.Message = "Not Found";
+                }
+                else
+                {
+                    response.Data = enumColor;
+                    response.IsSuccess = true;
+                    response.Code = 200;
+                    response.Message = "Received Successfully";
+                }
+            }
+            catch (Exception e)
+            {
+                response.ErrorMessages = new List<string> { e.Message };
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> GetEnumColorsDiamond()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var enumColor = EnumHelper.GetEnums<EnumColorDiamond>();
+                if (!enumColor.Any())
+                {
+                    response.IsSuccess = false;
+                    response.Code = 400;
+                    response.Message = "Not Found";
+                }
+                else
+                {
+                    response.Data = enumColor;
+                    response.IsSuccess = true;
+                    response.Code = 200;
+                    response.Message = "Received Successfully";
+                }
+            }
+            catch (Exception e)
+            {
+                response.ErrorMessages = new List<string> { e.Message };
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
         }
     }
 }

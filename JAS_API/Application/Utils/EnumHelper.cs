@@ -18,7 +18,7 @@ namespace Application.Utils
         {
             return Enum.GetValues(typeof(TEnum))
                        .Cast<TEnum>()
-                       .Select(e => new EnumItem { Name = e.ToString(), Value = Convert.ToInt32(e)})
+                       .Select(e => new EnumItem { Name = e.ToString().Replace("_"," "), Value = Convert.ToInt32(e)})
                        .ToList();
         }
     }
