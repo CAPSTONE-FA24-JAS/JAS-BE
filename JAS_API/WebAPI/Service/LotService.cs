@@ -921,11 +921,14 @@ namespace Application.Services
                 {
                     foreach (var player in playersInLot)
                     {
-
-                        var mapper = _mapper.Map<ViewPlayerInLotDTO>(player);
-                        var bidTime = await _unitOfWork.BidPriceRepository.GetAllAsync(x => x.CurrentPrice == player.CurrentPrice && x.CustomerId == player.CustomerId && x.LotId == lotId);
-                        mapper.BidTime = (bidTime.FirstOrDefault() != null)?(DateTime?)bidTime.FirstOrDefault().CreationDate: null;
-                        DTOs.Add(mapper);
+                        var bidExist = await _unitOfWork.BidPriceRepository.GetAllAsync(x => x.CustomerId == player.CustomerId && x.LotId == player.LotId);
+                        if(bidExist.Any())
+                        {
+                            var mapper = _mapper.Map<ViewPlayerInLotDTO>(player);
+                            var bidTime = await _unitOfWork.BidPriceRepository.GetAllAsync(x => x.CurrentPrice == player.CurrentPrice && x.CustomerId == player.CustomerId && x.LotId == lotId);
+                            mapper.BidTime = (bidTime.FirstOrDefault() != null) ? (DateTime?)bidTime.FirstOrDefault().CreationDate : null;
+                            DTOs.Add(mapper);
+                        }
                     }
                     reponse.Code = 200;
                     reponse.IsSuccess = true;

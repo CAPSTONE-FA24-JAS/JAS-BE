@@ -719,6 +719,7 @@ namespace WebAPI.Service
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforSercetBiddingAuto", "Phiên đã kết thúc!");
                         lot.ActualEndTime = DateTime.UtcNow;
                         await _unitOfWork.SaveChangeAsync();
+
                     }
                 }
             }
@@ -759,7 +760,7 @@ namespace WebAPI.Service
 
                             var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == player.CustomerId);
                             
-                                var autobidAvaiable = player.AutoBids?.FirstOrDefault(x => x.IsActive == true && x.MinPrice <= highestBidOfLot.CurrentPrice.Value && x.MaxPrice >= highestBidOfLot.CurrentPrice.Value);
+                            var autobidAvaiable = player.AutoBids?.FirstOrDefault(x => x.IsActive == true && x.MinPrice <= highestBidOfLot.CurrentPrice.Value && x.MaxPrice >= highestBidOfLot.CurrentPrice.Value);
                             if(currentPriceOfPlayer.CurrentPrice >= highestBidOfLot.CurrentPrice || highestBidOfLot == null)
                             {
                                 continue;
@@ -774,7 +775,7 @@ namespace WebAPI.Service
                             {
                                 continue;
                             }
-
+                            //tìm ra autobid phù hợp với autobid có tg thực hiện giữa mỗi lần auto
                             if (autobidAvaiable != null)
                             {
                                 var bidPriceFuture = currentPriceOfPlayer.CurrentPrice + (player.Lot.BidIncrement * autobidAvaiable.NumberOfPriceStep);
@@ -825,6 +826,11 @@ namespace WebAPI.Service
                                         _cacheService.AddToStream((int)player.LotId, bidData, (int)player.CustomerId);
 
                                         await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
+                                        //tam dừng tg cho luồng này
+                                        TimeSpan delayTime = TimeSpan.FromMinutes(autobidAvaiable.TimeIncrement.Value);
+                                        // Đợi trong thời gian đã cho
+                                        await Task.Delay(delayTime);
+
                                     }
                                 }
                                 //không làm gì cả không lưu redis
