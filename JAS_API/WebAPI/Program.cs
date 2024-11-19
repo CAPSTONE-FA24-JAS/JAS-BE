@@ -140,6 +140,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<BiddingHub>("/Auctionning");
+app.MapHub<NotificationHub>("/Notification");
 
 app.Run();
 public partial class Program { }
