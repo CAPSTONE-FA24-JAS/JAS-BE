@@ -14,6 +14,7 @@ using Domain.Entity;
 using Domain.Enums;
 using iTextSharp.text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
@@ -24,6 +25,7 @@ using System.Linq.Expressions;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
+using WebAPI.Middlewares;
 
 namespace Application.Services
 {
@@ -39,8 +41,10 @@ namespace Application.Services
         private readonly IWalletService _walletService;
         private readonly ICustomerLotService _customerLotService;
         private const string Tags = "Backend_BillTranfer";
+        private readonly IHubContext<NotificationHub> _notificationHub;
 
-        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IWalletService walletService, ICustomerLotService customerLotService)
+        public InvoiceService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IWalletService walletService,
+            ICustomerLotService customerLotService, IHubContext<NotificationHub> notificationHub)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -49,6 +53,7 @@ namespace Application.Services
             _httpContextAccessor = httpContextAccessor;
             _walletService = walletService;
             _customerLotService = customerLotService;
+            _notificationHub = notificationHub;
         }
 
         public async Task<APIResponseModel> getInvoicesByStatusForManger(int? pageSize, int? pageIndex)
@@ -120,8 +125,24 @@ namespace Application.Services
                     };
 
                     await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
+                    
+                    var notification = new Notification
+                    {
+                        Title = $"Has been assigned for invoice {invoiceById.Id}",
+                        Description = $"Has been assigned for invoice  {invoiceById.Id} by manager",
+                        Is_Read = false,
+                        NotifiableId = invoiceById.Id,  //invoiceById
+                        AccountId = invoiceById.Shipper.AccountId,
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "Delivering",
+                        ImageLink = invoiceById.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+                    };
+
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
+
                     await _unitOfWork.SaveChangeAsync();
 
+                    await _notificationHub.Clients.Groups(invoiceById.Shipper.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                     var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
 
                     response.Message = $"Asign shipper Successfully";
@@ -257,7 +278,23 @@ namespace Application.Services
 
                         await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
 
+                        var notification = new Notification
+                        {
+                            Title = $"Successful delivery for  {invoiceById.Id} by shipper {invoiceById.Shipper.Id}",
+                            Description = $"Successful delivery for  {invoiceById.Id} by shipper {invoiceById.Shipper.Id}",
+                            Is_Read = false,
+                            NotifiableId = invoiceById.Id,  //invoiceById
+                            AccountId = 61,
+                            CreationDate = DateTime.UtcNow,
+                            Notifi_Type = "Finished",
+                            ImageLink = invoiceById.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+                        };
+
+                        await _unitOfWork.NotificationRepository.AddAsync(notification);
+
                         await _unitOfWork.SaveChangeAsync();
+
+                        await _notificationHub.Clients.Groups("61").SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
                         var jewelryOfInvoice = invoiceById.CustomerLot.Lot.Jewelry;
 
@@ -356,8 +393,24 @@ namespace Application.Services
 
                         await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
 
+                        var notification = new Notification
+                        {
+                            Title = $"Fiinish invoice {invoiceById.Id}",
+                            Description = $"Your Invoice {invoiceById.Id} had been finish and company auto paid into your wallet for you.Please check your wallet!",
+                            Is_Read = false,
+                            NotifiableId = invoiceById.Id,  //invoiceById
+                            AccountId = invoiceById.Customer.AccountId,
+                            CreationDate = DateTime.UtcNow,
+                            Notifi_Type = "Finished",
+                            ImageLink = invoiceById.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+                        };
+
+                        await _unitOfWork.NotificationRepository.AddAsync(notification);
 
                         await _unitOfWork.SaveChangeAsync();
+
+                        await _notificationHub.Clients.Groups(invoiceById.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                        
 
                         var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
 

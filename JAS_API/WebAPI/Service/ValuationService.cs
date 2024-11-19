@@ -35,13 +35,15 @@ namespace Application.Services
         private const string Tags_Receipt = "ReceiptPDF";
         private readonly IGeneratePDFService _generatePDFService;
         private readonly IHubContext<BiddingHub> _hubContext;
-        public ValuationService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IGeneratePDFService generatePDFService, IHubContext<BiddingHub> hubContext)
+        private readonly IHubContext<NotificationHub> _notificationHub;
+        public ValuationService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IGeneratePDFService generatePDFService, IHubContext<BiddingHub> hubContext, IHubContext<NotificationHub> notificationHub)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinary = cloudinary;
             _generatePDFService = generatePDFService;
             _hubContext = hubContext;
+            _notificationHub = notificationHub;
         }
         public async Task<APIResponseModel> ConsignAnItem(ConsignAnItemDTO consignAnItem)
         {
@@ -93,13 +95,31 @@ namespace Application.Services
                             imagesValuation.Add(imageValuationinput.ImageLink);
                             var imageValuation = _mapper.Map<ImageValuation>(imageValuationinput);
                             imageValuationList.Add(imageValuation);
-                                                      
+                                                  
 
                         }
                     }
                     await _unitOfWork.ImageValuationRepository.AddRangeAsync(imageValuationList);
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
+                        var notification = new Notification
+                        {
+                            Title = $"Have consign an item for customer {newvaluation.Seller.AccountId}",
+                            Description = $"Have consign an item for customer {newvaluation.Seller.AccountId}",
+                            Is_Read = false,
+                            NotifiableId = newvaluation.Id,  //valuationId
+                            AccountId = 61,
+                            CreationDate = DateTime.UtcNow,
+                            Notifi_Type = "Requested",
+                            StatusOfValuation = "0",
+                            ImageLink = imageValuationList.FirstOrDefault().ImageLink
+                        };
+
+                        await _unitOfWork.NotificationRepository.AddAsync(notification);
+
+                        await _unitOfWork.SaveChangeAsync();
+
+                        await _notificationHub.Clients.Groups("61").SendAsync("NewNotificationReceived", "Có thông báo mới!");
                         response.Message = $"Consign an item Successfully";
                         response.Code = 200;
                         response.IsSuccess = true;
@@ -193,8 +213,8 @@ namespace Application.Services
                     
                     var notification = new Notification
                     {
-                        Title = $"Has been Asigned to valuation",
-                        Description = $" Bạn đã được chỉ định cho valuation Id {id}",
+                        Title = $"Has been Asigned to valuation {id}",
+                        Description = $" You have been asigned for valuation Id {id}: {valuationById.Name}",
                         Is_Read = false,
                         NotifiableId = id,  //valuationId
                         AccountId = staff.AccountId,
@@ -207,7 +227,8 @@ namespace Application.Services
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
 
                     await _unitOfWork.SaveChangeAsync();
-                   
+
+                    await _notificationHub.Clients.Groups(staff.Id.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
@@ -253,18 +274,19 @@ namespace Application.Services
                     var notification = new Notification
                     {
                         Title = $"Premilinary valuation has been created for valuation Id {id}",
-                        Description = $" valuation {id} của bạn đã được định giá sơ bộ",
+                        Description = $" Your valuation {id}: {valuationById.Name} has been created preliminary valuation.",
                         Is_Read = false,
                         NotifiableId = id,  //valuationId
                         AccountId = valuationById.Seller.AccountId,
                         CreationDate = DateTime.UtcNow,
                         Notifi_Type = "Preliminary",
-                        StatusOfValuation = "2"
+                        StatusOfValuation = "2",
+                        ImageLink = valuationById.ImageValuations.FirstOrDefault().ImageLink
                     };
 
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
                     await _unitOfWork.SaveChangeAsync();
-                    await _hubContext.Clients.All.SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                    await _notificationHub.Clients.Groups(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
@@ -461,7 +483,22 @@ namespace Application.Services
                     AddHistoryValuation(id, valuationById.Status);
                     _unitOfWork.ValuationRepository.Update(valuationById);
 
+                    var notification = new Notification
+                    {
+                        Title = $"Valuation {id} has been approved by customer {valuationById.Seller.AccountId}",
+                        Description = $" valuation {id} has been approved by customer {valuationById.Seller.LastName} {valuationById.Seller.FirstName}",
+                        Is_Read = false,
+                        NotifiableId = id,  //valuationId
+                        AccountId = valuationById.Seller.AccountId,
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "ApprovedPreliminary",
+                        StatusOfValuation = "4",
+                        ImageLink = valuationById.ImageValuations.FirstOrDefault().ImageLink
+                    };
+
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
                     await _unitOfWork.SaveChangeAsync();
+                    await _notificationHub.Clients.Groups(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
 
@@ -501,10 +538,25 @@ namespace Application.Services
 
                     AddHistoryValuation(id, valuationById.Status);
                     _unitOfWork.ValuationRepository.Update(valuationById);
-                    await _unitOfWork.SaveChangeAsync();
+                  
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
+                    var notification = new Notification
+                    {
+                        Title = $"Premilinary valuation {id} has been reject by customer {valuationById.Seller.AccountId}",
+                        Description = $" Premilinary valuation {id} has been reject by customer {valuationById.Seller.LastName} {valuationById.Seller.FirstName}",
+                        Is_Read = false,
+                        NotifiableId = id,  //valuationId
+                        AccountId = valuationById.Seller.AccountId,
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "Preliminary",
+                        StatusOfValuation = "9",
+                        ImageLink = valuationById.ImageValuations.FirstOrDefault().ImageLink
+                    };
 
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
+                    await _unitOfWork.SaveChangeAsync();
+                    await _notificationHub.Clients.Groups(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
@@ -578,20 +630,22 @@ namespace Application.Services
 
                         var notification = new Notification
                         {
-                            Title = $"Reciept has been created for valuation Id {id}",
-                            Description = $" công ty đã nhận được hàng và biên bản xác nhận đã được tạo cho  valuation Id {id}",
+                            Title = $"Reciept has been created for valuation {id}",
+                            Description = $" The company has received the goods and a confirmation has been generated for valuation Id {id}: {valuationById.Name}",
                             Is_Read = false,
                             NotifiableId = id,  //valuationId
                             AccountId = valuationById.Seller.AccountId,
                             CreationDate = DateTime.UtcNow,
-                            Notifi_Type = "Preliminary",
-                            StatusOfValuation = "3"
+                            Notifi_Type = "RecivedJewelry",
+                            StatusOfValuation = "5",
+                            ImageLink = valuationById.ImageValuations.FirstOrDefault().ImageLink
+
                         };
 
                         await _unitOfWork.NotificationRepository.AddAsync(notification);
 
                         await _unitOfWork.SaveChangeAsync();
-                        await _hubContext.Clients.All.SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                        await _notificationHub.Clients.Groups(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                     }
                     var valuation = _mapper.Map<ValuationDTO>(valuationById);
 
@@ -633,7 +687,24 @@ namespace Application.Services
                     _unitOfWork.ValuationRepository.Update(valuationById);
 
 
+                    var notification = new Notification
+                    {
+                        Title = $"Request preliminary valuation for valuation {id}",
+                        Description = $" Your have been recieved preliminary valuation requestion for valuation Id {id}: {valuationById.Name}",
+                        Is_Read = false,
+                        NotifiableId = id,  //valuationId
+                        AccountId = valuationById.Appraiser.AccountId,
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "RequestedPreliminary",
+                        StatusOfValuation = "2",
+                        ImageLink = valuationById.ImageValuations.FirstOrDefault().ImageLink
+
+                    };
+
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
+
                     await _unitOfWork.SaveChangeAsync();
+                    await _notificationHub.Clients.Groups(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
 

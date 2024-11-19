@@ -30,6 +30,7 @@ namespace WebAPI
             services.AddScoped<IJewelryService, JewelryService>();
             services.AddScoped<IGeneratePDFService, GeneratePdfService>();
             services.AddScoped<ILotService, LotService>();
+            services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddHttpContextAccessor();
             services.AddFluentValidationAutoValidation();
             services.AddFluentValidationClientsideAdapters();
