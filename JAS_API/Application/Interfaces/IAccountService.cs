@@ -19,6 +19,5 @@ namespace Application.Interfaces
         public Task<APIResponseModel> CheckBidLimit(int customerId);
         Task<APIResponseModel> GetCreditCardByCustomerAsync(int customerId);
         Task<APIResponseModel> CreateNewCreditCardAsync(CreateCreditCardDTO model);
-
     }
 }

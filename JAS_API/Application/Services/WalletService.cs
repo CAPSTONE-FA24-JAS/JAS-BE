@@ -207,6 +207,14 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
+                var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(requestWithdrawDTO.CustomerId);
+                if (customer == null || customer.CreditCard != null)
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Code = 400;
+                    reponse.Message = "Customer Haven't Credit Card For Withdraw, Please Add New Credit Card";
+                    return reponse;
+                }
                 var walletExits =  await CheckBalance(requestWithdrawDTO.WalletId);
                 if (walletExits.Data is WalletDTO cs && walletExits.IsSuccess)
                 {
@@ -493,6 +501,43 @@ namespace Application.Services
                 reponse.Message = "Exception";
                 reponse.Code = 500;
                 reponse.IsSuccess = false;
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> GetListRequestWithdrawForManagerment()
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var transWithdraws = await _unitOfWork.WalletTransactionRepository.GetAllAsync(x => x.Status == EnumStatusTransaction.Pending.ToString()
+                                                                                                      && x.transactionType == EnumTransactionType.WithDrawWallet.ToString());
+                var requests = new List<RequestWithdraw>();
+                foreach (var trans in transWithdraws)
+                {
+                    var requestWithdraw = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(trans.DocNo);
+                    requests.Add(requestWithdraw);
+                }
+
+                if (!requests.Any())
+                {
+                    reponse.Code = 200;
+                    reponse.Message = "CurrentTime Haven't Request";
+                    reponse.IsSuccess = false;
+                    return reponse;
+                }
+                else
+                {
+                    reponse.IsSuccess = true;
+                    reponse.Code = 200;
+                    reponse.Message = "Received Successfuly";
+                    reponse.Data = _mapper.Map<IEnumerable<ViewRequestWithdrawDTO>>(requests);
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
             }
             return reponse;
         }

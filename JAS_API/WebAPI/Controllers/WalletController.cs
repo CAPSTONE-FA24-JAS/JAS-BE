@@ -257,6 +257,13 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ViewListRequestWithdrawForManagerment()
+        {
+            var result = await _walletService.GetListRequestWithdrawForManagerment();
+            return (result.IsSuccess)?Ok(result):BadRequest(result);
+        }
+
         [HttpPatch]
         public async Task<IActionResult> ApproveRequestNewWithdraw(int transId)
         {
@@ -270,6 +277,6 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
-
+        
     }
 }
