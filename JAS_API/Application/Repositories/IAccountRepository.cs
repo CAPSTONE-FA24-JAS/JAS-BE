@@ -1,4 +1,6 @@
-﻿using Domain.Entity;
+﻿using Application.ServiceReponse;
+using Application.ViewModels.CreditCardDTOs;
+using Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +22,6 @@ namespace Application.Repositories
         Task<IEnumerable<Account>> SearchAccountByRoleNameAsync(string roleName);
         Task<IEnumerable<Account>> GetSortedAccountAsync();
         Task<Role> GetRoleNameByRoleId(int RoleId);
+
     }
 }

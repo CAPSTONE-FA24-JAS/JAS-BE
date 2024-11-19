@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.ViewModels.AccountDTOs;
+using Application.ViewModels.CreditCardDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -167,6 +168,18 @@ namespace WebAPI.Controllers
             }
         }
 
-        
+        [HttpGet]
+        public async Task<IActionResult> GetAllCreditCardByCustomer(int customerId)
+        {
+            var result = await _accountService.GetCreditCardByCustomerAsync(customerId);
+            return (result.IsSuccess == true)? Ok(result): BadRequest(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddNewCreditCard(CreateCreditCardDTO model)
+        {
+            var result = await _accountService.CreateNewCreditCardAsync(model);
+            return (result.IsSuccess == true) ? Ok(result) : BadRequest(result);
+        }
     }
 }

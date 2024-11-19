@@ -24,6 +24,7 @@ using Application.ViewModels.WatchingDTOs;
 using Application.ViewModels.BlogDTOs;
 using Application.ViewModels.AutoBidDTOs;
 using Application.ViewModels.NotificationDTOs;
+using Application.ViewModels.CreditCardDTOs;
 
 
 namespace Infrastructures
@@ -293,7 +294,8 @@ namespace Infrastructures
                 .ForPath(dest => dest.BidPrice, src => src.MapFrom(x => x.CurrentPrice??null))
                 .ForPath(dest => dest.CustomerName, src => src.MapFrom(x => x.Customer.FirstName + " " + x.Customer.LastName??""))
                 .ForPath(dest => dest.BidPrice, src => src.MapFrom(x => x.CurrentPrice ?? null)) ;
-
+            CreateMap<ViewCreditCardDTO, CreditCard>().ReverseMap();
+            CreateMap<CreateCreditCardDTO, CreditCard>().ReverseMap();
                 
         }
     }
