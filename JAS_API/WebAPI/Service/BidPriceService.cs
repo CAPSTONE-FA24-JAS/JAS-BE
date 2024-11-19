@@ -377,7 +377,7 @@ namespace Application.Services
                         {
                             if (request.CurrentPrice < highestBid.CurrentPrice)
                             {
-                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Không được đặt giá thấp hơn hoặc bằng giá hiện tại", request.CurrentPrice);
+                                //await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Không được đặt giá thấp hơn hoặc bằng giá hiện tại", request.CurrentPrice);
                                 reponse.IsSuccess = false;
                                 reponse.Code = 200;
                                 reponse.Message = "Đặt giá không thành công do không thỏa mãn điều kiện";

@@ -13,8 +13,6 @@ using WebAPI.Service;
 using System.Text.Json.Serialization;
 using StackExchange.Redis;
 using Application.Interfaces;
-using DinkToPdf.Contracts;
-using DinkToPdf;
 using Swashbuckle.AspNetCore;
 using Application.Utils;
 
@@ -62,7 +60,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
 
 builder.Services.AddSingleton<LiveBiddingService>();
-builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+
 
 //dki background service
 builder.Services.AddHostedService<ProcessStreamService>();

@@ -15,6 +15,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection.Metadata;
@@ -189,6 +190,7 @@ namespace Application.Services
                     _unitOfWork.ValuationRepository.Update(valuationById);
 
                     var staff = await _unitOfWork.StaffRepository.GetByIdAsync(staffId);
+                    
                     var notification = new Notification
                     {
                         Title = $"Has been Asigned to valuation",
@@ -205,8 +207,7 @@ namespace Application.Services
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
 
                     await _unitOfWork.SaveChangeAsync();
-
-                    await _hubContext.Clients.All.SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                   
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
@@ -547,13 +548,11 @@ namespace Application.Services
 
                     byte[] pdfBytes = _generatePDFService.CreateReceiptPDF(valuationById, DateTime.UtcNow, receipt.ActualStatusOfJewelry);
 
-                    string filePath = $"BienBanXacNhanNhanHang_{valuationById.Id}.pdf";
-
-                    await File.WriteAllBytesAsync(filePath, pdfBytes);
+                    using var memoryStream = new MemoryStream(pdfBytes);
 
                     var uploadFile = await _cloudinary.UploadAsync(new RawUploadParams
                     {
-                        File = new FileDescription(filePath),
+                        File = new FileDescription($"BienBanXacNhanHang{valuationById.Id}.pdf", memoryStream),
                         Tags = Tags_Receipt,
                         Type = "upload"
 

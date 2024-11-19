@@ -173,7 +173,7 @@ namespace WebAPI.Service
                     _unitOfWork.LotRepository.Update(lotsql);
                     await _unitOfWork.SaveChangeAsync();
 
-                    await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinner", "Phiên đã kết thúc va khong co dau gia");
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinnerReduce", "Phiên đã kết thúc va khong co dau gia");
 
                 }
                 else
@@ -197,7 +197,8 @@ namespace WebAPI.Service
                         lotsql.Status = EnumStatusLot.Sold.ToString();
                         _unitOfWork.LotRepository.Update(lotsql);
                         await _unitOfWork.SaveChangeAsync();
-
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedReduceBidding", "Phien đa ket thuc", winnerBid.CustomerId, winnerBid.CurrentPrice);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeForReduceBidding", "Thoi gian ket actual", lot.ActualEndTime);
                         //xu ly cho thang thang va thua
                         await HandleWinnerAndLoserLot(lotId, winnerBid);
                     }
@@ -255,8 +256,8 @@ namespace WebAPI.Service
                             _unitOfWork.LotRepository.Update(lotsql);
                             await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
                             await _unitOfWork.SaveChangeAsync();
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedReduceBidding", "Phien đa ket thuc");
-
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedReduceBidding", "Phien đa ket thuc", winnerBid.CustomerId, winnerBid.CurrentPrice);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeForReduceBidding", "Thoi gian ket actual", lot.ActualEndTime);
                         //xu ly cho thang thang va thua
                         await HandleWinnerAndLoserLot(lotId, winnerBid);
                             break;
@@ -348,7 +349,7 @@ namespace WebAPI.Service
                 var notification = new Notification
                 {
                     Title = $"Đấu giá thắng Lot {lotId}",
-                    Description = $" Bạn đã win lot {lotId} và hệ thống đã tự động taoj invoice cho bạn",
+                    Description = $" Bạn đã win lot {lotId} và hệ thống đã tự động tạo invoice cho bạn",
                     Is_Read = false,
                     NotifiableId = invoice.Id,
                     AccountId = winnerCustomerLot.Customer.AccountId,

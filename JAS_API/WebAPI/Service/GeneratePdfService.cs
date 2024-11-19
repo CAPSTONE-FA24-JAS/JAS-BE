@@ -1,7 +1,5 @@
 ﻿using Application.Interfaces;
 using Application.Utils;
-using DinkToPdf;
-using DinkToPdf.Contracts;
 using Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -13,96 +11,56 @@ namespace Application.Services
 {
     public class GeneratePdfService : IGeneratePDFService
     {
-        private readonly IConverter _converter;
+        
         private readonly HelperValuation _helperValuation;
-        public GeneratePdfService(IConverter converter, HelperValuation helperValuation)
+        public GeneratePdfService( HelperValuation helperValuation, IConfiguration configuration)
         {
-            _converter = converter;
+            License.LicenseKey = configuration["IronPdf:LicenseKey"];
             _helperValuation = helperValuation;
         }
         public byte[] CreateReceiptPDF(Valuation valuation, DateTime? recivedDate, string? productRecivedStatus)
         {
-            string exportsPath = Path.Combine(Directory.GetCurrentDirectory(), "Exports");
-            // Tạo thư mục "Exports" nếu chưa tồn tại
-            if (!Directory.Exists(exportsPath))
-            {
-                Directory.CreateDirectory(exportsPath);
-            }
+            // Tạo nội dung HTML từ HelperValuation
+            string htmlContent = _helperValuation.ToHtmlFileReceipt(valuation, recivedDate, productRecivedStatus);
 
-            string fileName = $"BienBanXacNhanNhanHang_{valuation.Id}.pdf";
-            string outputPath = Path.Combine(exportsPath, fileName);
+            // Khởi tạo trình render PDF của IronPdf
+            var renderer = new ChromePdfRenderer();
 
-            var glb = new GlobalSettings
-            {
-                DocumentTitle = fileName,
-                Out = outputPath
-            };
+            // Cấu hình để đảm bảo hỗ trợ đầy đủ
+            renderer.RenderingOptions.MarginTop = 10; // margin trên
+            renderer.RenderingOptions.MarginBottom = 10; // margin dưới
+            renderer.RenderingOptions.MarginLeft = 10; // margin trái
+            renderer.RenderingOptions.MarginRight = 10; // margin phải
+            renderer.RenderingOptions.PrintHtmlBackgrounds = true;
 
-            var objectSettings = new ObjectSettings
-            {
-                PagesCount = true,
-                HtmlContent = _helperValuation.ToHtmlFileReceipt(valuation, recivedDate, productRecivedStatus),
-                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = null }
-            };
+            // Render nội dung HTML thành PDF
+            var pdf = renderer.RenderHtmlAsPdf(htmlContent);
 
-            var pdf = new HtmlToPdfDocument
-            {
-                GlobalSettings = glb,
-                Objects = { objectSettings }
-            };
-
-            _converter.Convert(pdf);
-
-            // Đọc tệp PDF đã tạo thành mảng byte
-            byte[] pdfBytes = File.ReadAllBytes(outputPath);
-
-            // Xóa tệp tạm sau khi đọc nếu cần
-            File.Delete(outputPath);
-
-            return pdfBytes;
+            // Trả về mảng byte PDF
+            return pdf.BinaryData;
         }
 
 
         public byte[] CreateAuthorizedPDF(Valuation valuation)
         {
-            string exportsPath = Path.Combine(Directory.GetCurrentDirectory(), "Exports");
-            // Tạo thư mục "Exports" nếu chưa tồn tại
-            if (!Directory.Exists(exportsPath))
-            {
-                Directory.CreateDirectory(exportsPath);
-            }
+            // Tạo nội dung HTML từ HelperValuation
+            string htmlContent = _helperValuation.ToHtmlFileAuthorized(valuation);
 
-            string fileName = $"BienBanUyQuyen_{valuation.Id}.pdf";
-            string outputPath = Path.Combine(exportsPath, fileName);
+            // Khởi tạo trình render PDF của IronPdf
+            var renderer = new ChromePdfRenderer();
 
-            var glb = new GlobalSettings
-            {
-                DocumentTitle = fileName,
-                Out = outputPath
-            };
+            // Cấu hình để đảm bảo hỗ trợ đầy đủ
+            renderer.RenderingOptions.MarginTop = 10; // margin trên
+            renderer.RenderingOptions.MarginBottom = 10; // margin dưới
+            renderer.RenderingOptions.MarginLeft = 10; // margin trái
+            renderer.RenderingOptions.MarginRight = 10; // margin phải
+            renderer.RenderingOptions.PrintHtmlBackgrounds = true;
 
-            var objectSettings = new ObjectSettings
-            {
-                PagesCount = true,
-                HtmlContent = _helperValuation.ToHtmlFileAuthorized(valuation),
-                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = null }
-            };
+            // Render nội dung HTML thành PDF
+            var pdf = renderer.RenderHtmlAsPdf(htmlContent);
 
-            var pdf = new HtmlToPdfDocument
-            {
-                GlobalSettings = glb,
-                Objects = { objectSettings }
-            };
-
-            _converter.Convert(pdf);
-
-            // Đọc tệp PDF đã tạo thành mảng byte
-            byte[] pdfBytes = File.ReadAllBytes(outputPath);
-
-            // Xóa tệp tạm sau khi đọc nếu cần
-            File.Delete(outputPath);
-
-            return pdfBytes;
+            // Trả về mảng byte PDF
+            return pdf.BinaryData;
         }
 
     }
