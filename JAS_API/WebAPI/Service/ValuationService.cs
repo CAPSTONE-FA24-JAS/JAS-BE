@@ -2,6 +2,7 @@
 using Application.Repositories;
 using Application.ServiceReponse;
 using Application.Utils;
+using Application.ViewModels.NotificationDTOs;
 using Application.ViewModels.ValuationDTOs;
 using AutoMapper;
 using Azure;
@@ -102,20 +103,21 @@ namespace Application.Services
                     await _unitOfWork.ImageValuationRepository.AddRangeAsync(imageValuationList);
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
-                        var notification = new Notification
+                        var notification = new ViewNotificationDTO
                         {
-                            Title = $"Have consign an item for customer {newvaluation.Seller.AccountId}",
-                            Description = $"Have consign an item for customer {newvaluation.Seller.AccountId}",
+                            Title = $"Have consign an item from customer ",
+                            Description = $"Have consign an item from customer",
                             Is_Read = false,
                             NotifiableId = newvaluation.Id,  //valuationId
                             AccountId = 61,
                             CreationDate = DateTime.UtcNow,
                             Notifi_Type = "Requested",
                             StatusOfValuation = "0",
-                            ImageLink = imageValuationList.FirstOrDefault().ImageLink
+                            ImageLink = imageValuationList.FirstOrDefault()?.ImageLink
                         };
 
-                        await _unitOfWork.NotificationRepository.AddAsync(notification);
+                        var notiDTO = _mapper.Map<Notification>(notification);
+                        await _unitOfWork.NotificationRepository.AddAsync(notiDTO);
 
                         await _unitOfWork.SaveChangeAsync();
 
@@ -684,27 +686,8 @@ namespace Application.Services
                     valuationById.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
 
                     AddHistoryValuation(id, valuationById.Status);
-                    _unitOfWork.ValuationRepository.Update(valuationById);
-
-
-                    var notification = new Notification
-                    {
-                        Title = $"Request preliminary valuation for valuation {id}",
-                        Description = $" Your have been recieved preliminary valuation requestion for valuation Id {id}: {valuationById.Name}",
-                        Is_Read = false,
-                        NotifiableId = id,  //valuationId
-                        AccountId = valuationById.Appraiser.AccountId,
-                        CreationDate = DateTime.UtcNow,
-                        Notifi_Type = "RequestedPreliminary",
-                        StatusOfValuation = "2",
-                        ImageLink = valuationById.ImageValuations.FirstOrDefault().ImageLink
-
-                    };
-
-                    await _unitOfWork.NotificationRepository.AddAsync(notification);
-
+                    _unitOfWork.ValuationRepository.Update(valuationById);      
                     await _unitOfWork.SaveChangeAsync();
-                    await _notificationHub.Clients.Groups(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
 
