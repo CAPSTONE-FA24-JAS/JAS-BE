@@ -299,6 +299,9 @@ namespace Infrastructures
             CreateMap<ViewRequestWithdrawDTO, RequestWithdraw>().ReverseMap()
                 .ForPath(dest => dest.CustomerId, src => src.MapFrom(x => x.Wallet.CustomerId))
                 .ForPath(dest => dest.ViewCreditCardDTO, src => src.MapFrom(x => x.Wallet.Customer.CreditCard));
+            CreateMap<CustomerLot, CustomerLotWinnerDTO>()
+                .ForMember(dest => dest.Customer, src => src.MapFrom(x => x.Customer))
+                .ReverseMap();
 
         }
     }
