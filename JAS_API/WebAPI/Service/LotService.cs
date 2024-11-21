@@ -24,9 +24,10 @@ namespace Application.Services
         private readonly IWalletTransactionService _walletTransactionService;
         private readonly IFoorFeePercentService _foorFeePercentService;
         private readonly IHubContext<BiddingHub> _hubContext;
+        private readonly IHubContext<NotificationHub> _notificationHub;
 
         public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IAccountService accountService, IWalletService walletService,
-            IWalletTransactionService walletTransactionService, IFoorFeePercentService foorFeePercentService, IHubContext<BiddingHub> hubContext)
+            IWalletTransactionService walletTransactionService, IFoorFeePercentService foorFeePercentService, IHubContext<BiddingHub> hubContext, IHubContext<NotificationHub> notificationHub)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -36,6 +37,7 @@ namespace Application.Services
             _walletTransactionService = walletTransactionService;
             _foorFeePercentService = foorFeePercentService;
             _hubContext = hubContext;
+            _notificationHub = notificationHub;
         }
 
         public async Task<APIResponseModel> CreateLot(object lotDTO)
@@ -427,6 +429,21 @@ namespace Application.Services
 
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
+                        //noti cho staff quan ly lot
+                        var notification = new Notification
+                        {
+                            Title = $"Have customer register to bid for lot",
+                            Description = $" Have customer register to bid for lot {customerLot.Lot.Title}",
+                            Is_Read = false,
+                            NotifiableId = customerLot.LotId,  //LotId
+                            AccountId = customerLot.Lot.Staff.AccountId,
+                            CreationDate = DateTime.UtcNow,
+                            Notifi_Type = "Registed",
+                            ImageLink = customerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+                        };
+                        await _unitOfWork.NotificationRepository.AddAsync(notification);
+                        await _unitOfWork.SaveChangeAsync();
+                        await _notificationHub.Clients.Group(customerLot.Lot.Staff.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                         response.IsSuccess = true;
                         response.Message = "Register customer to lot successfully";
                         response.Code = 200;

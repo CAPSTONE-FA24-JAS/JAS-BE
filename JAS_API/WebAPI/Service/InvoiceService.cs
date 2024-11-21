@@ -142,7 +142,7 @@ namespace Application.Services
 
                     await _unitOfWork.SaveChangeAsync();
 
-                    await _notificationHub.Clients.Groups(invoiceById.Shipper.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                    await _notificationHub.Clients.Group(invoiceById.Shipper.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                     var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
 
                     response.Message = $"Asign shipper Successfully";
@@ -294,7 +294,7 @@ namespace Application.Services
 
                         await _unitOfWork.SaveChangeAsync();
 
-                        await _notificationHub.Clients.Groups("61").SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                        await _notificationHub.Clients.Group("61").SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
                         var jewelryOfInvoice = invoiceById.CustomerLot.Lot.Jewelry;
 
@@ -409,7 +409,7 @@ namespace Application.Services
 
                         await _unitOfWork.SaveChangeAsync();
 
-                        await _notificationHub.Clients.Groups(invoiceById.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                        await _notificationHub.Clients.Group(invoiceById.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                         
 
                         var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
@@ -943,6 +943,20 @@ namespace Application.Services
                         
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
+                            var notification = new Notification
+                            {
+                                Title = $"Customer upload bill transaction for invoice with bankTransfer",
+                                Description = $" Customer upload bill transaction for invoice with bankTransfer. Please check and complete invoice!",
+                                Is_Read = false,
+                                NotifiableId = invoiceById.Id,
+                                AccountId = 61,
+                                CreationDate = DateTime.UtcNow,
+                                Notifi_Type = "PendingPayment",
+                                ImageLink = invoiceById.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
+                            };
+                            await _unitOfWork.NotificationRepository.AddAsync(notification);
+                            await _unitOfWork.SaveChangeAsync();
+                            await _notificationHub.Clients.Group("61").SendAsync("NewNotificationReceived", "Có thông báo mới!");
                             response.Message = $"Upload file bill transaction Successfully";
                             response.Code = 200;
                             response.IsSuccess = true;

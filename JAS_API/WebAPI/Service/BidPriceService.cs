@@ -93,9 +93,9 @@ namespace Application.Services
                         await _hubContext.Groups.AddToGroupAsync(request.ConnectionId, lotGroupName);
 
                         
-                        await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendCurrentPriceForReduceBidding", lot.CurrentPrice);
-                        await _hubContext.Clients.Groups(lotGroupName).SendAsync("StatusBid", lot.Status);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("StatusBid", lot.Status);
 
                     // await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
 
@@ -588,7 +588,7 @@ namespace Application.Services
                     _unitOfWork.LotRepository.Update(lot);
                     await _unitOfWork.SaveChangeAsync();
                     _cacheService.UpdateLotStatus(lotId, statusTranfer);
-                    await _hubContext.Clients.Groups(lotGroupName).SendAsync("UpdateStatusBid", lot.Status);
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("UpdateStatusBid", lot.Status);
 
                     reponse.IsSuccess = true;
                     reponse.Message = "update status lot successfully";
@@ -632,7 +632,7 @@ namespace Application.Services
                     await _unitOfWork.SaveChangeAsync();
                     _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Canceled.ToString());
                     _cacheService.UpdateLotActualEndTime(lotId, (DateTime)lot.ActualEndTime);
-                    await _hubContext.Clients.Groups(lotGroupName).SendAsync("UpdateStatusBid", lot.Status);
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("UpdateStatusBid", lot.Status);
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("CanceledAuctionPublic", "Phiên đã bi huy!");
                     await HandleLoserLot(lotId);
                     reponse.IsSuccess = true;

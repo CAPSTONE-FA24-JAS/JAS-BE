@@ -486,18 +486,7 @@ namespace Application.Services
                         Status = EnumCustomerLot.Refunded.ToString(),
                         CurrentTime = DateTime.UtcNow,
                     };
-                    var notification = new ViewNotificationDTO
-                    {
-                        Title = $"Đấu giá thua Lot {loser.LotId}",
-                        Description = $" Bạn đã lose lot {loser.LotId} và hệ thống đã tự động hoan tien cho bạn",
-                        Is_Read = false,
-                        NotifiableId = loser.Id,
-                        AccountId = loser.Customer.AccountId,
-                        CreationDate = DateTime.UtcNow,
-                        Notifi_Type = "CustomerLot",
-                    };
-                    var notificationEntity = _mapper.Map<Notification>(notification);
-                    await _unitOfWork.NotificationRepository.AddAsync(notificationEntity);
+                    
                     await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
                     await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
                     await _unitOfWork.WalletTransactionRepository.AddAsync(transactionWallet);
