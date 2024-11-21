@@ -744,15 +744,14 @@ namespace WebAPI.Service
                     string redisKey1 = $"BidPrice:{item.LotId}";
                     //lay ra highest bidPrice
                     var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == item.LotId);
-                    var highestBidOfLot = topBidders.FirstOrDefault();
 
-                    if (highestBidOfLot != null && highestBidOfLot.CurrentPrice != null)
+                    var highestBidOfLot = topBidders.FirstOrDefault()?.CurrentPrice.Value?? item.Lot.StartPrice.GetValueOrDefault();
+
+                    var currentPrice = highestBidOfLot;
+
+                    if (item.AutoBids.Any(x => x.IsActive == true && x.MinPrice <= currentPrice && x.MaxPrice >= currentPrice))
                     {
-                        var currentPrice = highestBidOfLot.CurrentPrice.Value;
-                        if (item.AutoBids.Any(x => x.IsActive == true && x.MinPrice <= currentPrice && x.MaxPrice >= currentPrice))
-                        {
-                            customerLots.Add(item);
-                        }
+                        customerLots.Add(item);
                     }
                 }
 
@@ -765,13 +764,14 @@ namespace WebAPI.Service
                             string redisKey1 = $"BidPrice:{player.LotId}";
                             //lay ra highest bidPrice
                             var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == player.LotId);
-                            var highestBidOfLot = topBidders.FirstOrDefault();
-                            Console.WriteLine($"HighestBidOfLot after initialization: {highestBidOfLot?.CurrentPrice}");
+                            var highestBidOfLot = topBidders.FirstOrDefault()?.CurrentPrice.Value ?? player.Lot.StartPrice.GetValueOrDefault();
+
+                            Console.WriteLine($"HighestBidOfLot after initialization: {highestBidOfLot}");
 
                             var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == player.CustomerId);
                             
-                            var autobidAvaiable = player.AutoBids?.FirstOrDefault(x => x.IsActive == true && x.MinPrice <= highestBidOfLot.CurrentPrice.Value && x.MaxPrice >= highestBidOfLot.CurrentPrice.Value);
-                            if(currentPriceOfPlayer.CurrentPrice >= highestBidOfLot.CurrentPrice || highestBidOfLot == null)
+                            var autobidAvaiable = player.AutoBids?.FirstOrDefault(x => x.IsActive == true && x.MinPrice <= highestBidOfLot && x.MaxPrice >= highestBidOfLot);
+                            if(currentPriceOfPlayer.CurrentPrice >= highestBidOfLot || highestBidOfLot == null)
                             {
                                 continue;
                             }
@@ -781,7 +781,7 @@ namespace WebAPI.Service
                                 continue; 
                             }
 
-                            if( highestBidOfLot.CurrentPrice.HasValue && currentPriceOfPlayer.CurrentPrice.Value > highestBidOfLot.CurrentPrice.Value)
+                            if(currentPriceOfPlayer.CurrentPrice.Value > highestBidOfLot)
                             {
                                 continue;
                             }
