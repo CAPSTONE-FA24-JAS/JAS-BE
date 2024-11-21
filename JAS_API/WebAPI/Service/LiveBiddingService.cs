@@ -745,8 +745,15 @@ namespace WebAPI.Service
                     //lay ra highest bidPrice
                     var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == item.LotId);
                     var highestBidOfLot = topBidders.FirstOrDefault();
-                    if(item.AutoBids.Any(x => x.IsActive == true && x.MinPrice <= highestBidOfLot.CurrentPrice && x.MaxPrice >= highestBidOfLot.CurrentPrice))
-                    customerLots.Add(item);
+
+                    if (highestBidOfLot != null && highestBidOfLot.CurrentPrice != null)
+                    {
+                        var currentPrice = highestBidOfLot.CurrentPrice.Value;
+                        if (item.AutoBids.Any(x => x.IsActive == true && x.MinPrice <= currentPrice && x.MaxPrice >= currentPrice))
+                        {
+                            customerLots.Add(item);
+                        }
+                    }
                 }
 
                 try
