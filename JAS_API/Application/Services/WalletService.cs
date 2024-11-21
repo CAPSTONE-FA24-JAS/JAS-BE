@@ -373,6 +373,7 @@ namespace Application.Services
 
             walletexist.AvailableBalance -= amountMoney;
             walletexist.FrozenBalance = (walletexist.FrozenBalance ?? 0) + amountMoney;
+            walletexist.Balance = walletexist.AvailableBalance + walletexist.FrozenBalance;
             _unitOfWork.WalletRepository.Update(walletexist);
 
             var result = await _unitOfWork.SaveChangeAsync();
