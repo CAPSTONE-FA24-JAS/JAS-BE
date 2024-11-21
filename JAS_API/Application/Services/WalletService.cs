@@ -130,7 +130,7 @@ namespace Application.Services
                 else
                 {
                     //kiem tra du so du khong
-                    if (walletexist.AvailableBalance < (decimal)depositPrice)
+                    if ((walletexist.AvailableBalance?? 0) < (decimal)depositPrice)
                     {
                         reponse.Code = 404;
                         reponse.Message = "Customer insufficient balance, Please add money into your wallet!";
@@ -218,7 +218,7 @@ namespace Application.Services
                 var walletExits =  await CheckBalance(requestWithdrawDTO.WalletId);
                 if (walletExits.Data is WalletDTO cs && walletExits.IsSuccess)
                 {
-                    if ((float)cs.AvailableBalance < requestWithdrawDTO.Amount)
+                    if ((float)(cs.AvailableBalance?? 0) < requestWithdrawDTO.Amount)
                     {
                         reponse.IsSuccess = false;
                         reponse.Code = 400;
@@ -311,13 +311,12 @@ namespace Application.Services
                 var walletexist = await _unitOfWork.WalletRepository.GetByIdAsync(walletId);
                 if (isAdd)
                 {
-                    walletexist.Balance += amountMoney;
                     if (walletexist.AvailableBalance == null)
                     {
                         walletexist.AvailableBalance = 0;
                     }
                     walletexist.AvailableBalance += amountMoney;
-
+                    walletexist.Balance = walletexist.AvailableBalance + (walletexist.FrozenBalance ?? 0);
                     _unitOfWork.WalletRepository.Update(walletexist);
                     
                 }
@@ -340,7 +339,7 @@ namespace Application.Services
                     else
                     {
                         walletexist.AvailableBalance -= amountMoney;
-                        walletexist.Balance = walletexist.AvailableBalance + walletexist.FrozenBalance;
+                        walletexist.Balance = walletexist.AvailableBalance + (walletexist.FrozenBalance ?? 0);
                         _unitOfWork.WalletRepository.Update(walletexist);
                     }
                 }
