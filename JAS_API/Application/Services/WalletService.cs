@@ -309,13 +309,12 @@ namespace Application.Services
                 var walletexist = await _unitOfWork.WalletRepository.GetByIdAsync(walletId);
                 if (isAdd)
                 {
-                    walletexist.Balance += amountMoney;
                     if (walletexist.AvailableBalance == null)
                     {
                         walletexist.AvailableBalance = 0;
                     }
                     walletexist.AvailableBalance += amountMoney;
-
+                    walletexist.Balance = walletexist.AvailableBalance + (walletexist.FrozenBalance ?? 0);
                     _unitOfWork.WalletRepository.Update(walletexist);
                     
                 }
@@ -338,7 +337,7 @@ namespace Application.Services
                     else
                     {
                         walletexist.AvailableBalance -= amountMoney;
-                        walletexist.Balance = walletexist.AvailableBalance + walletexist.FrozenBalance;
+                        walletexist.Balance = walletexist.AvailableBalance + (walletexist.FrozenBalance ?? 0);
                         _unitOfWork.WalletRepository.Update(walletexist);
                     }
                 }
