@@ -128,7 +128,7 @@ namespace Application.Services
                 else
                 {
                     //kiem tra du so du khong
-                    if (walletexist.AvailableBalance < (decimal)depositPrice)
+                    if ((walletexist.AvailableBalance?? 0) < (decimal)depositPrice)
                     {
                         reponse.Code = 404;
                         reponse.Message = "Customer insufficient balance, Please add money into your wallet!";
@@ -216,7 +216,7 @@ namespace Application.Services
                 var walletExits =  await CheckBalance(requestWithdrawDTO.WalletId);
                 if (walletExits.Data is WalletDTO cs && walletExits.IsSuccess)
                 {
-                    if ((float)cs.AvailableBalance < requestWithdrawDTO.Amount)
+                    if ((float)(cs.AvailableBalance?? 0) < requestWithdrawDTO.Amount)
                     {
                         reponse.IsSuccess = false;
                         reponse.Code = 400;
