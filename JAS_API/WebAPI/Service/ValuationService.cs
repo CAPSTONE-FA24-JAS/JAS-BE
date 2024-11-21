@@ -121,7 +121,7 @@ namespace Application.Services
 
                         await _unitOfWork.SaveChangeAsync();
 
-                        await _notificationHub.Clients.Groups("61").SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                        await _notificationHub.Clients.Group("61").SendAsync("NewNotificationReceived", "Có thông báo mới!");
                         response.Message = $"Consign an item Successfully";
                         response.Code = 200;
                         response.IsSuccess = true;
@@ -230,7 +230,7 @@ namespace Application.Services
 
                     await _unitOfWork.SaveChangeAsync();
 
-                    await _notificationHub.Clients.Groups(staff.Id.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                    await _notificationHub.Clients.Group(staff.Id.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
@@ -288,7 +288,7 @@ namespace Application.Services
 
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
                     await _unitOfWork.SaveChangeAsync();
-                    await _notificationHub.Clients.Groups(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                    await _notificationHub.Clients.Group(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
@@ -491,7 +491,7 @@ namespace Application.Services
                         Description = $" valuation {id} has been approved by customer {valuationById.Seller.LastName} {valuationById.Seller.FirstName}",
                         Is_Read = false,
                         NotifiableId = id,  //valuationId
-                        AccountId = valuationById.Seller.AccountId,
+                        AccountId = valuationById.Staff.AccountId,
                         CreationDate = DateTime.UtcNow,
                         Notifi_Type = "ApprovedPreliminary",
                         StatusOfValuation = "4",
@@ -500,7 +500,7 @@ namespace Application.Services
 
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
                     await _unitOfWork.SaveChangeAsync();
-                    await _notificationHub.Clients.Groups(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                    await _notificationHub.Clients.Group(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
                     var valuationDTO = _mapper.Map<ValuationDTO>(valuationById);
 
@@ -558,7 +558,7 @@ namespace Application.Services
 
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
                     await _unitOfWork.SaveChangeAsync();
-                    await _notificationHub.Clients.Groups(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                    await _notificationHub.Clients.Group(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                     response.Message = $"Update status Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
@@ -647,7 +647,7 @@ namespace Application.Services
                         await _unitOfWork.NotificationRepository.AddAsync(notification);
 
                         await _unitOfWork.SaveChangeAsync();
-                        await _notificationHub.Clients.Groups(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                        await _notificationHub.Clients.Group(valuationById.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                     }
                     var valuation = _mapper.Map<ValuationDTO>(valuationById);
 

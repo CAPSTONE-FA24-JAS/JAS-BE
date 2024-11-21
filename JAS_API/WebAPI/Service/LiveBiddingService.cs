@@ -7,6 +7,7 @@ using Application.Utils;
 using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.LiveBiddingDTOs;
 using Application.ViewModels.LotDTOs;
+using Application.ViewModels.NotificationDTOs;
 using Castle.Core.Resource;
 using Domain.Entity;
 using Domain.Enums;
@@ -358,14 +359,14 @@ namespace WebAPI.Service
                     NotifiableId = invoice.Id,
                     AccountId = winnerCustomerLot.Customer.AccountId,
                     CreationDate = DateTime.UtcNow,
-                    Notifi_Type = "CustomerLot",
+                    Notifi_Type = "CreateInvoice",
                     ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
                     
                 };
 
                 await _unitOfWork.NotificationRepository.AddAsync(notification);
                 await _unitOfWork.SaveChangeAsync();
-                await _notificationHub.Clients.Groups(winnerCustomerLot.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                await _notificationHub.Clients.Group(winnerCustomerLot.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
 
                 //lay ra list customerLot theo  lotId trừ thằng thắng
@@ -414,14 +415,14 @@ namespace WebAPI.Service
                             NotifiableId = loser.Id,  //cusrtomerLot => dẫn tới myBid
                             AccountId = loser.Customer.AccountId,
                             CreationDate = DateTime.UtcNow,
-                            Notifi_Type = "CustomerLot",
+                            Notifi_Type = "Refunded",
                             ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
 
                             //  ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
                         };
 
                         await _unitOfWork.NotificationRepository.AddAsync(notificationloser);
-                        await _notificationHub.Clients.Groups(loser.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                        await _notificationHub.Clients.Group(loser.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                         //cap nhat transaction vi
                         var walletTrasaction = new WalletTransaction
                         {
@@ -608,6 +609,20 @@ namespace WebAPI.Service
                     loser.IsWinner = false;
                     loser.IsRefunded = true;
                     loser.Status = EnumCustomerLot.Refunded.ToString();
+                    var notification = new Notification
+                    {
+                        Title = $"Bidding lose in lot {loser.LotId}",
+                        Description = $" You had been lose in lot {loser.LotId} và system auto refunded deposit for you",
+                        Is_Read = false,
+                        NotifiableId = loser.Id,
+                        AccountId = loser.Customer.AccountId,
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "Refunded",
+                        ImageLink = loser.Lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
+                    };
+
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
+                    await _notificationHub.Clients.Group(loser.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                 }
             }
         }
@@ -660,6 +675,23 @@ namespace WebAPI.Service
                             _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
                             await _unitOfWork.InvoiceRepository.AddAsync(invoice);
                             lot.Status = EnumStatusLot.Sold.ToString();
+
+                            //noti cho winner
+                            var notification = new Notification
+                            {
+                                Title = $"Bidding win in Lot {lot.Id}",
+                                Description = $" You won in lot {lot.Id} and system auto created invoice for you.",
+                                Is_Read = false,
+                                NotifiableId = invoice.Id,
+                                AccountId = bidPriceWinner.Customer.AccountId,
+                                CreationDate = DateTime.UtcNow,
+                                Notifi_Type = "CreateInvoice",
+                                ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
+
+                            };
+                            await _unitOfWork.NotificationRepository.AddAsync(notification);
+                            await _unitOfWork.SaveChangeAsync();
+                            await _notificationHub.Clients.Group(bidPriceWinner.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
                             var losers = lot.CustomerLots.Where(x => x.CustomerId != bidPriceWinner.CustomerId).ToList();
                             await SetLoser(losers);
@@ -727,6 +759,21 @@ namespace WebAPI.Service
                             _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
                             await _unitOfWork.InvoiceRepository.AddAsync(invoice);
                             lot.Status = EnumStatusLot.Sold.ToString();
+                            //tao noti cho nguoi thang
+                            var notification = new Notification
+                            {
+                                Title = $"Bidding win in Lot {lot.Id}",
+                                Description = $" You won in lot {lot.Id} and system auto created invoice for you.",
+                                Is_Read = false,
+                                NotifiableId = invoice.Id,
+                                AccountId = bidPriceWinner.Customer.AccountId,
+                                CreationDate = DateTime.UtcNow,
+                                Notifi_Type = "CreateInvoice",
+                                ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
+
+                            };
+                            await _unitOfWork.NotificationRepository.AddAsync(notification);
+                            await _notificationHub.Clients.Group(bidPriceWinner.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
                             var losers = lot.CustomerLots.Where(x => x.CustomerId != bidPriceWinner.CustomerId).ToList();
                             await SetLoser(losers);
@@ -951,7 +998,7 @@ namespace WebAPI.Service
                         };
 
                         await _unitOfWork.NotificationRepository.AddAsync(notificationloser);
-                        await _notificationHub.Clients.Groups(customerLot.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                        await _notificationHub.Clients.Group(customerLot.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                         //cap nhat transaction vi
                         var walletTrasaction = new WalletTransaction
                         {
