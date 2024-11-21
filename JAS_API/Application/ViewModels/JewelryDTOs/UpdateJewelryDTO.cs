@@ -30,28 +30,20 @@ namespace Application.ViewModels.JewelryDTOs
         public int? ArtistId { get; set; }
         public int? CategoryId { get; set; }
 
-        [FromForm]
         public  List<UpdateImageJewelryDTO>? UpdateImageJewelryDTOs { get; set; }
-        [FromForm]
         public  IEnumerable<UpdateKeyCharacteristicDetailDTO>? UpdateKeyCharacteristicDetailDTOs { get; set; }
-        [FromForm]
         public  IEnumerable<UpdateMainDiamondDTO>? UpdateMainDiamondDTOs { get; set; }
-        [FromForm]
         public  IEnumerable<UpdateSecondaryDiamondDTO>? UpdateSecondaryDiamondDTOs { get; set; }
-        [FromForm]
         public  IEnumerable<UpdateMainShaphieDTO>? UpdateMainShaphieDTOs { get; set; }
-        [FromForm]
         public  IEnumerable<UpdateSecondaryShaphieDTO>? UpdateSecondaryShaphieDTOs { get; set; }
     }
 
     public class UpdateImageJewelryDTO : UpdateBaseEntity
         {
-        [FromForm]
         public IFormFile? ImageLink { get; set; }
         public string? Title { get; set; }
-        [FromForm]
         public IFormFile? ThumbnailImage { get; set; }
-    }
+        }
 
     public class UpdateKeyCharacteristicDetailDTO : UpdateBaseEntity
     {
@@ -74,22 +66,18 @@ namespace Application.ViewModels.JewelryDTOs
         public string? LengthWidthRatio { get; set; }
         public string? Type { get; set; }
         //
-        [FromForm]
         public virtual IEnumerable<UpdateDocumentMainDiamondDTO>? UpdateDocumentMainDiamondDTOs { get; set; }
-        [FromForm]
         public virtual IEnumerable<UpdateImageMainDiamondDTO>? UpdateImageMainDiamondDTOs { get; set; }
     }
 
     public class UpdateDocumentMainDiamondDTO : UpdateBaseEntity
     {
-        [FromForm]
         public string? DocumentLink { get; set; }
         public string? DocumentTitle { get; set; }
     }
 
     public class UpdateImageMainDiamondDTO : UpdateBaseEntity
     {
-        [FromForm]
         public IFormFile? ImageLink { get; set; }
     }
 
@@ -110,22 +98,18 @@ namespace Application.ViewModels.JewelryDTOs
         public float? TotalCarat { get; set; }
 
         //
-        [FromForm]
         public virtual IEnumerable<UpdateDocumentSecondaryDiamondDTO>? UpdateDocumentSecondaryDiamondDTOs { get; set; }
-        [FromForm]
         public virtual IEnumerable<UpdateImageSecondaryDiamondDTO>? UpdateImageSecondaryDiamondDTOs { get; set; }
     }
 
     public class UpdateDocumentSecondaryDiamondDTO : UpdateBaseEntity
     {
-        [FromForm]
         public string? DocumentLink { get; set; }
         public string? DocumentTitle { get; set; }
     }
 
     public class UpdateImageSecondaryDiamondDTO : UpdateBaseEntity
     {
-        [FromForm]
         public IFormFile? ImageLink { get; set; }
     }
 
@@ -139,23 +123,18 @@ namespace Application.ViewModels.JewelryDTOs
         public string? SettingType { get; set; }
         public string? Dimension { get; set; }
 
-        //
-        [FromForm]
         public virtual IEnumerable<UpdateeDocumentMainShaphieDTO>? UpdateeDocumentMainShaphieDTOs { get; set; }
-        [FromForm]
         public virtual IEnumerable<UpdateImageMainShaphieDTO>? UpdateImageMainShaphieDTOs { get; set; }
     }
 
     public class UpdateeDocumentMainShaphieDTO : UpdateBaseEntity
     {
-        [FromForm]
         public string? DocumentLink { get; set; }
         public string? DocumentTitle { get; set; }
     }
 
     public class UpdateImageMainShaphieDTO : UpdateBaseEntity
     {
-        [FromForm]
         public IFormFile? ImageLink { get; set; }
     }
 
@@ -171,22 +150,18 @@ namespace Application.ViewModels.JewelryDTOs
         public float? TotalCarat { get; set; }
 
         //
-        [FromForm]
         public virtual IEnumerable<UpdateDocumentSecondaryShaphieDTO>? UpdateDocumentSecondaryShaphieDTOs { get; set; }
-        [FromForm]
         public virtual IEnumerable<UpdateImageSecondaryShaphieDTO>? UpdateImageSecondaryShaphieDTOs { get; set; }
     }
 
     public class UpdateDocumentSecondaryShaphieDTO : UpdateBaseEntity
     {
-        [FromForm]
         public string? DocumentLink { get; set; }
         public string? DocumentTitle { get; set; }
     }
 
     public class UpdateImageSecondaryShaphieDTO : UpdateBaseEntity
     {
-        [FromForm]
         public IFormFile? ImageLink { get; set; }
     }
 }
