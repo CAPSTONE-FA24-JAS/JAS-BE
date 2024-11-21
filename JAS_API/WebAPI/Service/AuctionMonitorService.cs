@@ -31,6 +31,7 @@ namespace WebAPI.Service
                         await liveBiddingService.ChecKAuctionEndAsync();
                         
 
+
                     }
                     await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
                 }

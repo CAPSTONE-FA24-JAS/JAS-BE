@@ -375,6 +375,7 @@ namespace Application.Services
 
             walletexist.AvailableBalance -= amountMoney;
             walletexist.FrozenBalance = (walletexist.FrozenBalance ?? 0) + amountMoney;
+            walletexist.Balance = walletexist.AvailableBalance + walletexist.FrozenBalance;
             _unitOfWork.WalletRepository.Update(walletexist);
 
             var result = await _unitOfWork.SaveChangeAsync();
@@ -458,8 +459,9 @@ namespace Application.Services
                 {
                     //thuc hien hoan vi
                     var walletOfUser = loser.Customer.Wallet;
-                    walletOfUser.Balance += (decimal?)loser.Lot.Deposit;
-                    walletOfUser.AvailableBalance += (decimal?)loser.Lot.Deposit;
+                    //walletOfUser.Balance += (decimal?)loser.Lot.Deposit;
+                    //walletOfUser.AvailableBalance += (decimal?)loser.Lot.Deposit;
+                    await UpdateBanlance(walletOfUser.Id, (decimal)loser.Lot.Deposit, true);
                     //tao transaction
                     var transactionCompany = new Transaction()
                     {
@@ -491,7 +493,6 @@ namespace Application.Services
                     await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
                     await _unitOfWork.WalletTransactionRepository.AddAsync(transactionWallet);
                 }
-                
             }
             catch (Exception ex)
             {
