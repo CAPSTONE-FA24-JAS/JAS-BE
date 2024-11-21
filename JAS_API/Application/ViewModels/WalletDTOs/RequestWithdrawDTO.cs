@@ -15,6 +15,7 @@ namespace Application.ViewModels.WalletDTOs
     }
     public class ViewRequestWithdrawDTO
     {
+        public int Id { get; set; }
         public int CustomerId { get; set; }
         public int WalletId { get; set; }
         public float Amount { get; set; }

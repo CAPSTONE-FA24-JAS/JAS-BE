@@ -208,7 +208,7 @@ namespace Application.Services
             try
             {
                 var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(requestWithdrawDTO.CustomerId);
-                if (customer == null || customer.CreditCard != null)
+                if (customer == null || customer.CreditCard == null)
                 {
                     reponse.IsSuccess = false;
                     reponse.Code = 400;
@@ -379,14 +379,15 @@ namespace Application.Services
             return false;
         }
 
-        public async Task<APIResponseModel> ApproveRequestWithdraw(int transId)
+        public async Task<APIResponseModel> ApproveRequestWithdraw(int requestId)
         {
             var reponse = new APIResponseModel();
             try
             {
-                var transExist = await _unitOfWork.WalletTransactionRepository.GetByIdAsync(transId, x =>  x.Status == EnumStatusTransaction.Pending.ToString() 
-                                                                                                && x.transactionType == EnumTransactionType.WithDrawWallet.ToString());
-                if (transExist == null)
+                var transExist = await _unitOfWork.WalletTransactionRepository.GetAllAsync(x => x.DocNo == requestId && x.Status == EnumStatusTransaction.Pending.ToString() 
+                                                                                               && x.transactionType == EnumTransactionType.WithDrawWallet.ToString());
+                var thisTransExit = transExist.FirstOrDefault();
+                if (!transExist.Any())
                 {
                     reponse.Code = 404;
                     reponse.Message = "Not Found Trans Withdraw In System";
@@ -394,7 +395,7 @@ namespace Application.Services
                 }
                 else
                 {
-                    var requestexist = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(transExist.DocNo);
+                    var requestexist = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(thisTransExit?.DocNo);
                     if (requestexist != null)
                     {
                         var transOfCompany = new Transaction()
@@ -408,7 +409,7 @@ namespace Application.Services
 
                         requestexist.Wallet.FrozenBalance -= (decimal)requestexist.Amount;
                         requestexist.Wallet.Balance -= (decimal)requestexist.Amount;
-                        transExist.Status = EnumStatusTransaction.Completed.ToString();
+                        thisTransExit.Status = EnumStatusTransaction.Completed.ToString();
                         await _unitOfWork.TransactionRepository.AddAsync(transOfCompany);
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {

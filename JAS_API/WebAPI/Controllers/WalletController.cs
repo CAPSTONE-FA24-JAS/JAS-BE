@@ -265,9 +265,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpPatch]
-        public async Task<IActionResult> ApproveRequestNewWithdraw(int transId)
+        public async Task<IActionResult> ApproveRequestNewWithdraw(int requestId)
         {
-            var result = await _walletService.ApproveRequestWithdraw(transId);
+            var result = await _walletService.ApproveRequestWithdraw(requestId);
             if (result.IsSuccess)
             {
                 return Ok(result);
