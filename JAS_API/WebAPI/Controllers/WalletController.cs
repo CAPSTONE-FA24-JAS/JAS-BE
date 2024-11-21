@@ -1,7 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.ViewModels.VNPayDTOs;
 using Application.ViewModels.WalletDTOs;
-using CloudinaryDotNet.Actions;
 using Domain.Entity;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +19,7 @@ namespace WebAPI.Controllers
         private readonly IInvoiceService _invoiceService;
         private readonly ILotService _lotService;
         private readonly ICustomerLotService _customerLotService;
-         private readonly ILogger<WalletController> _logger;
+        private readonly ILogger<WalletController> _logger;
 
         public WalletController(IWalletService walletService, IVNPayService vpnService, IAccountService accountService, IVNPayService vNPayService, IWalletTransactionService walletTransactionService, ITransactionService transactionService, IClaimsService claimsService, IInvoiceService invoiceService, ILogger<WalletController> logger, ILotService lotService, ICustomerLotService customerLotService)
         {
@@ -54,7 +53,7 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> CheckPasswordWallet(int walletId, string password)
         {
-            var result = await _walletService.CheckPasswordWallet(walletId,password);
+            var result = await _walletService.CheckPasswordWallet(walletId, password);
             if (result.IsSuccess)
             {
                 return Ok(result);
@@ -206,7 +205,7 @@ namespace WebAPI.Controllers
                                 Status = EnumCustomerLot.Paid.ToString(),
                                 CurrentTime = DateTime.UtcNow,
                             };
-                             _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
+                            _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
                             var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
                             if (transactionResult.IsSuccess)
                             {
@@ -261,7 +260,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> ViewListRequestWithdrawForManagerment()
         {
             var result = await _walletService.GetListRequestWithdrawForManagerment();
-            return (result.IsSuccess)?Ok(result):BadRequest(result);
+            return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
 
         [HttpPatch]
@@ -277,6 +276,6 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
-        
+
     }
 }

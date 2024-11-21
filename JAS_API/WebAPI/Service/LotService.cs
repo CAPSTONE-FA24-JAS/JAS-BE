@@ -1,21 +1,15 @@
 using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
-using Application.ViewModels.AccountDTOs;
 using Application.ViewModels.BidPriceDTOs;
 using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.LotDTOs;
 using AutoMapper;
-using Azure;
-using Castle.Core.Resource;
 using Domain.Entity;
 using Domain.Enums;
-using Google.Apis.Storage.v1.Data;
 using Microsoft.AspNetCore.SignalR;
 using System.Linq.Expressions;
-using System.Reflection;
 using WebAPI.Middlewares;
-using static Google.Apis.Requests.BatchRequest;
 
 namespace Application.Services
 {
@@ -30,7 +24,7 @@ namespace Application.Services
         private readonly IFoorFeePercentService _foorFeePercentService;
         private readonly IHubContext<BiddingHub> _hubContext;
 
-        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IAccountService accountService, IWalletService walletService, 
+        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService, IAccountService accountService, IWalletService walletService,
             IWalletTransactionService walletTransactionService, IFoorFeePercentService foorFeePercentService, IHubContext<BiddingHub> hubContext)
         {
             _unitOfWork = unitOfWork;
@@ -57,36 +51,36 @@ namespace Application.Services
                 else
                 {
                     var lot = _mapper.Map<Lot>(lotDTO);
-                    var autionexits =await _unitOfWork.AuctionRepository.GetByIdAsync(lot.AuctionId);
-                    if(autionexits != null)
+                    var autionexits = await _unitOfWork.AuctionRepository.GetByIdAsync(lot.AuctionId);
+                    if (autionexits != null)
                     {
-                        
-                            if (lotDTO is CreateLotFixedPriceDTO)
-                            {
-                                lot.LotType = EnumLotType.Fixed_Price.ToString();
-                            }
-                            if (lotDTO is CreateLotSecretAuctionDTO)
-                            {
-                                lot.LotType = EnumLotType.Secret_Auction.ToString();
-                            }
-                            if (lotDTO is CreateLotPublicAuctionDTO)
-                            {
-                                lot.LotType = EnumLotType.Public_Auction.ToString();
-                            }
-                            if (lotDTO is CreateLotAuctionPriceGraduallyReducedDTO)
-                            {
-                                lot.LotType = EnumLotType.Auction_Price_GraduallyReduced.ToString();
-                            }
 
-                            lot.StartTime = autionexits.StartTime;
-                            lot.EndTime = autionexits.EndTime;
-                            lot.Status = EnumStatusLot.Waiting.ToString();
-                            lot.FloorFeePercent = 25;
-                            await _unitOfWork.LotRepository.AddAsync(lot);
-                            var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(lot.JewelryId);
-                            
-                            if (await _unitOfWork.SaveChangeAsync() > 0)
-                            {
+                        if (lotDTO is CreateLotFixedPriceDTO)
+                        {
+                            lot.LotType = EnumLotType.Fixed_Price.ToString();
+                        }
+                        if (lotDTO is CreateLotSecretAuctionDTO)
+                        {
+                            lot.LotType = EnumLotType.Secret_Auction.ToString();
+                        }
+                        if (lotDTO is CreateLotPublicAuctionDTO)
+                        {
+                            lot.LotType = EnumLotType.Public_Auction.ToString();
+                        }
+                        if (lotDTO is CreateLotAuctionPriceGraduallyReducedDTO)
+                        {
+                            lot.LotType = EnumLotType.Auction_Price_GraduallyReduced.ToString();
+                        }
+
+                        lot.StartTime = autionexits.StartTime;
+                        lot.EndTime = autionexits.EndTime;
+                        lot.Status = EnumStatusLot.Waiting.ToString();
+                        lot.FloorFeePercent = 25;
+                        await _unitOfWork.LotRepository.AddAsync(lot);
+                        var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(lot.JewelryId);
+
+                        if (await _unitOfWork.SaveChangeAsync() > 0)
+                        {
                             // Lưu lot vào Redis(dung hash)
                             var lotRedis = new Lot
                             {
@@ -109,16 +103,16 @@ namespace Application.Services
                             };
                             _cacheService.SetLotInfo(lotRedis);
 
-                                reponse.Code = 200;
-                                reponse.IsSuccess = true;
-                                reponse.Message = $"CreateLot {lot.LotType} is successfuly";
-                            }
-                            else
-                            {
-                                reponse.Code = 409;
-                                reponse.IsSuccess = false;
-                                reponse.Message = "Error when saving change";
-                            }
+                            reponse.Code = 200;
+                            reponse.IsSuccess = true;
+                            reponse.Message = $"CreateLot {lot.LotType} is successfuly";
+                        }
+                        else
+                        {
+                            reponse.Code = 409;
+                            reponse.IsSuccess = false;
+                            reponse.Message = "Error when saving change";
+                        }
 
                     }
                     else
@@ -129,7 +123,7 @@ namespace Application.Services
                     }
 
                 }
-                    
+
             }
             catch (Exception e)
             {
@@ -145,7 +139,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var lot = await _unitOfWork.LotRepository.GetByIdAsync( Id, includes: new Expression<Func<Lot, object>>[] { x => x.Staff, x => x.Seller, x => x.Jewelry });
+                var lot = await _unitOfWork.LotRepository.GetByIdAsync(Id, includes: new Expression<Func<Lot, object>>[] { x => x.Staff, x => x.Seller, x => x.Jewelry });
                 if (lot == null)
                 {
                     reponse.Code = 404;
@@ -174,7 +168,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var lots = await _unitOfWork.LotRepository.GetAllAsync(includes : new Expression<Func<Lot, object>>[] {x => x.Staff, x => x.Seller, x => x.Jewelry });
+                var lots = await _unitOfWork.LotRepository.GetAllAsync(includes: new Expression<Func<Lot, object>>[] { x => x.Staff, x => x.Seller, x => x.Jewelry });
                 if (!lots.Any())
                 {
                     reponse.Code = 404;
@@ -184,7 +178,7 @@ namespace Application.Services
                 else
                 {
                     reponse.Code = 200;
-                    var DTOs =  new List<object>();
+                    var DTOs = new List<object>();
                     foreach (var lot in lots)
                     {
                         var mapper = IsMapper(lot, lot.LotType);
@@ -248,7 +242,7 @@ namespace Application.Services
                 else
                 {
                     reponse.Code = 200;
-                    
+
                     reponse.Data = lotTypes;
                     reponse.IsSuccess = true;
                     reponse.Message = $"Received list lot type is successfuly. Have {lotTypes.Count} Type";
@@ -303,7 +297,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var lots = await _unitOfWork.LotRepository.GetAllAsync( condition: x => x.AuctionId == auctionId, includes: new Expression<Func<Lot, object>>[] { x => x.Staff, x => x.Seller, x => x.Jewelry });
+                var lots = await _unitOfWork.LotRepository.GetAllAsync(condition: x => x.AuctionId == auctionId, includes: new Expression<Func<Lot, object>>[] { x => x.Staff, x => x.Seller, x => x.Jewelry });
                 if (!lots.Any())
                 {
                     reponse.Code = 404;
@@ -367,7 +361,7 @@ namespace Application.Services
                     return new APIResponseModel { IsSuccess = false, Message = "Not Found Lot.", Code = 404 };
                 }
 
-                if(registerToLotDTO.CustomerId == lotExist.Jewelry.Valuation.SellerId)
+                if (registerToLotDTO.CustomerId == lotExist.Jewelry.Valuation.SellerId)
                 {
                     return new APIResponseModel { IsSuccess = false, Message = "Seller Canot Auction Jewelry Of Him/Her.", Code = 400 };
                 }
@@ -453,14 +447,14 @@ namespace Application.Services
             return response;
         }
 
-        
+
         public async Task<APIResponseModel> GetCustomerLotByLot(int lotId)
         {
             var reponse = new APIResponseModel();
             try
             {
                 var lots = await _unitOfWork.CustomerLotRepository.GetAllAsync(condition: x => x.LotId == lotId);
-                if(lots.Count() > 0)
+                if (lots.Count() > 0)
                 {
                     reponse.Code = 200;
                     reponse.Data = _mapper.Map<IEnumerable<CustomerLotDTO>>(lots);
@@ -532,7 +526,7 @@ namespace Application.Services
 
 
                     _unitOfWork.LotRepository.UpdateRange(lots);
-                    await _unitOfWork.SaveChangeAsync(); 
+                    await _unitOfWork.SaveChangeAsync();
                     response.Code = 200;
                     response.Data = true;
                     response.IsSuccess = true;
@@ -584,7 +578,7 @@ namespace Application.Services
         }
         private async Task<bool> checkCustomerIntoBidPrice(int customerId, int lotId)
         {
-            if ( _unitOfWork.BidPriceRepository.GetAllAsync(x => x.CustomerId == customerId && x.LotId == lotId).Result.Any())
+            if (_unitOfWork.BidPriceRepository.GetAllAsync(x => x.CustomerId == customerId && x.LotId == lotId).Result.Any())
             {
                 return true;
             }
@@ -597,7 +591,7 @@ namespace Application.Services
             try
             {
                 var CustomerLotExist = await checkCustomerRegisteredToLot(model.CustomerId, model.LotId);
-                if (CustomerLotExist != null) 
+                if (CustomerLotExist != null)
                 {
                     var bidPriceExist = CustomerLotExist?.Lot?.BidPrices?.FirstOrDefault(x => x.CustomerId == model.CustomerId && x.LotId == model.LotId);
                     if (bidPriceExist != null)
@@ -633,7 +627,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet model) 
+        public async Task<APIResponseModel> PlaceBidFixedPriceAndSercet(PlaceBidFixedPriceAndSercet model)
         {
             var response = new APIResponseModel();
             try
@@ -668,7 +662,7 @@ namespace Application.Services
                 {
 
                     var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(model.CustomerId);
-                    
+
                     if (model.CurrentPrice < lot.StartPrice || model.CurrentPrice > lot.FinalPriceSold && lot.LotType == EnumLotType.Secret_Auction.ToString())
                     {
                         response.Code = 400;
@@ -676,8 +670,8 @@ namespace Application.Services
                         response.Message = $"The Price To Bid Must into the range of lot allow.";
                         return response;
                     }
-                    
-                    if(lot.CurrentPrice < model.CurrentPrice || lot.CurrentPrice == null)
+
+                    if (lot.CurrentPrice < model.CurrentPrice || lot.CurrentPrice == null)
                     {
                         lot.CurrentPrice = model.CurrentPrice;
                         foreach (var customerLot in lot.CustomerLots.Where(x => x.CustomerId != model.CustomerId))
@@ -758,9 +752,9 @@ namespace Application.Services
                     {
                         CurrentPrice = playerJoined.Lot.FinalPriceSold,
                         BidTime = DateTime.UtcNow
-                        
-                    };            
-                    var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(placeBidBuyNowDTO.CustomerId);                   
+
+                    };
+                    var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(placeBidBuyNowDTO.CustomerId);
                     var firstName = customer.FirstName;
                     var lastname = customer.LastName;
 
@@ -811,14 +805,14 @@ namespace Application.Services
                         CustomerLotId = lot.CustomerLots.First(x => x.CustomerId == winnerInLot?.CustomerId).Id,
                         StaffId = lot.StaffId,
                         Price = winnerInLot.CurrentPrice,
-                        Free = winnerInLot.CurrentPrice  * await _foorFeePercentService.GetPercentFloorFeeOfLot((float)winnerInLot.CurrentPrice),
+                        Free = winnerInLot.CurrentPrice * await _foorFeePercentService.GetPercentFloorFeeOfLot((float)winnerInLot.CurrentPrice),
                         TotalPrice = totalprice,
                         CreationDate = DateTime.Now,
                         Status = EnumCustomerLot.CreateInvoice.ToString()
                     };
                     await _walletService.RefundToWalletForUsersAsync(lot.CustomerLots.Where(x => x.CustomerId != placeBidBuyNowDTO.CustomerId
                                              && x.LotId == placeBidBuyNowDTO.LotId).ToList());
-                    
+
                     await _unitOfWork.InvoiceRepository.AddAsync(invoice);
 
                     if (await _unitOfWork.SaveChangeAsync() > 0)
@@ -908,7 +902,7 @@ namespace Application.Services
                     foreach (var player in playersInLot)
                     {
                         var bidExist = await _unitOfWork.BidPriceRepository.GetAllAsync(x => x.CustomerId == player.CustomerId && x.LotId == player.LotId);
-                        if(bidExist.Any())
+                        if (bidExist.Any())
                         {
                             var mapper = _mapper.Map<ViewPlayerInLotDTO>(player);
                             var bidTime = await _unitOfWork.BidPriceRepository.GetAllAsync(x => x.CurrentPrice == player.CurrentPrice && x.CustomerId == player.CustomerId && x.LotId == lotId);
