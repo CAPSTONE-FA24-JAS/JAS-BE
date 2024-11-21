@@ -457,8 +457,9 @@ namespace Application.Services
                 {
                     //thuc hien hoan vi
                     var walletOfUser = loser.Customer.Wallet;
-                    walletOfUser.Balance += (decimal?)loser.Lot.Deposit;
-                    walletOfUser.AvailableBalance += (decimal?)loser.Lot.Deposit;
+                    //walletOfUser.Balance += (decimal?)loser.Lot.Deposit;
+                    //walletOfUser.AvailableBalance += (decimal?)loser.Lot.Deposit;
+                    await UpdateBanlance(walletOfUser.Id, (decimal)loser.Lot.Deposit, true);
                     //tao transaction
                     var transactionCompany = new Transaction()
                     {
@@ -489,7 +490,6 @@ namespace Application.Services
                     await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
                     await _unitOfWork.WalletTransactionRepository.AddAsync(transactionWallet);
                 }
-                
             }
             catch (Exception ex)
             {
