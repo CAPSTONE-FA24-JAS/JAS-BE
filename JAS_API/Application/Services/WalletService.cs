@@ -330,9 +330,19 @@ namespace Application.Services
                         reponse.Message = $"Balance of wallet have {walletexist.Balance}, it less than amount money you want to deduct";
                         return reponse;
                     }
-                    walletexist.Balance -= amountMoney;
-                    walletexist.AvailableBalance -= amountMoney;
-                    _unitOfWork.WalletRepository.Update(walletexist);
+                    if (walletexist.AvailableBalance == 0)
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Code = 400;
+                        reponse.Message = $"Available banlance of wallet is 0 cann't do it";
+                        return reponse;
+                    }
+                    else
+                    {
+                        walletexist.AvailableBalance -= amountMoney;
+                        walletexist.Balance = walletexist.AvailableBalance + walletexist.FrozenBalance;
+                        _unitOfWork.WalletRepository.Update(walletexist);
+                    }
                 }
                 if (await _unitOfWork.SaveChangeAsync() > 0)
                 {
@@ -340,7 +350,6 @@ namespace Application.Services
                     reponse.Code = 200;
                     reponse.Message = $"{(isAdd ? "Add" : "Deduct")} Wallet Successfully";
                 }
-
             }
             catch (Exception e)
             {
