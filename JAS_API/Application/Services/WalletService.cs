@@ -206,7 +206,7 @@ namespace Application.Services
             try
             {
                 var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(requestWithdrawDTO.CustomerId);
-                if (customer == null || customer.CreditCard != null)
+                if (customer == null || customer.CreditCard == null)
                 {
                     reponse.IsSuccess = false;
                     reponse.Code = 400;
