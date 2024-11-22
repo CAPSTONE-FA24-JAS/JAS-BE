@@ -12,7 +12,7 @@ namespace Application.Interfaces
 {
     public interface IVNPayService
     {
-        Task<string> CreatePaymentUrl(HttpContext httpContext, VNPaymentRequestDTO model, WalletTransaction walletTransaction);
+        Task<string> CreatePaymentUrl(HttpContext httpContext, VNPaymentRequestDTO model, WalletTransaction? walletTransaction);
         VNPaymentReponseDTO PaymentExecute(IQueryCollection collection);
     }
 }

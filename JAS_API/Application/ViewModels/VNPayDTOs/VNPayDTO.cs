@@ -14,6 +14,7 @@ namespace Application.ViewModels.VNPayDTOs
         public string Description { get; set; }
         public float Amount { get; set; }
         public DateTime CreatedDate { get; set; }
+        public int DocNo { get; set; }
 
     }
     public class VNPaymentReponseDTO
@@ -22,6 +23,7 @@ namespace Application.ViewModels.VNPayDTOs
         public string PaymentMethod { get; set; }
         public string OrderDescription { get; set; }
         public string OrderId { get; set; }
+        public int DocNo { get; set; }
         public string PaymentId { get; set; }
         public string TransactionId { get; set; }
         public string Token { get; set; }

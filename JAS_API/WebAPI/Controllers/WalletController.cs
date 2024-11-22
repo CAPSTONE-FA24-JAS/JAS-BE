@@ -99,53 +99,6 @@ namespace WebAPI.Controllers
             return Content(paymentUrl);
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> PayCallBack()
-        //{
-        //    var result =  _vpnService.PaymentExecute(Request.Query);
-
-        //    if (result.VnPayResponseCode == "00" || result.Success != null)
-        //    {
-        //        var tranUpdate = await _walletTransactionService.UpdateTransaction(result.OrderId);
-        //        if (!tranUpdate.IsSuccess)
-        //        {
-        //            return BadRequest(tranUpdate);
-        //        }
-        //        if (tranUpdate.Data is WalletTransaction trans)
-        //            {
-        //                if (trans.transactionType == EnumTransactionType.AddWallet.ToString())
-        //                {
-        //                    var walletUpdate = await _walletService.UpdateBanlance((int)trans.DocNo, (decimal)trans.Amount, true);
-
-        //                    if (walletUpdate.IsSuccess)
-        //                    {
-        //                        return Ok(result);
-        //                    }
-
-        //                }
-
-        //                if (trans.transactionId == result.OrderId)
-        //                {
-        //                    var newTrans = new Transaction()
-        //                    {
-        //                        Amount = trans.Amount,
-        //                        DocNo = trans.DocNo,
-        //                        TransactionTime = DateTime.UtcNow,
-        //                        TransactionType = trans.transactionType
-        //                    };
-        //                    var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
-        //                    if (transactionResult.IsSuccess)
-        //                    {
-        //                        return Ok(result);
-        //                    }
-        //                }
-
-        //        }
-
-        //    }
-        //    return Ok(result);
-        //}
-
         [HttpGet]
         public async Task<IActionResult> PayCallBack()
         {

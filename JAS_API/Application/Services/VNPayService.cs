@@ -28,7 +28,7 @@ namespace Application.Services
             _claimsService = claimsService;
         }
 
-        public async Task<string> CreatePaymentUrl(HttpContext httpContext, VNPaymentRequestDTO model, WalletTransaction walletTransaction)
+        public async Task<string> CreatePaymentUrl(HttpContext httpContext, VNPaymentRequestDTO model, WalletTransaction? walletTransaction)
         {
             var tick = DateTime.Now.Ticks.ToString();
 
@@ -47,22 +47,19 @@ namespace Application.Services
             vnpay.AddRequestData("vnp_OrderType", "other");
             vnpay.AddRequestData("vnp_ReturnUrl", _configuration["VnPay:PaymentBackReturnUrl"]);
             vnpay.AddRequestData("vnp_TxnRef", tick);
-
-            walletTransaction.transactionId = tick;
-            walletTransaction.Status = EnumStatusTransaction.Pending.ToString();
-            walletTransaction.Amount = model.Amount;
-            walletTransaction.CreationDate = model.CreatedDate;
-
-            walletTransaction.transactionId = tick;
-
-            await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
-
-            if (await _unitOfWork.SaveChangeAsync() > 0)
+            vnpay.AddRequestData("vnp_DocNo", model.DocNo.ToString());
+            if(walletTransaction != null)
             {
-                var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
-                return paymentUrl;
+                walletTransaction.transactionId = tick;
+                walletTransaction.Status = EnumStatusTransaction.Pending.ToString();
+                walletTransaction.Amount = model.Amount;
+                walletTransaction.CreationDate = model.CreatedDate;
+                walletTransaction.transactionId = tick;
+                await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
+                await _unitOfWork.SaveChangeAsync();
             }
-            return "";
+            var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
+            return paymentUrl;
         }
 
 
@@ -78,6 +75,7 @@ namespace Application.Services
                 }
             }
 
+            var vnp_DocNo = Convert.ToInt32(vnpay.GetResponseData("vnp_DocNo"));
             var vnp_orderId = Convert.ToInt64(vnpay.GetResponseData("vnp_TxnRef"));
             var vnp_TransactionId = Convert.ToInt64(vnpay.GetResponseData("vnp_TransactionNo"));
             var vnp_SecureHash = collection.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value;
@@ -99,6 +97,7 @@ namespace Application.Services
             vnpayreponse.Token = vnp_SecureHash;
             vnpayreponse.VnPayResponseCode = vnp_ResponseCode;
             vnpayreponse.Success = true;
+            vnpayreponse.DocNo = vnp_DocNo;
             DateTime TransactionTime;
             if (DateTime.TryParseExact(vnp_TrasactionTime, "yyyyMMddHHmmss", null, System.Globalization.DateTimeStyles.None, out TransactionTime))
             {
