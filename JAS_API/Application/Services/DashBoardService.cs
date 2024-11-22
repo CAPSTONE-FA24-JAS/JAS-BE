@@ -86,8 +86,6 @@ namespace Application.Services
             return response;
         }
 
-        
-
         public async Task<APIResponseModel> DashBoardRevenueInYear(int year)
         {
             var response = new APIResponseModel();
@@ -449,5 +447,37 @@ namespace Application.Services
             }
             return response;
         }
+
+        public async Task<APIResponseModel> TotalProfit()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                float? totalProfit = 0f;
+
+                var invoices = await _unitOfWork.InvoiceRepository.GetAllAsync(x => x.Status == EnumCustomerLot.Finished.ToString());
+
+                foreach (var invoice in invoices ?? Enumerable.Empty<Invoice>())
+                {
+                    var profit = invoice.CustomerLot?.Lot?.CurrentPrice ?? 0f; 
+                    var invoiceTotalPrice = invoice.TotalPrice ?? 0f;
+
+                    totalProfit += (invoiceTotalPrice - profit);
+                }
+
+                response.Code = 200;
+                response.Data = totalProfit;
+                response.IsSuccess = true;
+                response.Message = "Received Successfully Total Profit In System";
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processing: {ex.Message}";
+            }
+            return response;
+        }
+
     }
 }
