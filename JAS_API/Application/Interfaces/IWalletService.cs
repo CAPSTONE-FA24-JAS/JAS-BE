@@ -19,6 +19,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> RequestWithdraw(RequestWithdrawDTO requestWithdrawDTO);
         Task<APIResponseModel> ApproveRequestWithdraw(int RequestId);
         Task<APIResponseModel> GetListRequestWithdrawForManagerment();
+        Task<APIResponseModel> GetListRequestWithdrawForCustomer(int customerId);
         Task<APIResponseModel> RefundToWalletForUsersAsync(List<CustomerLot> customerLots);
 
     }
