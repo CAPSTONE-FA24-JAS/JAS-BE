@@ -19,5 +19,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> GetTopFiveJewelryAuctionsAsync();
         Task<APIResponseModel> GetTopFiveSellersAsync();
         Task<APIResponseModel> GetTopFiveBuyersAsync();
+        Task<APIResponseModel> TotalUser();
+        Task<APIResponseModel> TotalUserActive();
     }
 }
