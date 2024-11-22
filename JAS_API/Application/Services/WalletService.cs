@@ -1,16 +1,10 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
-using Application.ViewModels.BidLimitDTOs;
-using Application.ViewModels.LotDTOs;
-using Application.ViewModels.NotificationDTOs;
 using Application.ViewModels.WalletDTOs;
 using AutoMapper;
-using Azure;
-using CloudinaryDotNet;
 using Domain.Entity;
 using Domain.Enums;
-using static System.TimeZoneInfo;
 
 namespace Application.Services
 {
@@ -52,7 +46,7 @@ namespace Application.Services
             {
                 reponse.IsSuccess = false;
                 reponse.ErrorMessages = new List<string> { e.Message };
-                
+
             }
             return reponse;
         }
@@ -63,7 +57,7 @@ namespace Application.Services
             try
             {
                 var wallet = await _unitOfWork.WalletRepository.GetByIdAsync(walletId, includes: x => x.Customer);
-                if(wallet == null)
+                if (wallet == null)
                 {
                     reponse.Code = 404;
                     reponse.Message = "Not Found Wallet In System";
@@ -76,12 +70,12 @@ namespace Application.Services
                     reponse.Message = "Received Successfuly";
                     reponse.Data = _mapper.Map<WalletDTO>(wallet);
                 }
-                
+
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-               reponse.IsSuccess = false;
-               reponse.ErrorMessages = new List<string> { e.Message };
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
             }
             return reponse;
         }
@@ -99,10 +93,10 @@ namespace Application.Services
                     reponse.IsSuccess = false;
                     return reponse;
                 }
-                    reponse.IsSuccess = true;
-                    reponse.Code = 200;
-                    reponse.Message = "Received Successfuly, Password of wallet avaiable";
-                
+                reponse.IsSuccess = true;
+                reponse.Code = 200;
+                reponse.Message = "Received Successfuly, Password of wallet avaiable";
+
             }
             catch (Exception e)
             {
@@ -130,7 +124,7 @@ namespace Application.Services
                 else
                 {
                     //kiem tra du so du khong
-                    if ((walletexist.AvailableBalance?? 0) < (decimal)depositPrice)
+                    if ((walletexist.AvailableBalance ?? 0) < (decimal)depositPrice)
                     {
                         reponse.Code = 404;
                         reponse.Message = "Customer insufficient balance, Please add money into your wallet!";
@@ -215,10 +209,10 @@ namespace Application.Services
                     reponse.Message = "Customer Haven't Credit Card For Withdraw, Please Add New Credit Card";
                     return reponse;
                 }
-                var walletExits =  await CheckBalance(requestWithdrawDTO.WalletId);
+                var walletExits = await CheckBalance(requestWithdrawDTO.WalletId);
                 if (walletExits.Data is WalletDTO cs && walletExits.IsSuccess)
                 {
-                    if ((float)(cs.AvailableBalance?? 0) < requestWithdrawDTO.Amount)
+                    if ((float)(cs.AvailableBalance ?? 0) < requestWithdrawDTO.Amount)
                     {
                         reponse.IsSuccess = false;
                         reponse.Code = 400;
@@ -239,7 +233,7 @@ namespace Application.Services
                             WalletId = requestWithdrawDTO.WalletId,
                             transactionPerson = requestWithdrawDTO.CustomerId
                         };
-                        
+
                         if (!await LockFundsForWithdrawal(requestWithdrawDTO.WalletId, (decimal)requestWithdrawDTO.Amount))
                         {
                             reponse.IsSuccess = false;
@@ -249,7 +243,7 @@ namespace Application.Services
                         else
                         {
                             await _unitOfWork.WalletTransactionRepository.AddAsync(trans);
-                            
+
                             if (await _unitOfWork.SaveChangeAsync() > 0)
                             {
                                 trans.DocNo = request.Id;
@@ -273,9 +267,9 @@ namespace Application.Services
                                 reponse.Message = "Error when saving Request Withdraw";
                                 reponse.IsSuccess = false;
                             }
-                            
+
                         }
-                        
+
                     }
                 }
                 else
@@ -318,11 +312,11 @@ namespace Application.Services
                     walletexist.AvailableBalance += amountMoney;
                     walletexist.Balance = walletexist.AvailableBalance + (walletexist.FrozenBalance ?? 0);
                     _unitOfWork.WalletRepository.Update(walletexist);
-                    
+
                 }
                 else
                 {
-                    if(amountMoney > walletexist.AvailableBalance)
+                    if (amountMoney > walletexist.AvailableBalance)
                     {
                         reponse.IsSuccess = false;
                         reponse.Code = 400;
@@ -393,7 +387,7 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var transExist = await _unitOfWork.WalletTransactionRepository.GetAllAsync(x => x.DocNo == requestId && x.Status == EnumStatusTransaction.Pending.ToString() 
+                var transExist = await _unitOfWork.WalletTransactionRepository.GetAllAsync(x => x.DocNo == requestId && x.Status == EnumStatusTransaction.Pending.ToString()
                                                                                                && x.transactionType == EnumTransactionType.WithDrawWallet.ToString());
                 var thisTransExit = transExist.FirstOrDefault();
                 if (!transExist.Any())
@@ -450,12 +444,12 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<APIResponseModel> RefundToWalletForUsersAsync(List<CustomerLot> customerLot) 
+        public async Task<APIResponseModel> RefundToWalletForUsersAsync(List<CustomerLot> customerLot)
         {
             var reponse = new APIResponseModel();
             try
             {
-                foreach (var loser in customerLot) 
+                foreach (var loser in customerLot)
                 {
                     //thuc hien hoan vi
                     var walletOfUser = loser.Customer.Wallet;

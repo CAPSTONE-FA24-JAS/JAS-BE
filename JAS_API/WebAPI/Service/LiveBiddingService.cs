@@ -845,7 +845,7 @@ namespace WebAPI.Service
                             var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == player.CustomerId);
                             
                             var autobidAvaiable = player.AutoBids?.FirstOrDefault(x => x.IsActive == true && x.MinPrice <= highestBidOfLot && x.MaxPrice >= highestBidOfLot);
-                            if(currentPriceOfPlayer.CurrentPrice >= highestBidOfLot || highestBidOfLot == null)
+                            if ((currentPriceOfPlayer.CurrentPrice.HasValue && currentPriceOfPlayer.CurrentPrice.Value >= highestBidOfLot) || highestBidOfLot == null)
                             {
                                 continue;
                             }

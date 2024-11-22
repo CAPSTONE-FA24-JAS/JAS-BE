@@ -99,53 +99,6 @@ namespace WebAPI.Controllers
             return Content(paymentUrl);
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> PayCallBack()
-        //{
-        //    var result =  _vpnService.PaymentExecute(Request.Query);
-
-        //    if (result.VnPayResponseCode == "00" || result.Success != null)
-        //    {
-        //        var tranUpdate = await _walletTransactionService.UpdateTransaction(result.OrderId);
-        //        if (!tranUpdate.IsSuccess)
-        //        {
-        //            return BadRequest(tranUpdate);
-        //        }
-        //        if (tranUpdate.Data is WalletTransaction trans)
-        //            {
-        //                if (trans.transactionType == EnumTransactionType.AddWallet.ToString())
-        //                {
-        //                    var walletUpdate = await _walletService.UpdateBanlance((int)trans.DocNo, (decimal)trans.Amount, true);
-
-        //                    if (walletUpdate.IsSuccess)
-        //                    {
-        //                        return Ok(result);
-        //                    }
-
-        //                }
-
-        //                if (trans.transactionId == result.OrderId)
-        //                {
-        //                    var newTrans = new Transaction()
-        //                    {
-        //                        Amount = trans.Amount,
-        //                        DocNo = trans.DocNo,
-        //                        TransactionTime = DateTime.UtcNow,
-        //                        TransactionType = trans.transactionType
-        //                    };
-        //                    var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
-        //                    if (transactionResult.IsSuccess)
-        //                    {
-        //                        return Ok(result);
-        //                    }
-        //                }
-
-        //        }
-
-        //    }
-        //    return Ok(result);
-        //}
-
         [HttpGet]
         public async Task<IActionResult> PayCallBack()
         {
@@ -154,50 +107,18 @@ namespace WebAPI.Controllers
             {
                 if (result.VnPayResponseCode == "00" || result.Success != null)
                 {
-                    var tranUpdate = await _walletTransactionService.UpdateTransaction(result.OrderId);
-
-                    if (!tranUpdate.IsSuccess)
+                    if (result.DocNo != null)
                     {
-                        return BadRequest(tranUpdate);
-                    }
-
-                    if (tranUpdate.Data != null && tranUpdate.Data is WalletTransaction trans)
-                    {
-
-                        if (trans.transactionType == EnumTransactionType.AddWallet.ToString())
-                        {
-                            var walletUpdate = await _walletService.UpdateBanlance((int)trans.DocNo, (decimal)trans.Amount, true);
-                            var newTrans = new Transaction()
-                            {
-                                Amount = trans.Amount,
-                                DocNo = trans.DocNo,
-                                TransactionTime = DateTime.UtcNow,
-                                TransactionType = trans.transactionType,
-                                TransactionPerson = trans.transactionPerson,
-                            };
-                            var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
-                            if (walletUpdate.IsSuccess && transactionResult.IsSuccess)
-                            {
-                                return Ok(result);
-                            }
-                            else
-                            {
-                                return BadRequest(walletUpdate);
-                            }
-                        }
-
-                        if (trans.transactionId == result.OrderId)
-                        {
-                            var invoice = await _invoiceService.GetInvoiceById((int)trans.DocNo);
+                            var invoice = await _invoiceService.GetInvoiceById((int)result.DocNo);
                             invoice.Status = EnumCustomerLot.Paid.ToString();
                             invoice.CustomerLot.Status = EnumCustomerLot.Paid.ToString();
                             var newTrans = new Transaction()
                             {
-                                Amount = trans.Amount,
-                                DocNo = trans.DocNo,
+                                Amount = invoice.TotalPrice,
+                                DocNo = invoice.Id,
                                 TransactionTime = DateTime.UtcNow,
-                                TransactionType = trans.transactionType,
-                                TransactionPerson = trans.transactionPerson,
+                                TransactionType = EnumTransactionType.BuyPay.ToString(),
+                                TransactionPerson = invoice.CustomerId,
                             };
                             var historyStatusCustomerLot = new HistoryStatusCustomerLot()
                             {
@@ -215,16 +136,40 @@ namespace WebAPI.Controllers
                             {
                                 return BadRequest(transactionResult);
                             }
-                        }
                     }
                     else
                     {
-                        if (tranUpdate.Data == null)
+                        var tranUpdate = await _walletTransactionService.UpdateTransaction(result.OrderId);
+                        if (!tranUpdate.IsSuccess)
                         {
-                            _logger.LogWarning("Transaction update returned null data.");
-                            return BadRequest("Transaction data is null.");
+                            return BadRequest(tranUpdate);
                         }
 
+                        if (tranUpdate.Data != null && tranUpdate.Data is WalletTransaction trans)
+                        {
+
+                            if (trans.transactionType == EnumTransactionType.AddWallet.ToString())
+                            {
+                                var walletUpdate = await _walletService.UpdateBanlance((int)trans.DocNo, (decimal)trans.Amount, true);
+                                var newTrans = new Transaction()
+                                {
+                                    Amount = trans.Amount,
+                                    DocNo = trans.DocNo,
+                                    TransactionTime = DateTime.UtcNow,
+                                    TransactionType = trans.transactionType,
+                                    TransactionPerson = trans.transactionPerson,
+                                };
+                                var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
+                                if (walletUpdate.IsSuccess && transactionResult.IsSuccess)
+                                {
+                                    return Ok(result);
+                                }
+                                else
+                                {
+                                    return BadRequest(walletUpdate);
+                                }
+                            }
+                        }
                     }
                 }
                 else

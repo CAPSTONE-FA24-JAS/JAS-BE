@@ -675,15 +675,6 @@ namespace Application.Services
                 var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
                 if (invoiceById != null)
                 {
-                    var walletTrans = new WalletTransaction()
-                    {
-                        DocNo = model.InvoiceId,
-                        TransactionTime = DateTime.Now,
-                        Amount = (float)-model.Amount,
-                        Status = EnumStatusTransaction.Pending.ToString(),
-                        transactionType = EnumTransactionType.Banktransfer.ToString(),
-                        transactionPerson = (int)invoiceById.CustomerId
-                    };
                     invoiceById.CustomerLot.Status = EnumCustomerLot.PendingPayment.ToString();
 
                     var historyStatusCustomerLot = new HistoryStatusCustomerLot()
@@ -692,12 +683,9 @@ namespace Application.Services
                         Status = EnumCustomerLot.PendingPayment.ToString(),
                         CurrentTime = DateTime.UtcNow,
                     };
-                    //invoiceById.InvoiceOfWalletTransaction = 
                     invoiceById.PaymentMethod = EnumPaymentType.Transfer.ToString();
                     invoiceById.Status = EnumCustomerLot.PendingPayment.ToString();
                     await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
-                    await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrans);
-                    
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         response.Message = $"Add transaction Successfully";
@@ -738,19 +726,15 @@ namespace Application.Services
                         CreatedDate = DateTime.UtcNow,
                         Description = $"payment the invoice have id is : {model.InvoiceId}",
                         FullName = invoiceExist.Customer.FirstName + " " + invoiceExist.Customer.LastName,
-                        OrderId = new Random().Next(1000, 100000)
+                        OrderId = new Random().Next(1000, 100000),
+                        DocNo = invoiceExist.Id,
                     };
-                    var transaction = new WalletTransaction()
-                    {
-                        transactionType = EnumTransactionType.BuyPay.ToString(),
-                        DocNo = model.InvoiceId,
-                        transactionPerson = (int)invoiceExist.CustomerId,
-                    };
+                    
                     invoiceExist.Status = EnumCustomerLot.PendingPayment.ToString();
                     invoiceExist.PaymentMethod = EnumPaymentType.Wallet.ToString();
                     await _unitOfWork.SaveChangeAsync();
                     var httpContext = _httpContextAccessor.HttpContext;
-                    string paymentUrl = await _vNPayService.CreatePaymentUrl(httpContext, vnPayModel, transaction);
+                    string paymentUrl = await _vNPayService.CreatePaymentUrl(httpContext, vnPayModel,null);
                     // tra về url thanh toán 
                     // => Fe thanh toán xong gọi api refund
                     if (!string.IsNullOrEmpty(paymentUrl))
@@ -994,49 +978,37 @@ namespace Application.Services
                 var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
                 if (invoiceById != null)
                 {
-                    var walletTransactions = await _unitOfWork.WalletTransactionRepository.GetAllAsync(x => x.DocNo == invoiceId && x.transactionType == EnumTransactionType.Banktransfer.ToString());
-                    var walletTransaction = walletTransactions.FirstOrDefault();
-                    if (walletTransaction != null)
+                    invoiceById.Status = EnumCustomerLot.Paid.ToString();
+                    invoiceById.CustomerLot.Status = EnumCustomerLot.Paid.ToString();
+
+                    var historyStatusCustomerLot = new HistoryStatusCustomerLot()
                     {
-                        walletTransaction.Status = EnumStatusTransaction.Completed.ToString();
-                        invoiceById.Status = EnumCustomerLot.Paid.ToString();
-                        invoiceById.CustomerLot.Status = EnumCustomerLot.Paid.ToString();
+                        CustomerLotId = invoiceById.CustomerLot.Id,
+                        Status = EnumCustomerLot.Paid.ToString(),
+                        CurrentTime = DateTime.UtcNow,
+                    };
 
-                        var historyStatusCustomerLot = new HistoryStatusCustomerLot()
-                        {
-                            CustomerLotId = invoiceById.CustomerLot.Id,
-                            Status = EnumCustomerLot.Paid.ToString(),
-                            CurrentTime = DateTime.UtcNow,
-                        };
+                    var trans = new Transaction()
+                    {
+                        Amount = invoiceById.TotalPrice,
+                        DocNo = invoiceById.Id,
+                        TransactionTime = DateTime.Now,
+                        TransactionType = EnumTransactionType.Banktransfer.ToString(),
+                        TransactionPerson = invoiceById.CustomerId
+                    };
 
-                        var trans = new Transaction()
-                        {
-                            Amount = (float)walletTransaction.Amount,
-                            DocNo = walletTransaction.DocNo,
-                            TransactionTime = DateTime.Now,
-                            TransactionType = EnumTransactionType.Banktransfer.ToString(),
-                            TransactionPerson = invoiceById.CustomerId
-                        };
-
-                        await _unitOfWork.TransactionRepository.AddAsync(trans);
-                        await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
-                        if (await _unitOfWork.SaveChangeAsync() > 0)
-                        {
-                            response.Message = "Upload file bill transaction Successfully";
-                            response.Code = 200;
-                            response.IsSuccess = true;
-                        }
-                        else
-                        {
-                            response.Message = "Failed to save changes";
-                            response.Code = 500;
-                            response.IsSuccess = false;
-                        }
+                    await _unitOfWork.TransactionRepository.AddAsync(trans);
+                    await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        response.Message = "Upload file bill transaction Successfully";
+                        response.Code = 200;
+                        response.IsSuccess = true;
                     }
                     else
                     {
-                        response.Message = "Wallet transaction records not found for the specified invoice";
-                        response.Code = 404;
+                        response.Message = "Failed to save changes";
+                        response.Code = 500;
                         response.IsSuccess = false;
                     }
                 }
@@ -1059,7 +1031,7 @@ namespace Application.Services
 
         public Lot GetLotInInvoice(int invoiceId)
         {
-            var lotExit = _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId).Result.CustomerLot.Lot;
+            var lotExit = _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId).Result?.CustomerLot?.Lot;
             if (lotExit == null) 
             {
                 return null;
@@ -1156,6 +1128,4 @@ namespace Application.Services
             return response;
         }
     }
-
-
 }
