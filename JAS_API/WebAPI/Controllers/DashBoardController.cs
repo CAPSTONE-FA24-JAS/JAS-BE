@@ -97,5 +97,19 @@ namespace WebAPI.Controllers
             var result = await _dashboardService.GetTopFiveBuyersAsync();
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> TotalAccountsAsync()
+        {
+            var result = await _dashboardService.TotalUser();
+            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> TotalAccountActiveAsync()
+        {
+            var result = await _dashboardService.TotalUserActive();
+            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+        }
     }
 }

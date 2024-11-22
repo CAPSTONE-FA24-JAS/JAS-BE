@@ -6,6 +6,7 @@ using Application.ViewModels.InvoiceDTOs;
 using Application.ViewModels.JewelryDTOs;
 using Application.ViewModels.TransactionDTOs;
 using AutoMapper;
+using Azure;
 using Domain.Entity;
 using Domain.Enums;
 using System.Linq.Expressions;
@@ -371,6 +372,72 @@ namespace Application.Services
                     response.Data = 0;
                     response.IsSuccess = true;
                     response.Message = "Current Time System Haven't Buyer Top.";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processcing";
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> TotalUser()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.Role.Name == "Customer" && x.IsConfirmed == true);
+
+                if (accounts.Count > 0)
+                {
+
+                    response.Code = 200;
+                    response.Data = accounts.Count;
+                    response.IsSuccess = true;
+                    response.Message = "Received Successfully Customer In System";
+                }
+                else
+                {
+                    response.Code = 200;
+                    response.Data = 0;
+                    response.IsSuccess = true;
+                    response.Message = "Current Time System Haven't Customer.";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processcing";
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> TotalUserActive()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.Role.Name == "Customer" && x.IsConfirmed == true && x.Status == true);
+
+                if (accounts.Count > 0)
+                {
+
+                    response.Code = 200;
+                    response.Data = accounts.Count;
+                    response.IsSuccess = true;
+                    response.Message = "Received Successfully Customer In System";
+                }
+                else
+                {
+                    response.Code = 200;
+                    response.Data = 0;
+                    response.IsSuccess = true;
+                    response.Message = "Current Time System Haven't Customer.";
                 }
 
             }
