@@ -208,6 +208,13 @@ namespace WebAPI.Controllers
             return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ViewListRequestWithdrawForCustomer(int customerId)
+        {
+            var result = await _walletService.GetListRequestWithdrawForCustomer(customerId);
+            return (result.IsSuccess) ? Ok(result) : BadRequest(result);
+        }
+
         [HttpPatch]
         public async Task<IActionResult> ApproveRequestNewWithdraw(int requestId)
         {

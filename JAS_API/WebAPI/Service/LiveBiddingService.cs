@@ -845,7 +845,7 @@ namespace WebAPI.Service
                             var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == player.CustomerId);
                             
                             var autobidAvaiable = player.AutoBids?.FirstOrDefault(x => x.IsActive == true && x.MinPrice <= highestBidOfLot && x.MaxPrice >= highestBidOfLot);
-                            if ((currentPriceOfPlayer.CurrentPrice.HasValue && currentPriceOfPlayer.CurrentPrice.Value >= highestBidOfLot) || highestBidOfLot == null)
+                            if ((currentPriceOfPlayer != null && currentPriceOfPlayer.CurrentPrice.Value >= highestBidOfLot) || highestBidOfLot == null)
                             {
                                 continue;
                             }
@@ -855,14 +855,10 @@ namespace WebAPI.Service
                                 continue; 
                             }
 
-                            if(currentPriceOfPlayer.CurrentPrice.Value > highestBidOfLot)
-                            {
-                                continue;
-                            }
                             //tìm ra autobid phù hợp với autobid có tg thực hiện giữa mỗi lần auto
                             if (autobidAvaiable != null)
                             {
-                                var bidPriceFuture = currentPriceOfPlayer.CurrentPrice + (player.Lot.BidIncrement * autobidAvaiable.NumberOfPriceStep);
+                                var bidPriceFuture = currentPriceOfPlayer?.CurrentPrice?? player.Lot.StartPrice + (player.Lot.BidIncrement * autobidAvaiable.NumberOfPriceStep);
                                 //nếu giá đấu tương lai lớn hơn giá bán cuối của lot thì ko làm gì cả
                                 if(bidPriceFuture > player.Lot.FinalPriceSold)
                                 {
