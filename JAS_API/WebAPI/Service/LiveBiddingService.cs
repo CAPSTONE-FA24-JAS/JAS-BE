@@ -886,20 +886,14 @@ namespace WebAPI.Service
                                         var bidPriceStream = _cacheService.AddToStream((int)player.Lot.Id, bidData, (int)player.CustomerId);
                                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", bidPriceStream.CustomerId, firstName, lastname, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
                                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", bidPriceStream.CustomerId, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
-
                                         //bỏ dòng này nè danh vì khi nào bán được sản phẩm đó mới trừ bidLimit
                                         // player.Customer.PriceLimit -= bidPriceFuture;
                                         await _unitOfWork.SaveChangeAsync();
-                                        string redisKey = $"BidPrice:{player.LotId}";
-                                        // Lưu dữ liệu đấu giá vào Redis
-                                        _cacheService.AddToStream((int)player.LotId, bidData, (int)player.CustomerId);
-
                                         await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
                                         //tam dừng tg cho luồng này
                                         TimeSpan delayTime = TimeSpan.FromMinutes(autobidAvaiable.TimeIncrement.Value);
                                         // Đợi trong thời gian đã cho
                                         await Task.Delay(delayTime);
-
                                     }
                                 }
                                 //không làm gì cả không lưu redis

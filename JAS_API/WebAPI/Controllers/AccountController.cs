@@ -141,7 +141,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPatch]
         public async Task<IActionResult> UpdateProfile(int Id, [FromForm] UpdateProfileDTO updateDTO)
         {
             var result = await _accountService.UpdateProfile(Id,updateDTO);
