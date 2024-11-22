@@ -678,7 +678,8 @@ namespace Application.Services
 
                         //hoan coc cho loser
                         var walletOfLoser = await _unitOfWork.WalletRepository.GetByCustomerId(customerLot.CustomerId);
-                        walletOfLoser.Balance = walletOfLoser.Balance + (decimal?)customerLot.Lot.Deposit;
+                        walletOfLoser.AvailableBalance += ((decimal?)customerLot?.Lot?.Deposit ?? 0);
+                        walletOfLoser.Balance = walletOfLoser.AvailableBalance ?? 0 + walletOfLoser.FrozenBalance ?? 0;
                         _unitOfWork.WalletRepository.Update(walletOfLoser);
                        customerLot.IsRefunded = true;
                        customerLot.Status = EnumCustomerLot.Refunded.ToString();
