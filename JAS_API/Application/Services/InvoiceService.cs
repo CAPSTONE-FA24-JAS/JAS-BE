@@ -673,7 +673,8 @@ namespace Application.Services
                         CreatedDate = DateTime.UtcNow,
                         Description = $"payment the invoice have id is : {model.InvoiceId}",
                         FullName = invoiceExist.Customer.FirstName + " " + invoiceExist.Customer.LastName,
-                        OrderId = new Random().Next(1000, 100000)
+                        OrderId = new Random().Next(1000, 100000),
+                        DocNo = invoiceExist.Id,
                     };
                     
                     invoiceExist.Status = EnumCustomerLot.PendingPayment.ToString();
