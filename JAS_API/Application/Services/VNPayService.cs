@@ -47,8 +47,7 @@ namespace Application.Services
             vnpay.AddRequestData("vnp_OrderType", "other");
             vnpay.AddRequestData("vnp_ReturnUrl", _configuration["VnPay:PaymentBackReturnUrl"]);
             vnpay.AddRequestData("vnp_TxnRef", tick);
-            
-            if(walletTransaction != null)
+            if (walletTransaction != null)
             {
                 walletTransaction.transactionId = tick;
                 walletTransaction.Status = EnumStatusTransaction.Pending.ToString();
@@ -57,6 +56,8 @@ namespace Application.Services
                 walletTransaction.transactionId = tick;
                 await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
                 await _unitOfWork.SaveChangeAsync();
+
+                vnpay.AddRequestData("vnp_DocNo", (-1).ToString());
             }
             else
             {
