@@ -624,6 +624,7 @@ namespace WebAPI.Service
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
                     await _notificationHub.Clients.Group(loser.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                 }
+                await _unitOfWork.SaveChangeAsync();
             }
         }
 
