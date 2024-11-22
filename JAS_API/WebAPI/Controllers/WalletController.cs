@@ -107,7 +107,7 @@ namespace WebAPI.Controllers
             {
                 if (result.VnPayResponseCode == "00" || result.Success != null)
                 {
-                    if (result.DocNo != null)
+                    if (result.DocNo != -1)
                     {
                             var invoice = await _invoiceService.GetInvoiceById((int)result.DocNo);
                             invoice.Status = EnumCustomerLot.Paid.ToString();
