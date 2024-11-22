@@ -59,5 +59,16 @@ namespace WebAPI.Controllers
             return (result.IsSuccess == true)? Ok(result) : BadRequest(result);
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> GetWinnerForLotAsync(int lotId)
+        {
+            var result = await _customerLotService.GetWinnerForLot(lotId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }

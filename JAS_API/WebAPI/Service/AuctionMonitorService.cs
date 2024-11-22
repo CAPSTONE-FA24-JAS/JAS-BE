@@ -14,23 +14,34 @@ namespace WebAPI.Service
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            try
             {
-                using (var scope = _serviceProvider.CreateScope())
+                while (!stoppingToken.IsCancellationRequested)
                 {
-                    var liveBiddingService = scope.ServiceProvider.GetRequiredService<LiveBiddingService>();
-                    await liveBiddingService.CheckLotStartAsync();
-                    await liveBiddingService.ChecKLotEndAsync();
-                    await liveBiddingService.ChecKLotEndReducedBiddingAsync();
-                    //await liveBiddingService.CheckLotBuyNowAsync();                
-                    await liveBiddingService.CheckLotFixedPriceAsync();
-                    await liveBiddingService.CheckLotSercetAsync();
-                    await liveBiddingService.ChecKAuctionEndAsync();
-                    await liveBiddingService.AutoBidAsync();
+                    using (var scope = _serviceProvider.CreateScope())
+                    {
+                        var liveBiddingService = scope.ServiceProvider.GetRequiredService<LiveBiddingService>();
+                        await liveBiddingService.CheckLotStartAsync();
+                        await liveBiddingService.AutoBidAsync();
+                        await liveBiddingService.ChecKLotEndAsync();
+                        await liveBiddingService.ChecKLotEndReducedBiddingAsync();
+                        //await liveBiddingService.CheckLotBuyNowAsync();                
+                        await liveBiddingService.CheckLotFixedPriceAsync();
+                        await liveBiddingService.CheckLotSercetAsync();
+                        await liveBiddingService.ChecKAuctionEndAsync();
+                        
 
+
+                    }
+                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
                 }
-                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }
+            catch (Exception ex)
+            {
+                // Log lỗi và tiếp tục
+                _logger.LogError(ex, "Error in AuctionMonitorService");
+            }
+
         }
     }
 }

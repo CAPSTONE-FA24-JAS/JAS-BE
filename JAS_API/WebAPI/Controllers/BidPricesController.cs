@@ -55,10 +55,20 @@ namespace WebAPI.Controllers
 
         //pause,close, open lot
         [HttpPut]
-        public async Task<IActionResult> CloseLot(int lotId, int? status)
+        public async Task<IActionResult> OpenAndPauseLotAsync(int lotId, int? status)
         {
 
             var result = await _bidPriceService.UpdateStatusBid(lotId, status);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> CancelLotAsync(int lotId)
+        {
+
+            var result = await _bidPriceService.cancelLot(lotId);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);

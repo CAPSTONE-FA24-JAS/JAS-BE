@@ -8,10 +8,12 @@ using AutoMapper;
 using CloudinaryDotNet;
 using Domain.Entity;
 using Domain.Enums;
+using Grpc.Core;
 using iTextSharp.text;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -253,16 +255,16 @@ namespace Application.Services
             {
                 //Redis
                 var winnerCurrentNew = await _unitOfWork.CustomerLotRepository.GetByIdAsync(customerLotId);
-                var bidPriceNew = new BidPrice()
+               
+
+                BiddingInputDTO bidData = new BiddingInputDTO
                 {
-                    BidTime = DateTime.Now,
                     CurrentPrice = priceCurrent,
-                    CustomerId = winnerCurrentNew.CustomerId,
-                    LotId = winnerCurrentNew.LotId
+                    BidTime = DateTime.UtcNow
                 };
                 //Redis
                 string redisKey = $"BidPrice:{winnerCurrentNew.Lot.Id}";
-                _cacheService.SetSortedSetData<BidPrice>(redisKey, bidPriceNew, priceCurrent);
+                _cacheService.AddToStream((int)winnerCurrentNew.LotId, bidData, (int)winnerCurrentNew.CustomerId);
                 foreach (var player in await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.CustomerId != winnerCurrentNew.CustomerId))
                 {
                     player.IsWinner = false;
@@ -331,6 +333,48 @@ namespace Application.Services
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<APIResponseModel> GetWinnerForLot(int lotid)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+
+
+                var customerLots = await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.IsWinner == true && x.LotId == lotid);
+                if(customerLots != null)
+                {
+                    List<CustomerLotWinnerDTO> listLotDTO = new List<CustomerLotWinnerDTO>();
+
+                    foreach (var item in customerLots)
+                    {
+                        var lotsResponse = _mapper.Map<CustomerLotWinnerDTO>(item);
+                        listLotDTO.Add(lotsResponse);
+                    };
+
+                    response.Message = $"Have winner for lot";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = listLotDTO;
+
+                }
+                else
+                {
+                    response.Message = $"Don't have customerLots";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
         }
     }
 }

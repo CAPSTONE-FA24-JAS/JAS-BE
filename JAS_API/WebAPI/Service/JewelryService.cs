@@ -9,7 +9,9 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Domain.Entity;
 using Domain.Enums;
+using Microsoft.AspNetCore.SignalR;
 using System.Linq.Expressions;
+using WebAPI.Middlewares;
 
 
 namespace Application.Services
@@ -30,13 +32,15 @@ namespace Application.Services
         private const string TagsDocumentSecondShaphie = "DocumentSecondShaphie";
         private const string TagsAuthorized = "FilePDF_Authorized";
         private readonly IGeneratePDFService _generatePDFService;
+        private readonly IHubContext<NotificationHub> _notificationHub;
 
-        public JewelryService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IGeneratePDFService generatePDFService)
+        public JewelryService(IUnitOfWork unitOfWork, IMapper mapper, Cloudinary cloudinary, IGeneratePDFService generatePDFService, IHubContext<NotificationHub> notificationHub)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _cloudinary = cloudinary;
             _generatePDFService = generatePDFService;
+            _notificationHub = notificationHub;
         }
 
         private async Task<UploadResult> uploadImageOnCloudary(IFormFile file, string tag)
@@ -159,18 +163,22 @@ namespace Application.Services
 
                 var notification = new Notification
                 {
-                    Title = $"Final valuation Id:  {jewelry.Id} has been create",
-                    Description = $" Thẩm định đã tạo định giá cuối cho valuation Id : {jewelry.Id}",
+                    Title = $"Final valuation Id: {jewelry.Valuation.Id} has been create",
+                    Description = $"The company has created a final valuation for valuation Id {jewelry.Valuation.Id}: {jewelry.Name}",
                     Is_Read = false,
                     NotifiableId = jewelry.ValuationId,  //valuationId
                     AccountId = jewelry.Valuation.Staff.AccountId,
                     CreationDate = DateTime.UtcNow,
-                    Notifi_Type = "FinalValuation"
+                    Notifi_Type = "FinalValuation",
+                    StatusOfValuation = "6",
+                    ImageLink = jewelry.ImageJewelries.FirstOrDefault().ImageLink
                 };
 
                 await _unitOfWork.NotificationRepository.AddAsync(notification);
                 await _unitOfWork.SaveChangeAsync();
+             
 
+                await _notificationHub.Clients.Groups(jewelry.Valuation.Staff.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
                 var finalValuation = _mapper.Map<JewelryDTO>(jewelry);
 
                 response.Message = "Create Jewelry Successfully";
@@ -500,10 +508,26 @@ namespace Application.Services
                     valuationById.BidForm = EnumHelper.GetEnums<EnumLotType>().FirstOrDefault(x => x.Value == requestDTO.BidForm).Name; ;
 
                     _unitOfWork.JewelryRepository.Update(valuationById);
+
+                    var notification = new Notification
+                    {
+                        Title = $"Final valuation {valuationById.Id} need to approved",
+                        Description = $"You need to check and approved final valuation {valuationById.Id}: {valuationById.Name}",
+                        Is_Read = false,
+                        NotifiableId = valuationById.ValuationId,  //valuationId
+                        AccountId = 61,
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "FinalValuation",
+                        StatusOfValuation = "6",
+                        ImageLink = valuationById.ImageJewelries.FirstOrDefault().ImageLink
+                    };
+
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
                     await _unitOfWork.SaveChangeAsync();
 
-                    var valuationDTO = _mapper.Map<JewelryDTO>(valuationById);
 
+                    await _notificationHub.Clients.Groups("61").SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                    var valuationDTO = _mapper.Map<JewelryDTO>(valuationById);
                     response.Message = $"Update Successfully";
                     response.Code = 200;
                     response.IsSuccess = true;
@@ -543,16 +567,19 @@ namespace Application.Services
                     var notification = new Notification
                     {
                         Title = $"Final valuation Id:  {jewelryById.ValuationId} has been approved by manager",
-                        Description = $"  định giá cuối cho valuation Id : {jewelryById.ValuationId} đã được manager approved",
+                        Description = $"  Final valuation for valuation Id {jewelryById.ValuationId}: {jewelryById.Name} has been manager approved",
                         Is_Read = false,
                         NotifiableId = jewelryById.ValuationId,  //jewelryId
                         AccountId = jewelryById.Valuation.Seller.AccountId,
-                        CreationDate = DateTime.UtcNow
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "ManagerApproved",
+                        StatusOfValuation = "7",
+                        ImageLink = jewelryById.ImageJewelries.FirstOrDefault().ImageLink
                     };
 
                     await _unitOfWork.NotificationRepository.AddAsync(notification);
                     await _unitOfWork.SaveChangeAsync();
-                   
+                    await _notificationHub.Clients.Groups(jewelryById.Valuation.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
                     var jewelryDTO = _mapper.Map<JewelryDTO>(jewelryById);
 
@@ -624,11 +651,11 @@ namespace Application.Services
                 var seller = await _unitOfWork.CustomerRepository.GetByIdAsync(sellerId);
                 var valuation = await _unitOfWork.ValuationRepository.GetByIdAsync(valuationId);
                 var statusResult = OtpService.ValidateOtpForAuthorized(seller.Account.ConfirmationToken, valuationId, sellerId, opt);
-                dynamic validationResult = statusResult;
-                if (!validationResult.status)
+                
+                if (!statusResult)
                 {
                     response.IsSuccess = false;
-                    response.Message = validationResult.msg + validationResult.timeStepMatched;
+                    response.Message = "Verify OTP failed!";
                     return response;
                 }
                 else
@@ -647,13 +674,12 @@ namespace Application.Services
 
                     byte[] pdfBytes = _generatePDFService.CreateAuthorizedPDF(valuation);
 
-                    string filePath = $"GiayUyQuyen_{valuation.Id}.pdf";
+                    using var memoryStream = new MemoryStream(pdfBytes);
 
-                    await File.WriteAllBytesAsync(filePath, pdfBytes);
 
                     var uploadFile = await _cloudinary.UploadAsync(new RawUploadParams
                     {
-                        File = new FileDescription(filePath),
+                        File = new FileDescription($"GiayUyQuyen_{valuation.Id}.pdf", memoryStream),
                         Tags = TagsAuthorized,
                         Type = "upload"
 
@@ -680,11 +706,15 @@ namespace Application.Services
                         var notification = new Notification
                         {
                             Title = $"Final valuation Id:  {valuation.Id} has been authorized by seller ",
-                            Description = $"  định giá cuối cho valuation Id : {valuation.Id} has been authorized by seller",
+                            Description = $"  Final valuation for valuation Id {valuation.Id}: {valuation.Name} has been authorized by seller",
                             Is_Read = false,
-                            NotifiableId = valuation.Id,  //jewelryId
+                            NotifiableId = valuation.Id,  //valuatiionId
                             AccountId = valuation.Staff.AccountId,
-                            CreationDate = DateTime.UtcNow
+                            CreationDate = DateTime.UtcNow,
+                            Notifi_Type = "Authorized",
+                            StatusOfValuation = "8",
+                            ImageLink = valuation.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+
                         };
 
                         await _unitOfWork.NotificationRepository.AddAsync(notification);

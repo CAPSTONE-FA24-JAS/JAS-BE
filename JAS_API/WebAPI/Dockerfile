@@ -2,7 +2,7 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
+USER root
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -17,6 +17,8 @@ COPY ["Infrastructures/Infrastructures.csproj", "Infrastructures/"]
 COPY ["Application/Application.csproj", "Application/"]
 COPY ["Domain/Domain.csproj", "Domain/"]
 RUN dotnet restore "./WebAPI/WebAPI.csproj"
+
+
 COPY . .
 WORKDIR "/src/WebAPI"
 RUN dotnet build "./WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
@@ -31,3 +33,4 @@ FROM base AS final
 WORKDIR /app	
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "WebAPI.dll", "--environment=Development"]
+CMD ["bash"]

@@ -35,11 +35,11 @@ namespace Infrastructures.Repositories
         }
 
         //get những thằng thua
-        public List<CustomerLot>? GetListCustomerLotByCustomerAndLot(List<BidPrice> bidPriceList, int customerLotWinnerId)
+        public List<CustomerLot>? GetListCustomerLotByCustomerAndLot(int lotId, int customerLotWinnerId)
         {
             var customerLots = _dbContext.CustomerLots
        .AsEnumerable() // Switch to client-side evaluation
-       .Where(x => bidPriceList.Any(bd => bd.CustomerId == x.CustomerId && bd.LotId == x.LotId) && x.Id != customerLotWinnerId)
+       .Where(x => x.LotId == lotId && x.Id != customerLotWinnerId)
        .ToList();
             if (!customerLots.Any())
             {

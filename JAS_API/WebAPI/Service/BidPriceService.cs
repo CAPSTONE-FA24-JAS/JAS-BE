@@ -10,7 +10,9 @@ using Castle.Core.Resource;
 using CloudinaryDotNet;
 using Domain.Entity;
 using Domain.Enums;
+using iTextSharp.text.pdf.parser.clipper;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -31,10 +33,11 @@ namespace Application.Services
         private readonly ICacheService _cacheService;
         private readonly ShareDB _shared;
         private readonly ICustomerLotService _customerLotService;
+        private readonly IHubContext<NotificationHub> _notificationHub;
 
 
         public BidPriceService(IUnitOfWork unitOfWork, IMapper mapper, IHubContext<BiddingHub> hubContext,
-                               ICacheService cacheService, ShareDB shareDB, ICustomerLotService customerLotService)
+                               ICacheService cacheService, ShareDB shareDB, ICustomerLotService customerLotService, IHubContext<NotificationHub> notificationHub)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -42,7 +45,7 @@ namespace Application.Services
             _cacheService = cacheService;
             _shared = shareDB;
             _customerLotService = customerLotService;
-            
+            _notificationHub = notificationHub;
         }
 
         public async Task<APIResponseModel> JoinBid(JoinLotRequestDTO request)
@@ -90,8 +93,9 @@ namespace Application.Services
                         await _hubContext.Groups.AddToGroupAsync(request.ConnectionId, lotGroupName);
 
                         
-                        await _hubContext.Clients.Groups(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendCurrentPriceForReduceBidding", lot.CurrentPrice);
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("StatusBid", lot.Status);
 
                     // await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
 
@@ -102,6 +106,7 @@ namespace Application.Services
                               await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
                               await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLot", topBidders);
                               await _hubContext.Clients.Group(lotGroupName).SendAsync("SendHistoryBiddingOfLotOfStaff", topBidderWithName);
+
 
                          }
                          else
@@ -298,9 +303,7 @@ namespace Application.Services
                             reponse.IsSuccess = false;
                         }
                         else
-                        {
-
-                            
+                        {                           
                             if(highestBid != null)
                             {
                                 if (request.CurrentPrice < highestBid.CurrentPrice)
@@ -316,6 +319,25 @@ namespace Application.Services
 
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", customerId, firstName, lastname, request.CurrentPrice, bidPrice.BidTime);
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, bidPrice.BidTime);
+                                    if (lot.EndTime.HasValue)
+                                    {
+                                        DateTime endTime = lot.EndTime.Value;
+
+                                        //10s cuối
+                                        TimeSpan extendTime = endTime - request.BidTime;
+
+                                        // Nếu còn dưới 10 giây thì gia hạn thêm 10 giây
+                                        if (extendTime.TotalSeconds < 10)
+                                        {
+                                            endTime = endTime.AddSeconds(10);
+                                            _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
+                                        }
+                                        else
+                                        {
+                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
+                                        }
+                                    }
                                     reponse.IsSuccess = true;
                                     reponse.Code = 200;
                                     reponse.Message = "Đã thêm giá vào hàng đợi stream";
@@ -326,6 +348,25 @@ namespace Application.Services
                             {
 
                                 _cacheService.AddToStream(conn.LotId, request, customerId);
+                                if (lot.EndTime.HasValue)
+                                {
+                                    DateTime endTime = lot.EndTime.Value;
+
+                                    //10s cuối
+                                    TimeSpan extendTime = endTime - request.BidTime;
+
+                                    // Nếu còn dưới 10 giây thì gia hạn thêm 10 giây
+                                    if (extendTime.TotalSeconds < 10)
+                                    {
+                                        endTime = endTime.AddSeconds(10);
+                                        _cacheService.UpdateLotEndTime(conn.LotId, endTime);
+                                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, endTime);
+                                    }
+                                    else
+                                    {
+                                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", conn.LotId, lot.EndTime);
+                                    }
+                                }
                                 reponse.IsSuccess = true;
                                 reponse.Code = 200;
                                 reponse.Message = "Đã thêm giá vào hàng đợi stream";
@@ -341,7 +382,7 @@ namespace Application.Services
                         {
                             if (request.CurrentPrice < highestBid.CurrentPrice)
                             {
-                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Không được đặt giá thấp hơn hoặc bằng giá hiện tại", request.CurrentPrice);
+                                //await _hubContext.Clients.Group(lotGroupName).SendAsync("SendResultCheckCurrentPrice", "Không được đặt giá thấp hơn hoặc bằng giá hiện tại", request.CurrentPrice);
                                 reponse.IsSuccess = false;
                                 reponse.Code = 200;
                                 reponse.Message = "Đặt giá không thành công do không thỏa mãn điều kiện";
@@ -473,7 +514,7 @@ namespace Application.Services
                             await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
 
 
-                            
+                            await CountCustomerBidded(conn.LotId);
                             reponse.IsSuccess = true;
                             reponse.Code = 200;
                             reponse.Message = "Place bid successfully!";
@@ -498,7 +539,7 @@ namespace Application.Services
 
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", customerId, request.CurrentPrice, request.BidTime);
 
-
+                        await CountCustomerBidded(conn.LotId);
 
                         reponse.IsSuccess = true;
                         reponse.Code = 200;
@@ -523,6 +564,13 @@ namespace Application.Services
             return reponse;
         }
 
+        public async Task CountCustomerBidded(int lotId)
+        {
+            string redisKey = $"BidPrice:{lotId}";
+            var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, x => x.LotId == lotId);
+            var amountCustomerBidded = bidPrices.Distinct().Count();
+            await _hubContext.Clients.All.SendAsync("SendAmountCustomerBid", "So luong nguoi da dau gia la: ", amountCustomerBidded);
+        }
         public async Task<APIResponseModel> UpdateStatusBid(int lotId, int? status)
         {
             var reponse = new APIResponseModel();
@@ -539,7 +587,8 @@ namespace Application.Services
 
                     _unitOfWork.LotRepository.Update(lot);
                     await _unitOfWork.SaveChangeAsync();
-                    await _hubContext.Clients.Groups(lotGroupName).SendAsync("Closed Bid!");
+                    _cacheService.UpdateLotStatus(lotId, statusTranfer);
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("UpdateStatusBid", lot.Status);
 
                     reponse.IsSuccess = true;
                     reponse.Message = "update status lot successfully";
@@ -564,6 +613,148 @@ namespace Application.Services
             }
             return reponse;
         }
+
+        public async Task<APIResponseModel> cancelLot(int lotId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                string lotGroupName = $"lot-{lotId}";
+
+                
+                var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+                if (lot != null)
+                {
+                    lot.Status = EnumStatusLot.Canceled.ToString();
+                    lot.ActualEndTime = DateTime.UtcNow;
+
+                    _unitOfWork.LotRepository.Update(lot);
+                    await _unitOfWork.SaveChangeAsync();
+                    _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Canceled.ToString());
+                    _cacheService.UpdateLotActualEndTime(lotId, (DateTime)lot.ActualEndTime);
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("UpdateStatusBid", lot.Status);
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("CanceledAuctionPublic", "Phiên đã bi huy!");
+                    await HandleLoserLot(lotId);
+                    reponse.IsSuccess = true;
+                    reponse.Message = "update status lot successfully";
+                    reponse.Code = 200;
+                    reponse.Data = lot.Status;
+                }
+                else
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Code = 404;
+                    reponse.Message = "Khong tim thay lot!";
+                }
+            }
+            catch (Exception ex)
+
+
+            {
+                reponse.IsSuccess = false;
+                reponse.Message = ex.Message;
+                reponse.Code = 500;
+
+            }
+            return reponse;
+        }
+
+
+        private async Task HandleLoserLot(int lotId)
+        {
+                string redisKey = $"BidPrice:{lotId}";
+                var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
+                await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
+                var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
+
+                //lay ra list customerLot theo  lotId 
+                var customerlots = await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.LotId == lotId);
+                if (customerlots != null)
+                {
+                    List<CustomerLot> listCustomerLot = new List<CustomerLot>();
+                    foreach (var customerLot in customerlots)
+                    {
+                       customerLot.IsWinner = false;
+
+                        //hoan coc cho loser
+                        var walletOfLoser = await _unitOfWork.WalletRepository.GetByCustomerId(customerLot.CustomerId);
+                        walletOfLoser.Balance = walletOfLoser.Balance + (decimal?)customerLot.Lot.Deposit;
+                        _unitOfWork.WalletRepository.Update(walletOfLoser);
+                       customerLot.IsRefunded = true;
+                       customerLot.Status = EnumCustomerLot.Refunded.ToString();
+                        listCustomerLot.Add(customerLot);
+
+                        var maxBidPriceLoser = await _unitOfWork.BidPriceRepository.GetMaxBidPriceByCustomerIdAndLot(customerLot.CustomerId, lotId);
+                        if (maxBidPriceLoser == null)
+                        {
+                           customerLot.CurrentPrice = 0;
+                        }
+                        else
+                        {
+                            customerLot.CurrentPrice = maxBidPriceLoser.CurrentPrice;
+                        }
+
+                        _unitOfWork.CustomerLotRepository.Update(customerLot);
+                        //lưu history của loser là refunded
+                        var historyCustomerlotLoser = new HistoryStatusCustomerLot()
+                        {
+                            Status = customerLot.Status,
+                            CustomerLotId = customerLot.Id,
+                            CurrentTime = DateTime.UtcNow,
+                        };
+                        await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerlotLoser);
+
+                        //tao notification cho loser
+                        var notificationloser = new Notification
+                        {
+                            Title = $"Lot {lotId} had been canceld",
+                            Description = $" Lot {lotId} had been canceld and system auto refunded deposit for you",
+                            Is_Read = false,
+                            NotifiableId = customerLot.Id,  //cusrtomerLot => dẫn tới myBid
+                            AccountId = customerLot.Customer.AccountId,
+                            CreationDate = DateTime.UtcNow,
+                            Notifi_Type = "CustomerLot",
+                            ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
+
+                            //  ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+                        };
+
+                        await _unitOfWork.NotificationRepository.AddAsync(notificationloser);
+                        await _notificationHub.Clients.Groups(customerLot.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                        //cap nhat transaction vi
+                        var walletTrasaction = new WalletTransaction
+                        {
+                            transactionType = EnumTransactionType.RefundDeposit.ToString(),
+                            DocNo = customerLot.Id,
+                            Amount = customerLot.Lot.Deposit,
+                            TransactionTime = DateTime.UtcNow,
+                            Status = "Completed",
+                            WalletId = customerLot.Customer.Wallet.Id,
+                            transactionPerson = customerLot.Customer.Id
+                        };
+                        await _unitOfWork.WalletTransactionRepository.AddAsync(walletTrasaction);
+
+
+                        //cap nhat transaction cty
+                        var trasaction = new Transaction
+                        {
+                            TransactionType = EnumTransactionType.RefundDeposit.ToString(),
+                            DocNo = customerLot.Id,
+                            Amount = customerLot.Lot.Deposit,
+                            TransactionTime = DateTime.UtcNow,
+                            TransactionPerson = customerLot.CustomerId
+
+                        };
+                        await _unitOfWork.TransactionRepository.AddAsync(trasaction);
+
+                    }
+                    _unitOfWork.CustomerLotRepository.UpdateRange(listCustomerLot);
+
+                }
+                await _unitOfWork.SaveChangeAsync();
+            
+        }
+
 
 
     }

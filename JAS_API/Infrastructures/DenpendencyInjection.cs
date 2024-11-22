@@ -76,7 +76,6 @@ namespace Infrastructures
             services.AddScoped<ICustomerLotService, CustomerLotService>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<ITransactionService, TransactionService>();
-            services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IInvoiceRepository, InvoiceRepository>();
             services.AddSingleton<ShareDB>();
             services.AddScoped<IVNPayService, VNPayService>();
@@ -100,7 +99,7 @@ namespace Infrastructures
             services.AddScoped<IDashBoardService, DashBoardService>();
 
             services.AddScoped<ICreditCardRepository, CreditCardRepository>();
-
+            services.AddSingleton<ShareDBForNotification>();
             services.AddDbContext<AppDbContext>(option =>
             {
                 option.UseLazyLoadingProxies().UseNpgsql(databaseConnection);

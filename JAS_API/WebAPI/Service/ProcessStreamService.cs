@@ -31,7 +31,7 @@ namespace WebAPI.Service
                 {
                     var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
-                    var lotLiveBidding = _cacheService.GetHashLots(x => x.LotType == EnumLotType.Public_Auction.ToString() && x.Status ==  EnumStatusLot.Auctioning.ToString());
+                    var lotLiveBidding = await _unitOfWork.LotRepository.GetAllAsync(x => x.LotType == EnumLotType.Public_Auction.ToString() && x.Status ==  EnumStatusLot.Auctioning.ToString());
 
                     if(lotLiveBidding == null)
                     {
@@ -78,7 +78,7 @@ namespace WebAPI.Service
 
                         if (result.result == false)
                         {
-                            _logger.LogInformation($"Không còn giá nào trong Stream cho Lot {lot.Id}");
+                          //  _logger.LogInformation($"Không còn giá nào trong Stream cho Lot {lot.Id}");
                             // Đợi 100ms trước khi kiểm tra lại
                             await Task.Delay(100);
                             continue;

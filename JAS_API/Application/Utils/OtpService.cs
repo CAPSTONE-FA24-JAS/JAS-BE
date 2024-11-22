@@ -50,7 +50,7 @@ namespace Application.Utils
         }
 
 
-        public static object ValidateOtpForAuthorized(string secretKey, int jewelryid, int staffId, string otp)
+        public static bool ValidateOtpForAuthorized(string secretKey, int jewelryid, int staffId, string otp)
         {
             string combine = secretKey + jewelryid.ToString() + staffId.ToString();
             using (var sha256 = System.Security.Cryptography.SHA256.Create())
@@ -64,13 +64,13 @@ namespace Application.Utils
 
                 if (isValid)
                 {
-                    var response = new { msg = "Verify successful", status = true };
-                    return response;
+                    
+                    return true;
                 }
                 else
                 {
-                    var response = new { msg = "OTP not valid", status = false, timeStepMatched = timeStepMatched };
-                    return response;
+                    
+                    return false;
                 }
             }
         }
