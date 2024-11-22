@@ -43,7 +43,7 @@ namespace Application.Services
             vnpay.AddRequestData("vnp_IpAddr", Utils.Utils.GetIpAddress(httpContext));
             vnpay.AddRequestData("vnp_Locale", _configuration["VnPay:Locale"]);
 
-            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + model.OrderId);
+            
             vnpay.AddRequestData("vnp_OrderType", "other");
             vnpay.AddRequestData("vnp_ReturnUrl", _configuration["VnPay:PaymentBackReturnUrl"]);
             vnpay.AddRequestData("vnp_TxnRef", tick);
@@ -56,12 +56,11 @@ namespace Application.Services
                 walletTransaction.transactionId = tick;
                 await _unitOfWork.WalletTransactionRepository.AddAsync(walletTransaction);
                 await _unitOfWork.SaveChangeAsync();
-
-                vnpay.AddRequestData("vnp_DocNo", (-1).ToString());
+                vnpay.AddRequestData("vnp_OrderInfo", (-1).ToString());
             }
             else
             {
-                vnpay.AddRequestData("vnp_DocNo", model.DocNo.ToString());
+                vnpay.AddRequestData("vnp_OrderInfo", model.DocNo.ToString());
             }
             var paymentUrl = vnpay.CreateRequestUrl(_configuration["VnPay:vnp_Url"], _configuration["VnPay:vnp_HashSecret"]);
             return paymentUrl;
@@ -80,7 +79,7 @@ namespace Application.Services
                 }
             }
 
-            var vnp_DocNo = Convert.ToInt32(vnpay.GetResponseData("vnp_DocNo"));
+            var vnp_DocNo = Convert.ToInt32(vnpay.GetResponseData("vnp_OrderInfo"));
             var vnp_orderId = Convert.ToInt64(vnpay.GetResponseData("vnp_TxnRef"));
             var vnp_TransactionId = Convert.ToInt64(vnpay.GetResponseData("vnp_TransactionNo"));
             var vnp_SecureHash = collection.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value;
