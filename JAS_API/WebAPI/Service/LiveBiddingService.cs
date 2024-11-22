@@ -684,10 +684,10 @@ namespace WebAPI.Service
                                 Description = $" You won in lot {lot.Id} and system auto created invoice for you.",
                                 Is_Read = false,
                                 NotifiableId = invoice.Id,
-                                AccountId = bidPriceWinner.Customer.AccountId,
+                                AccountId = bidPriceWinner.Customer?.AccountId,
                                 CreationDate = DateTime.UtcNow,
                                 Notifi_Type = "CreateInvoice",
-                                ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
+                                ImageLink = lot.Jewelry?.ImageJewelries?.FirstOrDefault()?.ImageLink
 
                             };
                             await _unitOfWork.NotificationRepository.AddAsync(notification);
@@ -700,7 +700,7 @@ namespace WebAPI.Service
                         else
                         {
                             lot.Status = EnumStatusLot.Passed.ToString();
-                            var losers = lot.CustomerLots
+                            var losers = lot.CustomerLots?
                                          .Where(x => x.CustomerId != (bidPriceWinner?.CustomerId ?? -1))
                                          .ToList();
 
@@ -1030,7 +1030,6 @@ namespace WebAPI.Service
 
             }
         }
-
     }
 }
 

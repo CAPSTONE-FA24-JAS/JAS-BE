@@ -49,10 +49,9 @@ namespace WebAPI.Controllers
         //    return Ok();
         //}
 
-        //[HttpGet]
         //public async Task<IActionResult> TotalProfit()
         //{
-        //    var result = await _transactionService.TotalProfit();
+        //    var result = await _dashboardService.TotalProfit();
         //    return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         //}
 
@@ -62,7 +61,7 @@ namespace WebAPI.Controllers
         //    var result = await _transactionService.TotalProfitByMonth(month, year);
         //    return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         //}
-        
+
         [HttpGet]
         public async Task<IActionResult> DashBoardRevenueInYear(int year)
         {
