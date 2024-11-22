@@ -3,9 +3,14 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
+	  <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>593538ba-31b0-4af3-a2db-58e08117adaa</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <EnableSdkContainerDebugging>True</EnableSdkContainerDebugging>
+    <ContainerBaseImage>mcr.microsoft.com/dotnet/aspnet:8.0</ContainerBaseImage>
+    <ContainerRuntimeIdentifier>win-x64</ContainerRuntimeIdentifier>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -59,6 +64,9 @@
 	<ItemGroup>
 	  <None Include="wwwroot\HtmlFiles\Receipt.html" />
 	  <None Include="wwwroot\HtmlFiles\UyQuyen.html" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ContainerPort Include="8081" />
 	</ItemGroup>
 </Project>
 
