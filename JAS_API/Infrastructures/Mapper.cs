@@ -179,10 +179,20 @@ namespace Infrastructures
             CreateMap<Lot, CreateLotSecretAuctionDTO>().ReverseMap();
             CreateMap<Lot, CreateLotPublicAuctionDTO>().ReverseMap();
             CreateMap<Lot, CreateLotAuctionPriceGraduallyReducedDTO>().ReverseMap();
-            CreateMap<Lot, LotFixedPriceDTO>().ReverseMap();
-            CreateMap<Lot, LotSecretAuctionDTO>().ReverseMap();
-            CreateMap<Lot, LotPublicAuctionDTO>().ReverseMap();
-            CreateMap<Lot, LotAuctionPriceGraduallyReducedDTO>().ReverseMap();
+
+            CreateMap<Lot, LotFixedPriceDTO>()
+                .ForPath(dest => dest.CurrentPriceWinner, src => src.MapFrom(x => x.CurrentPrice))
+                .ReverseMap();
+            CreateMap<Lot, LotSecretAuctionDTO>()
+                .ForPath(dest => dest.CurrentPriceWinner, src => src.MapFrom(x => x.CurrentPrice))
+                .ReverseMap();
+            CreateMap<Lot, LotPublicAuctionDTO>()
+                .ForPath(dest => dest.CurrentPriceWinner, src => src.MapFrom(x => x.CurrentPrice))
+                .ReverseMap();
+            CreateMap<Lot, LotAuctionPriceGraduallyReducedDTO>()
+                .ForPath(dest => dest.CurrentPriceWinner, src => src.MapFrom(x => x.CurrentPrice))
+                .ReverseMap();
+
             CreateMap<Lot, LotDTO>()
                 .ForPath(x => x.ImageLinkJewelry, x => x.MapFrom(x => x.Jewelry.ImageJewelries.FirstOrDefault().ImageLink))
                 .ReverseMap();

@@ -36,6 +36,7 @@ namespace Application.ViewModels.LotDTOs
         public string? Status { get; set; }
         public float? Deposit { get; set; }
         public int? FloorFeePercent { get; set; }
+        public float? CurrentPriceWinner { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public DateTime? ActualEndTime { get; set; }

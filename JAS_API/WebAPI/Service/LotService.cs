@@ -284,6 +284,7 @@ namespace Application.Services
 
             return result;
         }
+
         internal async Task<object> CheckExitProperty(Lot lot)
         {
             object result = (status: true, msg: "Status is suiable");
@@ -465,7 +466,6 @@ namespace Application.Services
             return response;
         }
 
-
         public async Task<APIResponseModel> GetCustomerLotByLot(int lotId)
         {
             var reponse = new APIResponseModel();
@@ -495,6 +495,7 @@ namespace Application.Services
             }
             return reponse;
         }
+
         public async Task<APIResponseModel> CheckCustomerInLot(int customerId, int lotId)
         {
             var reponse = new APIResponseModel();
@@ -526,6 +527,7 @@ namespace Application.Services
             }
             return reponse;
         }
+
         public async Task<APIResponseModel> UpdateLotRange(int auctionId, string status)
         {
             var response = new APIResponseModel();
@@ -570,6 +572,7 @@ namespace Application.Services
         {
             throw new NotImplementedException();
         }
+
         private async Task AddBidPriceIfApplicable(string lotType, PlaceBidFixedPriceAndSercet model)
         {
             var bidPrice = new BidPrice
@@ -585,6 +588,7 @@ namespace Application.Services
                 await _unitOfWork.BidPriceRepository.AddAsync(bidPrice);
             }
         }
+
         private async Task<CustomerLot> checkCustomerRegisteredToLot(int customerId, int lotId)
         {
             var registered = await _unitOfWork.CustomerLotRepository.GetAllAsync(x => x.CustomerId == customerId && x.LotId == lotId);
@@ -594,6 +598,7 @@ namespace Application.Services
             }
             return null;
         }
+
         private async Task<bool> checkCustomerIntoBidPrice(int customerId, int lotId)
         {
             if (_unitOfWork.BidPriceRepository.GetAllAsync(x => x.CustomerId == customerId && x.LotId == lotId).Result.Any())
