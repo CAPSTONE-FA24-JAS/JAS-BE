@@ -23,7 +23,8 @@ namespace Application.ViewModels.JewelryDTOs
         public string? Status { get; set; }
         public DateTime? Time_Bidding { get; set; }
         public int? ValuationId { get; set; }
-        
+        public int? StaffId { get; set; }
+
         public IEnumerable<ImageJewelryDTO>? ImageJewelries { get; set; }
         
     }
