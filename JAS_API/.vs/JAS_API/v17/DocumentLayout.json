@@ -3,28 +3,20 @@
   "WorkspaceRootPath": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\seminer_9\\capstoneproject\\jas-be\\jas_api\\webapi\\controllers\\walletcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\controllers\\walletcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\seminer_9\\capstoneproject\\jas-be\\jas_api\\application\\services\\autobidservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\services\\autobidservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\seminer_9\\capstoneproject\\jas-be\\jas_api\\application\\services\\vnpayservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\services\\vnpayservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\seminer_9\\capstoneproject\\jas-be\\jas_api\\application\\services\\invoiceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\services\\invoiceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\seminer_9\\capstoneproject\\jas-be\\jas_api\\application\\services\\wallettransactionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\services\\wallettransactionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\seminer_9\\capstoneproject\\jas-be\\jas_api\\application\\interfaces\\iwalletservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\interfaces\\iwalletservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\seminer_9\\capstoneproject\\jas-be\\jas_api\\application\\services\\walletservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\services\\walletservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|d:\\seminer_9\\capstoneproject\\jas-be\\jas_api\\application\\viewmodels\\vnpaydtos\\vnpaydto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{985905D6-C55A-4936-989F-A7221294F5AE}|Application\\Application.csproj|solutionrelative:application\\viewmodels\\vnpaydtos\\vnpaydto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|d:\\seminer_9\\capstoneproject\\jas-be\\jas_api\\webapi\\controllers\\walletcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6CDEE83F-9530-4EF1-9746-9DBB56378B3B}|WebAPI\\WebAPI.csproj|solutionrelative:webapi\\controllers\\walletcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,73 +26,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 8,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "VNPayDTO.cs",
-              "DocumentMoniker": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\ViewModels\\VNPayDTOs\\VNPayDTO.cs",
-              "RelativeDocumentMoniker": "Application\\ViewModels\\VNPayDTOs\\VNPayDTO.cs",
-              "ToolTip": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\ViewModels\\VNPayDTOs\\VNPayDTO.cs",
-              "RelativeToolTip": "Application\\ViewModels\\VNPayDTOs\\VNPayDTO.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABAAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-22T07:33:29.25Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "WalletTransactionService.cs",
-              "DocumentMoniker": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\Services\\WalletTransactionService.cs",
-              "RelativeDocumentMoniker": "Application\\Services\\WalletTransactionService.cs",
-              "ToolTip": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\Services\\WalletTransactionService.cs",
-              "RelativeToolTip": "Application\\Services\\WalletTransactionService.cs",
-              "ViewState": "AgIAAEoAAAAAAAAAAAArwGEAAAA/AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-22T07:31:26.91Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "WalletController.cs",
-              "DocumentMoniker": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\WebAPI\\Controllers\\WalletController.cs",
-              "RelativeDocumentMoniker": "WebAPI\\Controllers\\WalletController.cs",
-              "ToolTip": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\WebAPI\\Controllers\\WalletController.cs",
-              "RelativeToolTip": "WebAPI\\Controllers\\WalletController.cs",
-              "ViewState": "AgIAAKAAAAAAAAAAAAAkwKsAAAAZAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-22T07:20:21.864Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "VNPayService.cs",
-              "DocumentMoniker": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\Services\\VNPayService.cs",
-              "RelativeDocumentMoniker": "Application\\Services\\VNPayService.cs",
-              "ToolTip": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\Services\\VNPayService.cs",
-              "RelativeToolTip": "Application\\Services\\VNPayService.cs",
-              "ViewState": "AgIAAFAAAAAAAAAAAAAgwGYAAAAoAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-22T07:15:51.822Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "InvoiceService.cs",
-              "DocumentMoniker": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\Services\\InvoiceService.cs",
-              "RelativeDocumentMoniker": "Application\\Services\\InvoiceService.cs",
-              "ToolTip": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\Services\\InvoiceService.cs",
-              "RelativeToolTip": "Application\\Services\\InvoiceService.cs",
-              "ViewState": "AgIAAGcCAAAAAAAAAAA0wKsCAABnAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-22T07:08:03.384Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
@@ -135,15 +62,53 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 0,
+              "Title": "AutoBidService.cs",
+              "DocumentMoniker": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\Services\\AutoBidService.cs",
+              "RelativeDocumentMoniker": "Application\\Services\\AutoBidService.cs",
+              "ToolTip": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\Services\\AutoBidService.cs",
+              "RelativeToolTip": "Application\\Services\\AutoBidService.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAkwBUAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-23T15:34:55.904Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "WalletService.cs",
               "DocumentMoniker": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\Services\\WalletService.cs",
               "RelativeDocumentMoniker": "Application\\Services\\WalletService.cs",
               "ToolTip": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\Services\\WalletService.cs",
               "RelativeToolTip": "Application\\Services\\WalletService.cs",
-              "ViewState": "AgIAALsBAAAAAAAAAAAwwMcBAABKAAAAAAAAAA==",
+              "ViewState": "AgIAAMkCAAAAAAAAAAAgwO4CAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-22T07:02:40.967Z",
+              "WhenOpened": "2024-11-23T09:12:43.657Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "WalletController.cs",
+              "DocumentMoniker": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\WebAPI\\Controllers\\WalletController.cs",
+              "RelativeDocumentMoniker": "WebAPI\\Controllers\\WalletController.cs",
+              "ToolTip": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\WebAPI\\Controllers\\WalletController.cs",
+              "RelativeToolTip": "WebAPI\\Controllers\\WalletController.cs",
+              "ViewState": "AgIAANwAAAAAAAAAAAAgwOUAAABQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-23T09:03:28.5Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IWalletService.cs",
+              "DocumentMoniker": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\Interfaces\\IWalletService.cs",
+              "RelativeDocumentMoniker": "Application\\Interfaces\\IWalletService.cs",
+              "ToolTip": "D:\\Seminer_9\\CapstoneProject\\JAS-BE\\JAS_API\\Application\\Interfaces\\IWalletService.cs",
+              "RelativeToolTip": "Application\\Interfaces\\IWalletService.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAzwBQAAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-23T08:14:50.15Z",
               "EditorCaption": ""
             }
           ]
