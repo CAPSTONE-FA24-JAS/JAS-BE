@@ -114,6 +114,7 @@ namespace Infrastructures
                 .ReverseMap();
             CreateMap<Jewelry, JewelryListDTO>()
                 .ForMember(dest => dest.ImageJewelries, opt => opt.MapFrom(src => src.ImageJewelries))
+                .ForPath(dest => dest.StaffId, src => src.MapFrom(src => src.Valuation.StaffId))
                 .ReverseMap();
             //CreateMap<CreateFinalValuationDTO, Jewelry>()
             //    .ForMember(dest => dest.ImageJewelries, opt => opt.Ignore())
