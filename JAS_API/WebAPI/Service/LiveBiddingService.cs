@@ -624,11 +624,28 @@ namespace WebAPI.Service
                 var _foorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();
                 var _customerLotService = scope.ServiceProvider.GetRequiredService<ICustomerLotService>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
-                //Xu ly luc tg ket thuc
                 var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow
                                                                             && x.LotType == EnumLotType.Fixed_Price.ToString()
                                                                             && x.Status.ToLower().Trim().Equals(EnumStatusLot.Auctioning.ToString().ToLower().Trim()));
+                var lotPauseEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow && x.LotType == EnumLotType.Fixed_Price.ToString() 
+                                                                                    && x.Status.ToLower().Trim().Equals(EnumStatusLot.Pause.ToString().ToLower().Trim()));
                 Invoice invoice;
+                // thuc hienn lot th pause
+                if (lotPauseEnds.Any())
+                {
+                    foreach (var lot in lotPauseEnds)
+                    {
+                        lot.Status = EnumStatusLot.Passed.ToString();
+                        var losers = lot.CustomerLots?.ToList();
+                        await SetLoser(losers);
+                        _cacheService.UpdateLotStatus(lot.Id, lot.Status);
+                        string lotGroupName = $"lot-{lot.Id}";
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforSercetBiddingAuto", "Phiên đã kết thúc!");
+                        lot.ActualEndTime = DateTime.UtcNow;
+                        await _unitOfWork.SaveChangeAsync();
+                    }
+                }
+                // truong hop lot auctioning
                 if (lotEnds.Count > 0)
                 {
                     foreach (var lot in lotEnds)
@@ -713,7 +730,24 @@ namespace WebAPI.Service
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 var _customerLotService = scope.ServiceProvider.GetRequiredService<ICustomerLotService>();
                 var lotEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow && x.LotType == EnumLotType.Secret_Auction.ToString() && x.Status.ToLower().Trim().Equals(EnumStatusLot.Auctioning.ToString().ToLower().Trim()));
+                var lotPauseEnds = await _unitOfWork.LotRepository.GetAllAsync(x => x.EndTime <= DateTime.UtcNow && x.LotType == EnumLotType.Secret_Auction.ToString() && x.Status.ToLower().Trim().Equals(EnumStatusLot.Pause.ToString().ToLower().Trim()));
                 Invoice invoice;
+                
+                if (lotPauseEnds.Any())
+                {
+                    foreach (var lot in lotPauseEnds)
+                    {
+                        lot.Status = EnumStatusLot.Passed.ToString();
+                        var losers = lot.CustomerLots?.ToList();
+                        await SetLoser(losers);
+                        _cacheService.UpdateLotStatus(lot.Id, lot.Status);
+                        string lotGroupName = $"lot-{lot.Id}";
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforSercetBiddingAuto", "Phiên đã kết thúc!");
+                        lot.ActualEndTime = DateTime.UtcNow;
+                        await _unitOfWork.SaveChangeAsync();
+                    }
+                }
+
                 if (lotEnds.Any())
                 {
                     foreach (var lot in lotEnds)
