@@ -145,11 +145,6 @@ namespace Application.Services
             return reponse;
         }
 
-        public Task<APIResponseModel> CheckWalletStatus(int walletId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<APIResponseModel> CreateWallet(CreateWalletDTO createWalletDTO)
         {
             var reponse = new APIResponseModel();
@@ -196,96 +191,7 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public async Task<APIResponseModel> RequestWithdraw(RequestWithdrawDTO requestWithdrawDTO)
-        {
-            var reponse = new APIResponseModel();
-            try
-            {
-                var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(requestWithdrawDTO.CustomerId);
-                if (customer == null || customer.CreditCard == null)
-                {
-                    reponse.IsSuccess = false;
-                    reponse.Code = 400;
-                    reponse.Message = "Customer Haven't Credit Card For Withdraw, Please Add New Credit Card";
-                    return reponse;
-                }
-                var walletExits = await CheckBalance(requestWithdrawDTO.WalletId);
-                if (walletExits.Data is WalletDTO cs && walletExits.IsSuccess)
-                {
-                    if ((float)(cs.AvailableBalance ?? 0) < requestWithdrawDTO.Amount)
-                    {
-                        reponse.IsSuccess = false;
-                        reponse.Code = 400;
-                        reponse.Message = "The amount exceeds the current balance.";
-                    }
-                    else
-                    {
-                        var request = _mapper.Map<RequestWithdraw>(requestWithdrawDTO);
-                        await _unitOfWork.RequestWithdrawRepository.AddAsync(request);
-                        await _unitOfWork.SaveChangeAsync();
-                        var trans = new WalletTransaction()
-                        {
-                            Amount = -requestWithdrawDTO.Amount,
-                            transactionType = EnumTransactionType.WithDrawWallet.ToString(),
-                            DocNo = request.Id,
-                            TransactionTime = DateTime.UtcNow,
-                            Status = EnumStatusTransaction.Pending.ToString(),
-                            WalletId = requestWithdrawDTO.WalletId,
-                            transactionPerson = requestWithdrawDTO.CustomerId
-                        };
-
-                        if (!await LockFundsForWithdrawal(requestWithdrawDTO.WalletId, (decimal)requestWithdrawDTO.Amount))
-                        {
-                            reponse.IsSuccess = false;
-                            reponse.Code = 400;
-                            reponse.Message = "Update ForWithdrawal Faild";
-                        }
-                        else
-                        {
-                            await _unitOfWork.WalletTransactionRepository.AddAsync(trans);
-
-                            if (await _unitOfWork.SaveChangeAsync() > 0)
-                            {
-                                trans.DocNo = request.Id;
-                                var resultTrans = await _walletTransactionService.CreateNewTransaction(trans);
-                                if (resultTrans.IsSuccess)
-                                {
-                                    reponse.Code = 200;
-                                    reponse.Message = "Add SuccessFull";
-                                    reponse.IsSuccess = true;
-                                }
-                                else
-                                {
-                                    reponse.Code = 500;
-                                    reponse.Message = "Error when saving Transaction";
-                                    reponse.IsSuccess = false;
-                                }
-                            }
-                            else
-                            {
-                                reponse.Code = 500;
-                                reponse.Message = "Error when saving Request Withdraw";
-                                reponse.IsSuccess = false;
-                            }
-
-                        }
-
-                    }
-                }
-                else
-                {
-                    reponse.Code = 404;
-                    reponse.Message = "Not Found Wallet";
-                    reponse.IsSuccess = false;
-                }
-            }
-            catch (Exception e)
-            {
-                reponse.IsSuccess = false;
-                reponse.ErrorMessages = new List<string> { e.Message };
-            }
-            return reponse;
-        }
+        
 
         public Task<APIResponseModel> TransactionHistory(int walletId)
         {
@@ -353,7 +259,7 @@ namespace Application.Services
             return reponse;
         }
 
-        public async Task<bool> LockFundsForWithdrawal(int walletId, decimal amountMoney)
+        public async Task<bool> LockFundsForWithdrawal(int walletId, decimal amountMoney, bool isCancel)
         {
             var walletexist = await _unitOfWork.WalletRepository.GetByIdAsync(walletId);
 
@@ -366,82 +272,26 @@ namespace Application.Services
             {
                 throw new Exception("Not enough available balance to lock.");
             }
-
-            walletexist.AvailableBalance -= amountMoney;
-            walletexist.FrozenBalance = (walletexist.FrozenBalance ?? 0) + amountMoney;
-            walletexist.Balance = walletexist.AvailableBalance + walletexist.FrozenBalance;
+            if (isCancel)
+            {
+                walletexist.AvailableBalance += amountMoney;
+                walletexist.FrozenBalance = (walletexist.FrozenBalance ?? 0) - amountMoney;
+                walletexist.Balance = walletexist.AvailableBalance + walletexist.FrozenBalance;
+            }
+            else
+            {
+                walletexist.AvailableBalance -= amountMoney;
+                walletexist.FrozenBalance = (walletexist.FrozenBalance ?? 0) + amountMoney;
+                walletexist.Balance = walletexist.AvailableBalance + walletexist.FrozenBalance;
+            }
             _unitOfWork.WalletRepository.Update(walletexist);
 
-            var result = await _unitOfWork.SaveChangeAsync();
-
-            if (result > 0)
+            if (await _unitOfWork.SaveChangeAsync() > 0)
             {
                 return true;
             }
 
             return false;
-        }
-
-        public async Task<APIResponseModel> ApproveRequestWithdraw(int requestId)
-        {
-            var reponse = new APIResponseModel();
-            try
-            {
-                var transExist = await _unitOfWork.WalletTransactionRepository.GetAllAsync(x => x.DocNo == requestId && x.Status == EnumStatusTransaction.Pending.ToString()
-                                                                                               && x.transactionType == EnumTransactionType.WithDrawWallet.ToString());
-                var thisTransExit = transExist.FirstOrDefault();
-                if (!transExist.Any())
-                {
-                    reponse.Code = 404;
-                    reponse.Message = "Not Found Trans Withdraw In System";
-                    reponse.IsSuccess = false;
-                }
-                else
-                {
-                    var requestexist = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(thisTransExit?.DocNo);
-                    if (requestexist != null)
-                    {
-                        var transOfCompany = new Transaction()
-                        {
-                            Amount = requestexist.Amount,
-                            DocNo = requestexist.Id,
-                            TransactionPerson = requestexist.Wallet.CustomerId,
-                            TransactionTime = DateTime.Now,
-                            TransactionType = EnumTransactionType.WithDrawWallet.ToString(),
-                        };
-
-                        requestexist.Wallet.FrozenBalance -= (decimal)requestexist.Amount;
-                        requestexist.Wallet.Balance -= (decimal)requestexist.Amount;
-                        thisTransExit.Status = EnumStatusTransaction.Completed.ToString();
-                        await _unitOfWork.TransactionRepository.AddAsync(transOfCompany);
-                        if (await _unitOfWork.SaveChangeAsync() > 0)
-                        {
-                            reponse.IsSuccess = true;
-                            reponse.Code = 200;
-                            reponse.Message = "Approve Successfuly";
-                        }
-                        else
-                        {
-                            reponse.Code = 400;
-                            reponse.Message = "Error when saving";
-                            reponse.IsSuccess = false;
-                        }
-                    }
-                    else
-                    {
-                        reponse.IsSuccess = false;
-                        reponse.Code = 400;
-                        reponse.Message = "Not Found Request In System";
-                    }
-                }
-
-            }
-            catch (Exception e)
-            {
-                reponse.IsSuccess = false;
-                reponse.ErrorMessages = new List<string> { e.Message };
-            }
-            return reponse;
         }
 
         public async Task<APIResponseModel> RefundToWalletForUsersAsync(List<CustomerLot> customerLot)
@@ -482,7 +332,7 @@ namespace Application.Services
                         Status = EnumCustomerLot.Refunded.ToString(),
                         CurrentTime = DateTime.UtcNow,
                     };
-                    
+
                     await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
                     await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
                     await _unitOfWork.WalletTransactionRepository.AddAsync(transactionWallet);
@@ -563,6 +413,356 @@ namespace Application.Services
                     reponse.Message = "Received Successfuly";
                     reponse.Data = _mapper.Map<IEnumerable<ViewRequestWithdrawDTO>>(requests);
                 }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+
+
+        // Withdraw
+        public async Task<APIResponseModel> RequestWithdraw(RequestWithdrawDTO requestWithdrawDTO)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(requestWithdrawDTO.CustomerId);
+                if (customer == null || customer.CreditCard == null)
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Code = 400;
+                    reponse.Message = "Customer Haven't Credit Card For Withdraw, Please Add New Credit Card";
+                    return reponse;
+                }
+                var walletExits = await CheckBalance(requestWithdrawDTO.WalletId);
+                if (walletExits.Data is WalletDTO cs && walletExits.IsSuccess)
+                {
+                    if ((float)(cs.AvailableBalance ?? 0) < requestWithdrawDTO.Amount)
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Code = 400;
+                        reponse.Message = "The amount exceeds the current balance.";
+                    }
+                    else
+                    {
+                        var request = _mapper.Map<RequestWithdraw>(requestWithdrawDTO);
+                        request.Status = EnumStatusRequestWithdraw.Requested.ToString();
+                        await _unitOfWork.RequestWithdrawRepository.AddAsync(request);
+                        await _unitOfWork.SaveChangeAsync();
+                        var trans = new WalletTransaction()
+                        {
+                            Amount = -requestWithdrawDTO.Amount,
+                            transactionType = EnumTransactionType.WithDrawWallet.ToString(),
+                            DocNo = request.Id,
+                            TransactionTime = DateTime.UtcNow,
+                            Status = EnumStatusTransaction.Pending.ToString(),
+                            WalletId = requestWithdrawDTO.WalletId,
+                            transactionPerson = requestWithdrawDTO.CustomerId
+                        };
+
+                        if (!await LockFundsForWithdrawal(requestWithdrawDTO.WalletId, (decimal)requestWithdrawDTO.Amount,false))
+                        {
+                            reponse.IsSuccess = false;
+                            reponse.Code = 400;
+                            reponse.Message = "Update ForWithdrawal Faild";
+                        }
+                        else
+                        {
+                            await _unitOfWork.WalletTransactionRepository.AddAsync(trans);
+
+                            if (await _unitOfWork.SaveChangeAsync() > 0)
+                            {
+                                trans.DocNo = request.Id;
+                                var resultTrans = await _walletTransactionService.CreateNewTransaction(trans);
+                                if (resultTrans.IsSuccess)
+                                {
+                                    reponse.Code = 200;
+                                    reponse.Message = "Add SuccessFull";
+                                    reponse.IsSuccess = true;
+                                }
+                                else
+                                {
+                                    reponse.Code = 500;
+                                    reponse.Message = "Error when saving Transaction";
+                                    reponse.IsSuccess = false;
+                                }
+                            }
+                            else
+                            {
+                                reponse.Code = 500;
+                                reponse.Message = "Error when saving Request Withdraw";
+                                reponse.IsSuccess = false;
+                            }
+
+                        }
+
+                    }
+                }
+                else
+                {
+                    reponse.Code = 404;
+                    reponse.Message = "Not Found Wallet";
+                    reponse.IsSuccess = false;
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> CancelRequestWithdrawByCustomer(int customerId, int requestId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var requestExist = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(requestId);
+
+                if (requestExist != null)
+                {
+                    if(requestExist.Status == EnumStatusRequestWithdraw.Requested.ToString() || requestExist.Status == EnumStatusRequestWithdraw.InProgress.ToString())
+                    {
+                        
+                        if (!await LockFundsForWithdrawal((int)requestExist.WalletId, (decimal)requestExist.Amount, true))
+                        {
+                            reponse.IsSuccess = false;
+                            reponse.Code = 400;
+                            reponse.Message = "Faild When Update Money In Wallet";
+                            return reponse;
+                        }
+                        else
+                        {
+                            requestExist.Status = EnumStatusRequestWithdraw.Canceled.ToString();
+
+                            if (await _unitOfWork.SaveChangeAsync() > 0)
+                            {
+                                reponse.Code = 200;
+                                reponse.Message = "Cancel Successfull";
+                                reponse.IsSuccess = true;
+                                return reponse;
+                            }
+                            else
+                            {
+                                reponse.Code = 400;
+                                reponse.Message = "Cancel Faild When Saving";
+                                reponse.IsSuccess = false;
+                                return reponse;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        reponse.Code = 400;
+                        reponse.Message = "CurrentTime don't cancel because request not in range allow for canncel.";
+                        reponse.IsSuccess = false;
+                        return reponse;
+                    }
+                }
+                else if (requestExist?.Wallet?.CustomerId != customerId)
+                {
+                    reponse.Code = 400;
+                    reponse.Message = "Customer not allow customiz this request withdraw.";
+                    reponse.IsSuccess = false;
+                    return reponse;
+                }
+                else
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Code = 400;
+                    reponse.Message = "Not found request withdraw";
+                    return reponse;
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> ProgressRequestWithdraw(int requestId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var requestExist = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(requestId);
+
+                if (requestExist != null)
+                {
+                    if (requestExist.Status == EnumStatusRequestWithdraw.Requested.ToString())
+                    {
+                        requestExist.Status = EnumStatusRequestWithdraw.InProgress.ToString();
+                        
+                        if (await _unitOfWork.SaveChangeAsync() > 0)
+                        {
+                            reponse.Code = 200;
+                            reponse.Message = "progress Successfull";
+                            reponse.IsSuccess = true;
+                            return reponse;
+                        }
+                        else
+                        {
+                            reponse.Code = 400;
+                            reponse.Message = "Progress Faild When Saving";
+                            reponse.IsSuccess = false;
+                            return reponse;
+                        }
+                    }
+                    else
+                    {
+                        reponse.Code = 400;
+                        reponse.Message = "CurrentTime don't in progress because request not in range allow for in progress.";
+                        reponse.IsSuccess = false;
+                        return reponse;
+                    }
+                }
+                else
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Code = 400;
+                    reponse.Message = "Not found request withdraw";
+                    return reponse;
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+
+        public async Task<APIResponseModel> RejectRequestWithdrawByStaff(int requestId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var requestExist = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(requestId);
+
+                if (requestExist != null)
+                {
+                    if (requestExist.Status == EnumStatusRequestWithdraw.Requested.ToString() || requestExist.Status == EnumStatusRequestWithdraw.InProgress.ToString())
+                    {
+                        
+                        if (!await LockFundsForWithdrawal((int)requestExist.WalletId, (decimal)requestExist.Amount, true))
+                        {
+                            reponse.IsSuccess = false;
+                            reponse.Code = 400;
+                            reponse.Message = "Faild When Update Money In Wallet";
+                            return reponse;
+                        }
+                        else
+                        {
+                            requestExist.Status = EnumStatusRequestWithdraw.Canceled.ToString();
+                            if (await _unitOfWork.SaveChangeAsync() > 0)
+                            {
+                                reponse.Code = 200;
+                                reponse.Message = "Cancel Successfull";
+                                reponse.IsSuccess = true;
+                                return reponse;
+                            }
+                            else
+                            {
+                                reponse.Code = 400;
+                                reponse.Message = "Cancel Faild When Saving";
+                                reponse.IsSuccess = false;
+                                return reponse;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        reponse.Code = 400;
+                        reponse.Message = "CurrentTime don't cancel because request not in range allow for canncel.";
+                        reponse.IsSuccess = false;
+                        return reponse;
+                    }
+                }
+                else
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Code = 400;
+                    reponse.Message = "Not found request withdraw";
+                    return reponse;
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
+        public async Task<APIResponseModel> ApproveRequestWithdraw(int requestId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var transExist = await _unitOfWork.WalletTransactionRepository.GetAllAsync(x => x.DocNo == requestId && x.Status == EnumStatusTransaction.Pending.ToString()
+                                                                                               && x.transactionType == EnumTransactionType.WithDrawWallet.ToString());
+                var thisTransExit = transExist.FirstOrDefault();
+                if (!transExist.Any())
+                {
+                    reponse.Code = 404;
+                    reponse.Message = "Not Found Trans Withdraw In System";
+                    reponse.IsSuccess = false;
+                }
+                else
+                {
+                    var requestexist = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(thisTransExit?.DocNo);
+                    if (requestexist != null)
+                    {
+                        if(requestexist.Status == EnumStatusRequestWithdraw.InProgress.ToString())
+                        {
+                            var transOfCompany = new Transaction()
+                            {
+                                Amount = requestexist.Amount,
+                                DocNo = requestexist.Id,
+                                TransactionPerson = requestexist.Wallet.CustomerId,
+                                TransactionTime = DateTime.Now,
+                                TransactionType = EnumTransactionType.WithDrawWallet.ToString(),
+                            };
+
+                            requestexist.Wallet.FrozenBalance -= (decimal)requestexist.Amount;
+                            requestexist.Wallet.Balance = requestexist.Wallet.AvailableBalance + requestexist.Wallet.FrozenBalance;
+                            requestexist.Status = EnumStatusRequestWithdraw.Transfered.ToString();
+                            thisTransExit.Status = EnumStatusTransaction.Completed.ToString();
+                            await _unitOfWork.TransactionRepository.AddAsync(transOfCompany);
+                            if (await _unitOfWork.SaveChangeAsync() > 0)
+                            {
+                                reponse.IsSuccess = true;
+                                reponse.Code = 200;
+                                reponse.Message = "Approve Successfuly";
+                            }
+                            else
+                            {
+                                reponse.Code = 400;
+                                reponse.Message = "Error when saving";
+                                reponse.IsSuccess = false;
+                            }
+                        }
+                        else
+                        {
+                            reponse.Code = 400;
+                            reponse.Message = "This Status of request not allow approve";
+                            reponse.IsSuccess = false;
+                        }
+                        
+                    }
+                    else
+                    {
+                        reponse.IsSuccess = false;
+                        reponse.Code = 400;
+                        reponse.Message = "Not Found Request In System";
+                    }
+                }
+
             }
             catch (Exception e)
             {

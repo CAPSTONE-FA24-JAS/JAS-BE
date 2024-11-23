@@ -10,6 +10,7 @@ namespace Domain.Entity
     {
         public float? Amount { get; set; }
         public int? WalletId { get; set; }
+        public string? Status { get; set; }
         //
         public virtual Wallet? Wallet { get; set; }
         //public  WalletTransaction? RequestOfWalletTransaction { get; set; }
