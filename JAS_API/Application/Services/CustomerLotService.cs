@@ -228,15 +228,15 @@ namespace Application.Services
                 var highestBid = topBidders.FirstOrDefault();
 
                 var autobidCurrent = autoBid;
-                if (highestBid == null || priceFuture >= autobidCurrent.MinPrice && priceFuture <= autobidCurrent.MaxPrice)
+                if (priceFuture >= autobidCurrent.MinPrice && priceFuture <= autobidCurrent.MaxPrice)
                 {
-                    if (highestBid == null || highestBid.CurrentPrice < priceFuture)
+                    if (highestBid?.CurrentPrice < priceFuture)
                     {
                         return (true, priceFuture); // lấy giá future
                     }
                     else
                     {
-                        float? priceCurrentPlusStep = highestBid.CurrentPrice; // Giá hiện tại
+                        float? priceCurrentPlusStep = highestBid?.CurrentPrice; // Giá hiện tại
                         return (false, priceCurrentPlusStep);
                     }
                 }
