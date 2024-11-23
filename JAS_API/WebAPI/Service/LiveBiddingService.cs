@@ -1,4 +1,4 @@
-﻿
+
 using Application;
 using Application.Interfaces;
 using Application.ViewModels.CustomerLotDTOs;
@@ -881,7 +881,8 @@ namespace WebAPI.Service
                             //tìm ra autobid phù hợp với autobid có tg thực hiện giữa mỗi lần auto
                             if (autobidAvaiable != null)
                             {
-                                var bidPriceFuture = currentPriceOfPlayer?.CurrentPrice ?? player.Lot.StartPrice + (player.Lot.BidIncrement * autobidAvaiable.NumberOfPriceStep);
+                                // th chưa ai đặt 
+                                var bidPriceFuture = highestBidOfLot + (player.Lot.BidIncrement * autobidAvaiable.NumberOfPriceStep);
                                 //nếu giá đấu tương lai lớn hơn giá bán cuối của lot thì ko làm gì cả
                                 if (bidPriceFuture > player.Lot.FinalPriceSold)
                                 {
