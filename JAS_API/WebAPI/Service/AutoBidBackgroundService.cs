@@ -100,11 +100,12 @@ namespace WebAPI.Service
                             if (autobidAvaiable != null)
                             {
                                 //check time step next
+                                TimeSpan availableTime = TimeSpan.FromMinutes(autobidAvaiable.TimeIncrement.Value);
+
                                 TimeSpan distanceTime = (currentPriceOfPlayer != null)
                                                         ? (DateTime.UtcNow - currentPriceOfPlayer.BidTime.Value)
-                                                        : TimeSpan.FromSeconds(2);
-                                TimeSpan availableTime = TimeSpan.FromMinutes(autobidAvaiable.TimeIncrement.Value);
-                                if (distanceTime.TotalSeconds > 1)
+                                                        : availableTime + TimeSpan.FromSeconds(1);
+                                if (distanceTime.TotalSeconds > availableTime.TotalSeconds)
                                 {
                                     // TH chưa ai đặt 
                                     var bidPriceFuture = highestBidOfLot + (player.Lot.BidIncrement * autobidAvaiable.NumberOfPriceStep);
