@@ -35,6 +35,10 @@ namespace WebAPI
             services.AddFluentValidationAutoValidation();
             services.AddFluentValidationClientsideAdapters();
             services.AddHostedService<AutoBidBackgroundService>();
+            services.Configure<HostOptions>(options =>
+            {
+                options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
+            });
 
             services.AddMemoryCache();
             return services;
