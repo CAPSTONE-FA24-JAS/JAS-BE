@@ -525,7 +525,7 @@ namespace Application.Services
 
                 if (requestExist != null)
                 {
-                    if(requestExist.Status == EnumStatusRequestWithdraw.Requested.ToString() || requestExist.Status == EnumStatusRequestWithdraw.InProgress.ToString())
+                    if(requestExist.Status == EnumStatusRequestWithdraw.Requested.ToString())
                     {
                         
                         if (!await LockFundsForWithdrawal((int)requestExist.WalletId, (decimal)requestExist.Amount, true))
