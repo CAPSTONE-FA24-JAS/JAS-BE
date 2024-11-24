@@ -41,6 +41,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> GetEnumShapes();
         Task<APIResponseModel> GetEnumClarities();
         Task<APIResponseModel> GetEnumCuts();
+        Task<APIResponseModel> getJewelryByIdAsync(int id);
 
     }
 }

@@ -1421,5 +1421,39 @@ namespace Application.Services
             }
             return response;
         }
+
+        public async Task<APIResponseModel> getJewelryByIdAsync(int id)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var jewelryById = await _unitOfWork.JewelryRepository.GetByIdAsync(id, includes: new Expression<Func<Jewelry,
+                                                                                           object>>[] { x => x.ImageJewelries
+                                                                                                         });
+                if (jewelryById != null)
+                {
+                    var jewelry = _mapper.Map<JewelryDTO>(jewelryById);
+                    response.Message = $"Found jewelry Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = jewelry;
+                }
+                else
+                {
+                    response.Message = $"Not found jewelry";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
     }
 }

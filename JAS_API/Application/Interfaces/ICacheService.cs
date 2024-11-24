@@ -53,5 +53,6 @@ namespace Application.Interfaces
         public BidPrice AddToStream(int lotId, BiddingInputDTO request, int customerId);
 
         (bool result, BidPrice? bidPrice, float? highestBid) PlaceBidWithLuaScript(int lotId);
+        Task SubscribeToChannelAsync(string channel, Action<string> messageHandler);
     }
 }

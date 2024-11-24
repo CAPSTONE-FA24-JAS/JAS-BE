@@ -21,6 +21,7 @@ namespace Application.Services
     public class CacheService : ICacheService
     {
         private readonly IDatabase _cacheDb;
+        private readonly ISubscriber _subscriber;
 
         public CacheService(IConnectionMultiplexer connectionMultiplexer)
         {
@@ -28,6 +29,7 @@ namespace Application.Services
             {
                 
                 _cacheDb = connectionMultiplexer.GetDatabase();
+                _subscriber = connectionMultiplexer.GetSubscriber();
             }
             catch (Exception ex)
             {
@@ -386,6 +388,7 @@ namespace Application.Services
             string script = @"
 local stream_key = KEYS[1]
 local sorted_set_key = KEYS[2]
+local last_processed_id_key = KEYS[3]
 
 -- Lấy giá đấu đầu tiên từ Stream
 local entries = redis.call('XREAD', 'COUNT', 1, 'STREAMS', stream_key, '0')
@@ -511,6 +514,7 @@ end
         public BidPrice AddToStream(int lotId, BiddingInputDTO request, int customerId)
         {
             var streamKey = $"BidStream:{lotId}";
+            var pubsubChannel = $"channel-{lotId}";
             var timestamp = new DateTimeOffset(request.BidTime).ToUnixTimeSeconds();
             var bidPrice = new BidPrice
             {
@@ -525,10 +529,22 @@ end
             {
              new NameValueEntry("BidPrice", serializedBidPrice)  // Store the serialized BidPrice object
             });
+
+            // Gửi tín hiệu Pub/Sub để thông báo
+            var subscriber = _subscriber;
+            subscriber.PublishAsync(pubsubChannel, "Newbid");
             return bidPrice;
         }
 
+        //dki de nhan thong bao qua redis pub/sub
+        public async Task SubscribeToChannelAsync(string channel, Action<string> messageHandler)
+        {
+            var subscriber = _subscriber;
+            await subscriber.SubscribeAsync(channel, (channel, message) =>
+            {
+                messageHandler(message);
+            });
+        }
 
-       
     }
 }
