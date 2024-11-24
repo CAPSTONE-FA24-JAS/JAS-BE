@@ -34,7 +34,7 @@ namespace WebAPI
             services.AddHttpContextAccessor();
             services.AddFluentValidationAutoValidation();
             services.AddFluentValidationClientsideAdapters();
-
+            services.AddHostedService<AutoBidBackgroundService>();
 
             services.AddMemoryCache();
             return services;
