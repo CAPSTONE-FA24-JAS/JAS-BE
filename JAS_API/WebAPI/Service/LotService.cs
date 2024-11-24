@@ -789,6 +789,7 @@ namespace Application.Services
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinnerPublic", "Phiên đã kết thúc!", placeBidBuyNowDTO.CustomerId, playerJoined.Lot.BuyNowPrice);
 
                     lot.Status = EnumStatusLot.Sold.ToString();
+                    lot.CurrentPrice = lot.FinalPriceSold;
                     _cacheService.UpdateLotStatus((int)placeBidBuyNowDTO.LotId, EnumStatusLot.Sold.ToString());
                     var winnerInLot = lot.CustomerLots.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId
                                              && x.LotId == placeBidBuyNowDTO.LotId);
@@ -840,13 +841,14 @@ namespace Application.Services
                     await _unitOfWork.InvoiceRepository.AddAsync(invoice);
                     var notification = new ViewNotificationDTO
                     {
-                        Title = $"Đấu giá thắng Lot {placeBidBuyNowDTO.LotId}",
-                        Description = $" Bạn đã win lot {placeBidBuyNowDTO.LotId} và hệ thống đã tự động tao invoice cho bạn",
+                        Title = $"Bidding win in Lot {placeBidBuyNowDTO.LotId}",
+                        Description = $" You won in lot {placeBidBuyNowDTO.LotId} and system auto created invoice for you.",
                         Is_Read = false,
                         NotifiableId = invoice.Id,
                         AccountId = winnerInLot.Customer.AccountId,
                         CreationDate = DateTime.UtcNow,
-                        Notifi_Type = "CustomerLot",
+                        Notifi_Type = "CreateInvoice",
+                    ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
                     };
                     var notificationEntity = _mapper.Map<Domain.Entity.Notification>(notification);
                     await _unitOfWork.NotificationRepository.AddAsync(notificationEntity);

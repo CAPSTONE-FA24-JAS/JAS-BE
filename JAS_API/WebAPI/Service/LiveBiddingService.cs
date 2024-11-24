@@ -6,6 +6,7 @@ using Domain.Entity;
 using Domain.Enums;
 using iTextSharp.text.pdf.parser.clipper;
 using Microsoft.AspNetCore.SignalR;
+using System.Reflection;
 using WebAPI.Middlewares;
 
 namespace WebAPI.Service
@@ -31,8 +32,9 @@ namespace WebAPI.Service
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 var lotLiveBidding = await _unitOfWork.LotRepository.GetAllAsync(x => x.LotType == EnumLotType.Public_Auction.ToString() && (x.Status == EnumStatusLot.Auctioning.ToString() ||
                                                                                            x.Status == EnumStatusLot.Pause.ToString()));
-                foreach (var lot in lotLiveBidding)
+                foreach (var lotsql in lotLiveBidding)
                 {
+                    var lot = _cacheService.GetLotById(lotsql.Id);
                     var endTime = lot.EndTime;
                     if (endTime.HasValue && DateTime.UtcNow > endTime.Value)
                     {
@@ -157,11 +159,8 @@ namespace WebAPI.Service
                 {
                     if (bidPrices.Count == 0)
                     {
-                        //cap nhat trang thai lot sold
-                        lot.ActualEndTime = lot.EndTime;
-                        lot.CurrentPrice = lot.CurrentPrice;
-                        lot.Status = EnumStatusLot.Passed.ToString();
-                        _cacheService.UpdateLotStatus(lotId, lot.Status);
+                        _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Passed.ToString());
+                        
 
                         lotsql.ActualEndTime = lot.EndTime;
                         lotsql.CurrentPrice = lot.CurrentPrice;
@@ -189,6 +188,7 @@ namespace WebAPI.Service
 
 
                             lotsql.CurrentPrice = winnerBid.CurrentPrice;
+                            lotsql.FinalPriceSold = winnerBid.CurrentPrice;
                             lotsql.ActualEndTime = lot.ActualEndTime;
                             lotsql.Status = EnumStatusLot.Sold.ToString();
                             _unitOfWork.LotRepository.Update(lotsql);
@@ -260,14 +260,14 @@ namespace WebAPI.Service
                             var winnerBid = bidPrices[winnerIndex];
 
                             //cap nhat trang thai lot sold
-                            lot.CurrentPrice = winnerBid.CurrentPrice;
-                            lot.ActualEndTime = DateTime.UtcNow;
-                            lot.Status = EnumStatusLot.Sold.ToString();
+                            _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, winnerBid.CurrentPrice);
                             _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Sold.ToString());
+                            _cacheService.UpdateLotActualEndTime(lotId, DateTime.UtcNow);
                             lot = _cacheService.GetLotById(lotId);
                             var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
 
                             lotsql.CurrentPrice = winnerBid.CurrentPrice;
+                            lotsql.FinalPriceSold = winnerBid.CurrentPrice;
                             lotsql.ActualEndTime = DateTime.UtcNow;
                             lotsql.Status = EnumStatusLot.Sold.ToString();
                             _unitOfWork.LotRepository.Update(lotsql);
@@ -536,10 +536,11 @@ namespace WebAPI.Service
                             //  cập nhật lên cả redis và sql; cập nhật endLot actual, giá bán được
 
                             await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionPublicEnded", "Phiên đã kết thúc!");
-                            var winner = bidPrices.FirstOrDefault();
+                            var winner = bidPrices.Where(x => x.Status == "Success").FirstOrDefault();
                             lot.Status = EnumStatusLot.Sold.ToString();
                             lot.ActualEndTime = endTime;
                             lot.CurrentPrice = winner.CurrentPrice;
+                            lot.FinalPriceSold = winner.CurrentPrice;
                             _unitOfWork.LotRepository.Update(lot);
                             _cacheService.UpdateLotStatus(lotId, lot.Status);
                             _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, winner.CurrentPrice);
