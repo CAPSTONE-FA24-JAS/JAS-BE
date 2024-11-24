@@ -14,19 +14,38 @@ namespace WebAPI.Service
         private readonly IServiceProvider _serviceProvider;
         private readonly IHubContext<BiddingHub> _hubContext;
         private readonly IHubContext<NotificationHub> _notificationHub;
+        private readonly ILogger<AutoBidBackgroundService> _logger;
 
-        public AutoBidBackgroundService(IServiceProvider serviceProvider, IHubContext<BiddingHub> hubContext, IHubContext<NotificationHub> notificationHub)
+        public AutoBidBackgroundService(IServiceProvider serviceProvider, IHubContext<BiddingHub> hubContext, IHubContext<NotificationHub> notificationHub, ILogger<AutoBidBackgroundService> logger)
         {
             _serviceProvider = serviceProvider;
             _hubContext = hubContext;
             _notificationHub = notificationHub;
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            try
+            //try
+            //{
+            //    while (!stoppingToken.IsCancellationRequested)
+            //    {
+            //        using (var scope = _serviceProvider.CreateScope())
+            //        {
+            //            await AutoBidAsync();
+            //        }
+            //        await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError(ex, "Error occurred in AutoBidBackgroundService");
+            //    // Consider if you want to continue or throw
+            //    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken); // Delay before retry
+            //}
+            while (!stoppingToken.IsCancellationRequested)
             {
-                while (!stoppingToken.IsCancellationRequested)
+                try
                 {
                     using (var scope = _serviceProvider.CreateScope())
                     {
@@ -34,10 +53,12 @@ namespace WebAPI.Service
                     }
                     await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
                 }
-            }
-            catch (Exception ex)
-            {
-                throw ex.InnerException;
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error occurred in AutoBidBackgroundService");
+                    // Consider if you want to continue or throw
+                    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken); // Delay before retry
+                }
             }
         }
         public async Task AutoBidAsync()
