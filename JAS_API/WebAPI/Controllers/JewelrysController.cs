@@ -193,5 +193,12 @@ namespace WebAPI.Controllers
             var result = await _jewelryService.GetEnumClarities();
             return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult>GetDetailJewelryAsync(int jewelryId)
+        {
+            var result = await _jewelryService.getJewelryByIdAsync(jewelryId);
+            return (result.IsSuccess) ? Ok(result) : BadRequest(result);
+        }
     }
 }

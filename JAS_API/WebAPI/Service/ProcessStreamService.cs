@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using WebAPI.Middlewares;
 using Domain.Entity;
+using Application.Services;
 
 namespace WebAPI.Service
 {
@@ -61,13 +62,23 @@ namespace WebAPI.Service
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string lotGroupName = $"lot-{lot.Id}";
+                var pubsubChannel = $"channel-{lot.Id}";
+                var dataAvailable = new TaskCompletionSource<bool>();
+
+                await _cacheService.SubscribeToChannelAsync(pubsubChannel, message =>
+                {
+                    if (message == "Newbid")
+                    {
+                        dataAvailable.TrySetResult(true); // Signal that data is available
+                    }
+                });
                 try
                 {
                     while (true)
                     {
 
-                        lot.Status = _cacheService.GetLotById(lot.Id).Status;
-                        if (lot.Status == EnumStatusLot.Passed.ToString() || lot.Status == EnumStatusLot.Sold.ToString())
+                        
+                        if (await IsLotFinishedAsync(lot))
                         {
                             _logger.LogInformation($"Lot {lot.Id} đã kết thúc.");
                             break;
@@ -78,9 +89,10 @@ namespace WebAPI.Service
 
                         if (result.result == false)
                         {
-                          //  _logger.LogInformation($"Không còn giá nào trong Stream cho Lot {lot.Id}");
+                            //  _logger.LogInformation($"Không còn giá nào trong Stream cho Lot {lot.Id}");
                             // Đợi 100ms trước khi kiểm tra lại
-                            await Task.Delay(100);
+                            dataAvailable = new TaskCompletionSource<bool>();  // Reset the signal
+                            await dataAvailable.Task;
                             continue;
                         }
                         var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(result.bidPrice.CustomerId);
@@ -103,6 +115,22 @@ namespace WebAPI.Service
                     Console.WriteLine($"Error deserializing resultJson: {ex.Message}");
                 }
 
+            }
+        }
+
+
+        private async Task<bool> IsLotFinishedAsync(Lot lot)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+                
+                var lotById = await _unitOfWork.LotRepository.GetByIdAsync(lot.Id);
+
+                return lotById.Status == EnumStatusLot.Passed.ToString() ||
+                       lotById.Status == EnumStatusLot.Sold.ToString() ||
+                       lotById.Status == EnumStatusLot.Canceled.ToString();
             }
         }
     }
