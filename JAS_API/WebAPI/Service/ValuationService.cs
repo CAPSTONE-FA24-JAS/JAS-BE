@@ -551,7 +551,7 @@ namespace Application.Services
                         NotifiableId = id,  //valuationId
                         AccountId = valuationById.Seller.AccountId,
                         CreationDate = DateTime.UtcNow,
-                        Notifi_Type = "Preliminary",
+                        Notifi_Type = "Rejected",
                         StatusOfValuation = "9",
                         ImageLink = valuationById.ImageValuations.FirstOrDefault().ImageLink
                     };
