@@ -167,7 +167,7 @@ namespace WebAPI.Service
                         lotsql.Status = EnumStatusLot.Passed.ToString();
                         _unitOfWork.LotRepository.Update(lotsql);
                         await _unitOfWork.SaveChangeAsync();
-
+                        await HandleLoserLot(lotId);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinnerReduce", "Phiên đã kết thúc va khong co dau gia");
 
                     }
@@ -188,7 +188,7 @@ namespace WebAPI.Service
 
 
                             lotsql.CurrentPrice = winnerBid.CurrentPrice;
-                            lotsql.FinalPriceSold = winnerBid.CurrentPrice;
+                            
                             lotsql.ActualEndTime = lot.ActualEndTime;
                             lotsql.Status = EnumStatusLot.Sold.ToString();
                             _unitOfWork.LotRepository.Update(lotsql);
@@ -267,7 +267,7 @@ namespace WebAPI.Service
                             var lotsql = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
 
                             lotsql.CurrentPrice = winnerBid.CurrentPrice;
-                            lotsql.FinalPriceSold = winnerBid.CurrentPrice;
+                           
                             lotsql.ActualEndTime = DateTime.UtcNow;
                             lotsql.Status = EnumStatusLot.Sold.ToString();
                             _unitOfWork.LotRepository.Update(lotsql);
@@ -540,7 +540,7 @@ namespace WebAPI.Service
                             lot.Status = EnumStatusLot.Sold.ToString();
                             lot.ActualEndTime = endTime;
                             lot.CurrentPrice = winner.CurrentPrice;
-                            lot.FinalPriceSold = winner.CurrentPrice;
+                            
                             _unitOfWork.LotRepository.Update(lot);
                             _cacheService.UpdateLotStatus(lotId, lot.Status);
                             _cacheService.UpdateLotCurrentPriceForReduceBidding(lotId, winner.CurrentPrice);

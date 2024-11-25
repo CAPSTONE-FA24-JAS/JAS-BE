@@ -364,7 +364,7 @@ namespace Application.Services
                             var walletOfSeller = await _unitOfWork.WalletRepository.GetByCustomerId(sellerId);
 
 
-                            walletOfSeller.AvailableBalance += (decimal?)invoiceById?.CustomerLot?.Lot.FinalPriceSold ?? 0;
+                            walletOfSeller.AvailableBalance += (decimal?)invoiceById?.CustomerLot?.Lot.CurrentPrice ?? 0;
                             walletOfSeller.Balance = walletOfSeller.AvailableBalance ?? 0 + walletOfSeller.FrozenBalance ?? 0;
                             _unitOfWork.WalletRepository.Update(walletOfSeller);
 
