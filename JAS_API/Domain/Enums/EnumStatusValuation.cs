@@ -17,6 +17,6 @@ namespace Domain.Enums
         FinalValuated = 6,
         ManagerApproved = 7,
         Authorized = 8,
-        RejectedPreliminary = 9
+        Rejected = 9   
     }
 }

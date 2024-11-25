@@ -218,25 +218,24 @@ namespace Application.Services
             return response;
         }
         
-        public async Task<(bool, float?)> CheckBidPriceTop(float priceFuture, AutoBid autoBid)
+        public async Task<(bool, float?)> CheckBidPriceTop(float priceFuture,float highestBidOfLot, AutoBid autoBid)
         {
             try
             {
-                string redisKey = $"BidPrice:{autoBid.CustomerLot.LotId}";
-                //lay ra highest bidPrice
-                var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == autoBid.CustomerLot.LotId);
-                var highestBid = topBidders.FirstOrDefault();
-
+                //string redisKey = $"BidPrice:{autoBid.CustomerLot.LotId}";
+                ////lay ra highest bidPrice
+                //var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == autoBid.CustomerLot.LotId);
+                //var highestBid = topBidders.FirstOrDefault();
                 var autobidCurrent = autoBid;
                 if (priceFuture >= autobidCurrent.MinPrice && priceFuture <= autobidCurrent.MaxPrice)
                 {
-                    if (highestBid?.CurrentPrice < priceFuture)
+                    if (highestBidOfLot < priceFuture)
                     {
                         return (true, priceFuture); // lấy giá future
                     }
                     else
                     {
-                        float? priceCurrentPlusStep = highestBid?.CurrentPrice; // Giá hiện tại
+                        float? priceCurrentPlusStep = highestBidOfLot; // Giá hiện tại
                         return (false, priceCurrentPlusStep);
                     }
                 }

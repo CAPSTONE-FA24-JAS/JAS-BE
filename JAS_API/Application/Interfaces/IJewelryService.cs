@@ -42,6 +42,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> GetEnumClarities();
         Task<APIResponseModel> GetEnumCuts();
         Task<APIResponseModel> getJewelryByIdAsync(int id);
+        Task<APIResponseModel> RejectByManagerAsync(int jewelryId, int status);
 
     }
 }

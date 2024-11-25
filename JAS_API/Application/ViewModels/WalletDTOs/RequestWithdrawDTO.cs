@@ -18,6 +18,7 @@ namespace Application.ViewModels.WalletDTOs
         public int Id { get; set; }
         public int CustomerId { get; set; }
         public int WalletId { get; set; }
+        public string Status { get; set; }
         public float Amount { get; set; }
         public ViewCreditCardDTO? ViewCreditCardDTO { get; set; }
     }
