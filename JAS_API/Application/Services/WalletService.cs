@@ -263,15 +263,7 @@ namespace Application.Services
         {
             var walletexist = await _unitOfWork.WalletRepository.GetByIdAsync(walletId);
 
-            if (walletexist == null)
-            {
-                throw new Exception("Wallet not found.");
-            }
-
-            if (walletexist.AvailableBalance < amountMoney)
-            {
-                throw new Exception("Not enough available balance to lock.");
-            }
+            
             if (isCancel)
             {
                 walletexist.AvailableBalance += amountMoney;
@@ -280,6 +272,15 @@ namespace Application.Services
             }
             else
             {
+                if (walletexist == null)
+                {
+                    throw new Exception("Wallet not found.");
+                }
+
+                if (walletexist.AvailableBalance < amountMoney)
+                {
+                    throw new Exception("Not enough available balance to lock.");
+                }
                 walletexist.AvailableBalance -= amountMoney;
                 walletexist.FrozenBalance = (walletexist.FrozenBalance ?? 0) + amountMoney;
                 walletexist.Balance = walletexist.AvailableBalance + walletexist.FrozenBalance;
