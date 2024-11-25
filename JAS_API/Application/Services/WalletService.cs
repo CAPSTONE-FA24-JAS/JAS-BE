@@ -353,15 +353,15 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var transWithdraws = await _unitOfWork.WalletTransactionRepository.GetAllAsync(x => x.Status == EnumStatusTransaction.Pending.ToString()
-                                                                                                      && x.transactionType == EnumTransactionType.WithDrawWallet.ToString());
-                var requests = new List<RequestWithdraw>();
-                foreach (var trans in transWithdraws)
-                {
-                    var requestWithdraw = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(trans.DocNo);
-                    requests.Add(requestWithdraw);
-                }
-
+                //var transWithdraws = await _unitOfWork.WalletTransactionRepository.GetAllAsync(x => x.Status == EnumStatusTransaction.Pending.ToString()
+                //                                                                                      && x.transactionType == EnumTransactionType.WithDrawWallet.ToString());
+                //var requests = new List<RequestWithdraw>();
+                //foreach (var trans in transWithdraws)
+                //{
+                //    var requestWithdraw = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(trans.DocNo);
+                //    requests.Add(requestWithdraw);
+                //}
+                var requests = await _unitOfWork.RequestWithdrawRepository.GetAllAsync();
                 if (!requests.Any())
                 {
                     reponse.Code = 200;
@@ -390,15 +390,15 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var transWithdraws = await _unitOfWork.WalletTransactionRepository.GetAllAsync(x => x.Status == EnumStatusTransaction.Pending.ToString()
-                                                                                                      && x.transactionType == EnumTransactionType.WithDrawWallet.ToString());
-                var requests = new List<RequestWithdraw>();
-                foreach (var trans in transWithdraws)
-                {
-                    var requestWithdraw = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(trans.DocNo, x => x.Wallet.CustomerId == customerId);
-                    requests.Add(requestWithdraw);
-                }
-
+                //var transWithdraws = await _unitOfWork.WalletTransactionRepository.GetAllAsync(x => x.Status == EnumStatusTransaction.Pending.ToString()
+                //                                                                                      && x.transactionType == EnumTransactionType.WithDrawWallet.ToString());
+                //var requests = new List<RequestWithdraw>();
+                //foreach (var trans in transWithdraws)
+                //{
+                //    var requestWithdraw = await _unitOfWork.RequestWithdrawRepository.GetByIdAsync(trans.DocNo, x => x.Wallet.CustomerId == customerId);
+                //    requests.Add(requestWithdraw);
+                //}
+                var requests = await _unitOfWork.RequestWithdrawRepository.GetAllAsync(x => x.Wallet.CustomerId == customerId);
                 if (!requests.Any())
                 {
                     reponse.Code = 200;
