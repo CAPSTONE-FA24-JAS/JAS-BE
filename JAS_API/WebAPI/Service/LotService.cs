@@ -683,6 +683,13 @@ namespace Application.Services
                 var lot = await _unitOfWork.LotRepository.GetByIdAsync(model.LotId);
                 if (lot != null)
                 {
+                    if(lot.Status == EnumStatusLot.Pause.ToString())
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"This Lot Is Paused , Can't Place Bid.";
+                        return response;
+                    }
 
                     var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(model.CustomerId);
 
