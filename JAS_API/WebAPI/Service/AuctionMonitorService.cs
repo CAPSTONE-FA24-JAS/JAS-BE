@@ -22,7 +22,6 @@ namespace WebAPI.Service
                     {
                         var liveBiddingService = scope.ServiceProvider.GetRequiredService<LiveBiddingService>();
                         await liveBiddingService.CheckLotStartAsync();
-                        //await liveBiddingService.AutoBidAsync();
                         await liveBiddingService.ChecKLotEndAsync();
                         await liveBiddingService.ChecKLotEndReducedBiddingAsync();
                         await liveBiddingService.CheckLotFixedPriceAsync();

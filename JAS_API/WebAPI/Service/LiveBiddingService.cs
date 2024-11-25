@@ -205,13 +205,13 @@ namespace WebAPI.Service
                     
                     await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionPublicEnded", "Phiên đã kết thúc!");
-                    lot.Status = EnumStatusLot.Passed.ToString();
-                    lot.ActualEndTime = lot.EndTime;
+                    lotsql.Status = EnumStatusLot.Passed.ToString();
+                    lotsql.ActualEndTime = lotsql.EndTime;
 
-                    _unitOfWork.LotRepository.Update(lot);
+                    _unitOfWork.LotRepository.Update(lotsql);
 
-                    _cacheService.UpdateLotStatus(lotId, lot.Status);
-                    _cacheService.UpdateLotActualEndTime(lotId, (DateTime)lot.EndTime);
+                    _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Passed.ToString());
+                    _cacheService.UpdateLotActualEndTime(lotId, (DateTime)lotsql.EndTime);
                     await _unitOfWork.SaveChangeAsync();
 
                     await HandleLoserLot(lotId);
