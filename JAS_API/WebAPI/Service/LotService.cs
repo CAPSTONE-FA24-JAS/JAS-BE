@@ -396,6 +396,7 @@ namespace Application.Services
 
                     var customerLot = _mapper.Map<CustomerLot>(registerToLotDTO);
                     customerLot.IsDeposit = true;
+                    customerLot.CurrentPrice = 0;
                     await _unitOfWork.CustomerLotRepository.AddAsync(customerLot);
                     await _unitOfWork.SaveChangeAsync();
                     var newTransactionWallet = new WalletTransaction
@@ -704,12 +705,17 @@ namespace Application.Services
                     if (lot.CurrentPrice < model.CurrentPrice || lot.CurrentPrice == null)
                     {
                         lot.CurrentPrice = model.CurrentPrice;
-                        foreach (var customerLot in lot.CustomerLots.Where(x => x.CustomerId != model.CustomerId))
+                        
+                        if(lot.LotType == EnumLotType.Secret_Auction.ToString())
                         {
-                            customerLot.IsWinner = false;
+                            foreach (var customerLot in lot.CustomerLots.Where(x => x.CustomerId != model.CustomerId))
+                            {
+                                customerLot.IsWinner = false;
+                            }
+                            lot.CustomerLots.First(x => x.CustomerId == model.CustomerId).IsWinner = true;
                         }
-                        lot.CustomerLots.First(x => x.CustomerId == model.CustomerId).IsWinner = true;
                     }
+
                     foreach (var customerLot in lot.CustomerLots.Where(x => x.CustomerId == model.CustomerId))
                     {
                         customerLot.CurrentPrice = model.CurrentPrice;
