@@ -44,12 +44,12 @@ builder.Services.AddSignalR();
 builder.Services.AddSingleton(configuration);
 builder.Services.AddCors(option => option.AddPolicy(MyAllowSpecificOrigins, build =>
 {
-    build.WithOrigins("http://localhost:3000", "exp://127.0.0.1:8081", "https://jaswebadmin.netlify.app/").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+    build.WithOrigins("http://localhost:3000", "exp://127.0.0.1:8081", "https://jaswebadmin.netlify.app").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
 }));
 
 
 //builder.WebHost.UseUrls("https://localhost:7251");
-builder.WebHost.UseUrls("https://0.0.0.0:7251");
+builder.WebHost.UseUrls("http://0.0.0.0:7251");
 builder.Services.AddControllers();
 
 // Get Redis connection string from appsettings
