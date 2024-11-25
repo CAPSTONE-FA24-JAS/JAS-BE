@@ -396,6 +396,7 @@ namespace Application.Services
 
                     var customerLot = _mapper.Map<CustomerLot>(registerToLotDTO);
                     customerLot.IsDeposit = true;
+                    customerLot.CurrentPrice = 0;
                     await _unitOfWork.CustomerLotRepository.AddAsync(customerLot);
                     await _unitOfWork.SaveChangeAsync();
                     var newTransactionWallet = new WalletTransaction
