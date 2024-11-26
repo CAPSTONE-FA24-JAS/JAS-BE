@@ -96,7 +96,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpPatch]
+        [HttpPut]
         public async Task<IActionResult> UpdateAddressToShipForInvoice(UpdateAddressToShipInvoice model)
         {
             var result = await _invoiceService.UpdateAddressToshipForInvoice(model);
@@ -246,7 +246,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpPatch]
+        [HttpPut]
         public async Task<IActionResult> UploadBillForInvoice(UploadPaymentInvoiceByBankTransferDTO model)
         {
             var result = await _invoiceService.UploadBillForPaymentInvoiceByBankTransfer(model);

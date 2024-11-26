@@ -352,7 +352,7 @@ namespace Application.Services
                         var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(invoiceById.CustomerLot.Lot.JewelryId);
                         
 
-                        if(jewelry != null)
+                        if(jewelry == null)
                         {
                             response.Message = $"jewelry not found!";
                             response.Code = 404;

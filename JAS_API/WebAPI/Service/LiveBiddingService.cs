@@ -1024,13 +1024,13 @@ namespace WebAPI.Service
                         //tao notification cho loser
                         var notificationloser = new Notification
                         {
-                            Title = $"Lot {lotId} had been canceld",
-                            Description = $" Lot {lotId} had been canceld and system auto refunded deposit for you",
+                            Title = $"Lot {lotId} had been passed",
+                            Description = $" Lot {lotId} had been passed and system auto refunded deposit for you",
                             Is_Read = false,
                             NotifiableId = customerLot.Id,  //cusrtomerLot => dẫn tới myBid
                             AccountId = customerLot.Customer.AccountId,
                             CreationDate = DateTime.UtcNow,
-                            Notifi_Type = "CustomerLot",
+                            Notifi_Type = "Refunded",
                             ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
 
                             //  ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
