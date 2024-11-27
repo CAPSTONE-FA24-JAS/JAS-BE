@@ -109,33 +109,33 @@ namespace WebAPI.Controllers
                 {
                     if (result.DocNo != -1)
                     {
-                            var invoice = await _invoiceService.GetInvoiceById((int)result.DocNo);
-                            invoice.Status = EnumCustomerLot.Paid.ToString();
-                            invoice.CustomerLot.Status = EnumCustomerLot.Paid.ToString();
-                            var newTrans = new Transaction()
-                            {
-                                Amount = invoice.TotalPrice,
-                                DocNo = invoice.Id,
-                                TransactionTime = DateTime.UtcNow,
-                                TransactionType = EnumTransactionType.BuyPay.ToString(),
-                                TransactionPerson = invoice.CustomerId,
-                            };
-                            var historyStatusCustomerLot = new HistoryStatusCustomerLot()
-                            {
-                                CustomerLotId = invoice.CustomerLot.Id,
-                                Status = EnumCustomerLot.Paid.ToString(),
-                                CurrentTime = DateTime.UtcNow,
-                            };
-                            _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
-                            var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
-                            if (transactionResult.IsSuccess)
-                            {
-                                return Ok(result);
-                            }
-                            else
-                            {
-                                return BadRequest(transactionResult);
-                            }
+                        var invoice = await _invoiceService.GetInvoiceById((int)result.DocNo);
+                        invoice.Status = EnumCustomerLot.Paid.ToString();
+                        invoice.CustomerLot.Status = EnumCustomerLot.Paid.ToString();
+                        var newTrans = new Transaction()
+                        {
+                            Amount = invoice.TotalPrice,
+                            DocNo = invoice.Id,
+                            TransactionTime = DateTime.UtcNow,
+                            TransactionType = EnumTransactionType.BuyPay.ToString(),
+                            TransactionPerson = invoice.CustomerId,
+                        };
+                        var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                        {
+                            CustomerLotId = invoice.CustomerLot.Id,
+                            Status = EnumCustomerLot.Paid.ToString(),
+                            CurrentTime = DateTime.UtcNow,
+                        };
+                        _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
+                        var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
+                        if (transactionResult.IsSuccess)
+                        {
+                            return await ConCac("Thành Công");
+                        }
+                        else
+                        {
+                            return await ConCac("Thất Bại");
+                        }
                     }
                     else
                     {
@@ -162,11 +162,11 @@ namespace WebAPI.Controllers
                                 var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
                                 if (walletUpdate.IsSuccess && transactionResult.IsSuccess)
                                 {
-                                    return Ok(result);
+                                    return await ConCac("Thành Công");
                                 }
                                 else
                                 {
-                                    return BadRequest(walletUpdate);
+                                    return await ConCac("Thất Bại");
                                 }
                             }
                         }
@@ -187,7 +187,7 @@ namespace WebAPI.Controllers
         }
 
 
-        
+
 
         [HttpGet]
         public async Task<IActionResult> ViewListRequestWithdrawForManagerment()
@@ -237,8 +237,104 @@ namespace WebAPI.Controllers
             var result = await _walletService.ApproveRequestWithdraw(requestId);
             return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
+        [HttpGet]
+        public async Task<IActionResult> ConCac(string status)
+        {
+            string templatePageRedirect = $@"
+        <!DOCTYPE html>
+        <html lang=""en"">
+        <head>
+            <meta charset=""UTF-8"">
+            <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+            <title>Thông Báo Thành Công</title>
+            <style>
+                body {{
+                    font-family: 'Arial', sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f7f7f7;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                }}
 
-        
+                .container {{
+                    text-align: center;
+                    padding: 40px 30px;
+                    background-color: #ffffff;
+                    border-radius: 15px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    max-width: 400px;
+                    width: 90%;
+                    border: 2px solid #e6c300;
+                }}
 
+                .container h1 {{
+                    font-size: 28px;
+                    color: #3cbcb4; /* Xanh ngọc */
+                    margin-bottom: 20px;
+                }}
+
+                .container p {{
+                    font-size: 16px;
+                    color: #555555;
+                    margin-bottom: 30px;
+                }}
+
+                button {{
+                    background-color: #e6c300; /* Vàng */
+                    color: white;
+                    border: none;
+                    padding: 12px 20px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                }}
+
+                button:hover {{
+                    background-color: #d4af37; /* Vàng đậm hơn */
+                    transform: scale(1.05);
+                }}
+
+                .logo {{
+                    background-color: #3cbcb4; /* Xanh ngọc */
+                    width: 60px;
+                    height: 60px;
+                    display: inline-block;
+                    border-radius: 50%;
+                    line-height: 60px;
+                    text-align: center;
+                    color: white;
+                    font-size: 24px;
+                    font-weight: bold;
+                    margin-bottom: 20px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                }}
+            </style>
+        </head>
+        <body>
+            <div class=""container"">
+                <div class=""logo"">💎</div>
+                <h1>Chúc mừng!</h1>
+                <p>Hành động của bạn đã được thực hiện <b>{status}</b>.</p>
+                <button onclick=""redirectToPage()"">Đi đến phiên đấu giá</button>
+            </div>
+
+            <script>
+                function redirectToPage() {{
+                    // Đặt URL của trang cần chuyển đến
+                    window.location.href = ""com.tptnam.myapp"";
+                }}
+            </script>
+        </body>
+        </html>
+    ";
+
+            return Content(templatePageRedirect, "text/html");
+        }
     }
 }
