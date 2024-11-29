@@ -21,6 +21,5 @@ namespace Application.Interfaces
         Task<APIResponseModel> GetTopFiveBuyersAsync();
         Task<APIResponseModel> TotalUser();
         Task<APIResponseModel> TotalUserActive();
-        Task<APIResponseModel> TotalProfit();
     }
 }

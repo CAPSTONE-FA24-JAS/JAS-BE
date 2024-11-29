@@ -556,9 +556,9 @@ namespace Application.Services
                 {
                     invoiceExist.AddressToShipId = model.AddressToShipId;
                     var addressToShip = await _unitOfWork.AddressToShipRepository.GetByIdAsync(model.AddressToShipId);
-                    var distanceOfOrder = GetDistanceMatrix.GetDistanceAsync("Hồ Chí Minh", addressToShip.AddressLine.ToString());
+                    var distanceOfOrder = GetDistanceMatrix.GetDistanceAsync("Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Hồ Chí Minh 700000", addressToShip.AddressLine.ToString());
                     invoiceExist.FeeShip = await FindFeeShipByDistanceAsync(distanceOfOrder.Result);
-                    invoiceExist.TotalPrice = invoiceExist.Price + invoiceExist.Free + invoiceExist.FeeShip - invoiceExist.CustomerLot.Lot.Deposit;
+                    invoiceExist.TotalPrice = invoiceExist.Price + invoiceExist.Free + invoiceExist.FeeShip - invoiceExist?.CustomerLot?.Lot?.Deposit;
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         response.Message = $"Update Invoice Successfully";
@@ -1101,11 +1101,7 @@ namespace Application.Services
 
             try
             {
-
                 Expression<Func<Invoice, bool>> filter;
-
-
-
                 var invoices = await _unitOfWork.InvoiceRepository.getInvoicesDeliveringByShipper(shipperId, pageIndex, pageSize);
                 List<InvoiceDetailDTO> listInvoiceDTO = new List<InvoiceDetailDTO>();
                 if (invoices.totalItems > 0)

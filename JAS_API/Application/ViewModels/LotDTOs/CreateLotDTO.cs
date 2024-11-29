@@ -14,7 +14,8 @@ namespace Application.ViewModels.LotDTOs
     public class BaseLot
     {
         public string? Title { get; set; }
-        
+        public int? Round { get; set; }
+
     }
   
     public class CreateLotFixedPriceDTO : BaseLot
@@ -31,7 +32,6 @@ namespace Application.ViewModels.LotDTOs
     public class CreateLotSecretAuctionDTO : BaseLot
     {
         public float? StartPrice { get; set; }
-        public float? FinalPriceSold { get; set; }
         public float? Deposit { get; set; }
         public bool? IsExtend { get; set; }
         public bool? HaveFinancialProof { get; set; }

@@ -25,7 +25,7 @@ namespace Domain.Entity
         public bool? HaveFinancialProof { get; set; }
         public string? LotType { get; set; }
         public int? BidIncrementTime { get; set; }
-
+        public int? Round { get; set; }
         public int? SellerId { get; set; }
         public int? StaffId { get; set; }
         public int? JewelryId { get; set; }

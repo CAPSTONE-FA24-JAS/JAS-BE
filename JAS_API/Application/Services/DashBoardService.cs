@@ -128,7 +128,7 @@ namespace Application.Services
             var Revenue = invoices.Where(x => x.CreationDate.Month == month).ToList();
             if (Revenue.Count > 0)
             {
-                return Revenue.Sum(x => x.TotalPrice);
+                return Revenue.Sum(x => (x.FeeShip?? 0 + x.Free?? 0));
             }
             return 0;
         }
@@ -188,7 +188,7 @@ namespace Application.Services
                     response.Code = 200;
                     response.Data = totalRevenue.Sum(x => x.TotalPrice);
                     response.IsSuccess = true;
-                    response.Message = $"Received Successfully Total Revenue: {totalRevenue.Sum(x => x.TotalPrice)}.";
+                    response.Message = $"Received Successfully Total Revenue: {totalRevenue.Sum(x => (x.FeeShip ?? 0 + x.Free ?? 0))}.";
                 }
                 else
                 {
