@@ -25,6 +25,7 @@ using Application.ViewModels.BlogDTOs;
 using Application.ViewModels.AutoBidDTOs;
 using Application.ViewModels.NotificationDTOs;
 using Application.ViewModels.CreditCardDTOs;
+using iTextSharp.text;
 
 
 namespace Infrastructures
@@ -262,9 +263,9 @@ namespace Infrastructures
             CreateMap<Invoice, ViewRevenueOfConpanyDTO>()
                 .ForPath(dest => dest.Month , src => src.MapFrom(x => x.CreationDate.Month))
                 .ReverseMap();
-            CreateMap<IEnumerable<Transaction>, ViewRevenueOfConpanyDTO>()
-                .ForPath(dest => dest.Month, src => src.MapFrom(x => x.First().TransactionTime.Value.Month))
-                .ForPath(dest => dest.TotalRevenue, src => src.MapFrom(x => x.Sum( x => x.Amount)));
+            CreateMap<IEnumerable<List<Invoice>>, ViewRevenueOfConpanyDTO>()
+                .ForPath(dest => dest.Month, src => src.MapFrom(x => x.FirstOrDefault().Select(x => x.CreationDate.Month)))
+                .ForPath(dest => dest.TotalRevenue, src => src.MapFrom(src => src.SelectMany(x => x).Sum(x => x.Free + x.FeeShip)));
             CreateMap<Watching, CreateWatchingDTO>().ReverseMap();
             CreateMap<Watching, ViewWatchingDTO>()
                 .ForMember(dest => dest.jewelryDTO, src => src.MapFrom(x => x.Jewelry))
