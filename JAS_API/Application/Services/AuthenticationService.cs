@@ -140,7 +140,7 @@ namespace Application.Services
                     user.PasswordHash = HashPassword.HashWithSHA256(registerAccountDTO.PasswordHash);
                     await _unitOfWork.AccountRepository.AddAsync(user);
                     //await _unitOfWork.CustomerRepository.AddAsync(user.Customer);    
-                    var confirmationLink = $"http://103.163.25.53/api/Authentication/ConfirmEmail/confirm/confirm?token={user.ConfirmationToken}&email={user.Email}";
+                    var confirmationLink = $"http://20.6.129.78/api/Authentication/ConfirmEmail/confirm/confirm?token={user.ConfirmationToken}&email={user.Email}";
                     var emailSent = await SendEmail.SendConfirmationEmail(user.Email, confirmationLink);
                     if (!emailSent)
                     {
