@@ -84,7 +84,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpPatch]
+        [HttpPut]
         public async Task<IActionResult> SetAddressToShipIsDefault(int Id, int customerId)
         {
             var result = await _addressToShipService.UpdateAddressIsDefault(Id, customerId);

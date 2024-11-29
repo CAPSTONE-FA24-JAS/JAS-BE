@@ -210,28 +210,28 @@ namespace WebAPI.Controllers
             return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPatch]
+        [HttpPut]
         public async Task<IActionResult> CancelRequestNewWithdrawByCustomer(int customerId, int requestId)
         {
             var result = await _walletService.CancelRequestWithdrawByCustomer(customerId, requestId);
             return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPatch]
+        [HttpPut]
         public async Task<IActionResult> CancelRequestNewWithdrawByStaff(int requestId)
         {
             var result = await _walletService.RejectRequestWithdrawByStaff(requestId);
             return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPatch]
+        [HttpPut]
         public async Task<IActionResult> ProcessRequestNewWithdrawByStaff(int requestId)
         {
             var result = await _walletService.ProgressRequestWithdraw(requestId);
             return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPatch]
+        [HttpPut]
         public async Task<IActionResult> ApproveRequestNewWithdraw(int requestId)
         {
             var result = await _walletService.ApproveRequestWithdraw(requestId);

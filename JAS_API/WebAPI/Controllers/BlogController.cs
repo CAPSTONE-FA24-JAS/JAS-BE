@@ -60,7 +60,7 @@ namespace WebAPI.Controllers
             return BadRequest(result);
         }
 
-        [HttpPatch]
+        [HttpPut]
         public async Task<IActionResult> UpdateInforBlog(UpdateBlogDTO updateBlogDTO)
         {
             var result = await _blogService.UpdateBlog(updateBlogDTO);

@@ -349,75 +349,93 @@ namespace Application.Services
                     }
                     else
                     {
-                        //cong vao cho wallet seller
-                        var walletOfSeller = await _unitOfWork.WalletRepository.GetByCustomerId(sellerId);
-
-                        walletOfSeller.Balance = walletOfSeller.Balance + (decimal?)invoiceById.CustomerLot.Lot.CurrentPrice;
-
-                        _unitOfWork.WalletRepository.Update(walletOfSeller);
-
-                        //lưu transation vi seller
-                        var wallerTransaction = new WalletTransaction
-                        {
-                            transactionType = EnumTransactionType.SellerPay.ToString(),
-                            DocNo = invoiceById.Id,
-                            Amount = invoiceById.Price,
-                            TransactionTime = DateTime.Now,
-                            Status = "Completed",
-                            WalletId = walletOfSeller.Id,
-                            transactionPerson = (int)invoiceById.CustomerId
-                        };
-
-                        await _unitOfWork.WalletTransactionRepository.AddAsync(wallerTransaction);
-
-
-                        //luu transaction cho cong ty
-                        var transactionCompany = new Transaction
-                        {
-                            DocNo = invoiceById.Id,
-                            Amount = invoiceById.Price,
-                            TransactionTime = wallerTransaction.TransactionTime,
-                            TransactionType = EnumTransactionType.SellerPay.ToString(),
-                            TransactionPerson = invoiceById.CustomerLot.CustomerId
-                        };
-                        await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
-
-
-                        //luu history cho history customerlot
-                        var historyCustomerLot = new HistoryStatusCustomerLot
-                        {
-                            CurrentTime = DateTime.Now,
-                            Status = EnumCustomerLot.Finished.ToString(),
-                            CustomerLotId = invoiceById.CustomerLotId
-                        };
-
-                        await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
-
-                        var notification = new Notification
-                        {
-                            Title = $"Fiinish invoice {invoiceById.Id}",
-                            Description = $"Your Invoice {invoiceById.Id} had been finish and company auto paid into your wallet for you.Please check your wallet!",
-                            Is_Read = false,
-                            NotifiableId = invoiceById.Id,  //invoiceById
-                            AccountId = invoiceById.Customer.AccountId,
-                            CreationDate = DateTime.UtcNow,
-                            Notifi_Type = "Finished",
-                            ImageLink = invoiceById.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
-                        };
-
-                        await _unitOfWork.NotificationRepository.AddAsync(notification);
-
-                        await _unitOfWork.SaveChangeAsync();
-
-                        await _notificationHub.Clients.Group(invoiceById.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                        var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(invoiceById.CustomerLot.Lot.JewelryId);
                         
 
-                        var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
+                        if(jewelry == null)
+                        {
+                            response.Message = $"jewelry not found!";
+                            response.Code = 404;
+                            response.IsSuccess = false;
+                        }
+                        else
+                        {
+                            //cong vao cho wallet seller
+                            var walletOfSeller = await _unitOfWork.WalletRepository.GetByCustomerId(sellerId);
 
-                        response.Message = $"Finish invoice!";
-                        response.Code = 200;
-                        response.IsSuccess = true;
-                        response.Data = valuationDTO;
+
+                            walletOfSeller.AvailableBalance += (decimal?)invoiceById?.CustomerLot?.Lot.CurrentPrice ?? 0;
+                            walletOfSeller.Balance = walletOfSeller.AvailableBalance ?? 0 + walletOfSeller.FrozenBalance ?? 0;
+                            _unitOfWork.WalletRepository.Update(walletOfSeller);
+
+                            jewelry.Status = EnumStatusJewelry.Sold.ToString();
+                            _unitOfWork.JewelryRepository.Update(jewelry);
+                            //lưu transation vi seller
+                            var wallerTransaction = new WalletTransaction
+                            {
+                                transactionType = EnumTransactionType.SellerPay.ToString(),
+                                DocNo = invoiceById.Id,
+                                Amount = invoiceById.Price,
+                                TransactionTime = DateTime.Now,
+                                Status = "Completed",
+                                WalletId = walletOfSeller.Id,
+                                transactionPerson = (int)invoiceById.CustomerId
+                            };
+
+                            await _unitOfWork.WalletTransactionRepository.AddAsync(wallerTransaction);
+
+
+                            //luu transaction cho cong ty
+                            var transactionCompany = new Transaction
+                            {
+                                DocNo = invoiceById.Id,
+                                Amount = invoiceById.Price,
+                                TransactionTime = wallerTransaction.TransactionTime,
+                                TransactionType = EnumTransactionType.SellerPay.ToString(),
+                                TransactionPerson = invoiceById.CustomerLot.CustomerId
+                            };
+                            await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
+
+
+                            //luu history cho history customerlot
+                            var historyCustomerLot = new HistoryStatusCustomerLot
+                            {
+                                CurrentTime = DateTime.Now,
+                                Status = EnumCustomerLot.Finished.ToString(),
+                                CustomerLotId = invoiceById.CustomerLotId
+                            };
+
+                            await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
+
+                            var notification = new Notification
+                            {
+                                Title = $"Fiinish invoice {invoiceById.Id}",
+                                Description = $"Your Invoice {invoiceById.Id} had been finish and company auto paid into your wallet for you.Please check your wallet!",
+                                Is_Read = false,
+                                NotifiableId = invoiceById.Id,  //invoiceById
+                                AccountId = invoiceById.Customer.AccountId,
+                                CreationDate = DateTime.UtcNow,
+                                Notifi_Type = "Finished",
+                                ImageLink = invoiceById.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+                            };
+
+                            await _unitOfWork.NotificationRepository.AddAsync(notification);
+
+                            await _unitOfWork.SaveChangeAsync();
+
+                            await _notificationHub.Clients.Group(invoiceById.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+
+
+                            var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
+
+                            response.Message = $"Finish invoice!";
+                            response.Code = 200;
+                            response.IsSuccess = true;
+                            response.Data = valuationDTO;
+                        }
+                        
+
+
                     }
 
                 }

@@ -606,6 +606,62 @@ namespace Application.Services
             return response;
         }
 
+        public async Task<APIResponseModel> RejectByManagerAsync(int jewelryId, int status)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var jewelryById = await _unitOfWork.JewelryRepository.GetByIdAsync(jewelryId);
+                if (jewelryById != null)
+                {
+                    jewelryById.Valuation.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+
+
+                    AddHistoryValuation(jewelryById.Valuation.Id, jewelryById.Valuation.Status);
+                    _unitOfWork.JewelryRepository.Update(jewelryById);
+                    var notification = new Notification
+                    {
+                        Title = $"Final valuation has been approved by manager",
+                        Description = $"  Final valuation for valuation {jewelryById.Name} has been manager rejected",
+                        Is_Read = false,
+                        NotifiableId = jewelryById.ValuationId,  //jewelryId
+                        AccountId = jewelryById.Valuation.Seller.AccountId,
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "Rejected",
+                        StatusOfValuation = "9",
+                        ImageLink = jewelryById.ImageJewelries.FirstOrDefault().ImageLink
+                    };
+
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
+                    await _unitOfWork.SaveChangeAsync();
+                    await _notificationHub.Clients.Groups(jewelryById.Valuation.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+
+                    var jewelryDTO = _mapper.Map<JewelryDTO>(jewelryById);
+
+                    response.Message = $"Update status Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = jewelryDTO;
+                }
+                else
+                {
+                    response.Message = $"Not found valuation";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+
         public async Task<APIResponseModel> RequestOTPForAuthorizedBySellerAsync(int valuationId, int sellerId)
         {
             var response = new APIResponseModel();
@@ -1416,6 +1472,40 @@ namespace Application.Services
             catch (Exception e)
             {
                 response.ErrorMessages = new List<string> { e.Message };
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> getJewelryByIdAsync(int id)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var jewelryById = await _unitOfWork.JewelryRepository.GetByIdAsync(id, includes: new Expression<Func<Jewelry,
+                                                                                           object>>[] { x => x.ImageJewelries
+                                                                                                         });
+                if (jewelryById != null)
+                {
+                    var jewelry = _mapper.Map<JewelryDTO>(jewelryById);
+                    response.Message = $"Found jewelry Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = jewelry;
+                }
+                else
+                {
+                    response.Message = $"Not found jewelry";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
                 response.Code = 500;
                 response.IsSuccess = false;
             }
