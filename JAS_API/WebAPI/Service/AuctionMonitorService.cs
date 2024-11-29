@@ -14,30 +14,40 @@ namespace WebAPI.Service
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var liveBiddingService = scope.ServiceProvider.GetRequiredService<LiveBiddingService>();
+
+                    var tasks = new List<Task>
+            {
+                RunTaskWithLogging(() => liveBiddingService.CheckLotStartAsync(), "CheckLotStartAsync"),
+                RunTaskWithLogging(() => liveBiddingService.ChecKLotEndAsync(), "ChecKLotEndAsync"),
+                RunTaskWithLogging(() => liveBiddingService.ChecKLotEndReducedBiddingAsync(), "ChecKLotEndReducedBiddingAsync"),
+                RunTaskWithLogging(() => liveBiddingService.CheckLotFixedPriceAsync(), "CheckLotFixedPriceAsync"),
+                RunTaskWithLogging(() => liveBiddingService.CheckLotSercetAsync(), "CheckLotSercetAsync"),
+                RunTaskWithLogging(() => liveBiddingService.ChecKAuctionEndAsync(), "ChecKAuctionEndAsync")
+            };
+
+                    await Task.WhenAll(tasks);
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+            }
+        }
+
+        private async Task RunTaskWithLogging(Func<Task> taskFunc, string taskName)
+        {
             try
             {
-                while (!stoppingToken.IsCancellationRequested)
-                {
-                    using (var scope = _serviceProvider.CreateScope())
-                    {
-                        var liveBiddingService = scope.ServiceProvider.GetRequiredService<LiveBiddingService>();
-                        await liveBiddingService.CheckLotStartAsync();
-                        //await liveBiddingService.AutoBidAsync();
-                        await liveBiddingService.ChecKLotEndAsync();
-                        await liveBiddingService.ChecKLotEndReducedBiddingAsync();
-                        await liveBiddingService.CheckLotFixedPriceAsync();
-                        await liveBiddingService.CheckLotSercetAsync();
-                        await liveBiddingService.ChecKAuctionEndAsync();
-                    }
-                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
-                }
+                await taskFunc();
             }
             catch (Exception ex)
             {
-                // Log lỗi và tiếp tục
-                _logger.LogError(ex, "Error in AuctionMonitorService");
+                _logger.LogError(ex, $"Error in {taskName}");
             }
-
         }
+
     }
 }
