@@ -21,6 +21,7 @@ namespace Domain.Entity
         public string? ActualStatusOfJewelry { get; set; }
         public string? Status { get; set; }
         public string? CancelReason { get; set; }
+        public string? Note { get; set; }
         public int? SellerId { get; set; }
         public int? StaffId { get; set; }
         public int? AppraiserId { get; set; }
