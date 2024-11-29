@@ -4,6 +4,8 @@ using Application.ViewModels.WalletDTOs;
 using Domain.Entity;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+using static QRCoder.PayloadGenerator;
 
 namespace WebAPI.Controllers
 {
@@ -130,11 +132,11 @@ namespace WebAPI.Controllers
                         var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
                         if (transactionResult.IsSuccess)
                         {
-                            return await ConCac("Thành Công");
+                            return await StatusPage("Thành Công", true);
                         }
                         else
                         {
-                            return await ConCac("Thất Bại");
+                            return await StatusPage("Thất Bại", false);
                         }
                     }
                     else
@@ -162,11 +164,11 @@ namespace WebAPI.Controllers
                                 var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
                                 if (walletUpdate.IsSuccess && transactionResult.IsSuccess)
                                 {
-                                    return await ConCac("Thành Công");
+                                    return await StatusPage("Thành Công",true);
                                 }
                                 else
                                 {
-                                    return await ConCac("Thất Bại");
+                                    return await StatusPage("Thất Bại", false);
                                 }
                             }
                         }
@@ -237,8 +239,22 @@ namespace WebAPI.Controllers
             var result = await _walletService.ApproveRequestWithdraw(requestId);
             return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
-        [HttpGet]
-        public async Task<IActionResult> ConCac(string status)
+
+        [HttpGet("reponsestatuspagetranfer")]
+        public async Task<IActionResult> ReponseStatusPageTranfer(bool isSuccessfull)
+        {
+            if (isSuccessfull == true)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest(false);
+            }
+        }
+
+        [HttpGet("statuspage")]
+        public async Task<IActionResult> StatusPage(string status, bool returnStatus)
         {
             string templatePageRedirect = $@"
         <!DOCTYPE html>
@@ -321,13 +337,13 @@ namespace WebAPI.Controllers
                 <div class=""logo"">💎</div>
                 <h1>Chúc mừng!</h1>
                 <p>Hành động của bạn đã được thực hiện <b>{status}</b>.</p>
-                <button onclick=""redirectToPage()"">Đi đến phiên đấu giá</button>
+                <button onclick=""simplemeditation://result-payment/isSuccess={returnStatus}"">Đi đến phiên đấu giá</button>
             </div>
 
-            <script>
+            /<script>
                 function redirectToPage() {{
                     // Đặt URL của trang cần chuyển đến
-                    window.location.href = ""com.tptnam.myapp"";
+                    window.location.href = ""reponsestatuspagetranfer?isSuccessfull={returnStatus}"";
                 }}
             </script>
         </body>
