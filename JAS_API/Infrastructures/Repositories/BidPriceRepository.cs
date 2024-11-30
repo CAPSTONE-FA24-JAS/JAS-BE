@@ -66,5 +66,18 @@ namespace Infrastructures.Repositories
             }
         }
 
+        public async Task<bool> GetBidPriceByCustomerAndLot(int customerId, int lotId)
+        {
+            var maxBidPrice = await _dbContext.BidPrices.Where(x => x.LotId == lotId && x.CustomerId == customerId).FirstOrDefaultAsync();
+            if (maxBidPrice == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
     }
 }

@@ -15,5 +15,6 @@ namespace Application.Repositories
 
         //cho hinh thuc 4 dau gia ngc, chac chan chi cos 1 bidPrice
         BidPrice GetBidPriceByLotIdForReduceBidding(int lotId);
+        Task<bool> GetBidPriceByCustomerAndLot(int customerId, int lotId);
     }
 }

@@ -107,6 +107,7 @@ namespace Application.Services
                                 HaveFinancialProof = lot.HaveFinancialProof,
                                 StaffId = lot.StaffId,
                                 JewelryId = lot.JewelryId,
+                                Round = lot.Round
                             };
                             _cacheService.SetLotInfo(lotRedis);
 
@@ -763,6 +764,14 @@ namespace Application.Services
                 string lotGroupName = $"lot-{placeBidBuyNowDTO.LotId}";
                 if (lot != null)
                 {
+                    if(lot.FinalPriceSold == null)
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"The lost haven't function for buy now.";
+                        return response;
+                    }
+
                     if (lot.LotType != EnumLotType.Public_Auction.ToString())
                     {
                         response.Code = 400;
@@ -808,7 +817,7 @@ namespace Application.Services
                     lot.Status = EnumStatusLot.Sold.ToString();
                     lot.CurrentPrice = lot.FinalPriceSold;
                     _cacheService.UpdateLotStatus((int)placeBidBuyNowDTO.LotId, EnumStatusLot.Sold.ToString());
-                    var winnerInLot = lot.CustomerLots.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId
+                    var winnerInLot = lot.CustomerLots?.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId
                                              && x.LotId == placeBidBuyNowDTO.LotId);
 
                     winnerInLot.Status = EnumCustomerLot.CreateInvoice.ToString();

@@ -150,6 +150,22 @@ namespace Infrastructures.Repositories
             }
         }
 
+        
+        public async Task<(List<int?> shipperIds, List<int> invoiceCounts)> getShipperAndInvoices()
+        {
+            var result = await _dbContext.Invoices.GroupBy(x => x.ShipperId)
+                                             .Where(g => g.Key != null)
+                                             .Select( g => new
+                                             {
+                                                 ShipperId = g.Key,
+                                                 InvoiceCount = g.Count()
+                                             }).ToListAsync();
+
+            var shipperIds = result.Select(r => r.ShipperId).ToList();
+            var invoiceCounts = result.Select(r => r.InvoiceCount).ToList();
+            return (shipperIds, invoiceCounts);
+        }
+
 
     }
 }

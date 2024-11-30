@@ -61,73 +61,84 @@ namespace Application.Services
                 }
                 else
                 {
-                    newvaluation.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault( x => x.Value == consignAnItem.Status).Name;
-                    await _unitOfWork.ValuationRepository.AddAsync(newvaluation);
-                    await _unitOfWork.SaveChangeAsync();
-
-                    
-                    AddHistoryValuation(newvaluation.Id, newvaluation.Status);
-
-                    
-                    foreach (var image in consignAnItem.ImageValuation)
+                    var wallet = await _unitOfWork.WalletRepository.GetByCustomerId(consignAnItem.Status);
+                    if(wallet == null)
                     {
-                        var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
-                        {
-                            File = new FileDescription(image.FileName,
-                                                   image.OpenReadStream()),
-                            Tags = Tags
-                        }).ConfigureAwait(false);
-
-
-
-                        if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
-                        {
-                            response.Message = $"Image upload failed." + uploadImage.Error.Message + "";
-                            response.Code = (int)uploadImage.StatusCode;
-                            response.IsSuccess = false;
-                        }
-                        else
-                        {
-                            var imageValuationinput = new ImageValuationDTO
-                            {
-                                ValuationId = newvaluation.Id,
-                                ImageLink = uploadImage.SecureUrl.AbsoluteUri
-                            };
-                            imagesValuation.Add(imageValuationinput.ImageLink);
-                            var imageValuation = _mapper.Map<ImageValuation>(imageValuationinput);
-                            imageValuationList.Add(imageValuation);
-                                                  
-
-                        }
+                        response.Message = $"Owner hasn't wallet!";
+                        response.Code = 404;
+                        response.IsSuccess = false;
                     }
-                    await _unitOfWork.ImageValuationRepository.AddRangeAsync(imageValuationList);
-                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    else
                     {
-                        var notification = new ViewNotificationDTO
-                        {
-                            Title = $"Have consign an item from customer ",
-                            Description = $"Have consign an item from customer",
-                            Is_Read = false,
-                            NotifiableId = newvaluation.Id,  //valuationId
-                            AccountId = 61,
-                            CreationDate = DateTime.UtcNow,
-                            Notifi_Type = "Requested",
-                            StatusOfValuation = "0",
-                            ImageLink = imageValuationList.FirstOrDefault()?.ImageLink
-                        };
-
-                        var notiDTO = _mapper.Map<Notification>(notification);
-                        await _unitOfWork.NotificationRepository.AddAsync(notiDTO);
-
+                        newvaluation.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == consignAnItem.Status).Name;
+                        await _unitOfWork.ValuationRepository.AddAsync(newvaluation);
                         await _unitOfWork.SaveChangeAsync();
 
-                        await _notificationHub.Clients.Group("61").SendAsync("NewNotificationReceived", "Có thông báo mới!");
-                        response.Message = $"Consign an item Successfully";
-                        response.Code = 200;
-                        response.IsSuccess = true;
-                        response.Data = imagesValuation;
+
+                        AddHistoryValuation(newvaluation.Id, newvaluation.Status);
+
+
+                        foreach (var image in consignAnItem.ImageValuation)
+                        {
+                            var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
+                            {
+                                File = new FileDescription(image.FileName,
+                                                       image.OpenReadStream()),
+                                Tags = Tags
+                            }).ConfigureAwait(false);
+
+
+
+                            if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
+                            {
+                                response.Message = $"Image upload failed." + uploadImage.Error.Message + "";
+                                response.Code = (int)uploadImage.StatusCode;
+                                response.IsSuccess = false;
+                            }
+                            else
+                            {
+                                var imageValuationinput = new ImageValuationDTO
+                                {
+                                    ValuationId = newvaluation.Id,
+                                    ImageLink = uploadImage.SecureUrl.AbsoluteUri
+                                };
+                                imagesValuation.Add(imageValuationinput.ImageLink);
+                                var imageValuation = _mapper.Map<ImageValuation>(imageValuationinput);
+                                imageValuationList.Add(imageValuation);
+
+
+                            }
+                        }
+                        await _unitOfWork.ImageValuationRepository.AddRangeAsync(imageValuationList);
+                        if (await _unitOfWork.SaveChangeAsync() > 0)
+                        {
+                            var notification = new ViewNotificationDTO
+                            {
+                                Title = $"Have consign an item from customer ",
+                                Description = $"Have consign an item from customer",
+                                Is_Read = false,
+                                NotifiableId = newvaluation.Id,  //valuationId
+                                AccountId = 61,
+                                CreationDate = DateTime.UtcNow,
+                                Notifi_Type = "Requested",
+                                StatusOfValuation = "0",
+                                ImageLink = imageValuationList.FirstOrDefault()?.ImageLink
+                            };
+
+                            var notiDTO = _mapper.Map<Notification>(notification);
+                            await _unitOfWork.NotificationRepository.AddAsync(notiDTO);
+
+                            await _unitOfWork.SaveChangeAsync();
+
+                            await _notificationHub.Clients.Group("61").SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                            response.Message = $"Consign an item Successfully";
+                            response.Code = 200;
+                            response.IsSuccess = true;
+                            response.Data = imagesValuation;
+                        }
+
                     }
-                       
+
 
                 }
                 
@@ -600,7 +611,7 @@ namespace Application.Services
 
                     AddHistoryValuation(valuationById.Id, valuationById.Status);                    
 
-                    byte[] pdfBytes = _generatePDFService.CreateReceiptPDF(valuationById, DateTime.UtcNow, receipt.ActualStatusOfJewelry);
+                    byte[] pdfBytes = _generatePDFService.CreateReceiptPDF(valuationById, DateTime.UtcNow, receipt.ActualStatusOfJewelry, receipt.Note);
 
                     using var memoryStream = new MemoryStream(pdfBytes);
 
