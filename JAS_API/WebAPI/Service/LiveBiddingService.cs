@@ -271,7 +271,7 @@ namespace WebAPI.Service
                             lotsql.ActualEndTime = DateTime.UtcNow;
                             lotsql.Status = EnumStatusLot.Sold.ToString();
                             _unitOfWork.LotRepository.Update(lotsql);
-                            await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
+                           // await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
                             await _unitOfWork.SaveChangeAsync();
                             await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedReduceBidding", "Phien đa ket thuc", winnerBid.CustomerId, winnerBid.CurrentPrice);
                             await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeForReduceBidding", "Thoi gian ket actual", lot.ActualEndTime);

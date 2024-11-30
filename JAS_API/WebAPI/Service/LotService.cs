@@ -103,6 +103,7 @@ namespace Application.Services
                                 HaveFinancialProof = lot.HaveFinancialProof,
                                 StaffId = lot.StaffId,
                                 JewelryId = lot.JewelryId,
+                                Round = lot.Round
                             };
                             _cacheService.SetLotInfo(lotRedis);
 

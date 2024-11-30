@@ -274,5 +274,19 @@ namespace WebAPI.Controllers
             }
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> getShipperAndInvoices()
+        {
+            var result = await _invoiceService.GetShipperAndInvoices();
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }

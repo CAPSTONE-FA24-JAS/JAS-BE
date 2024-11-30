@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
+using Application.ViewModels.AccountDTOs;
 using Application.ViewModels.InvoiceDTOs;
 using Application.ViewModels.TransactionDTOs;
 using Application.ViewModels.ValuationDTOs;
@@ -1146,5 +1147,55 @@ namespace Application.Services
             }
             return response;
         }
+
+        public async Task<APIResponseModel> GetShipperAndInvoices()
+        {
+            var response = new APIResponseModel();
+
+            try
+            {
+                
+                var result = await _unitOfWork.InvoiceRepository.getShipperAndInvoices();
+                List<StaffDTO> shippers = new List<StaffDTO>();
+               
+                if (result.shipperIds != null && result.invoiceCounts != null)
+                {
+                    foreach (var shipperId in result.shipperIds)
+                    {
+                        var shipper = await _unitOfWork.StaffRepository.GetByIdAsync(shipperId);
+                        var shipperDTO = _mapper.Map<StaffDTO>(shipper);
+                        shippers.Add(shipperDTO);
+                    }
+                    response.Message = "List shipper retrieved successfully.";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+
+                    // Gán dữ liệu vào response.Data
+                    response.Data = new
+                    {
+                        Shipper = shippers,
+                        InvoiceCounts = result.invoiceCounts
+                    };
+                }
+                else
+                {
+                    response.Message = "No shippers found.";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = null; // Không có dữ liệu
+                }
+            }
+            catch (Exception ex)
+            {
+                // Xử lý ngoại lệ
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "An exception occurred.";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+
+            return response;
+        }
+
     }
 }
