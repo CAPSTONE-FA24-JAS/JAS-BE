@@ -66,8 +66,12 @@ namespace Application.Services
                         {
                             lot.LotType = EnumLotType.Secret_Auction.ToString();
                         }
-                        if (lotDTO is CreateLotPublicAuctionDTO)
+                        if (lotDTO is CreateLotPublicAuctionDTO publicAuctionDTO)
                         {
+                            if (!publicAuctionDTO.IsHaveFinalPrice.Value)
+                            {
+                                lot.FinalPriceSold = null;
+                            }
                             lot.LotType = EnumLotType.Public_Auction.ToString();
                         }
                         if (lotDTO is CreateLotAuctionPriceGraduallyReducedDTO)
