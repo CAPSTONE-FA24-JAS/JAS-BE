@@ -17,7 +17,7 @@ namespace Application.Utils
             _env = env;
         }
 
-        public string ToHtmlFileReceipt(Valuation valuation, DateTime? recivedDate, string? productRecivedStatus)
+        public string ToHtmlFileReceipt(Valuation valuation, DateTime? recivedDate, string? productRecivedStatus, string? note)
         {
             // Sử dụng _env.WebRootPath để lấy đường dẫn đến thư mục wwwroot
             string templatePath = Path.Combine(_env.WebRootPath, "HtmlFiles", "Receipt.html");
@@ -31,7 +31,8 @@ namespace Application.Utils
                                        .Replace("{{Phone_seller}}", valuation.Seller.Account.PhoneNumber)
                                        .Replace("{{JewelryName}}", valuation.Name)
                                        .Replace("{{ReceivingDate}}", recivedDate?.ToString() ?? "")
-                                       .Replace("{{ProductRecivedStatus}}", productRecivedStatus ?? "");
+                                       .Replace("{{ProductRecivedStatus}}", productRecivedStatus ?? "")
+                                       .Replace("{{Note}}", note ?? "");
 
             return templateHtml;
         }

@@ -18,10 +18,10 @@ namespace Application.Services
             License.LicenseKey = configuration["IronPdf:LicenseKey"];
             _helperValuation = helperValuation;
         }
-        public byte[] CreateReceiptPDF(Valuation valuation, DateTime? recivedDate, string? productRecivedStatus)
+        public byte[] CreateReceiptPDF(Valuation valuation, DateTime? recivedDate, string? productRecivedStatus, string? note)
         {
             // Tạo nội dung HTML từ HelperValuation
-            string htmlContent = _helperValuation.ToHtmlFileReceipt(valuation, recivedDate, productRecivedStatus);
+            string htmlContent = _helperValuation.ToHtmlFileReceipt(valuation, recivedDate, productRecivedStatus, note);
 
             // Khởi tạo trình render PDF của IronPdf
             var renderer = new ChromePdfRenderer();

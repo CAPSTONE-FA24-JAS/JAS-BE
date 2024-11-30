@@ -15,5 +15,7 @@ namespace Application.ViewModels.ValuationDTOs
 
         public int Status { get; set; }
 
+        public string? Note { get; set; }
+
     }
 }

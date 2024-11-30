@@ -37,6 +37,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> getInvoicesDeliveringByShipper(int shipperId, int? pageIndex, int? pageSize);
         
         Task<Invoice?> GetInvoiceById(int id);
+        Task<APIResponseModel> GetShipperAndInvoices();
 
     }
 }

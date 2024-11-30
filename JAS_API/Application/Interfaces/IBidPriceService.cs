@@ -19,6 +19,7 @@ namespace Application.Interfaces
 
         Task<APIResponseModel> UpdateStatusBid(int lotId, int? status);
         Task<APIResponseModel> cancelLot(int lotId);
+        Task<APIResponseModel> checkPlacebidForReduceBidding(int customerId, int lotId);
 
 
     }
