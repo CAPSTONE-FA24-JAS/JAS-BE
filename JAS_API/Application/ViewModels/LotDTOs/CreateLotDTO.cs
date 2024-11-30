@@ -48,6 +48,7 @@ namespace Application.ViewModels.LotDTOs
         public float? Deposit { get; set; }
         public bool? IsExtend { get; set; }
         public bool? HaveFinancialProof { get; set; }
+        public bool? IsHaveFinalPrice { get; set; }
         
         public int? StaffId { get; set; }
         public int? JewelryId { get; set; }
