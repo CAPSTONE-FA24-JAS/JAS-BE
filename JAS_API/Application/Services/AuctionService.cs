@@ -262,6 +262,11 @@ namespace Application.Services
                     auctionExisted.ModificationDate = DateTime.Now;
                     auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
                     auctionExisted.StartTime = updateAuctionDTO.StartTime;
+                    foreach (var lot in auctionExisted?.Lots)
+                    {
+                        lot.StartTime = updateAuctionDTO.StartTime;
+                        lot.EndTime = updateAuctionDTO.EndTime;
+                    }
                 }
                 else
                 {
@@ -281,7 +286,7 @@ namespace Application.Services
                     }).ConfigureAwait(false);
                     if (uploadResult == null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
                     {
-                        reponse.Message = $"File upload failed." + uploadResult.Error.Message + "";
+                        reponse.Message = $"File upload failed." + uploadResult?.Error.Message + "";
                         reponse.Code = (int)uploadResult.StatusCode;
                         reponse.IsSuccess = false;
                     }
