@@ -23,6 +23,7 @@ namespace Application.ViewModels.LotDTOs
         public bool? HaveFinancialProof { get; set; }
         public string? LotType { get; set; }
         public string? ImageLinkJewelry { get; set; }
+        public int? Round { get; set; }
 
         public int? SellerId { get; set; }
         public int? StaffId { get; set; }
@@ -43,6 +44,7 @@ namespace Application.ViewModels.LotDTOs
         public bool? IsExtend { get; set; }
         public bool? HaveFinancialProof { get; set; }
         public string? LotType { get; set; }
+        public int? Round { get; set; }
 
         public int? SellerId { get; set; }
         public int? StaffId { get; set; }
