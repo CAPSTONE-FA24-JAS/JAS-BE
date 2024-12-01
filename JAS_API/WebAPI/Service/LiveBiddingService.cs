@@ -189,7 +189,7 @@ namespace WebAPI.Service
 
                             lotsql.CurrentPrice = winnerBid.CurrentPrice;
                             
-                            lotsql.ActualEndTime = lot.ActualEndTime;
+                            lotsql.ActualEndTime = lot.EndTime;
                             lotsql.Status = EnumStatusLot.Sold.ToString();
                             _unitOfWork.LotRepository.Update(lotsql);
                             await _unitOfWork.SaveChangeAsync();
