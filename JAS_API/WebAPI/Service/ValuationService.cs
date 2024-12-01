@@ -61,7 +61,7 @@ namespace Application.Services
                 }
                 else
                 {
-                    var wallet = await _unitOfWork.WalletRepository.GetByCustomerId(consignAnItem.Status);
+                    var wallet = await _unitOfWork.WalletRepository.GetByCustomerId(consignAnItem.SellerId);
                     if(wallet == null)
                     {
                         response.Message = $"Owner hasn't wallet!";

@@ -816,7 +816,7 @@ namespace Application.Services
                             NotifiableId = customerLot.Id,  //cusrtomerLot => dẫn tới myBid
                             AccountId = customerLot.Customer.AccountId,
                             CreationDate = DateTime.UtcNow,
-                            Notifi_Type = "CustomerLot",
+                            Notifi_Type = "Refunded",
                             ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
 
                             //  ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
