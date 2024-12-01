@@ -34,6 +34,7 @@ namespace Application.Services
         private readonly Cloudinary _cloudinary;
         private const string Tags = "Backend_ImageValuation";
         private const string Tags_Receipt = "ReceiptPDF";
+        private const string Tags_Document_Gemstone = "DocumentGemstone";
         private readonly IGeneratePDFService _generatePDFService;
         private readonly IHubContext<BiddingHub> _hubContext;
         private readonly IHubContext<NotificationHub> _notificationHub;
@@ -50,6 +51,7 @@ namespace Application.Services
         {
             var response = new APIResponseModel();
             List<String> imagesValuation = new List<string>();
+            List<String> documentGemstone = new List<string>();
             List<ImageValuation> imageValuationList = new List<ImageValuation>();
             try
             {
@@ -108,6 +110,37 @@ namespace Application.Services
 
 
                             }
+                        }                      
+
+                        foreach (var image in consignAnItem.DocumentGemstone)
+                        {
+                            var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
+                            {
+                                File = new FileDescription(image.FileName,
+                                                       image.OpenReadStream()),
+                                Tags = Tags_Document_Gemstone
+                            }).ConfigureAwait(false);
+
+
+
+                            if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
+                            {
+                                response.Message = $"Document upload failed." + uploadImage.Error.Message + "";
+                                response.Code = (int)uploadImage.StatusCode;
+                                response.IsSuccess = false;
+                            }
+                            else
+                            {
+                                var imageValuationinput = new ImageValuationDTO
+                                {
+                                    ValuationId = newvaluation.Id,
+                                    ImageLink = uploadImage.SecureUrl.AbsoluteUri,
+                                    DefaultImage = "PDF"
+                                };
+                                documentGemstone.Add(imageValuationinput.ImageLink);
+                                var imageValuation = _mapper.Map<ImageValuation>(imageValuationinput);
+                                imageValuationList.Add(imageValuation);
+                            }
                         }
                         await _unitOfWork.ImageValuationRepository.AddRangeAsync(imageValuationList);
                         if (await _unitOfWork.SaveChangeAsync() > 0)
@@ -134,7 +167,9 @@ namespace Application.Services
                             response.Message = $"Consign an item Successfully";
                             response.Code = 200;
                             response.IsSuccess = true;
-                            response.Data = imagesValuation;
+                            response.Data = new { 
+                                                Images = imagesValuation,
+                                                Doucment = documentGemstone};
                         }
 
                     }

@@ -18,5 +18,7 @@ namespace Application.ViewModels.ValuationDTOs
 
         public int Status { get; set; }
         public List<IFormFile>? ImageValuation { get; set; }
+
+        public List<IFormFile>? DocumentGemstone {  get; set; }
     }
 }

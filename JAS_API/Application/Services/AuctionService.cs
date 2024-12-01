@@ -266,6 +266,8 @@ namespace Application.Services
                     {
                         lot.StartTime = updateAuctionDTO.StartTime;
                         lot.EndTime = updateAuctionDTO.EndTime;
+                        _cacheService.UpdateLotEndTime(lot.Id, updateAuctionDTO.EndTime.Value);
+                        _cacheService.UpdateLotStartTime(lot.Id, updateAuctionDTO.StartTime.Value);
                     }
                 }
                 else

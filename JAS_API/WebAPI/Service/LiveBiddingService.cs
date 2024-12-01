@@ -203,7 +203,7 @@ namespace WebAPI.Service
                 else
                 {
                     
-                    await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
+                  //  await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPrices);
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionPublicEnded", "Phiên đã kết thúc!");
                     lotsql.Status = EnumStatusLot.Passed.ToString();
                     lotsql.ActualEndTime = lotsql.EndTime;
@@ -308,7 +308,7 @@ namespace WebAPI.Service
                         //lay lai lot tren redis
                         lot = _cacheService.GetLotById(lotId);
                         bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
-                    }
+                    }                 
                 }
                 
             }
@@ -837,15 +837,17 @@ namespace WebAPI.Service
                         else
                         {
 
-                            lot.Status = EnumStatusLot.Passed.ToString();
-                            var losers = lot.CustomerLots.Where(x => x.CustomerId != bidPriceWinner.CustomerId).ToList();
-                            await SetLoser(losers);
+                            lot.Status = EnumStatusLot.Passed.ToString();           
+                            var losers = lot.CustomerLots.Where(x => x.LotId == lot.Id).ToList();
+                            if(losers != null)
+                            {
+                                await SetLoser(losers);
+                            } 
                         }
-
                         _cacheService.UpdateLotStatus(lot.Id, lot.Status);
+                        lot.ActualEndTime = lot.EndTime;
                         string lotGroupName = $"lot-{lot.Id}";
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforSercetBiddingAuto", "Phiên đã kết thúc!");
-                        lot.ActualEndTime = DateTime.UtcNow;
+                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceforSercetBiddingAuto", "Phiên đã kết thúc!");                       
                         await _unitOfWork.SaveChangeAsync();
 
                     }
