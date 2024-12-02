@@ -756,9 +756,17 @@ namespace Application.Services
                     
                     invoiceExist.Status = EnumCustomerLot.PendingPayment.ToString();
                     invoiceExist.PaymentMethod = EnumPaymentType.Wallet.ToString();
-                    await _unitOfWork.SaveChangeAsync();
+                    invoiceExist.CustomerLot.Status = EnumCustomerLot.PendingPayment.ToString();
                     var httpContext = _httpContextAccessor.HttpContext;
                     string paymentUrl = await _vNPayService.CreatePaymentUrl(httpContext, vnPayModel,null);
+                    var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                    {
+                        CustomerLotId = invoiceExist.CustomerLot.Id,
+                        Status = EnumCustomerLot.PendingPayment.ToString(),
+                        CurrentTime = DateTime.UtcNow,
+                    };
+                    _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
+                    await _unitOfWork.SaveChangeAsync();
                     // tra về url thanh toán 
                     // => Fe thanh toán xong gọi api refund
                     if (!string.IsNullOrEmpty(paymentUrl))

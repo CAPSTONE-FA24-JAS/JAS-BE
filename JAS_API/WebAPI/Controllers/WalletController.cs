@@ -161,6 +161,7 @@ namespace WebAPI.Controllers
                                     TransactionType = trans.transactionType,
                                     TransactionPerson = trans.transactionPerson,
                                 };
+
                                 var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
                                 if (walletUpdate.IsSuccess && transactionResult.IsSuccess)
                                 {
