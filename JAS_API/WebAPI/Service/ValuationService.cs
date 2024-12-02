@@ -2,6 +2,7 @@
 using Application.Repositories;
 using Application.ServiceReponse;
 using Application.Utils;
+using Application.ViewModels.JewelryDTOs;
 using Application.ViewModels.NotificationDTOs;
 using Application.ViewModels.ValuationDTOs;
 using AutoMapper;
@@ -107,42 +108,43 @@ namespace Application.Services
                                 imagesValuation.Add(imageValuationinput.ImageLink);
                                 var imageValuation = _mapper.Map<ImageValuation>(imageValuationinput);
                                 imageValuationList.Add(imageValuation);
-
-
-                            }
-                        }                      
-
-                        foreach (var image in consignAnItem.DocumentGemstone)
-                        {
-                            var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
-                            {
-                                File = new FileDescription(image.FileName,
-                                                       image.OpenReadStream()),
-                                Tags = Tags_Document_Gemstone
-                            }).ConfigureAwait(false);
-
-
-
-                            if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
-                            {
-                                response.Message = $"Document upload failed." + uploadImage.Error.Message + "";
-                                response.Code = (int)uploadImage.StatusCode;
-                                response.IsSuccess = false;
-                            }
-                            else
-                            {
-                                var imageValuationinput = new ImageValuationDTO
-                                {
-                                    ValuationId = newvaluation.Id,
-                                    ImageLink = uploadImage.SecureUrl.AbsoluteUri,
-                                    DefaultImage = "PDF"
-                                };
-                                documentGemstone.Add(imageValuationinput.ImageLink);
-                                var imageValuation = _mapper.Map<ImageValuation>(imageValuationinput);
-                                imageValuationList.Add(imageValuation);
                             }
                         }
-                        await _unitOfWork.ImageValuationRepository.AddRangeAsync(imageValuationList);
+
+                        if (consignAnItem.DocumentGemstone != null && consignAnItem.DocumentGemstone.Any())
+                        {
+                            foreach (var image in consignAnItem.DocumentGemstone)
+                            {
+                                var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
+                                {
+                                    File = new FileDescription(image.FileName,
+                                                           image.OpenReadStream()),
+                                    Tags = Tags_Document_Gemstone
+                                }).ConfigureAwait(false);
+
+
+
+                                if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
+                                {
+                                    response.Message = $"Document upload failed." + uploadImage.Error.Message + "";
+                                    response.Code = (int)uploadImage.StatusCode;
+                                    response.IsSuccess = false;
+                                }
+                                else
+                                {
+                                    var imageValuationinput = new ImageValuationDTO
+                                    {
+                                        ValuationId = newvaluation.Id,
+                                        ImageLink = uploadImage.SecureUrl.AbsoluteUri,
+                                        DefaultImage = "PDF"
+                                    };
+                                    documentGemstone.Add(imageValuationinput.ImageLink);
+                                    var imageValuation = _mapper.Map<ImageValuation>(imageValuationinput);
+                                    imageValuationList.Add(imageValuation);
+                                }
+                            }
+                            await _unitOfWork.ImageValuationRepository.AddRangeAsync(imageValuationList);
+                        }
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
                             var notification = new ViewNotificationDTO
