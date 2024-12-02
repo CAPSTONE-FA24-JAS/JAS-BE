@@ -97,7 +97,7 @@ namespace Application.Services
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendCurrentPriceForReduceBidding", lot.CurrentPrice);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("StatusBid", lot.Status);
-
+                        await CountCustomerBidded(request.LotId);
                     // await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
 
                     if (topBidders.Any())
@@ -670,8 +670,11 @@ namespace Application.Services
         {
             string redisKey = $"BidPrice:{lotId}";
             var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, x => x.LotId == lotId);
-            var amountCustomerBidded = bidPrices.Distinct().Count();
-            await _hubContext.Clients.All.SendAsync("SendAmountCustomerBid", "So luong nguoi da dau gia la: ", amountCustomerBidded);
+            if(bidPrices != null)
+            {
+                var amountCustomerBidded = bidPrices.Distinct().Count();
+                await _hubContext.Clients.All.SendAsync("SendAmountCustomerBid", "So luong nguoi da dau gia la: ", amountCustomerBidded);
+            }          
         }
         public async Task<APIResponseModel> UpdateStatusBid(int lotId, int? status)
         {
