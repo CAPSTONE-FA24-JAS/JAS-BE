@@ -143,8 +143,9 @@ namespace Application.Services
                                     imageValuationList.Add(imageValuation);
                                 }
                             }
-                            await _unitOfWork.ImageValuationRepository.AddRangeAsync(imageValuationList);
+                            
                         }
+                        await _unitOfWork.ImageValuationRepository.AddRangeAsync(imageValuationList);
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
                             var notification = new ViewNotificationDTO

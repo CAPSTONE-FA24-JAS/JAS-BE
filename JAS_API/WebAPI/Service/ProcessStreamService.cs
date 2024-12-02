@@ -65,13 +65,13 @@ namespace WebAPI.Service
                 var pubsubChannel = $"channel-{lot.Id}";
                 var dataAvailable = new TaskCompletionSource<bool>();
 
-                await _cacheService.SubscribeToChannelAsync(pubsubChannel, message =>
-                {
-                    if (message == "Newbid")
-                    {
-                        dataAvailable.TrySetResult(true); // Signal that data is available
-                    }
-                });
+                //await _cacheService.SubscribeToChannelAsync(pubsubChannel, message =>
+                //{
+                //    if (message == "Newbid")
+                //    {
+                //        dataAvailable.TrySetResult(true); // Signal that data is available
+                //    }
+                //});
                 try
                 {
                     while (true)
@@ -91,8 +91,9 @@ namespace WebAPI.Service
                         {
                             //  _logger.LogInformation($"Không còn giá nào trong Stream cho Lot {lot.Id}");
                             // Đợi 100ms trước khi kiểm tra lại
-                            dataAvailable = new TaskCompletionSource<bool>();  // Reset the signal
-                            await dataAvailable.Task;
+                            //  dataAvailable = new TaskCompletionSource<bool>();  // Reset the signal
+                            //   await dataAvailable.Task;
+                            await Task.Delay(700);
                             continue;
                         }
                         var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(result.bidPrice.CustomerId);
