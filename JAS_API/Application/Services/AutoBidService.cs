@@ -49,6 +49,12 @@ namespace Application.Services
                     return CreateErrorResponse("Mapper failed", 400);
                 }
 
+                if (createAutoBidDTO.MinPrice > (customerLotOfAutoBid?.Customer?.PriceLimit ?? 0)
+                    || createAutoBidDTO.MaxPrice > (customerLotOfAutoBid?.Customer?.PriceLimit ?? 0))
+                {
+                    return CreateErrorResponse("Bid limit not enought for this price", 400);
+                }
+
                 autoBid.IsActive = true;
                 customerLotOfAutoBid.IsAutoBid = true;
 

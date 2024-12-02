@@ -380,7 +380,7 @@ namespace Application.Services
                                 TransactionTime = DateTime.Now,
                                 Status = "Completed",
                                 WalletId = walletOfSeller.Id,
-                                transactionPerson = (int)invoiceById.CustomerId
+                                transactionPerson = (int)sellerId,
                             };
 
                             await _unitOfWork.WalletTransactionRepository.AddAsync(wallerTransaction);
@@ -393,7 +393,7 @@ namespace Application.Services
                                 Amount = invoiceById.Price,
                                 TransactionTime = wallerTransaction.TransactionTime,
                                 TransactionType = EnumTransactionType.SellerPay.ToString(),
-                                TransactionPerson = invoiceById.CustomerLot.CustomerId
+                                TransactionPerson = sellerId,
                             };
                             await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
 
@@ -414,7 +414,7 @@ namespace Application.Services
                                 Description = $"Your Invoice {invoiceById.Id} had been finish and company auto paid into your wallet for you.Please check your wallet!",
                                 Is_Read = false,
                                 NotifiableId = invoiceById.Id,  //invoiceById
-                                AccountId = invoiceById.Customer.AccountId,
+                                AccountId = invoiceById.CustomerLot.Lot.Jewelry.Valuation.Seller.AccountId,
                                 CreationDate = DateTime.UtcNow,
                                 Notifi_Type = "Finished",
                                 ImageLink = invoiceById.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
@@ -424,7 +424,7 @@ namespace Application.Services
 
                             await _unitOfWork.SaveChangeAsync();
 
-                            await _notificationHub.Clients.Group(invoiceById.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                            await _notificationHub.Clients.Group(invoiceById.CustomerLot.Lot.Jewelry.Valuation.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
 
                             var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
@@ -756,9 +756,17 @@ namespace Application.Services
                     
                     invoiceExist.Status = EnumCustomerLot.PendingPayment.ToString();
                     invoiceExist.PaymentMethod = EnumPaymentType.Wallet.ToString();
-                    await _unitOfWork.SaveChangeAsync();
+                    invoiceExist.CustomerLot.Status = EnumCustomerLot.PendingPayment.ToString();
                     var httpContext = _httpContextAccessor.HttpContext;
                     string paymentUrl = await _vNPayService.CreatePaymentUrl(httpContext, vnPayModel,null);
+                    var historyStatusCustomerLot = new HistoryStatusCustomerLot()
+                    {
+                        CustomerLotId = invoiceExist.CustomerLot.Id,
+                        Status = EnumCustomerLot.PendingPayment.ToString(),
+                        CurrentTime = DateTime.UtcNow,
+                    };
+                    _customerLotService.CreateHistoryCustomerLot(historyStatusCustomerLot);
+                    await _unitOfWork.SaveChangeAsync();
                     // tra về url thanh toán 
                     // => Fe thanh toán xong gọi api refund
                     if (!string.IsNullOrEmpty(paymentUrl))
