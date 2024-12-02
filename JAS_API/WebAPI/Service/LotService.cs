@@ -686,6 +686,18 @@ namespace Application.Services
                     response.Message = $"The customer auctioned into the lot";
                     return response;
                 }
+
+                if(playerJoined.Lot.HaveFinancialProof == true)
+                {
+                    if(playerJoined.Customer.PriceLimit < model.CurrentPrice)
+                    {
+                        response.Code = 400;
+                        response.IsSuccess = false;
+                        response.Message = $"The customer haven't allow place bid out bidlimit current.";
+                        return response;
+                    }
+                }
+
                 var lot = await _unitOfWork.LotRepository.GetByIdAsync(model.LotId);
                 if (lot != null)
                 {
@@ -797,6 +809,18 @@ namespace Application.Services
                         response.Message = $"The customer is not register into the lot";
                         return response;
                     }
+
+                    if (playerJoined.Lot.HaveFinancialProof == true)
+                    {
+                        if (playerJoined.Customer.PriceLimit < playerJoined.Lot.FinalPriceSold)
+                        {
+                            response.Code = 400;
+                            response.IsSuccess = false;
+                            response.Message = $"The customer haven't allow place bid out bidlimit current.";
+                            return response;
+                        }
+                    }
+
                     var bidData = new BiddingInputDTO
                     {
                         CurrentPrice = playerJoined.Lot.FinalPriceSold,
