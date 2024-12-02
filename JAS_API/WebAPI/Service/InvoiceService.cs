@@ -564,6 +564,7 @@ namespace Application.Services
                         FeeShip = await FindFeeShipByDistanceAsync(distanceOfOrder.Result);
                     }
                     invoiceExist.FeeShip = FeeShip;
+                    invoiceExist.AddressToShipId = null;
                     invoiceExist.TotalPrice = invoiceExist.Price + invoiceExist.Free + invoiceExist.FeeShip - invoiceExist?.CustomerLot?.Lot?.Deposit;
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
