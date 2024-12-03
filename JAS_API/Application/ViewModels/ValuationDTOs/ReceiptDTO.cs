@@ -17,5 +17,8 @@ namespace Application.ViewModels.ValuationDTOs
 
         public string? Note { get; set; }
 
+        public string? Khoiluong { get; set; }
+
+        public string? JewelryName { get; set; }
     }
 }

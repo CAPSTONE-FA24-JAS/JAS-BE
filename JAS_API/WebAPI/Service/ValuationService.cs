@@ -647,10 +647,10 @@ namespace Application.Services
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
 
-                    AddHistoryValuation(valuationById.Id, valuationById.Status);                    
+                    AddHistoryValuation(valuationById.Id, valuationById.Status);
 
-                    byte[] pdfBytes = _generatePDFService.CreateReceiptPDF(valuationById, DateTime.UtcNow, receipt.ActualStatusOfJewelry, receipt.Note);
-
+                     byte[] pdfBytes = _generatePDFService.CreateReceiptPDF(valuationById, receipt.JewelryName, DateTime.UtcNow, receipt.ActualStatusOfJewelry, receipt.Note, receipt.Khoiluong);
+                    //byte[] pdfBytes = _generatePDFService.CreateAuthorizedPDF(valuationById);
                     using var memoryStream = new MemoryStream(pdfBytes);
 
                     var uploadFile = await _cloudinary.UploadAsync(new RawUploadParams
