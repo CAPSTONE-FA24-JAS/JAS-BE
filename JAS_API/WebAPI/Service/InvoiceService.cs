@@ -560,7 +560,9 @@ namespace Application.Services
                     if (!model.IsReceiveAtCompany)
                     {
                         var addressToShip = await _unitOfWork.AddressToShipRepository.GetByIdAsync(model.AddressToShipId);
-                        var distanceOfOrder = GetDistanceMatrix.GetDistanceAsync("Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Hồ Chí Minh 700000", addressToShip.AddressLine.ToString());
+                        var origin = Uri.EscapeDataString("Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Hồ Chí Minh 700000");
+                        var destination = Uri.EscapeDataString(addressToShip.AddressLine.ToString());
+                        var distanceOfOrder = GetDistanceMatrix.GetDistanceAsync(origin, destination);
                         FeeShip = await FindFeeShipByDistanceAsync(distanceOfOrder.Result);
                         IsReceivedAtCompany = false;
                     }
