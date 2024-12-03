@@ -333,6 +333,34 @@ namespace Application.Services
             }
             return reponse;
         }
+        public async Task<APIResponseModel> GetLotInAuctionId(int auctionId)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                var lots = await _unitOfWork.LotRepository.GetAllAsync(condition: x => x.AuctionId == auctionId, includes: new Expression<Func<Lot, object>>[] { x => x.Staff, x => x.Seller, x => x.Jewelry });
+                if (!lots.Any())
+                {
+                    reponse.Code = 404;
+                    reponse.IsSuccess = true;
+                    reponse.Message = "Not Found Lots";
+                }
+                else
+                {
+                    reponse.Code = 200;
+                    reponse.Data = _mapper.Map<IEnumerable<LotDTO>>(lots); ;
+                    reponse.IsSuccess = true;
+                    reponse.Message = $"Received lots is successfuly. Have {lots.Count()} lot in Auction";
+                }
+            }
+            catch (Exception e)
+            {
+                reponse.Code = 500;
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+        }
 
         public async Task<APIResponseModel> GetListStatusOfLot()
         {

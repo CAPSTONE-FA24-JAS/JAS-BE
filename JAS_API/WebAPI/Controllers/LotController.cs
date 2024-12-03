@@ -73,6 +73,17 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ViewListLotInAuction(int auctionId)
+        {
+            var result = await _lotService.GetLotInAuctionId(auctionId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> ViewDetailLotById(int Id)
         {
             var result = await _lotService.GetLotById(Id);
