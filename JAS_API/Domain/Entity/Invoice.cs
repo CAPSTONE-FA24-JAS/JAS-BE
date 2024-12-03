@@ -22,6 +22,7 @@ namespace Domain.Entity
         public int? StaffId { get; set; }
         public int? ShipperId { get; set; }
         public string? Note {get;set;}
+        public bool? IsReceiveAtCompany { get; set; }
         //
 
         public virtual AddressToShip? AddressToShip { get; set; }

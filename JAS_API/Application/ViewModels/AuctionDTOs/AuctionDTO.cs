@@ -1,4 +1,6 @@
-﻿using Domain.Entity;
+﻿using Application.ViewModels.LotDTOs;
+using AutoMapper;
+using Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +19,13 @@ namespace Application.ViewModels.AuctionDTOs
         public string? Description { get; set; }
         public string? ImageLink { get; set; }
         public string? Status { get; set; }
-        public int? TotalLot {  get; set; } 
+        public int? TotalLot {  get; set; }
 
-        //public virtual IEnumerable<Lot>? Lots { get; set; }
+        public virtual IEnumerable<LotDetailDTO>? LotDTOs { get; private set; } = Enumerable.Empty<LotDetailDTO>();
+
+        public void SetLotDTOs(IEnumerable<Lot> lots, IMapper mapper)
+        {
+            LotDTOs = mapper.Map<IEnumerable<LotDetailDTO>>(lots);
+        }
     }
 }
