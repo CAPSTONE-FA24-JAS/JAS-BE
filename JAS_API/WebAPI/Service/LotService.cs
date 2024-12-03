@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.Utils;
+using Application.ViewModels.AuctionDTOs;
 using Application.ViewModels.BidPriceDTOs;
 using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.LotDTOs;
@@ -306,8 +307,9 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
-                var lots = await _unitOfWork.LotRepository.GetAllAsync(condition: x => x.AuctionId == auctionId, includes: new Expression<Func<Lot, object>>[] { x => x.Staff, x => x.Seller, x => x.Jewelry });
-                if (!lots.Any())
+                //var lots = await _unitOfWork.LotRepository.GetAllAsync(condition: x => x.AuctionId == auctionId, includes: new Expression<Func<Lot, object>>[] { x => x.Staff, x => x.Seller, x => x.Jewelry });
+                var auction = await _unitOfWork.AuctionRepository.GetByIdAsync(auctionId);
+                if (auction == null)
                 {
                     reponse.Code = 404;
                     reponse.IsSuccess = true;
@@ -315,10 +317,12 @@ namespace Application.Services
                 }
                 else
                 {
+                    var auctionDTO = _mapper.Map<AuctionDTO>(auction);
+                    auctionDTO.SetLotDTOs(auction.Lots, _mapper);
                     reponse.Code = 200;
-                    reponse.Data = _mapper.Map<IEnumerable<LotDTO>>(lots);
+                    reponse.Data = auctionDTO;
                     reponse.IsSuccess = true;
-                    reponse.Message = $"Received lots is successfuly. Have {lots.Count} lot in Auction";
+                    reponse.Message = $"Received lots is successfuly. Have {auction.Lots.Count()} lot in Auction";
                 }
             }
             catch (Exception e)
