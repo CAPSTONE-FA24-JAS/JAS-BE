@@ -555,16 +555,18 @@ namespace Application.Services
                 var invoiceExist = await _unitOfWork.InvoiceRepository.GetByIdAsync(model.InvoiceId);
                 if (invoiceExist != null)
                 {
-                    invoiceExist.AddressToShipId = model.AddressToShipId;
                     float? FeeShip = 0.0f;
+                    bool? IsReceivedAtCompany = true;
                     if (!model.IsReceiveAtCompany)
                     {
                         var addressToShip = await _unitOfWork.AddressToShipRepository.GetByIdAsync(model.AddressToShipId);
                         var distanceOfOrder = GetDistanceMatrix.GetDistanceAsync("Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Hồ Chí Minh 700000", addressToShip.AddressLine.ToString());
                         FeeShip = await FindFeeShipByDistanceAsync(distanceOfOrder.Result);
+                        IsReceivedAtCompany = false;
                     }
+                    invoiceExist.AddressToShipId = (model.IsReceiveAtCompany == false)?model.AddressToShipId:null;
+                    invoiceExist.IsReceiveAtCompany = IsReceivedAtCompany;
                     invoiceExist.FeeShip = FeeShip;
-                    invoiceExist.AddressToShipId = null;
                     invoiceExist.TotalPrice = invoiceExist.Price + invoiceExist.Free + invoiceExist.FeeShip - invoiceExist?.CustomerLot?.Lot?.Deposit;
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
