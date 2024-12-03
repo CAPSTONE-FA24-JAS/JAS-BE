@@ -18,6 +18,7 @@ namespace Application.ViewModels.InvoiceDTOs
         public string? PaymentMethod { get; set; }
         public int? AddressToShipId { get; set; }
         public int? ShipperId { get; set; }
+        public bool? IsReceiveAtCompany { get; set; }
         public DateTime CreationDate { get; set; }
         public MyBidDTO? MyBidDTO { get; set; }
     }
@@ -37,8 +38,6 @@ namespace Application.ViewModels.InvoiceDTOs
         public string? AddressToShip { get; set; }
         public float? Free { get; set; }
         public float? FeeShip { get; set; }
-        
-
 
         public IEnumerable<StatusInvoiceDTO>? StatusInvoiceDTOs { get; set; }
     }
