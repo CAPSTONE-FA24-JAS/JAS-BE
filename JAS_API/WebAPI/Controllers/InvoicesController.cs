@@ -288,5 +288,19 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> getDeliveringInvoicesByShipperToAssign(int shipperId, int? pageIndex, int? pageSize)
+        {
+            var result = await _invoiceService.getInvoicesDeliveringByShipperToAssign(shipperId, pageSize, pageIndex);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }
