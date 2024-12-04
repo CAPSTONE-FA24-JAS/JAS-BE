@@ -12,8 +12,8 @@ namespace Application.Utils
         )
         {
             var userName = "JAS";
-            var emailFrom = "danhdcss160060@fpt.edu.vn";
-            var password = "iiws nica yiuu irnk";
+            var emailFrom = "jassystem57@gmail.com";
+            var password = "xqoj jhnk jgjs qvev";
             string emailTemplate =
                 @"
 <html>
@@ -138,8 +138,8 @@ namespace Application.Utils
         public static async Task<bool> SendEmailOTP(string toEmail, string OTP)
         {
             var userName = "JAS";
-            var emailFrom = "danhdcss160060@fpt.edu.vn";
-            var password = "iiws nica yiuu irnk";
+            var emailFrom = "jassystem57@gmail.com";
+            var password = "xqoj jhnk jgjs qvev";
             string emailTemplate = @"<!DOCTYPE html>
             <html lang='vi'>
 
