@@ -570,6 +570,7 @@ namespace Application.Services
                     invoiceExist.IsReceiveAtCompany = IsReceivedAtCompany;
                     invoiceExist.FeeShip = FeeShip;
                     invoiceExist.TotalPrice = invoiceExist.Price + invoiceExist.Free + invoiceExist.FeeShip - invoiceExist?.CustomerLot?.Lot?.Deposit;
+                     _unitOfWork.InvoiceRepository.Update(invoiceExist);
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         response.Message = $"Update Invoice Successfully";
