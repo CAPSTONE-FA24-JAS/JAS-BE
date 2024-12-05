@@ -26,42 +26,29 @@ namespace WebAPI.Service
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //try
-            //{
-            //    while (!stoppingToken.IsCancellationRequested)
-            //    {
-            //        using (var scope = _serviceProvider.CreateScope())
-            //        {
-            //            await AutoBidAsync();
-            //        }
-            //        await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    _logger.LogError(ex, "Error occurred in AutoBidBackgroundService");
-            //    // Consider if you want to continue or throw
-            //    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken); // Delay before retry
-            //}
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
                     using (var scope = _serviceProvider.CreateScope())
                     {
-                        await AutoBidAsync();
+                        //await AutoBidAsync(stoppingToken);
                     }
-                    await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogInformation("Operation canceled.");
+                    break;
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error occurred in AutoBidBackgroundService");
-                    // Consider if you want to continue or throw
-                    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken); // Delay before retry
+                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
                 }
             }
         }
-        public async Task AutoBidAsync()
+        public async Task AutoBidAsync(CancellationToken stoppingToken)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -75,6 +62,7 @@ namespace WebAPI.Service
                 var customerLots = new List<CustomerLot>();
                 foreach (var item in customerLotActives)
                 {
+                    stoppingToken.ThrowIfCancellationRequested();
                     string redisKey1 = $"BidPrice:{item.LotId}";
                     //lay ra highest bidPrice
                     var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == item.LotId);
@@ -88,12 +76,14 @@ namespace WebAPI.Service
                         customerLots.Add(item);
                     }
                 }
-
-                try
+                var tasks = customerLots.Select(async player =>
                 {
-
-                    foreach (var player in customerLots)
+                    try
                     {
+                    
+                        //foreach (var player in customerLots)
+                        //{
+                        stoppingToken.ThrowIfCancellationRequested();
 
                         if (await _customerLotService.CheckTimeAutoBid(player.Id))
                         {
@@ -109,12 +99,12 @@ namespace WebAPI.Service
                             var autobidAvaiable = player.AutoBids?.FirstOrDefault(x => x.IsActive == true && x.MinPrice <= highestBidOfLot && x.MaxPrice >= highestBidOfLot);
                             if ((currentPriceOfPlayer != null && currentPriceOfPlayer.CurrentPrice.Value >= highestBidOfLot) || highestBidOfLot == null)
                             {
-                                continue;
+                                return;
                             }
 
                             if (player.Lot == null || player.Customer == null || highestBidOfLot == null)
                             {
-                                continue;
+                                return;
                             }
 
                             //tìm ra autobid phù hợp với autobid có tg thực hiện giữa mỗi lần auto
@@ -133,7 +123,7 @@ namespace WebAPI.Service
                                     //nếu giá đấu tương lai lớn hơn giá bán cuối của lot thì ko làm gì cả
                                     if (bidPriceFuture > player.Lot.FinalPriceSold)
                                     {
-                                        continue;
+                                        return;
                                     }
                                     var (isFuturePrice, price) = await _customerLotService.CheckBidPriceTop((float)bidPriceFuture, highestBidOfLot, autobidAvaiable);
 
@@ -147,7 +137,6 @@ namespace WebAPI.Service
                                     // Nếu giá đấu hiện tại bé hơn, thì lấy bidPriceFuture luôn, không cânf kt lại
                                     if (isFuturePrice && price != null)
                                     {
-
                                         //kiểm tra bidLimit của customer có đủ điều kiện để đấu với giá này hay không
                                         if (player.Customer.PriceLimit >= bidPriceFuture)
                                         {
@@ -235,17 +224,20 @@ namespace WebAPI.Service
                                     }
                                     if (!isFuturePrice && price == null)
                                     {
-                                        continue;
+                                        return;
                                     }
                                 }
                             }
                         }
+                    //}
                     }
-                }
-                catch (Exception e)
-                {
-                    throw;
-                }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e, $"Error processing player {player.Id}");
+                        throw;
+                    }
+                });
+                await Task.WhenAll(tasks);
             }
         }
 
