@@ -17,6 +17,6 @@ namespace Application.Repositories
         Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesDeliveringByShipper(int shipperId, int? pageIndex, int? pageSize);
 
         Task<(List<int?> shipperIds, List<int> invoiceCounts)> getShipperAndInvoices();
-        Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesDeliveringByShipperToAssign(int shipperId, int? pageIndex, int? pageSize);
+        Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesDeliveringByShipperToAssign(int? pageIndex, int? pageSize);
         }
 }
