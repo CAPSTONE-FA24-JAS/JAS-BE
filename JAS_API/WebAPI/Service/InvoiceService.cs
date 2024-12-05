@@ -1211,14 +1211,14 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> getInvoicesDeliveringByShipperToAssign(int shipperId, int? pageIndex, int? pageSize)
+        public async Task<APIResponseModel> getInvoicesDeliveringByShipperToAssign(int? pageIndex, int? pageSize)
         {
             var response = new APIResponseModel();
 
             try
             {
                 Expression<Func<Invoice, bool>> filter;
-                var invoices = await _unitOfWork.InvoiceRepository.getInvoicesDeliveringByShipperToAssign(shipperId, pageIndex, pageSize);
+                var invoices = await _unitOfWork.InvoiceRepository.getInvoicesDeliveringByShipperToAssign(pageIndex, pageSize);
                 List<InvoiceDetailDTO> listInvoiceDTO = new List<InvoiceDetailDTO>();
                 if (invoices.totalItems > 0)
                 {

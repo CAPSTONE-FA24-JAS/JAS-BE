@@ -290,9 +290,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> getDeliveringInvoicesByShipperToAssign(int shipperId, int? pageIndex, int? pageSize)
+        public async Task<IActionResult> getDeliveringInvoicesByShipperToAssign(int? pageIndex, int? pageSize)
         {
-            var result = await _invoiceService.getInvoicesDeliveringByShipperToAssign(shipperId, pageSize, pageIndex);
+            var result = await _invoiceService.getInvoicesDeliveringByShipperToAssign(pageSize, pageIndex);
             if (result.IsSuccess)
             {
                 return Ok(result);

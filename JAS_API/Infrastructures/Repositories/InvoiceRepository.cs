@@ -166,13 +166,13 @@ namespace Infrastructures.Repositories
             return (shipperIds, invoiceCounts);
         }
 
-        public async Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesDeliveringByShipperToAssign(int shipperId, int? pageIndex, int? pageSize)
+        public async Task<(IEnumerable<Invoice> data, int totalItems)> getInvoicesDeliveringByShipperToAssign(int? pageIndex, int? pageSize)
         {
             IQueryable<Invoice> invoices;
 
 
             invoices = _dbContext.Invoices.Include(x => x.StatusInvoices)
-                                         .Where(x => x.ShipperId == shipperId && x.Status == "Delivering");
+                                         .Where(x => x.Status == "Delivering");
 
 
 
