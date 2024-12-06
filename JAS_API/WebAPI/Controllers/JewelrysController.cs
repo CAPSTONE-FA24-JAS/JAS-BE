@@ -216,9 +216,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> RejectByOwnerAsync(int jewelryId, int status)
+        public async Task<IActionResult> RejectByOwnerAsync(int jewelryId, int status, string reason)
         {
-            var result = await _jewelryService.RejectByOwnerAsync(jewelryId, status);
+            var result = await _jewelryService.RejectByOwnerAsync(jewelryId, status, reason);
             if (result.IsSuccess)
             {
                 return Ok(result);

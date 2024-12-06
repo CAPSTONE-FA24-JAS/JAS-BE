@@ -1512,7 +1512,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> RejectByOwnerAsync(int jewelryId, int status)
+        public async Task<APIResponseModel> RejectByOwnerAsync(int jewelryId, int status, string reason)
         {
             var response = new APIResponseModel();
             try
@@ -1521,6 +1521,7 @@ namespace Application.Services
                 if (jewelryById != null)
                 {
                     jewelryById.Valuation.Status = EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name;
+                    jewelryById.Valuation.CancelReason = reason;
 
                     jewelryById.Status = EnumStatusJewelry.Canceled.ToString();
                     AddHistoryValuation(jewelryById.Valuation.Id, EnumHelper.GetEnums<EnumStatusValuation>().FirstOrDefault(x => x.Value == status).Name);
