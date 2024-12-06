@@ -214,5 +214,19 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+        [HttpPut]
+        public async Task<IActionResult> RejectByOwnerAsync(int jewelryId, int status)
+        {
+            var result = await _jewelryService.RejectByOwnerAsync(jewelryId, status);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }

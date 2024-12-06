@@ -126,7 +126,7 @@ namespace Application.Services
                     };
 
                     await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
-                    
+
                     var notification = new Notification
                     {
                         Title = $"Has been assigned for invoice {invoiceById.Id}",
@@ -351,9 +351,9 @@ namespace Application.Services
                     else
                     {
                         var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(invoiceById.CustomerLot.Lot.JewelryId);
-                        
 
-                        if(jewelry == null)
+
+                        if (jewelry == null)
                         {
                             response.Message = $"jewelry not found!";
                             response.Code = 404;
@@ -434,7 +434,7 @@ namespace Application.Services
                             response.IsSuccess = true;
                             response.Data = valuationDTO;
                         }
-                        
+
 
 
                     }
@@ -566,11 +566,11 @@ namespace Application.Services
                         FeeShip = await FindFeeShipByDistanceAsync(distanceOfOrder.Result);
                         IsReceivedAtCompany = false;
                     }
-                    invoiceExist.AddressToShipId = (model.IsReceiveAtCompany == false)?model.AddressToShipId:null;
+                    invoiceExist.AddressToShipId = (model.IsReceiveAtCompany == false) ? model.AddressToShipId : null;
                     invoiceExist.IsReceiveAtCompany = IsReceivedAtCompany;
                     invoiceExist.FeeShip = FeeShip;
                     invoiceExist.TotalPrice = invoiceExist.Price + invoiceExist.Free + invoiceExist.FeeShip - invoiceExist?.CustomerLot?.Lot?.Deposit;
-                     _unitOfWork.InvoiceRepository.Update(invoiceExist);
+                    _unitOfWork.InvoiceRepository.Update(invoiceExist);
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         response.Message = $"Update Invoice Successfully";
@@ -600,7 +600,7 @@ namespace Application.Services
             }
             return response;
         }
-        
+
         internal async Task<float?> FindFeeShipByDistanceAsync(float distance)
         {
             var feeShips = await _unitOfWork.FeeShipRepository
@@ -759,12 +759,12 @@ namespace Application.Services
                         OrderId = new Random().Next(1000, 100000),
                         DocNo = invoiceExist.Id,
                     };
-                    
+
                     invoiceExist.Status = EnumCustomerLot.PendingPayment.ToString();
                     invoiceExist.PaymentMethod = EnumPaymentType.Wallet.ToString();
                     invoiceExist.CustomerLot.Status = EnumCustomerLot.PendingPayment.ToString();
                     var httpContext = _httpContextAccessor.HttpContext;
-                    string paymentUrl = await _vNPayService.CreatePaymentUrl(httpContext, vnPayModel,null);
+                    string paymentUrl = await _vNPayService.CreatePaymentUrl(httpContext, vnPayModel, null);
                     var historyStatusCustomerLot = new HistoryStatusCustomerLot()
                     {
                         CustomerLotId = invoiceExist.CustomerLot.Id,
@@ -935,10 +935,10 @@ namespace Application.Services
                 if (invoiceById != null)
                 {
                     var checkInvoiceHaveTrans = await _unitOfWork.WalletTransactionRepository
-                                                        .GetAllAsync(x => x.DocNo == model.InvoiceId 
+                                                        .GetAllAsync(x => x.DocNo == model.InvoiceId
                                                         && x.Status == EnumStatusTransaction.Pending.ToString()
                                                         && x.transactionType == EnumTransactionType.Banktransfer.ToString().Trim());
-                    if(checkInvoiceHaveTrans == null) 
+                    if (checkInvoiceHaveTrans == null)
                     {
                         response.Message = $"Dont have invoice for upload payment with banktransfer";
                         response.Code = 400;
@@ -960,9 +960,9 @@ namespace Application.Services
                     }
                     else
                     {
-                        
+
                         invoiceById.LinkBillTransaction = uploadResult.SecureUrl.AbsoluteUri;
-                        
+
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
                             var notification = new Notification
@@ -1070,7 +1070,7 @@ namespace Application.Services
         public Lot GetLotInInvoice(int invoiceId)
         {
             var lotExit = _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId).Result?.CustomerLot?.Lot;
-            if (lotExit == null) 
+            if (lotExit == null)
             {
                 return null;
             }
@@ -1083,7 +1083,7 @@ namespace Application.Services
 
             try
             {
-                var invoice = await _unitOfWork.InvoiceRepository.GetAllAsync(condition: x => x.Status == EnumCustomerLot.PendingPayment.ToString() && x.InvoiceOfWalletTransaction.transactionType == EnumTransactionType.Banktransfer.ToString()  && x.LinkBillTransaction != null);
+                var invoice = await _unitOfWork.InvoiceRepository.GetAllAsync(condition: x => x.Status == EnumCustomerLot.PendingPayment.ToString() && x.InvoiceOfWalletTransaction.transactionType == EnumTransactionType.Banktransfer.ToString() && x.LinkBillTransaction != null);
                 if (invoice.Count > 0)
                 {
                     var invoicesResponse = _mapper.Map<IEnumerable<ViewCheckInvoiceHaveBill>>(invoice);
@@ -1168,10 +1168,10 @@ namespace Application.Services
 
             try
             {
-                
+
                 var result = await _unitOfWork.InvoiceRepository.getShipperAndInvoices();
                 List<StaffDTO> shippers = new List<StaffDTO>();
-               
+
                 if (result.shipperIds != null && result.invoiceCounts != null)
                 {
                     foreach (var shipperId in result.shipperIds)
@@ -1258,5 +1258,262 @@ namespace Application.Services
             return response;
         }
 
+        public async Task<APIResponseModel> CancelledInvoiceByManager(int invoiceId)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
+                if (invoiceById != null)
+                {
+                    invoiceById.CustomerLot.Status = EnumCustomerLot.Cancelled.ToString();
+
+                    invoiceById.Status = EnumCustomerLot.Cancelled.ToString();
+                    _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
+                    _unitOfWork.InvoiceRepository.Update(invoiceById);
+                    invoiceById.CustomerLot.Lot.Status = EnumStatusLot.Passed.ToString();
+
+                    var historyCustomerLot = new HistoryStatusCustomerLot
+                    {
+                        CurrentTime = DateTime.Now,
+                        Status = EnumCustomerLot.Cancelled.ToString(),
+                        CustomerLotId = invoiceById.CustomerLotId
+                    };
+
+                    await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
+
+                    var notification = new Notification
+                    {
+                        Title = $"Your invoice {invoiceById.Id} had been cancelled",
+                        Description = $"Your invoice {invoiceById.Id} had been cancelled by manager because payment overdue.",
+                        Is_Read = false,
+                        NotifiableId = invoiceById.Id,  //invoiceById
+                        AccountId = invoiceById.CustomerLot.Customer.AccountId,
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "Cancelled",
+                        ImageLink = invoiceById.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+                    };
+
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
+
+                    await _unitOfWork.SaveChangeAsync();
+                    var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
+
+                    response.Message = $"cancelled invoice Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationDTO;
+                }
+                else
+                {
+                    response.Message = $"Not found invoice";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> UpdateRejectedInvoiceByShipper(int invoiceId)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
+                if (invoiceById != null)
+                {
+                    invoiceById.CustomerLot.Status = EnumCustomerLot.Rejected.ToString();
+
+                    invoiceById.Status = EnumCustomerLot.Rejected.ToString();
+                    _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
+                    _unitOfWork.InvoiceRepository.Update(invoiceById);
+
+                    var historyCustomerLot = new HistoryStatusCustomerLot
+                    {
+                        CurrentTime = DateTime.Now,
+                        Status = EnumCustomerLot.Rejected.ToString(),
+                        CustomerLotId = invoiceById.CustomerLotId
+                    };
+
+                    await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
+
+                    var notification = new Notification
+                    {
+                        Title = $"invoice {invoiceById.Id} had been Rejected",
+                        Description = $"invoice {invoiceById.Id} had been Rejected by customer because problem goods.",
+                        Is_Read = false,
+                        NotifiableId = invoiceById.Id,  //invoiceById
+                        AccountId = 61,
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "Rejected",
+                        ImageLink = invoiceById.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+                    };
+
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
+
+                    await _unitOfWork.SaveChangeAsync();
+                    var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
+
+                    response.Message = $"Rejected invoice Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationDTO;
+                }
+                else
+                {
+                    response.Message = $"Not found invoice";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> ClosedInvoiceByManager(int invoiceId)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
+                if (invoiceById != null)
+                {
+                    invoiceById.CustomerLot.Status = EnumCustomerLot.Closed.ToString();
+
+                    invoiceById.Status = EnumCustomerLot.Closed.ToString();
+                    _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
+                    _unitOfWork.InvoiceRepository.Update(invoiceById);
+
+                    //hoan tien cho nguoi mua
+                    var buyerId = invoiceById.CustomerLot.CustomerId;
+                    if (buyerId == null)
+                    {
+                        throw new Exception("Khong tim thay sellerId");
+                    }
+                    else
+                    {
+                        var lot = await _unitOfWork.LotRepository.GetByIdAsync(invoiceById.CustomerLot.LotId);
+
+
+                        if (lot == null)
+                        {
+                            response.Message = $"jewelry not lot!";
+                            response.Code = 404;
+                            response.IsSuccess = false;
+                        }
+                        else
+                        {
+                            //cong vao cho wallet seller
+                            var walletOfSeller = await _unitOfWork.WalletRepository.GetByCustomerId(buyerId);
+
+
+                            walletOfSeller.AvailableBalance += (decimal?)invoiceById?.TotalPrice ?? 0;
+                            walletOfSeller.Balance = walletOfSeller.AvailableBalance ?? 0 + walletOfSeller.FrozenBalance ?? 0;
+                            _unitOfWork.WalletRepository.Update(walletOfSeller);
+
+                            
+                            lot.Status = EnumStatusLot.Passed.ToString();
+                            _unitOfWork.LotRepository.Update(lot);
+                            //lưu transation vi seller
+                            var wallerTransaction = new WalletTransaction
+                            {
+                                transactionType = EnumTransactionType.RefundInvoice.ToString(),
+                                DocNo = invoiceById.Id,
+                                Amount = invoiceById?.TotalPrice,
+                                TransactionTime = DateTime.Now,
+                                Status = "Completed",
+                                WalletId = walletOfSeller.Id,
+                                transactionPerson = (int)buyerId,
+                            };
+
+                            await _unitOfWork.WalletTransactionRepository.AddAsync(wallerTransaction);
+
+
+                            //luu transaction cho cong ty
+                            var transactionCompany = new Transaction
+                            {
+                                DocNo = invoiceById.Id,
+                                Amount = invoiceById?.TotalPrice,
+                                TransactionTime = wallerTransaction.TransactionTime,
+                                TransactionType = EnumTransactionType.RefundInvoice.ToString(),
+                                TransactionPerson = buyerId,
+                            };
+                            await _unitOfWork.TransactionRepository.AddAsync(transactionCompany);
+
+
+                            //luu history cho history customerlot
+                            var historyCustomerLot = new HistoryStatusCustomerLot
+                            {
+                                CurrentTime = DateTime.Now,
+                                Status = EnumCustomerLot.Closed.ToString(),
+                                CustomerLotId = invoiceById.CustomerLotId
+                            };
+
+                            await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
+
+                            var notification = new Notification
+                            {
+                                Title = $"Closed invoice {invoiceById.Id}",
+                                Description = $"Your Invoice {invoiceById.Id} had been Closed and company auto paid into your wallet for you.Please check your wallet!",
+                                Is_Read = false,
+                                NotifiableId = invoiceById.Id,  //invoiceById
+                                AccountId = invoiceById.CustomerLot.Lot.Jewelry.Valuation.Seller.AccountId,
+                                CreationDate = DateTime.UtcNow,
+                                Notifi_Type = "Closed",
+                                ImageLink = invoiceById.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+                            };
+
+                            await _unitOfWork.NotificationRepository.AddAsync(notification);
+
+                            await _unitOfWork.SaveChangeAsync();
+
+                            await _notificationHub.Clients.Group(invoiceById.CustomerLot.Lot.Jewelry.Valuation.Seller.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+
+
+                            var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
+
+                            response.Message = $"Finish invoice!";
+                            response.Code = 200;
+                            response.IsSuccess = true;
+                            response.Data = valuationDTO;
+                        }
+
+
+
+                    }
+
+                }
+                else
+                {
+                    response.Message = $"Not found invoice";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
     }
 }

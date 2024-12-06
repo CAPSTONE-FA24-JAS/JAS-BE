@@ -44,5 +44,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> getJewelryByIdAsync(int id);
         Task<APIResponseModel> RejectByManagerAsync(int jewelryId, int status);
 
+        Task<APIResponseModel> RejectByOwnerAsync(int jewelryId, int status);
+
     }
 }

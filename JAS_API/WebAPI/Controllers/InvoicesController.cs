@@ -302,5 +302,48 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+        [HttpPut]
+        public async Task<IActionResult> CancelledInvoiceByManager(int invoiceId)
+        {
+            var result = await _invoiceService.CancelledInvoiceByManager(invoiceId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateRejectedInvoiceByShipper(int invoiceId)
+        {
+            var result = await _invoiceService.UpdateRejectedInvoiceByShipper(invoiceId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> ClosedInvoiceByManager(int invoiceId)
+        {
+            var result = await _invoiceService.ClosedInvoiceByManager(invoiceId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
     }
 }
