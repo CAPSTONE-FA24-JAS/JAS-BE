@@ -1258,7 +1258,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> CancelledInvoiceByManager(int invoiceId)
+        public async Task<APIResponseModel> CancelledInvoiceByManager(int invoiceId, string reason)
         {
             var response = new APIResponseModel();
             try
@@ -1267,7 +1267,7 @@ namespace Application.Services
                 if (invoiceById != null)
                 {
                     invoiceById.CustomerLot.Status = EnumCustomerLot.Cancelled.ToString();
-
+                    invoiceById.Note = reason;
                     invoiceById.Status = EnumCustomerLot.Cancelled.ToString();
                     _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
                     _unitOfWork.InvoiceRepository.Update(invoiceById);
@@ -1322,7 +1322,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> UpdateRejectedInvoiceByShipper(int invoiceId)
+        public async Task<APIResponseModel> UpdateRejectedInvoiceByShipper(int invoiceId, string reason)
         {
             var response = new APIResponseModel();
             try
@@ -1331,7 +1331,7 @@ namespace Application.Services
                 if (invoiceById != null)
                 {
                     invoiceById.CustomerLot.Status = EnumCustomerLot.Rejected.ToString();
-
+                    invoiceById.Note = reason;
                     invoiceById.Status = EnumCustomerLot.Rejected.ToString();
                     _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
                     _unitOfWork.InvoiceRepository.Update(invoiceById);
@@ -1497,6 +1497,70 @@ namespace Application.Services
 
                     }
 
+                }
+                else
+                {
+                    response.Message = $"Not found invoice";
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> CancelledInvoiceByBuyer(int invoiceId, string reason)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var invoiceById = await _unitOfWork.InvoiceRepository.GetByIdAsync(invoiceId);
+                if (invoiceById != null)
+                {
+                    invoiceById.CustomerLot.Status = EnumCustomerLot.Cancelled.ToString();
+                    invoiceById.Note = reason;
+                    invoiceById.Status = EnumCustomerLot.Cancelled.ToString();
+                    _unitOfWork.CustomerLotRepository.Update(invoiceById.CustomerLot);
+                    _unitOfWork.InvoiceRepository.Update(invoiceById);
+                    invoiceById.CustomerLot.Lot.Status = EnumStatusLot.Passed.ToString();
+
+                    var historyCustomerLot = new HistoryStatusCustomerLot
+                    {
+                        CurrentTime = DateTime.Now,
+                        Status = EnumCustomerLot.Cancelled.ToString(),
+                        CustomerLotId = invoiceById.CustomerLotId
+                    };
+
+                    await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyCustomerLot);
+
+                    var notification = new Notification
+                    {
+                        Title = $"Invoice {invoiceById.Id} had been cancelled",
+                        Description = $"Invoice {invoiceById.Id} had been cancelled by customer.",
+                        Is_Read = false,
+                        NotifiableId = invoiceById.Id,  //invoiceById
+                        AccountId = 61,
+                        CreationDate = DateTime.UtcNow,
+                        Notifi_Type = "Cancelled",
+                        ImageLink = invoiceById.CustomerLot.Lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink
+                    };
+
+                    await _unitOfWork.NotificationRepository.AddAsync(notification);
+
+                    await _unitOfWork.SaveChangeAsync();
+                    var valuationDTO = _mapper.Map<InvoiceDTO>(invoiceById);
+
+                    response.Message = $"cancelled invoice Successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = valuationDTO;
                 }
                 else
                 {
