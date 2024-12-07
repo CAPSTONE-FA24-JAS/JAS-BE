@@ -111,7 +111,7 @@ namespace WebAPI.Service
                             if (autobidAvaiable != null)
                             {
                                 //check time step next
-                                TimeSpan availableTime = TimeSpan.FromMinutes(autobidAvaiable.TimeIncrement.Value);
+                                TimeSpan availableTime = TimeSpan.FromSeconds(autobidAvaiable.TimeIncrement.Value);
 
                                 TimeSpan distanceTime = (currentPriceOfPlayer != null)
                                                         ? (DateTime.UtcNow - currentPriceOfPlayer.BidTime.Value)
