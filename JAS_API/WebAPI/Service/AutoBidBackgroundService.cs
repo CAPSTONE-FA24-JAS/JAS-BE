@@ -32,7 +32,7 @@ namespace WebAPI.Service
                 {
                     using (var scope = _serviceProvider.CreateScope())
                     {
-                        //await AutoBidAsync(stoppingToken);
+                        await AutoBidAsync(stoppingToken);
                     }
                     await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
                 }
