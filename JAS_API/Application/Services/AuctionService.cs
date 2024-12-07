@@ -2,14 +2,11 @@
 using Application.ServiceReponse;
 using Application.Utils;
 using Application.ViewModels.AuctionDTOs;
-using Application.ViewModels.BidLimitDTOs;
 using AutoMapper;
-using Azure;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Domain.Entity;
 using Domain.Enums;
-using Google.Apis.Util;
 
 namespace Application.Services
 {
@@ -23,8 +20,10 @@ namespace Application.Services
         private const string Tags = "Backend_ImageAuction";
         private readonly ILotService _lotService;
         private readonly ICacheService _cacheService;
+        private readonly IWalletService _walletService;
+        private readonly IServiceProvider _serviceProvider;
 
-        public AuctionService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService, ICurrentTime currentTime, Cloudinary cloudinary, ILotService lotService, ICacheService cacheService)
+        public AuctionService(IUnitOfWork unitOfWork, IMapper mapper, IClaimsService claimsService, ICurrentTime currentTime, Cloudinary cloudinary, ILotService lotService, ICacheService cacheService, IWalletService walletService, IServiceProvider serviceProvider)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -33,6 +32,8 @@ namespace Application.Services
             _cloudinary = cloudinary;
             _lotService = lotService;
             _cacheService = cacheService;
+            _walletService = walletService;
+            _serviceProvider = serviceProvider;
         }
 
         public async Task<APIResponseModel> CreateAuction(CreateAuctionDTO createAuctionDTO)
@@ -49,7 +50,7 @@ namespace Application.Services
                 }
                 var newAuction = _mapper.Map<Auction>(createAuctionDTO);
                 newAuction.Status = EnumStatusAuction.Waiting.ToString();
-                if(newAuction == null)
+                if (newAuction == null)
                 {
                     reponse.IsSuccess = false;
                     reponse.Message = "Auction is wrong when mapping";
@@ -70,7 +71,7 @@ namespace Application.Services
                 }
                 newAuction.ImageLink = uploadResult.SecureUrl.AbsoluteUri;
                 await _unitOfWork.AuctionRepository.AddAsync(newAuction);
-                if(await _unitOfWork.SaveChangeAsync() > 0)
+                if (await _unitOfWork.SaveChangeAsync() > 0)
                 {
                     reponse.IsSuccess = true;
                     reponse.Message = "Auction created successfully.";
@@ -256,7 +257,7 @@ namespace Application.Services
                     reponse.Code = 404;
                     return reponse;
                 }
-                if(auctionExisted.Status == EnumStatusAuction.Waiting.ToString())
+                if (auctionExisted.Status == EnumStatusAuction.Waiting.ToString())
                 {
                     _mapper.Map(updateAuctionDTO, auctionExisted);
                     auctionExisted.ModificationDate = DateTime.Now;
@@ -277,8 +278,8 @@ namespace Application.Services
                     reponse.Code = 400;
                     return reponse;
                 }
-                
-                if(updateAuctionDTO.FileImage != null)
+
+                if (updateAuctionDTO.FileImage != null)
                 {
                     var uploadResult = await _cloudinary.UploadAsync(new ImageUploadParams
                     {
@@ -424,15 +425,22 @@ namespace Application.Services
                 }
                 else
                 {
-
-                    auctionExisted.Status = EnumStatusAuction.Cancelled.ToString();
-                    auctionExisted.ModificationDate = DateTime.Now;
-                    auctionExisted.ModificationBy = _claimsService.GetCurrentUserId;
-                    await _lotService.UpdateLotRange(auctionExisted.Id, EnumStatusAuction.Cancelled.ToString());
+                    switch (auctionExisted.Status)
+                    {
+                        case nameof(EnumStatusAuction.UpComing):
+                            auctionExisted.Status = EnumStatusAuction.Cancelled.ToString();
+                            auctionExisted.ModificationDate = DateTime.Now;
+                            await _lotService.UpdateLotRange(auctionExisted.Id, EnumStatusAuction.Cancelled.ToString());
+                            break;
+                        case nameof(EnumStatusAuction.Live):
+                            auctionExisted.Status = EnumStatusAuction.Cancelled.ToString();
+                            auctionExisted.ModificationDate = DateTime.Now;
+                            await SetAfterCancelForLotWhenLive(auctionExisted);
+                            break;
+                        default:
+                            break;
+                    }
                     _unitOfWork.AuctionRepository.Update(auctionExisted);
-
-
-
                     if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         reponse.IsSuccess = true;
@@ -446,8 +454,8 @@ namespace Application.Services
                         reponse.IsSuccess = false;
                         reponse.Message = "Aution cannt saving because some condition.";
                     }
-                } 
-               
+                }
+
             }
             catch (Exception e)
             {
@@ -457,6 +465,46 @@ namespace Application.Services
                 reponse.Code = 500;
             }
             return reponse;
+        }
+        private async Task SetAfterCancelForLotWhenLive(Auction auction)
+        {
+            var lots = auction?.Lots?.ToList();
+            if (lots.Any())
+            {
+                // Set Lot
+                var tasks = lots.Select(async lot =>
+                {
+                    lot.Status = EnumStatusLot.Passed.ToString();
+                    List<CustomerLot> players = lot.CustomerLots.ToList();
+                    if (players.Count > 0)
+                    {
+                        var tasksPlayers = players.Select(async player =>
+                        {
+                            player.Status = EnumCustomerLot.Refunded.ToString();
+                            player.IsWinner = false;
+                            player.IsRefunded = true;
+                            //var notification = new Notification
+                            //{
+                            //    Title = $"Bidding lose in lot {player.LotId}",
+                            //    Description = $" You had been lose in lot {player.LotId} và system auto refunded deposit for you",
+                            //    Is_Read = false,
+                            //    NotifiableId = player.Id,
+                            //    AccountId = player.Customer.AccountId,
+                            //    CreationDate = DateTime.UtcNow,
+                            //    Notifi_Type = "Refunded",
+                            //    ImageLink = player.Lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
+                            //};
+
+                            //await _unitOfWork.NotificationRepository.AddAsync(notification);
+                            //await _notificationHub.Clients.Group(player.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+                        });
+                        await Task.WhenAll(tasksPlayers);
+                        await _walletService.RefundToWalletForUsersAsync(players);
+                    }
+                    return;
+                });
+                await Task.WhenAll(tasks);
+            }
         }
     }
 }
