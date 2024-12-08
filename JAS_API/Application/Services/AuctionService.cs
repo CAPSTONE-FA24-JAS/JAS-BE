@@ -426,12 +426,12 @@ namespace Application.Services
                     switch (auctionExisted.Status)
                     {
                         case nameof(EnumStatusAuction.UpComing):
-                            auctionExisted.Status = EnumStatusAuction.Canceled.ToString();
+                            auctionExisted.Status = EnumStatusAuction.Cancelled.ToString();
                             auctionExisted.ModificationDate = DateTime.Now;
                             await SetAfterCancelForLot(auctionExisted);
                             break;
                         case nameof(EnumStatusAuction.Live):
-                            auctionExisted.Status = EnumStatusAuction.Canceled.ToString();
+                            auctionExisted.Status = EnumStatusAuction.Cancelled.ToString();
                             auctionExisted.ModificationDate = DateTime.Now;
                             await SetAfterCancelForLot(auctionExisted);
                             break;
