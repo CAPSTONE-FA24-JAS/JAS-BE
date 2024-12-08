@@ -6,6 +6,6 @@
         UpComing = 2,
         Live = 3,
         Past = 4,
-        Cancelled = 5
+        Canceled = 5
     }
 }

@@ -426,14 +426,14 @@ namespace Application.Services
                     switch (auctionExisted.Status)
                     {
                         case nameof(EnumStatusAuction.UpComing):
-                            auctionExisted.Status = EnumStatusAuction.Cancelled.ToString();
+                            auctionExisted.Status = EnumStatusAuction.Canceled.ToString();
                             auctionExisted.ModificationDate = DateTime.Now;
-                            await _lotService.UpdateLotRange(auctionExisted.Id, EnumStatusAuction.Cancelled.ToString());
+                            await SetAfterCancelForLot(auctionExisted);
                             break;
                         case nameof(EnumStatusAuction.Live):
-                            auctionExisted.Status = EnumStatusAuction.Cancelled.ToString();
+                            auctionExisted.Status = EnumStatusAuction.Canceled.ToString();
                             auctionExisted.ModificationDate = DateTime.Now;
-                            await SetAfterCancelForLotWhenLive(auctionExisted);
+                            await SetAfterCancelForLot(auctionExisted);
                             break;
                         default:
                             break;
@@ -464,7 +464,7 @@ namespace Application.Services
             }
             return reponse;
         }
-        private async Task SetAfterCancelForLotWhenLive(Auction auction)
+        private async Task SetAfterCancelForLot(Auction auction)
         {
             var lots = auction?.Lots?.ToList();
             if (lots.Any())
@@ -472,7 +472,7 @@ namespace Application.Services
                 // Set Lot
                 var tasks = lots.Select(async lot =>
                 {
-                    lot.Status = EnumStatusLot.Passed.ToString();
+                    lot.Status = EnumStatusLot.Canceled.ToString();
                     List<CustomerLot> players = lot.CustomerLots.ToList();
                     if (players.Count > 0)
                     {
