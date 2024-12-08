@@ -14,6 +14,7 @@ namespace Domain.Enums
         RefundDeposit = 4,
         BuyPay = 5,
         SellerPay = 6,
-        Banktransfer = 7
+        Banktransfer = 7,
+        RefundInvoice = 8
     }
 }

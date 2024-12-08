@@ -97,7 +97,7 @@ namespace Application.Services
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("JoinLot", "admin", $"{request.AccountId} has joined lot {request.LotId}");
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendCurrentPriceForReduceBidding", lot.CurrentPrice);
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("StatusBid", lot.Status);
-
+                        await CountCustomerBidded(request.LotId);
                     // await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", request.LotId, lot.EndTime);
 
                     if (topBidders.Any())
@@ -670,8 +670,11 @@ namespace Application.Services
         {
             string redisKey = $"BidPrice:{lotId}";
             var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, x => x.LotId == lotId);
-            var amountCustomerBidded = bidPrices.Distinct().Count();
-            await _hubContext.Clients.All.SendAsync("SendAmountCustomerBid", "So luong nguoi da dau gia la: ", amountCustomerBidded);
+            if(bidPrices != null)
+            {
+                var amountCustomerBidded = bidPrices.Distinct().Count();
+                await _hubContext.Clients.All.SendAsync("SendAmountCustomerBid", "So luong nguoi da dau gia la: ", amountCustomerBidded);
+            }          
         }
         public async Task<APIResponseModel> UpdateStatusBid(int lotId, int? status)
         {
@@ -727,12 +730,12 @@ namespace Application.Services
                 var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
                 if (lot != null)
                 {
-                    lot.Status = EnumStatusLot.Canceled.ToString();
+                    lot.Status = EnumStatusLot.Cancelled.ToString();
                     lot.ActualEndTime = DateTime.UtcNow;
 
                     _unitOfWork.LotRepository.Update(lot);
                     await _unitOfWork.SaveChangeAsync();
-                    _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Canceled.ToString());
+                    _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Cancelled.ToString());
                     _cacheService.UpdateLotActualEndTime(lotId, (DateTime)lot.ActualEndTime);
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("UpdateStatusBid", lot.Status);
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("CanceledAuctionPublic", "Phiên đã bi huy!");
@@ -816,7 +819,7 @@ namespace Application.Services
                             NotifiableId = customerLot.Id,  //cusrtomerLot => dẫn tới myBid
                             AccountId = customerLot.Customer.AccountId,
                             CreationDate = DateTime.UtcNow,
-                            Notifi_Type = "CustomerLot",
+                            Notifi_Type = "Refunded",
                             ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
 
                             //  ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault().ImageLink

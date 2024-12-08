@@ -2,6 +2,7 @@
 using Application.Repositories;
 using Application.ServiceReponse;
 using Application.Utils;
+using Application.ViewModels.JewelryDTOs;
 using Application.ViewModels.NotificationDTOs;
 using Application.ViewModels.ValuationDTOs;
 using AutoMapper;
@@ -34,6 +35,7 @@ namespace Application.Services
         private readonly Cloudinary _cloudinary;
         private const string Tags = "Backend_ImageValuation";
         private const string Tags_Receipt = "ReceiptPDF";
+        private const string Tags_Document_Gemstone = "DocumentGemstone";
         private readonly IGeneratePDFService _generatePDFService;
         private readonly IHubContext<BiddingHub> _hubContext;
         private readonly IHubContext<NotificationHub> _notificationHub;
@@ -50,6 +52,7 @@ namespace Application.Services
         {
             var response = new APIResponseModel();
             List<String> imagesValuation = new List<string>();
+            List<String> documentGemstone = new List<string>();
             List<ImageValuation> imageValuationList = new List<ImageValuation>();
             try
             {
@@ -61,7 +64,7 @@ namespace Application.Services
                 }
                 else
                 {
-                    var wallet = await _unitOfWork.WalletRepository.GetByCustomerId(consignAnItem.Status);
+                    var wallet = await _unitOfWork.WalletRepository.GetByCustomerId(consignAnItem.SellerId);
                     if(wallet == null)
                     {
                         response.Message = $"Owner hasn't wallet!";
@@ -105,9 +108,42 @@ namespace Application.Services
                                 imagesValuation.Add(imageValuationinput.ImageLink);
                                 var imageValuation = _mapper.Map<ImageValuation>(imageValuationinput);
                                 imageValuationList.Add(imageValuation);
-
-
                             }
+                        }
+
+                        if (consignAnItem.DocumentGemstone != null && consignAnItem.DocumentGemstone.Any())
+                        {
+                            foreach (var image in consignAnItem.DocumentGemstone)
+                            {
+                                var uploadImage = await _cloudinary.UploadAsync(new CloudinaryDotNet.Actions.ImageUploadParams
+                                {
+                                    File = new FileDescription(image.FileName,
+                                                           image.OpenReadStream()),
+                                    Tags = Tags_Document_Gemstone
+                                }).ConfigureAwait(false);
+
+
+
+                                if (uploadImage == null || uploadImage.StatusCode != System.Net.HttpStatusCode.OK)
+                                {
+                                    response.Message = $"Document upload failed." + uploadImage.Error.Message + "";
+                                    response.Code = (int)uploadImage.StatusCode;
+                                    response.IsSuccess = false;
+                                }
+                                else
+                                {
+                                    var imageValuationinput = new ImageValuationDTO
+                                    {
+                                        ValuationId = newvaluation.Id,
+                                        ImageLink = uploadImage.SecureUrl.AbsoluteUri,
+                                        DefaultImage = "PDF"
+                                    };
+                                    documentGemstone.Add(imageValuationinput.ImageLink);
+                                    var imageValuation = _mapper.Map<ImageValuation>(imageValuationinput);
+                                    imageValuationList.Add(imageValuation);
+                                }
+                            }
+                            
                         }
                         await _unitOfWork.ImageValuationRepository.AddRangeAsync(imageValuationList);
                         if (await _unitOfWork.SaveChangeAsync() > 0)
@@ -134,7 +170,9 @@ namespace Application.Services
                             response.Message = $"Consign an item Successfully";
                             response.Code = 200;
                             response.IsSuccess = true;
-                            response.Data = imagesValuation;
+                            response.Data = new { 
+                                                Images = imagesValuation,
+                                                Doucment = documentGemstone};
                         }
 
                     }
@@ -609,10 +647,10 @@ namespace Application.Services
                     _unitOfWork.ValuationRepository.Update(valuationById);
                     await _unitOfWork.SaveChangeAsync();
 
-                    AddHistoryValuation(valuationById.Id, valuationById.Status);                    
+                    AddHistoryValuation(valuationById.Id, valuationById.Status);
 
-                    byte[] pdfBytes = _generatePDFService.CreateReceiptPDF(valuationById, DateTime.UtcNow, receipt.ActualStatusOfJewelry, receipt.Note);
-
+                     byte[] pdfBytes = _generatePDFService.CreateReceiptPDF(valuationById, receipt.JewelryName, DateTime.UtcNow, receipt.ActualStatusOfJewelry, receipt.Note, receipt.Khoiluong);
+                    //byte[] pdfBytes = _generatePDFService.CreateAuthorizedPDF(valuationById);
                     using var memoryStream = new MemoryStream(pdfBytes);
 
                     var uploadFile = await _cloudinary.UploadAsync(new RawUploadParams

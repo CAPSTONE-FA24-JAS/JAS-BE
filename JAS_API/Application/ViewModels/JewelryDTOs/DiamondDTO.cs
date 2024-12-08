@@ -23,6 +23,9 @@ namespace Application.ViewModels.JewelryDTOs
         public string? LengthWidthRatio { get; set; }
         public string? Type { get; set; }
         public int? JewelryId { get; set; }
+        public float? Carat { get; set; }
+
+        public float? TotalCarat { get; set; }
 
         public IEnumerable<DocumentDiamondDTO>? DocumentDiamonds { get; set; }
         public IEnumerable<ImageDiamondDTO>? ImageDiamonds { get; set; }

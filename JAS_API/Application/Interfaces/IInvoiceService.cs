@@ -38,6 +38,16 @@ namespace Application.Interfaces
         
         Task<Invoice?> GetInvoiceById(int id);
         Task<APIResponseModel> GetShipperAndInvoices();
+        Task<APIResponseModel> getInvoicesDeliveringByShipperToAssign(int? pageIndex, int? pageSize);
+
+        public Task<APIResponseModel> CancelledInvoiceByManager(int invoiceId, string reason);
+
+        public Task<APIResponseModel> UpdateRejectedInvoiceByShipper(int invoiceId, string reason);
+
+        public Task<APIResponseModel> ClosedInvoiceByManager(int invoiceId);
+        Task<APIResponseModel> CancelledInvoiceByBuyer(int invoiceId, string reason);
+
+        
 
     }
 }

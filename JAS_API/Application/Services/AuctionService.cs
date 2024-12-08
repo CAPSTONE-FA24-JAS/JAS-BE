@@ -267,6 +267,8 @@ namespace Application.Services
                     {
                         lot.StartTime = updateAuctionDTO.StartTime;
                         lot.EndTime = updateAuctionDTO.EndTime;
+                        _cacheService.UpdateLotEndTime(lot.Id, updateAuctionDTO.EndTime.Value);
+                        _cacheService.UpdateLotStartTime(lot.Id, updateAuctionDTO.StartTime.Value);
                     }
                 }
                 else
@@ -472,7 +474,7 @@ namespace Application.Services
                 // Set Lot
                 var tasks = lots.Select(async lot =>
                 {
-                    lot.Status = EnumStatusLot.Canceled.ToString();
+                    lot.Status = EnumStatusLot.Cancelled.ToString();
                     List<CustomerLot> players = lot.CustomerLots.ToList();
                     if (players.Count > 0)
                     {

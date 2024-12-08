@@ -76,14 +76,22 @@ namespace WebAPI.Service
                 {
                     while (true)
                     {
-
-                        
                         if (await IsLotFinishedAsync(lot))
                         {
                             _logger.LogInformation($"Lot {lot.Id} đã kết thúc.");
                             break;
                         }
 
+                        var timeout = Task.Delay(1000); // 1 giây
+                        var signal = await Task.WhenAny(dataAvailable.Task, timeout);
+                        if (signal == timeout)
+                        {
+                            _logger.LogInformation("Timeout reached, no new bids.");
+                            continue; // Tiếp tục vòng lặp, không làm gì nếu không có tín hiệu
+                        }
+
+
+                        _logger.LogInformation("Received new bid, processing...");
                         //xu ly kiem gia gia dau từ hàng đợi stream bằng lua script rôi lưu vào sortset
                         var result = _cacheService.PlaceBidWithLuaScript(lot.Id);
 
@@ -91,20 +99,25 @@ namespace WebAPI.Service
                         {
                             //  _logger.LogInformation($"Không còn giá nào trong Stream cho Lot {lot.Id}");
                             // Đợi 100ms trước khi kiểm tra lại
-                            dataAvailable = new TaskCompletionSource<bool>();  // Reset the signal
-                            await dataAvailable.Task;
+                              dataAvailable = new TaskCompletionSource<bool>();  // Reset the signal
+                             //  await dataAvailable.Task;
+                           // await Task.Delay(700);
                             continue;
                         }
-                        var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(result.bidPrice.CustomerId);
+                        else
+                        {
+                            var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(result.bidPrice.CustomerId);
 
 
-                        var firstName = customer.FirstName;
-                        var lastname = customer.LastName;
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", result.highestBid);
-                        //trar về name, giá ĐẤU, thời gian
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaffAfterProcessingStream", result.bidPrice.CustomerId, firstName, lastname, result.bidPrice.CurrentPrice, result.bidPrice.BidTime, result.bidPrice.Status);
+                            var firstName = customer.FirstName;
+                            var lastname = customer.LastName;
+                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendTopPrice", result.highestBid);
+                            //trar về name, giá ĐẤU, thời gian
+                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaffAfterProcessingStream", result.bidPrice.CustomerId, firstName, lastname, result.bidPrice.CurrentPrice, result.bidPrice.BidTime, result.bidPrice.Status);
 
-                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceAfterProcessingStream", result.bidPrice.CustomerId, result.bidPrice.CurrentPrice, result.bidPrice.BidTime, result.bidPrice.Status);
+                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceAfterProcessingStream", result.bidPrice.CustomerId, result.bidPrice.CurrentPrice, result.bidPrice.BidTime, result.bidPrice.Status);
+                        }
+                       
                     }
                 }catch(TaskCanceledException)
                 {
@@ -130,7 +143,7 @@ namespace WebAPI.Service
 
                 return lotById.Status == EnumStatusLot.Passed.ToString() ||
                        lotById.Status == EnumStatusLot.Sold.ToString() ||
-                       lotById.Status == EnumStatusLot.Canceled.ToString();
+                       lotById.Status == EnumStatusLot.Cancelled.ToString();
             }
         }
     }

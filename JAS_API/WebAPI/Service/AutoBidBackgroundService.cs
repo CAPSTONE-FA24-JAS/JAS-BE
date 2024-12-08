@@ -153,18 +153,81 @@ namespace WebAPI.Service
                                             CurrentPrice = bidPriceFuture,
                                             BidTime = DateTime.UtcNow
                                         };
+                                            string lotGroupName = $"lot-{player.LotId}";
+                                            var bidPriceStream = _cacheService.AddToStream((int)player.Lot.Id, bidData, (int)player.CustomerId);
+                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", bidPriceStream.CustomerId, firstName, lastname, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
+                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", bidPriceStream.CustomerId, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
+                                            await _unitOfWork.SaveChangeAsync();
+                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
 
-                                        string lotGroupName = $"lot-{player.LotId}";
-                                        var bidPriceStream = _cacheService.AddToStream((int)player.Lot.Id, bidData, (int)player.CustomerId);
-                                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", bidPriceStream.CustomerId, firstName, lastname, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
-                                        await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", bidPriceStream.CustomerId, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
-                                        await _unitOfWork.SaveChangeAsync();
-                                        await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
+                                            var lot = _cacheService.GetLotById(player.Lot.Id);
+                                            if (lot.IsExtend == true)
+                                            {
+                                                if (lot.EndTime.HasValue)
+                                                {
+                                                    DateTime endTime = lot.EndTime.Value;
+
+                                                    //10s cuối
+                                                    TimeSpan extendTime = endTime - bidPriceStream.BidTime.Value;
+
+                                                    //neu round vo tan
+                                                    if (lot.Round == null)
+                                                    {
+                                                        if (extendTime.TotalSeconds < 10)
+                                                        {
+                                                            endTime = endTime.AddSeconds(10);
+
+                                                            _cacheService.UpdateLotEndTime(player.Lot.Id, endTime);
+                                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", player.Lot.Id, endTime);
+                                                        }
+                                                        else
+                                                        {
+                                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", player.Lot.Id, lot.EndTime);
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (extendTime.TotalSeconds < 10)
+                                                        {
+                                                            if (lot.Round == 0)
+                                                            {
+                                                                await _hubContext.Clients.Group(lotGroupName).SendAsync("HetRound");
+                                                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", player.Lot.Id, lot.EndTime);
+
+                                                            }
+                                                            else
+                                                            {
+                                                                endTime = endTime.AddSeconds(10);
+                                                                var round = (int)lot.Round - 1;
+                                                                _cacheService.UpdateLotEndTime(player.Lot.Id, endTime);
+                                                                _cacheService.UpdateLotRound(player.Lot.Id, round);
+                                                                await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", player.Lot.Id, endTime);
+                                                            }
+
+                                                        }
+                                                        else
+                                                        {
+                                                            await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", player.Lot.Id, lot.EndTime);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (lot.EndTime.HasValue)
+                                                {
+                                                    DateTime endTime = lot.EndTime.Value;
+                                                    await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", player.Lot.Id, endTime);
+                                                }
+                                            }
+
+                                        }
                                     }
-                                }
-                                if (!isFuturePrice && price == null)
-                                {
-                                    return;
+                                    if (!isFuturePrice && price == null)
+                                    {
+                                        return;
+
+                                    }
                                 }
                             }
                             //}

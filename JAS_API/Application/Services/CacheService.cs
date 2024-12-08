@@ -563,5 +563,22 @@ end
         }
 
 
+        public void UpdateLotStartTime(int lotId, DateTime newEndTime)
+        {
+            var lotHashKey = $"lot-{lotId}"; // Tạo khóa cho Lot trong Redis
+            var lotData = _cacheDb.HashGet(lotHashKey, "lot");
+
+            if (lotData.HasValue)
+            {
+                var lot = JsonSerializer.Deserialize<Lot>(lotData);
+                lot.StartTime = newEndTime;
+
+                var updateLot = JsonSerializer.Serialize(lot);
+
+                _cacheDb.HashSet(lotHashKey, "lot", updateLot);
+            }
+        }
+
+
     }
 }

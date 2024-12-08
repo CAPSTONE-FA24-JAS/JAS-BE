@@ -288,5 +288,75 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> getDeliveringInvoicesByShipperToAssign(int? pageIndex, int? pageSize)
+        {
+            var result = await _invoiceService.getInvoicesDeliveringByShipperToAssign(pageSize, pageIndex);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> CancelledInvoiceByManager(int invoiceId, string reason)
+        {
+            var result = await _invoiceService.CancelledInvoiceByManager(invoiceId, reason);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateRejectedInvoiceByShipper(int invoiceId, string reason)
+        {
+            var result = await _invoiceService.UpdateRejectedInvoiceByShipper(invoiceId, reason);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> ClosedInvoiceByManager(int invoiceId)
+        {
+            var result = await _invoiceService.ClosedInvoiceByManager(invoiceId);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> CancelledInvoiceByBuyer(int invoiceId, string reason)
+        {
+            var result = await _invoiceService.CancelledInvoiceByBuyer(invoiceId, reason);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }

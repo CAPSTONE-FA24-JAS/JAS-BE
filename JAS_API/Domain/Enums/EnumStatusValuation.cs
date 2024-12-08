@@ -14,7 +14,7 @@ namespace Domain.Enums
         Preliminary = 3,
         ApprovedPreliminary = 4,
         RecivedJewelry = 5,
-        FinalValuated = 6,
+        Evaluated = 6,
         ManagerApproved = 7,
         Authorized = 8,
         Rejected = 9   

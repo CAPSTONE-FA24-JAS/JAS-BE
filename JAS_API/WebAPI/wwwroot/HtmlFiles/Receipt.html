@@ -4,16 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create Confirmation Receipt</title>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css" />
     <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
         .modal-custom .text-xl {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: bold;
         }
 
         .modal-custom .text-lg {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: bold;
         }
 
@@ -55,74 +58,151 @@
             padding: 10px;
             text-align: center;
         }
+
+        /* Custom styles for label and content text */
+        .row label {
+            flex: 0 0 20%;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .row span {
+            font-size: 1rem;
+            font-weight: normal;
+        }
+
+        /* Date section style */
+        .date-section {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        /* Updated font size for headings */
+        .modal-custom h5 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        /* Added margin for even spacing between row sections */
+        .row {
+            margin-bottom: 9px;
+        }
+
+        /* Updated font size for table content */
+        table td {
+            font-size: 1rem;
+        }
+
+        .modal-custom .content-text {
+            font-size: 1rem;
+        }
+
+        /* Styling for Địa điểm giao nhận (Not bold and same font size as span) */
+        .date-location {
+            font-size: 1rem; /* Match span size */
+            font-weight: normal; /* Remove bold */
+        }
+
+        /* Styling for Ghi chú (Smaller and faded text) */
+        .modal-custom .notes-list {
+            font-size: 0.9rem; /* Smaller text */
+            color: #777; /* Faded color */
+        }
+        /* Added margin-top for spacing between the table and location */
+        .date-location {
+            font-size: 1rem;
+            font-weight: normal;
+            margin-top: 20px; /* Adjust the value as needed */
+        }
+
     </style>
 </head>
 <body>
     <div class="modal-custom">
         <div class="modal-content">
             <h4 class="text-xl text-center">
-                Cộng hòa xã hội chủ nghĩa Việt Nam<br />Độc lập - Tự do - Hạnh Phúc
+                CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM<br />Độc lập - Tự do - Hạnh Phúc
             </h4>
             <h3 class="text-lg text-center">BIÊN BẢN GIAO NHẬN</h3>
-            <h5 class="font-bold">I. Bên A:</h5>
+
+            <!-- Add the date section below the heading -->
+            <div class="date-section">
+                Tp. Hồ Chí Minh,
+                <script>
+                    const today = new Date();
+                    const day = today.getDate();
+                    const month = today.getMonth() + 1; // Tháng bắt đầu từ 0
+                    const year = today.getFullYear();
+                    document.write(`ngày ${day} tháng ${month} năm ${year}`);
+                </script>
+            </div>
+
+            <h5>I. Bên nhận:</h5>
 
             <div class="row">
-                <label class="col" style="flex: 0 0 15%">Họ và tên:</label>
-                <span class="w-full mb-2 font-bold text-black">Jewelry Auction Company</span>
+                <label class="col">Ông(bà):</label>
+                <span class="w-full mb-2"> {{StaffName}} </span>
             </div>
 
             <div class="row">
-                <label class="col" style="flex: 0 0 15%">Địa chỉ:</label>
-                <span class="w-full mb-2 font-bold text-black">
-                    S10.05(VHGP), Nguyen Xien Street, Long Binh Ward, Thu Duc District, Ho Chi Minh City
+                <label class="col">Địa chỉ:</label>
+                <span class="w-full mb-2">
+                    Lô E2a-7, Đường D1, Long Thạnh Mỹ, Thành phố Thủ Đức, Hồ Chí Minh
                 </span>
             </div>
 
             <div class="row">
-                <label class="col" style="flex: 0 0 15%">Email:</label>
-                <span class="w-full mb-2 font-bold text-black">ngocnhse160303@fpt.edu.vn</span>
+                <label class="col">Email:</label>
+                <span class="w-full mb-2"> {{emailStaff}} </span>
+            </div>
+            <div class="row">
+                <label class="col">Chức vụ:</label>
+                <span class="w-full mb-2"> {{role}} </span>
             </div>
 
             <div class="row">
-                <label class="col" style="flex: 0 0 15%">Điện thoại:</label>
-                <span class="w-full mb-2 font-bold text-black">02158945456</span>
+                <label class="col">Điện thoại:</label>
+                <span class="w-full mb-2"> 0961545926 </span>
             </div>
 
-            <h5 class="font-bold">II. Bên B:</h5>
+            <h5>II. Bên giao:</h5>
 
             <div class="row">
-                <label class="col" style="flex: 0 0 15%">Họ và tên:</label>
-                <span class="w-full mb-2 font-bold">{{Seller_name}}</span>
-            </div>
-
-            <div class="row">
-                <label class="col" style="flex: 0 0 15%">Địa chỉ:</label>
-                <span class="w-full mb-2 font-bold">{{DiaChi_seller}}</span>
+                <label class="col">Ông(bà):</label>
+                <span class="w-full mb-2">{{Seller_name}}</span>
             </div>
 
             <div class="row">
-                <label class="col" style="flex: 0 0 15%">CCCD:</label>
-                <span class="w-full mb-2 font-bold">{{CCCD}}</span>
+                <label class="col">Địa chỉ:</label>
+                <span class="w-full mb-2">{{DiaChi_seller}}</span>
             </div>
 
             <div class="row">
-                <label class="col" style="flex: 0 0 15%">Ngày cấp:</label>
-                <span class="w-full mb-2 font-bold">{{Time_Create}}</span>
+                <label class="col">CCCD:</label>
+                <span class="w-full mb-2">{{CCCD}}</span>
             </div>
 
             <div class="row">
-                <label class="col" style="flex: 0 0 15%">Hết hạn:</label>
-                <span class="w-full mb-2 font-bold">{{Time_expire}}</span>
+                <label class="col">Ngày cấp:</label>
+                <span class="w-full mb-2">{{Time_Create}}</span>
             </div>
 
             <div class="row">
-                <label class="col" style="flex: 0 0 15%">Điện thoại:</label>
-                <span class="w-full mb-2 font-bold">{{Phone_seller}}</span>
+                <label class="col">Hết hạn:</label>
+                <span class="w-full mb-2">{{Time_expire}}</span>
             </div>
 
-            <h5 class="font-bold">III. Nội dung xác nhận:</h5>
+            <div class="row">
+                <label class="col">Điện thoại:</label>
+                <span class="w-full mb-2">{{Phone_seller}}</span>
+            </div>
 
-            <p class="mb-2">Công ty đã nhận được sản phẩm với nội dung dưới đây:</p>
+            <h5>III. Nội dung xác nhận:</h5>
+
+            <p class="content-text mb-2">Đã giao nhận được sản phẩm với nội dung dưới đây:</p>
 
             <table>
                 <thead>
@@ -130,6 +210,7 @@
                         <th>Tên trang sức</th>
                         <th>Ngày nhận hàng</th>
                         <th>Trạng thái sản phẩm</th>
+                        <th>Khối lượng</th>
                         <th>Ghi Chú</th>
                     </tr>
                 </thead>
@@ -138,10 +219,28 @@
                         <td>{{JewelryName}}</td>
                         <td>{{ReceivingDate}}</td>
                         <td>{{ProductRecivedStatus}}</td>
+                        <td>{{KhoiLuong}}</td>
                         <td>{{Note}}</td>
                     </tr>
                 </tbody>
             </table>
+
+            <!-- Added the delivery location after the table -->
+            <div class="row date-location">
+                <label class="col">Địa điểm giao nhận:</label>
+                <span class="w-full mb-2">
+                    Trụ sở công ty TNHH JAS, Lô E2a-7, Đường D1, Long Thạnh Mỹ, Thành phố Thủ Đức, Hồ Chí Minh
+                </span>
+            </div>
+
+            <!-- Added notes at the end -->
+            <h5>IV.Ghi chú:</h5>
+            <ul class="content-text">
+                <li>(1) Ghi rõ tên/loại trang sức, đá quý nhập/xuất.</li>
+                <li>(2) Ghi rõ tên đơn vị giao/nhận trang sức, đá quý.</li>
+                <li>(3) Địa điểm giao nhận.</li>
+                <li>(4) Kiểm định hiện vật hoặc nguyên niêm phong.</li>
+            </ul>
         </div>
     </div>
 </body>
