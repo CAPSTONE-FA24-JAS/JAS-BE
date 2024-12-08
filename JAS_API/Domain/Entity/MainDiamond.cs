@@ -12,6 +12,7 @@ namespace Domain.Entity
         public string? Color { get; set; }
         public string? Cut { get; set; }
         public string? Clarity { get; set; }
+        public float? Carat { get; set; }
         public int? Quantity { get; set; }
         public string? SettingType { get; set; }  
         public string? Dimension { get; set; }
