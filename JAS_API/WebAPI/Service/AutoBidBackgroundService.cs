@@ -231,7 +231,6 @@ namespace WebAPI.Service
                                 }
                             }
                             //}
-                        }
                     }
                     catch (Exception e)
                     {
