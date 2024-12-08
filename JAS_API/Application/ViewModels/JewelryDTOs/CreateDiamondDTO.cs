@@ -20,6 +20,8 @@ namespace Application.ViewModels.JewelryDTOs
         public string? Certificate { get; set; }
         public string? Fluorescence { get; set; }
         public float? LengthWidthRatio { get; set; }
+        public float? Carat { get; set; }
+        public float? TotalCarat { get; set; }
 
         public List<IFormFile>? DocumentDiamonds { get; set; }
         public List<IFormFile>? ImageDiamonds { get; set; }

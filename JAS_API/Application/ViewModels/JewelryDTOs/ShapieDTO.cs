@@ -18,6 +18,7 @@ namespace Application.ViewModels.JewelryDTOs
         public string? SettingType { get; set; }
         public string? Dimension { get; set; }
         public int? JewelryId { get; set; }
+        public float? TotalCarat { get; set; }
 
         //
         public IEnumerable<DocumentShaphieDTO>? DocumentShaphies { get; set; }
