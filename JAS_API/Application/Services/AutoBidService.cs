@@ -24,6 +24,7 @@ namespace Application.Services
             var response = new APIResponseModel();
             try
             {
+                
                 var customerLotOfAutoBid = await _unitOfWork.CustomerLotRepository.GetByIdAsync(createAutoBidDTO.CustomerLotId);
                 if (customerLotOfAutoBid == null)
                 {
@@ -36,13 +37,20 @@ namespace Application.Services
                     return CreateErrorResponse("Invalid lot type for AutoBid", 400);
                 }
 
+
                 bool isFinalPriceSold = lot.FinalPriceSold != null;
 
                 if (IsvalidBidRange(customerLotOfAutoBid, createAutoBidDTO, isFinalPriceSold) == false)
                 {
                     return CreateErrorResponse("Set New AutoBid Failed, Autobid of player must out range old autobid", 400);
                 }
-
+                if (isFinalPriceSold == true)
+                {
+                    if (createAutoBidDTO.MaxPrice > lot.FinalPriceSold)
+                    {
+                        return CreateErrorResponse("Set New AutoBid Failed, Autobid of player must out range price buy now", 400);
+                    }
+                }
                 var autoBid = _mapper.Map<AutoBid>(createAutoBidDTO);
                 if (autoBid == null)
                 {
