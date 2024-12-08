@@ -61,7 +61,7 @@ namespace WebAPI.Service
                     bool allLotsEnded = lotsInAuction.All(lot =>
                         lot.Status == EnumStatusLot.Sold.ToString() ||
                         lot.Status == EnumStatusLot.Passed.ToString() ||
-                        lot.Status == EnumStatusLot.Canceled.ToString());
+                        lot.Status == EnumStatusLot.Cancelled.ToString());
 
 
                     var maxTimeAuction = _cacheService.GetHashLots(x => x.AuctionId == auction.Id).OrderByDescending(x => x.EndTime).FirstOrDefault();

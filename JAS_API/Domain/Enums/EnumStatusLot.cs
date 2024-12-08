@@ -12,7 +12,7 @@ namespace Domain.Enums
         Ready = 2,
         Auctioning = 3,   
         Sold = 4 ,       
-        Canceled = 5,    
+        Cancelled = 5,    
         Passed = 6,
         Pause = 7
     }

@@ -730,12 +730,12 @@ namespace Application.Services
                 var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
                 if (lot != null)
                 {
-                    lot.Status = EnumStatusLot.Canceled.ToString();
+                    lot.Status = EnumStatusLot.Cancelled.ToString();
                     lot.ActualEndTime = DateTime.UtcNow;
 
                     _unitOfWork.LotRepository.Update(lot);
                     await _unitOfWork.SaveChangeAsync();
-                    _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Canceled.ToString());
+                    _cacheService.UpdateLotStatus(lotId, EnumStatusLot.Cancelled.ToString());
                     _cacheService.UpdateLotActualEndTime(lotId, (DateTime)lot.ActualEndTime);
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("UpdateStatusBid", lot.Status);
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("CanceledAuctionPublic", "Phiên đã bi huy!");

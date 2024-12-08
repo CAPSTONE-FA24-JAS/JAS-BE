@@ -143,7 +143,7 @@ namespace WebAPI.Service
 
                 return lotById.Status == EnumStatusLot.Passed.ToString() ||
                        lotById.Status == EnumStatusLot.Sold.ToString() ||
-                       lotById.Status == EnumStatusLot.Canceled.ToString();
+                       lotById.Status == EnumStatusLot.Cancelled.ToString();
             }
         }
     }
