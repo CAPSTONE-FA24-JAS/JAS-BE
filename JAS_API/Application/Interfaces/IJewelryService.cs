@@ -46,5 +46,7 @@ namespace Application.Interfaces
 
         Task<APIResponseModel> RejectByOwnerAsync(int jewelryId, int status, string reason);
 
+        Task<APIResponseModel> CancelByMangerToNoAuctionAsync(int jewelryId,string reason);
+
     }
 }

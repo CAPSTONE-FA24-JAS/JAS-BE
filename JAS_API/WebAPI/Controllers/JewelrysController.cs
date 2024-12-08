@@ -228,5 +228,19 @@ namespace WebAPI.Controllers
                 return BadRequest(result);
             }
         }
+
+        [HttpPut]
+        public async Task<IActionResult> CancelByMangerToNoAuctionAsync(int jewelryId,string reason)
+        {
+            var result = await _jewelryService.CancelByMangerToNoAuctionAsync(jewelryId, reason);
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }

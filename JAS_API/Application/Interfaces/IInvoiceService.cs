@@ -47,5 +47,7 @@ namespace Application.Interfaces
         public Task<APIResponseModel> ClosedInvoiceByManager(int invoiceId);
         Task<APIResponseModel> CancelledInvoiceByBuyer(int invoiceId, string reason);
 
+        
+
     }
 }
