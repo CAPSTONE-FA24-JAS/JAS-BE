@@ -306,7 +306,7 @@ namespace Application.Services
                 var playerCurent = await _unitOfWork.CustomerLotRepository
                     .GetByIdAsync(customerLotId);
                 var timeOld = playerCurent.ModificationDate.HasValue ? playerCurent.ModificationDate.Value : playerCurent.CreationDate;
-                int timeCount = (int)(DateTime.UtcNow - timeOld).TotalMinutes;
+                int timeCount = (int)(DateTime.UtcNow - timeOld).TotalSeconds;
                 var autoBid = playerCurent.AutoBids.FirstOrDefault(x => x.CustomerLotId == customerLotId && x.IsActive == true);
                 int timeIncrement = (int)autoBid.TimeIncrement;
 

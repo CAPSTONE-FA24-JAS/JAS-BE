@@ -1,7 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
 using Application.ViewModels.AutoBidDTOs;
-using Application.ViewModels.CategoryDTOs;
 using AutoMapper;
 using Domain.Entity;
 using Domain.Enums;
