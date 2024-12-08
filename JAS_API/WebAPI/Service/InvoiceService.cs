@@ -292,12 +292,15 @@ namespace Application.Services
                         };
 
                         await _unitOfWork.NotificationRepository.AddAsync(notification);
+                        var jewelryOfInvoice = invoiceById.CustomerLot.Lot.Jewelry;
+                        jewelryOfInvoice.Status = EnumStatusJewelry.Sold.ToString();
+                        _unitOfWork.JewelryRepository.Update(jewelryOfInvoice);
 
                         await _unitOfWork.SaveChangeAsync();
 
                         await _notificationHub.Clients.Group("61").SendAsync("NewNotificationReceived", "Có thông báo mới!");
 
-                        var jewelryOfInvoice = invoiceById.CustomerLot.Lot.Jewelry;
+                        
 
                         var invoiceByDTO = _mapper.Map<InvoiceDetailDTO>(invoiceById, x => x.Items["Jewelry"] = jewelryOfInvoice);
 
