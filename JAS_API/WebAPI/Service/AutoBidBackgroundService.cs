@@ -2,9 +2,7 @@
 using Application;
 using Application.Interfaces;
 using Application.ViewModels.CustomerLotDTOs;
-using Application.ViewModels.LotDTOs;
 using Domain.Entity;
-using Domain.Enums;
 using Microsoft.AspNetCore.SignalR;
 using WebAPI.Middlewares;
 
@@ -27,27 +25,45 @@ namespace WebAPI.Service
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            using (var cts = new CancellationTokenSource())
             {
-                try
+                cts.CancelAfter(TimeSpan.FromMinutes(5));
+
+                var tasks = new List<Task>();
+
+                while (!stoppingToken.IsCancellationRequested)
                 {
-                    using (var scope = _serviceProvider.CreateScope())
+                    try
                     {
-                        await AutoBidAsync(stoppingToken);
+                        var autoBidTask = Task.Run(async () =>
+                        {
+                            using (var scope = _serviceProvider.CreateScope())
+                        {
+                            await AutoBidAsync(cts.Token);
+                            
+                        }
+                        });
+
+                        tasks.Add(autoBidTask);
+
+                        await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+
+                        tasks.RemoveAll(task => task.IsCompleted);
                     }
-                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                    catch (OperationCanceledException)
+                    {
+                        _logger.LogInformation("Operation canceled.");
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error occurred in AutoBidBackgroundService");
+                        await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                    }
                 }
-                catch (OperationCanceledException)
-                {
-                    _logger.LogInformation("Operation canceled.");
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error occurred in AutoBidBackgroundService");
-                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
-                }
+                await Task.WhenAll(tasks);
             }
+                
         }
         public async Task AutoBidAsync(CancellationToken stoppingToken)
         {
