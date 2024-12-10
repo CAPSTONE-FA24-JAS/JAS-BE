@@ -338,13 +338,13 @@ namespace WebAPI.Controllers
                 <div class=""logo"">💎</div>
                 <h1>Chúc mừng!</h1>
                 <p>Hành động của bạn đã được thực hiện <b>{status}</b>.</p>
-                <button onclick=""simplemeditation://result-payment/isSuccess={returnStatus}"">Đi đến phiên đấu giá</button>
+                <button onclick=""openDeeplink(simplemeditation://result-payment/isSuccess={returnStatus.ToString().ToLower()})"">Đi đến phiên đấu giá</button>
             </div>
 
             /<script>
                 function redirectToPage() {{
                     // Đặt URL của trang cần chuyển đến
-                    window.location.href = ""reponsestatuspagetranfer?isSuccessfull={returnStatus}"";
+                    window.location.href = ""openDeeplink(reponsestatuspagetranfer/isSuccessfull={returnStatus.ToString().ToLower()})"";
                 }}
             </script>
         </body>
