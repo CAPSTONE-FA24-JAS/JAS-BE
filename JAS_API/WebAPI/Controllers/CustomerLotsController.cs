@@ -70,5 +70,12 @@ namespace WebAPI.Controllers
             }
             return Ok(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAutoBidByCustomerLot(int customerLotId)
+        {
+            var result = await _autoBidService.GetAutoBisByCustomerdLot(customerLotId);
+            return (result.IsSuccess == true) ? Ok(result) : BadRequest(result);
+        }
     }
 }

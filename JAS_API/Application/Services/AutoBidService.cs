@@ -2,6 +2,7 @@
 using Application.ServiceReponse;
 using Application.ViewModels.AutoBidDTOs;
 using AutoMapper;
+using Azure;
 using Domain.Entity;
 using Domain.Enums;
 
@@ -119,5 +120,26 @@ namespace Application.Services
             };
         }
 
+        public async Task<APIResponseModel> GetAutoBisByCustomerdLot(int customerLotId)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var autoBids = await _unitOfWork.AutoBidRepository.GetAllAsync(x => x.CustomerLotId == customerLotId);
+
+                response.Message = "Received Successfully";
+                response.Code = 200;
+                response.IsSuccess = true;
+                response.Data = _mapper.Map<IEnumerable<ViewAutoBidDTO>>(autoBids);
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
     }
 }
