@@ -27,28 +27,28 @@ namespace WebAPI.Service
         {
             using (var cts = new CancellationTokenSource())
             {
-                cts.CancelAfter(TimeSpan.FromMinutes(5));
+                cts.CancelAfter(TimeSpan.FromSeconds(120));
 
-                var tasks = new List<Task>();
+                //var tasks = new List<Task>();
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     try
                     {
-                        var autoBidTask = Task.Run(async () =>
-                        {
-                            using (var scope = _serviceProvider.CreateScope())
+                        //var autoBidTask = Task.Run(async () =>
+                        //{
+                        using (var scope = _serviceProvider.CreateScope())
                         {
                             await AutoBidAsync(cts.Token);
-                            
-                        }
-                        });
 
-                        tasks.Add(autoBidTask);
+                        }
+                        //});
+
+                        //tasks.Add(autoBidTask);
 
                         await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
 
-                        tasks.RemoveAll(task => task.IsCompleted);
+                        //tasks.RemoveAll(task => task.IsCompleted);
                     }
                     catch (OperationCanceledException)
                     {
@@ -61,9 +61,9 @@ namespace WebAPI.Service
                         await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
                     }
                 }
-                await Task.WhenAll(tasks);
+                //await Task.WhenAll(tasks);
             }
-                
+
         }
         public async Task AutoBidAsync(CancellationToken stoppingToken)
         {
@@ -80,9 +80,9 @@ namespace WebAPI.Service
                 foreach (var item in customerLotActives)
                 {
                     stoppingToken.ThrowIfCancellationRequested();
-                    string redisKey1 = $"BidPrice:{item.LotId}";
+                    string redisKey1 = $"BidPrice:{item.Lot.Id}";
                     //lay ra highest bidPrice
-                    var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == item.LotId);
+                    var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == item.Lot.Id);
 
                     var highestBidOfLot = topBidders.FirstOrDefault()?.CurrentPrice.Value ?? item.Lot.StartPrice.GetValueOrDefault();
 
@@ -99,11 +99,10 @@ namespace WebAPI.Service
                 {
                     stoppingToken.ThrowIfCancellationRequested();
 
-                    //if (await _customerLotService.CheckTimeAutoBid(player.Id))
-                    //{
-                    string redisKey1 = $"BidPrice:{player.LotId}";
+                    
+                    string redisKey1 = $"BidPrice:{player.Lot.Id}";
                     //lay ra highest bidPrice
-                    var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == player.LotId);
+                    var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == player.Lot.Id);
                     var highestBidOfLot = topBidders.FirstOrDefault()?.CurrentPrice.Value ?? player.Lot.StartPrice.GetValueOrDefault();
 
                     Console.WriteLine($"HighestBidOfLot after initialization: {highestBidOfLot}");
@@ -165,7 +164,7 @@ namespace WebAPI.Service
                                         CurrentPrice = bidPriceFuture,
                                         BidTime = DateTime.UtcNow
                                     };
-                                    string lotGroupName = $"lot-{player.LotId}";
+                                    string lotGroupName = $"lot-{player.Lot.Id}";
                                     var bidPriceStream = _cacheService.AddToStream((int)player.Lot.Id, bidData, (int)player.CustomerId);
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", bidPriceStream.CustomerId, firstName, lastname, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
                                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", bidPriceStream.CustomerId, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
