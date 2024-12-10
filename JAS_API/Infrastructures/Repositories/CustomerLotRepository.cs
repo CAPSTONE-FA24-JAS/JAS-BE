@@ -1,6 +1,8 @@
 ﻿using Application.Interfaces;
 using Application.Repositories;
+using Castle.Core.Resource;
 using Domain.Entity;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -113,6 +115,52 @@ namespace Infrastructures.Repositories
                 return [];
             }
             return customerLots;
+        }
+
+        public async Task<List<CustomerLot>> GetAllCustomerLotAuctioningAsync()
+        {
+            try
+            {
+                 return await _dbContext.CustomerLots.AsNoTracking()
+                    .Where(x => x.Lot != null && x.Lot.Status == EnumStatusLot.Auctioning.ToString() && x.Lot.LotType == EnumLotType.Public_Auction.ToString())
+                    .Select(x => new CustomerLot
+                    {
+                        Id = x.Id,
+                        CustomerId = x.CustomerId,
+                        Lot = new Lot
+                        {
+                            Id = x.Lot.Id,
+                            Status = x.Lot.Status,
+                            StartPrice = x.Lot.StartPrice,
+                            BidIncrement = x.Lot.BidIncrement,
+                            IsExtend = x.Lot.IsExtend,
+                        },
+                        AutoBids = x.AutoBids.Select(autoBid => new AutoBid
+                        {
+                            Id = autoBid.Id,
+                            MinPrice = autoBid.MinPrice,
+                            MaxPrice = autoBid.MaxPrice,
+                            TimeIncrement = autoBid.TimeIncrement,
+                            NumberOfPriceStep = autoBid.NumberOfPriceStep,
+                            IsActive = autoBid.IsActive,
+
+                        }).ToList(),
+                        Customer = new Customer
+                        {
+                            Id = x.Customer.Id,
+                            PriceLimit = x.Customer.PriceLimit,
+                            FirstName = x.Customer.FirstName,
+                            LastName = x.Customer.LastName,
+                        }
+                        
+                    })
+                    .ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error retrieving CustomerLots: {e.Message}");
+                return new List<CustomerLot>();
+            }
         }
 
 

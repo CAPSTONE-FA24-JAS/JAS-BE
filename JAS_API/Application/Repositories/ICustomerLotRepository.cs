@@ -19,6 +19,7 @@ namespace Application.Repositories
         List<CustomerLot>? GetListCustomerLotByCustomerAndLot(int lotId, int customerLotWinnerId);
 
         List<CustomerLot>? GetListCustomerLotByLotId(int lotId, int customerId);
+        Task<List<CustomerLot>> GetAllCustomerLotAuctioningAsync();
 
     }
 }
