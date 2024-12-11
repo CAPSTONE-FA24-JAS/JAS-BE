@@ -29,7 +29,7 @@ namespace WebAPI.Service
         {
             using (var cts = new CancellationTokenSource())
             {
-                int delay = 1000;
+                int delay = 5000;
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     try
