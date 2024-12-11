@@ -43,7 +43,7 @@ namespace WebAPI.Service
                     catch (OperationCanceledException)
                     {
                         _logger.LogInformation("Operation canceled.");
-                        break;
+                        await Task.Delay(delay, stoppingToken);
                     }
                     catch (Exception ex)
                     {
@@ -76,7 +76,15 @@ namespace WebAPI.Service
 
                     if (item.AutoBids.Any(x => x.IsActive == true && x.MinPrice <= currentPrice && x.MaxPrice >= currentPrice))
                     {
-                        await ProcessAutoBidAsync(item, topBidders, currentPrice, stoppingToken);
+                        var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == item.CustomerId && x.Status == "Success");
+                        if ((currentPriceOfPlayer != null && currentPriceOfPlayer.CurrentPrice.Value >= highestBidOfLot) || highestBidOfLot == null)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            await ProcessAutoBidAsync(item, topBidders, currentPrice, stoppingToken);
+                        }
                     }
                 }
             }
@@ -104,8 +112,11 @@ namespace WebAPI.Service
                         if (distanceTime.TotalSeconds > availableTime.TotalSeconds)
                         {
                             float bidPriceFuture = (float)(currentPrice + (player.Lot.BidIncrement * autobidAvaiable.NumberOfPriceStep));
+                            if (bidPriceFuture > player.Lot.FinalPriceSold)
+                            {
+                                return;
+                            }
                             var (isFuturePrice, price) = await _customerLotService.CheckBidPriceTop(bidPriceFuture, currentPrice, autobidAvaiable);
-
                             if (!isFuturePrice && price != null)
                             {
                                 bidPriceFuture = (float)(price + player.Lot.BidIncrement * autobidAvaiable.NumberOfPriceStep);
