@@ -39,20 +39,12 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Lot>> GetLotsForAutoServiceAsync(string lotType, string status)
         {
-            var lots = await _dbContext.Lots.AsNoTracking().Where(x => x.LotType == lotType && x.Status == status)
+            return await _dbContext.Lots.AsNoTracking().Where(x => x.LotType == lotType && x.Status == status)
                                                            .Select(x => new Lot
                                                            {  Id = x.Id,
                                                               Status = x.Status
                                                            })
                                                            .ToListAsync();
-            if (!lots.Any())
-            {
-                return [];
-            }
-            else
-            {
-                return lots;
-            }
         }
 
 
