@@ -29,7 +29,7 @@ namespace WebAPI.Service
         {
             using (var cts = new CancellationTokenSource())
             {
-                int delay = 1000;
+                int delay = 5000;
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     try
@@ -43,14 +43,11 @@ namespace WebAPI.Service
                     catch (OperationCanceledException)
                     {
                         _logger.LogInformation("Operation canceled.");
-                        await Task.Delay(delay, stoppingToken);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Error occurred in AutoBidBackgroundService");
-                        await Task.Delay(delay, stoppingToken);
                     }
-                    await Task.Delay(delay, stoppingToken);
                 }
             }
 
@@ -69,6 +66,11 @@ namespace WebAPI.Service
 
                     foreach (var item in customerLotActives)
                     {
+                        if (stoppingToken.IsCancellationRequested)
+                        {
+                            _logger.LogError("AutoBidAsync Operation canceled.");
+                            return;
+                        }
                         stoppingToken.ThrowIfCancellationRequested();
 
                         string redisKey1 = $"BidPrice:{item.Lot.Id}";
@@ -92,6 +94,10 @@ namespace WebAPI.Service
                     }
                 }
             }
+            catch (OperationCanceledException)
+            {
+                _logger.LogError("AutoBidAsync is Operation canceled.");
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"1111_Exception into AutoBidAsync {ex.Message} ");
@@ -105,6 +111,11 @@ namespace WebAPI.Service
             {
                 using (var scope = _serviceProvider.CreateScope())
                 {
+                    if (stoppingToken.IsCancellationRequested)
+                    {
+                        _logger.LogError("ProcessAutoBidAsync Operation canceled.");
+                        return;
+                    }
                     var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var _customerLotService = scope.ServiceProvider.GetRequiredService<ICustomerLotService>();
                     stoppingToken.ThrowIfCancellationRequested();
