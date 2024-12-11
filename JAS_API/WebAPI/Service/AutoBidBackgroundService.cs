@@ -50,44 +50,53 @@ namespace WebAPI.Service
                         _logger.LogError(ex, "Error occurred in AutoBidBackgroundService");
                         await Task.Delay(delay, stoppingToken);
                     }
+                    await Task.Delay(delay, stoppingToken);
                 }
             }
 
         }
         public async Task AutoBidAsync(CancellationToken stoppingToken)
         {
-            using (var scope = _serviceProvider.CreateScope())
+            try
             {
-                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var _customerLotService = scope.ServiceProvider.GetRequiredService<ICustomerLotService>();
-                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
-
-                var customerLotActives = await _unitOfWork.CustomerLotRepository.GetAllCustomerLotAuctioningAsync();
-
-                foreach (var item in customerLotActives)
+                using (var scope = _serviceProvider.CreateScope())
                 {
-                    stoppingToken.ThrowIfCancellationRequested();
+                    var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                    var _customerLotService = scope.ServiceProvider.GetRequiredService<ICustomerLotService>();
+                    var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
 
-                    string redisKey1 = $"BidPrice:{item.Lot.Id}";
-                    var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == item.Lot.Id);
+                    var customerLotActives = await _unitOfWork.CustomerLotRepository.GetAllCustomerLotAuctioningAsync();
 
-                    var highestBidOfLot = topBidders.FirstOrDefault()?.CurrentPrice.Value ?? item.Lot.StartPrice.GetValueOrDefault();
-                    var currentPrice = highestBidOfLot;
-
-                    if (item.AutoBids.Any(x => x.IsActive == true && x.MinPrice <= currentPrice && x.MaxPrice >= currentPrice))
+                    foreach (var item in customerLotActives)
                     {
-                        var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == item.CustomerId && x.Status == "Success");
-                        if ((currentPriceOfPlayer != null && currentPriceOfPlayer.CurrentPrice.Value >= highestBidOfLot) || highestBidOfLot == null)
+                        stoppingToken.ThrowIfCancellationRequested();
+
+                        string redisKey1 = $"BidPrice:{item.Lot.Id}";
+                        var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == item.Lot.Id);
+
+                        var highestBidOfLot = topBidders.FirstOrDefault()?.CurrentPrice.Value ?? item.Lot.StartPrice.GetValueOrDefault();
+                        var currentPrice = highestBidOfLot;
+
+                        if (item.AutoBids.Any(x => x.IsActive == true && x.MinPrice <= currentPrice && x.MaxPrice >= currentPrice))
                         {
-                            return;
-                        }
-                        else
-                        {
-                            await ProcessAutoBidAsync(item, topBidders, currentPrice, stoppingToken);
+                            var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == item.CustomerId && x.Status == "Success");
+                            if ((currentPriceOfPlayer != null && currentPriceOfPlayer.CurrentPrice.Value >= highestBidOfLot) || highestBidOfLot == null)
+                            {
+                                return;
+                            }
+                            else
+                            {
+                                await ProcessAutoBidAsync(item, topBidders, currentPrice, stoppingToken);
+                            }
                         }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"1111_Exception into AutoBidAsync {ex.Message} ");
+            }
+
         }
 
         private async Task ProcessAutoBidAsync(CustomerLot player, IEnumerable<BidPrice> topBidders, float currentPrice, CancellationToken stoppingToken)
@@ -134,21 +143,23 @@ namespace WebAPI.Service
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.LogError(e, $"Error processing player {player.Id}");
+                _logger.LogError(ex, $"1111_Exception into PlaceBid {ex.Message} ");
             }
         }
 
         private async Task PlaceBid(CustomerLot player, float bidPriceFuture)
         {
-            using (var scope = _serviceProvider.CreateScope())
+            try
             {
-                var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                    var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
 
-                var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(player.CustomerId);
-                var firstName = customer.FirstName;
+                    var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(player.CustomerId);
+                    var firstName = customer.FirstName;
                     var lastname = customer.LastName;
 
                     player.CurrentPrice = bidPriceFuture;
@@ -168,7 +179,7 @@ namespace WebAPI.Service
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("AutoBid", "AutoBid End Time");
 
                     var lot = _cacheService.GetLotById(player.Lot.Id);
-                    if (lot != null && lot.IsExtend == true) 
+                    if (lot != null && lot.IsExtend == true)
                     {
                         TimeSpan extendTime = lot.EndTime.Value - bidPriceStream.BidTime.Value;
                         if (extendTime.TotalSeconds < 10)
@@ -187,7 +198,13 @@ namespace WebAPI.Service
                         DateTime endTime = lot.EndTime.Value;
                         await _hubContext.Clients.Group(lotGroupName).SendAsync("SendEndTimeLot", player.Lot.Id, endTime);
                     }
+                }
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"1111_Exception into PlaceBid {ex.Message} ");
+            }
+            
         }
     }
 }

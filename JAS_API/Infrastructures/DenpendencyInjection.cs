@@ -102,7 +102,10 @@ namespace Infrastructures
             services.AddSingleton<ShareDBForNotification>();
             services.AddDbContext<AppDbContext>(option =>
             {
-                option.UseLazyLoadingProxies().UseNpgsql(databaseConnection);
+                option.UseLazyLoadingProxies().UseNpgsql(databaseConnection, otp =>
+                {
+                    otp.CommandTimeout(120);
+                });
             });
             services.AddAutoMapper(typeof(Mapper).Assembly);
             //services.AddSingleton<UserManager<Account>>();
