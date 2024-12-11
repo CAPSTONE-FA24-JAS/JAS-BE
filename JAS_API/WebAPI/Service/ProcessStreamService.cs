@@ -114,6 +114,10 @@ namespace WebAPI.Service
                                     _logger.LogInformation($"Không có giá hợp lệ trong luồng stream cho Lot {lot.Id}");
                                 }
                             }
+                            else
+                            {
+                                _logger.LogInformation($"message:" + message);
+                            }
                         }
 
                         // Tạm dừng để giảm tải CPU
