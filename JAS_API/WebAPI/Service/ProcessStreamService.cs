@@ -119,9 +119,6 @@ namespace WebAPI.Service
                                 _logger.LogInformation($"message:" + message);
                             }
                         }
-
-                        // Tạm dừng để giảm tải CPU
-                        await Task.Delay(100);
                     }
                 }
                 catch (TaskCanceledException)

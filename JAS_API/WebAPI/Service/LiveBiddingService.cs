@@ -32,15 +32,19 @@ namespace WebAPI.Service
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 var lotLiveBidding = await _unitOfWork.LotRepository.GetAllAsync(x => x.LotType == EnumLotType.Public_Auction.ToString() && (x.Status == EnumStatusLot.Auctioning.ToString() ||
                                                                                            x.Status == EnumStatusLot.Pause.ToString()));
-                foreach (var lotsql in lotLiveBidding)
+                if(lotLiveBidding != null)
                 {
-                    var lot = _cacheService.GetLotById(lotsql.Id);
-                    var endTime = lot.EndTime;
-                    if (endTime.HasValue && DateTime.UtcNow > endTime.Value)
+                    foreach (var lotsql in lotLiveBidding)
                     {
-                        await EndLot(lot.Id, endTime.Value);
+                        var lot = _cacheService.GetLotById(lotsql.Id);
+                        var endTime = lot.EndTime;
+                        if (endTime.HasValue && DateTime.UtcNow > endTime.Value)
+                        {
+                            await EndLot(lot.Id, endTime.Value);
+                        }
                     }
                 }
+               
             }
         }
 
@@ -84,7 +88,7 @@ namespace WebAPI.Service
             using (var scope = _serviceProvider.CreateScope())
             {
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+               // var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
 
                 var lotLiveBidding = await _unitOfWork.LotRepository.GetAllAsync(x => x.LotType == EnumLotType.Auction_Price_GraduallyReduced.ToString() && (x.Status == EnumStatusLot.Auctioning.ToString() ||
                                                                                            x.Status == EnumStatusLot.Pause.ToString()));
@@ -113,7 +117,7 @@ namespace WebAPI.Service
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+              //  var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _claimsService = scope.ServiceProvider.GetRequiredService<IClaimsService>();
                 var _lotService = scope.ServiceProvider.GetRequiredService<ILotService>();
