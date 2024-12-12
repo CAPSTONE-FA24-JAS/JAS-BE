@@ -386,111 +386,112 @@ namespace Application.Services
 
         public (bool result, BidPrice? bidPrice, float? highestBid) PlaceBidWithLuaScript(int lotId)
         {
-            //            string script = @"
-            //local stream_key = KEYS[1]
-            //local sorted_set_key = KEYS[2]
-            //local last_processed_id_key = KEYS[3]
-
-            //-- Lấy giá đấu đầu tiên từ Stream
-            //local entries = redis.call('XREAD', 'COUNT', 1, 'STREAMS', stream_key, '0')
-            //if not entries or #entries == 0 then
-            //    return nil -- Không có giá đấu nào trong Stream
-            //else
-            // local entry_id = entries[1][2][1][1]
-            // local bid_data = entries[1][2][1][2]
-
-            //local bid_data = cjson.decode(bid_data[2])  -- Decode the JSON data
-            //local newPrice = tonumber(bid_data.CurrentPrice)  -- Extract the new price
-            //local newTime = bid_data.BidTime
-
-            //-- Lấy giá đấu cao nhất hiện tại từ Sorted Set
-            //local highestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
-            //local highestBidPrice = 0
-            //local highestBidTime = 0
-
-            //if #highestBid > 0 then
-            //    highestBidPrice = tonumber(highestBid[2])
-            //    highestBidTime = cjson.decode(highestBid[1]).BidTime
-            //    -- Kiểm tra điều kiện giá mới
-            //    if newPrice > highestBidPrice then
-            //        bid_data.Status = ""Success""
-            //        redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
-            //        redis.call('XDEL', stream_key, entry_id) -- Xóa khỏi Stream nếu đạt điều kiện    
-            //    elseif newPrice == highestBidPrice then
-            //        bid_data.Status = ""Failed""
-            //        redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
-            //        redis.call('XDEL', stream_key, entry_id)
-            //    elseif newPrice < highestBidPrice then
-            //        bid_data.Status = ""Failed""
-            //        redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
-            //        redis.call('XDEL', stream_key, entry_id)
-            //    end
-            //else
-            //    -- Chấp nhận giá đầu tiên nếu chưa có giá nào
-            //    bid_data.Status = ""Success""
-            //    redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
-            //    redis.call('XDEL', stream_key, entry_id) -- Xóa khỏi Stream   
-            //end
-
-
-            //highestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
-            //if #highestBid > 0 then
-            //    return {highestBid[2], cjson.encode(bid_data)}
-            //else
-            //    return nil
-            //end
-            //end
-            //"
-            //            ;
             var stopwatch = new Stopwatch();
             stopwatch.Start();
+            string script = @"
+            local stream_key = KEYS[1]
+            local sorted_set_key = KEYS[2]
+            local last_processed_id_key = KEYS[3]
 
-            string script = @"local stream_key = KEYS[1]
-local sorted_set_key = KEYS[2]
+            -- Lấy giá đấu đầu tiên từ Stream
+            local entries = redis.call('XREAD', 'COUNT', 1, 'STREAMS', stream_key, '0')
+            if not entries or #entries == 0 then
+                return nil -- Không có giá đấu nào trong Stream
+            else
+             local entry_id = entries[1][2][1][1]
+             local bid_data = entries[1][2][1][2]
 
--- Read the first bid from the stream
-local entries = redis.call('XREAD', 'COUNT', 1, 'STREAMS', stream_key, '0')
-if not entries or #entries == 0 then
-    return nil -- No bid in the stream
-end
+            local bid_data = cjson.decode(bid_data[2])  -- Decode the JSON data
+            local newPrice = tonumber(bid_data.CurrentPrice)  -- Extract the new price
+            local newTime = bid_data.BidTime
 
-local entry_id = entries[1][2][1][1]
-local raw_bid_data = entries[1][2][1][2]
-local bid_data = cjson.decode(raw_bid_data[2]) -- Decode JSON bid data safely
+            -- Lấy giá đấu cao nhất hiện tại từ Sorted Set
+            local highestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
+            local highestBidPrice = 0
+            local highestBidTime = 0
 
-if not bid_data then
-    return nil -- Invalid JSON data
-end
+            if #highestBid > 0 then
+                highestBidPrice = tonumber(highestBid[2])
+                highestBidTime = cjson.decode(highestBid[1]).BidTime
+                -- Kiểm tra điều kiện giá mới
+                if newPrice > highestBidPrice then
+                    bid_data.Status = ""Success""
+                    redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
+                    redis.call('XDEL', stream_key, entry_id) -- Xóa khỏi Stream nếu đạt điều kiện    
+                elseif newPrice == highestBidPrice then
+                    bid_data.Status = ""Failed""
+                    redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
+                    redis.call('XDEL', stream_key, entry_id)
+                elseif newPrice < highestBidPrice then
+                    bid_data.Status = ""Failed""
+                    redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
+                    redis.call('XDEL', stream_key, entry_id)
+                end
+            else
+                -- Chấp nhận giá đầu tiên nếu chưa có giá nào
+                bid_data.Status = ""Success""
+                redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
+                redis.call('XDEL', stream_key, entry_id) -- Xóa khỏi Stream   
+            end
 
-local newPrice = tonumber(bid_data.CurrentPrice)
-local newTime = bid_data.BidTime
 
--- Get the highest bid from the sorted set
-local highestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
-local highestBidPrice = 0
+            highestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
+            if #highestBid > 0 then
+                return {highestBid[2], cjson.encode(bid_data)}
+            else
+                return nil
+            end
+            end
+            "
+            ;
+            
 
-if #highestBid == 0 then
-    bid_data.Status = ""Success""   
-end
+//            string script = @"local stream_key = KEYS[1]
+//local sorted_set_key = KEYS[2]
+
+//-- Read the first bid from the stream
+//local entries = redis.call('XREAD', 'COUNT', 1, 'STREAMS', stream_key, '0')
+//if not entries or #entries == 0 then
+//    return nil -- No bid in the stream
+//end
+
+//local entry_id = entries[1][2][1][1]
+//local raw_bid_data = entries[1][2][1][2]
+//local bid_data = cjson.decode(raw_bid_data[2]) -- Decode JSON bid data safely
+
+//if not bid_data then
+//    return nil -- Invalid JSON data
+//end
+
+//local newPrice = tonumber(bid_data.CurrentPrice)
+//local newTime = bid_data.BidTime
+
+//-- Get the highest bid from the sorted set
+//local highestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
+//local highestBidPrice = 0
+
+//if #highestBid == 0 then
+//    bid_data.Status = ""Success""   
+//end
 
 
-highestBidPrice = tonumber(highestBid[2])
-if newPrice > highestBidPrice then
-    bid_data.Status = ""Success""
-elseif newPrice == highestBidPrice then
-    bid_data.Status = ""Failed""
-else
-    bid_data.Status = ""Failed""
-end
+//highestBidPrice = tonumber(highestBid[2])
+//if newPrice > highestBidPrice then
+//    bid_data.Status = ""Success""
+//elseif newPrice == highestBidPrice then
+//    bid_data.Status = ""Failed""
+//else
+//    bid_data.Status = ""Failed""
+//end
 
--- Add the bid to the sorted set and delete from the stream
-redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
-redis.call('XDEL', stream_key, entry_id)
+//-- Add the bid to the sorted set and delete from the stream
+//redis.call('ZADD', sorted_set_key, newPrice, cjson.encode(bid_data))
+//redis.call('XDEL', stream_key, entry_id)
 
--- Return the highest bid after the update
-local updatedHighestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
-return {updatedHighestBid[2], cjson.encode(bid_data)}
-";
+//-- Return the highest bid after the update
+//local updatedHighestBid = redis.call('ZRANGE', sorted_set_key, -1, -1, 'WITHSCORES')
+//return {updatedHighestBid[2], cjson.encode(bid_data)}
+//";
 
            
 
