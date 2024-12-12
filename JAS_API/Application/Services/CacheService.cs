@@ -137,6 +137,21 @@ namespace Application.Services
             return result;
         }
 
+
+        public T GetHighestPrice<T>(string key)
+        {
+            // Chỉ lấy 1 phần tử đầu tiên
+            var value = _cacheDb.SortedSetRangeByRank(key, 0, 0, Order.Descending);
+
+            if (value.Any() && value.First().HasValue)
+            {
+                var deserializedItem = JsonSerializer.Deserialize<T>(value.First().HasValue);
+                
+            }
+
+            return default(T); // Trả về giá trị mặc định nếu không tìm thấy
+        }
+
         //get sortedSet filter
         public List<T> GetSortedSetDataForTime<T>(string key, Func<T, bool> filter = null)
         {

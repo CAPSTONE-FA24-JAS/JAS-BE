@@ -47,6 +47,18 @@ namespace Infrastructures.Repositories
                                                            .ToListAsync();
         }
 
+        public async Task<Lot?> GetLotsByAuctionAsync(int auctionId)
+        {
+            return await _dbContext.Lots.AsNoTracking().Where(x => x.AuctionId == auctionId).OrderByDescending(x => x.ActualEndTime)
+                                                           .Select(x => new Lot
+                                                           {
+                                                               Id = x.Id,
+                                                               ActualEndTime = x.ActualEndTime,
+                                                           })
+                                                           .FirstOrDefaultAsync();
+                                                           
+        }
+
 
 
     }

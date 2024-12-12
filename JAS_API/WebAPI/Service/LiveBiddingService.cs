@@ -57,27 +57,31 @@ namespace WebAPI.Service
                 var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 var auctionLiveBidding = _unitOfWork.AuctionRepository.GetAuctionsAsync(EnumStatusAuction.Live.ToString());
-                foreach (var auction in auctionLiveBidding)
+                if(auctionLiveBidding != null)
                 {
-                    var lotsInAuction = await _unitOfWork.LotRepository.GetAllAsync(x => x.AuctionId == auction.Id);
-
-
-                    bool allLotsEnded = lotsInAuction.All(lot =>
-                        lot.Status == EnumStatusLot.Sold.ToString() ||
-                        lot.Status == EnumStatusLot.Passed.ToString() ||
-                        lot.Status == EnumStatusLot.Cancelled.ToString());
-
-
-                    var maxTimeAuction = _cacheService.GetHashLots(x => x.AuctionId == auction.Id).OrderByDescending(x => x.EndTime).FirstOrDefault();
-                    if (allLotsEnded)
+                    foreach (var auction in auctionLiveBidding)
                     {
-                        auction.Status = EnumStatusAuction.Past.ToString();
-                        auction.ActualEndTime = maxTimeAuction.EndTime;
-                        _unitOfWork.AuctionRepository.Update(auction);
-                        await _unitOfWork.SaveChangeAsync();
-                        await _hubContext.Clients.All.SendAsync("AcutionHasBeenEnd", "Phiên đã được dong", auction.Id);
+                        var lotsInAuction = await _unitOfWork.LotRepository.GetAllAsync(x => x.AuctionId == auction.Id);
+
+
+                        bool allLotsEnded = lotsInAuction.All(lot =>
+                            lot.Status == EnumStatusLot.Sold.ToString() ||
+                            lot.Status == EnumStatusLot.Passed.ToString() ||
+                            lot.Status == EnumStatusLot.Cancelled.ToString());
+
+
+                        var maxTimeAuction = await _unitOfWork.LotRepository.GetLotsByAuctionAsync(auction.Id);
+                        if (allLotsEnded)
+                        {
+                            auction.Status = EnumStatusAuction.Past.ToString();
+                            auction.ActualEndTime = maxTimeAuction?.ActualEndTime;
+                            _unitOfWork.AuctionRepository.Update(auction);
+                            await _unitOfWork.SaveChangeAsync();
+                            await _hubContext.Clients.All.SendAsync("AcutionHasBeenEnd", "Phiên đã được dong", auction.Id);
+                        }
                     }
                 }
+                
             }
         }
 
@@ -327,7 +331,7 @@ namespace WebAPI.Service
                 var _floorFeeService = scope.ServiceProvider.GetRequiredService<IFoorFeePercentService>();
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string redisKey = $"BidPrice:{lotId}";
-                var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
+               // var bidPrices = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lotId);
                 var lot = await _unitOfWork.LotRepository.GetByIdAsync(lotId);
 
                 //update customerLot
@@ -493,7 +497,6 @@ namespace WebAPI.Service
 
                 _cacheService.UpdateLotStatus(lotId, lot.Status);
             }
-
         }
 
         private async Task EndLot(int lotId, DateTime endTime)

@@ -56,5 +56,6 @@ namespace Application.Interfaces
         Task SubscribeToChannelAsync(string channel, Action<string> messageHandler);
         void UpdateLotRound(int lotId, int round);
         void UpdateLotStartTime(int lotId, DateTime newEndTime);
+        T GetHighestPrice<T>(string key);
     }
 }
