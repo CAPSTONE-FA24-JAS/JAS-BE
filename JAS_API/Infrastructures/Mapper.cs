@@ -131,6 +131,7 @@ namespace Infrastructures
                 .ForMember(dest => dest.SecondaryShaphies, opt => opt.Ignore())
                 .ReverseMap();
             CreateMap<CreateDiamondDTO, MainDiamond>()
+                .ForPath(dest => dest.Carat, src => src.MapFrom(src => src.TotalCarat))
                 .ForMember(dest => dest.ImageMainDiamonds, opt => opt.Ignore())
                 .ForMember(dest => dest.DocumentMainDiamonds, opt => opt.Ignore())
                 .ReverseMap();
@@ -139,6 +140,7 @@ namespace Infrastructures
                 .ForMember(dest => dest.DocumentSecondaryDiamonds, opt => opt.Ignore())
                 .ReverseMap();
             CreateMap<CreateShaphieDTO, MainShaphie>()
+                .ForPath(dest => dest.Carat, src => src.MapFrom(src => src.TotalCarat))
                 .ForMember(dest => dest.ImageMainShaphies, opt => opt.Ignore())
                 .ForMember(dest => dest.DocumentMainShaphies, opt => opt.Ignore())
                 .ReverseMap();
