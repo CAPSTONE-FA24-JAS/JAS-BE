@@ -75,16 +75,17 @@ namespace WebAPI.Service
                         stoppingToken.ThrowIfCancellationRequested();
 
                         string redisKey1 = $"BidPrice:{item.Lot.Id}";
-                        // var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == item.Lot.Id);
+
                         var highestBid = _cacheService.GetHighestPrice<BidPrice>(redisKey1);
 
-                        var highestBidOfLot = highestBid?.CurrentPrice?? item.Lot.StartPrice.GetValueOrDefault();
+                        var highestBidOfLot = highestBid?.CurrentPrice.Value?? item.Lot.StartPrice.GetValueOrDefault();
+
                         var currentPrice = highestBidOfLot;
 
-                        if (item.AutoBids.Any(x => x.IsActive == true && x.MinPrice <= currentPrice && x.MaxPrice >= currentPrice))
-                        {
+                        bool checkAutoBid = item.AutoBids.Any(x => x.IsActive == true && x.MinPrice <= currentPrice && x.MaxPrice >= currentPrice);
 
-                            //var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == item.CustomerId && x.Status == "Success");
+                        if (checkAutoBid)
+                        {
                             bool currentPriceOfPlayer = highestBid.CustomerId == item.CustomerId && highestBid.Status == "Success" && highestBid.CurrentPrice.Value >= highestBidOfLot;
                             if (currentPriceOfPlayer || highestBidOfLot == null)
                             {
