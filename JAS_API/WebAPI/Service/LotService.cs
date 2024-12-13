@@ -83,7 +83,6 @@ namespace Application.Services
                         lot.StartTime = autionexits.StartTime;
                         lot.EndTime = autionexits.EndTime;
                         lot.Status = EnumStatusLot.Waiting.ToString();
-                        lot.FloorFeePercent = 25;
                         await _unitOfWork.LotRepository.AddAsync(lot);
                         var jewelry = await _unitOfWork.JewelryRepository.GetByIdAsync(lot.JewelryId);
 
@@ -719,9 +718,9 @@ namespace Application.Services
                     return response;
                 }
 
-                if(playerJoined.Lot.HaveFinancialProof == true)
+                if (playerJoined.Lot.HaveFinancialProof == true)
                 {
-                    if(playerJoined.Customer.PriceLimit < model.CurrentPrice)
+                    if (playerJoined.Customer.PriceLimit < model.CurrentPrice)
                     {
                         response.Code = 400;
                         response.IsSuccess = false;
@@ -733,7 +732,7 @@ namespace Application.Services
                 var lot = await _unitOfWork.LotRepository.GetByIdAsync(model.LotId);
                 if (lot != null)
                 {
-                    if(lot.Status == EnumStatusLot.Pause.ToString())
+                    if (lot.Status == EnumStatusLot.Pause.ToString())
                     {
                         response.Code = 400;
                         response.IsSuccess = false;
@@ -754,8 +753,8 @@ namespace Application.Services
                     if (lot.CurrentPrice < model.CurrentPrice || lot.CurrentPrice == null)
                     {
                         lot.CurrentPrice = model.CurrentPrice;
-                        
-                        if(lot.LotType == EnumLotType.Secret_Auction.ToString())
+
+                        if (lot.LotType == EnumLotType.Secret_Auction.ToString())
                         {
                             foreach (var customerLot in lot.CustomerLots.Where(x => x.CustomerId != model.CustomerId))
                             {
@@ -808,7 +807,7 @@ namespace Application.Services
                 string lotGroupName = $"lot-{placeBidBuyNowDTO.LotId}";
                 if (lot != null)
                 {
-                    if(lot.FinalPriceSold == null)
+                    if (lot.FinalPriceSold == null)
                     {
                         response.Code = 400;
                         response.IsSuccess = false;
@@ -930,7 +929,7 @@ namespace Application.Services
                         AccountId = winnerInLot.Customer.AccountId,
                         CreationDate = DateTime.UtcNow,
                         Notifi_Type = "CreateInvoice",
-                    ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
+                        ImageLink = lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
                     };
                     var notificationEntity = _mapper.Map<Domain.Entity.Notification>(notification);
                     await _unitOfWork.NotificationRepository.AddAsync(notificationEntity);
@@ -1043,6 +1042,124 @@ namespace Application.Services
                 reponse.ErrorMessages = new List<string> { e.Message };
             }
             return reponse;
+        }
+
+        public async Task<APIResponseModel> UpdateLot(object lotDTO)
+        {
+            var reponse = new APIResponseModel();
+            try
+            {
+                if (lotDTO == null)
+                {
+                    reponse.Code = 404;
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Please check property of request.";
+                }
+                else
+                {
+                    var lot = _mapper.Map<Lot>(lotDTO);
+                    var lotExist = await _unitOfWork.LotRepository.GetByIdAsync(lot.Id);
+                    if (lotExist == null)
+                    {
+                        reponse.Code = 404;
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Not Found Lot";
+                        return reponse;
+                    }
+                    var autionexits = await _unitOfWork.AuctionRepository.GetByIdAsync(lotExist.AuctionId);
+                    if (lotExist.Status != EnumStatusLot.Waiting.ToString() || autionexits.Status != EnumStatusAuction.UpComing.ToString()
+                        || autionexits.Status != EnumStatusAuction.Waiting.ToString())
+                    {
+                        reponse.Code = 404;
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Current status can't update lot";
+                        return reponse;
+                    }
+
+                    if (autionexits != null)
+                    {
+
+                        if (lotDTO is UpdateLotFixedPriceDTO fixedAuctionDTO)
+                        {
+                            var updateAfter = _mapper.Map(lotExist, fixedAuctionDTO);
+                            lotExist.LotType = EnumLotType.Fixed_Price.ToString();
+                        }
+                        if (lotDTO is UpdateLotSecretAuctionDTO secretAuctionDTO)
+                        {
+                            var updateAfter = _mapper.Map(lotExist, secretAuctionDTO);
+                            lotExist.LotType = EnumLotType.Secret_Auction.ToString();
+                        }
+                        if (lotDTO is UpdateLotPublicAuctionDTO publicAuctionDTO)
+                        {
+                            if (!publicAuctionDTO.IsHaveFinalPrice.Value)
+                            {
+                                lotExist.FinalPriceSold = null;
+                            }
+                            var updateAfter = _mapper.Map(lotExist, publicAuctionDTO);
+                            lotExist.LotType = EnumLotType.Public_Auction.ToString();
+                        }
+                        if (lotDTO is UpdateLotAuctionPriceGraduallyReducedDTO auctionPriceGraduallyReducedDTO)
+                        {
+                            var updateAfter = _mapper.Map(lotExist, auctionPriceGraduallyReducedDTO);
+                            lotExist.LotType = EnumLotType.Auction_Price_GraduallyReduced.ToString();
+                        }
+                        _unitOfWork.LotRepository.Update(lot);
+
+                        if (await _unitOfWork.SaveChangeAsync() > 0)
+                        {
+                            // Lưu lot vào Redis(dung hash)
+                            var lotRedis = new Lot
+                            {
+                                StartTime = lot.StartTime,
+                                EndTime = lot.EndTime,
+                                Id = lot.Id,
+                                Status = lot.Status,
+                                AuctionId = lot.AuctionId,
+                                StartPrice = lot.StartPrice,
+                                FinalPriceSold = lot.FinalPriceSold,
+                                BidIncrement = lot.BidIncrement,
+                                LotType = lot.LotType,
+                                BidIncrementTime = lot.BidIncrementTime,
+                                Title = lot.Title,
+                                Deposit = lot.Deposit,
+                                IsExtend = lot.IsExtend,
+                                HaveFinancialProof = lot.HaveFinancialProof,
+                                StaffId = lot.StaffId,
+                                JewelryId = lot.JewelryId,
+                                Round = lot.Round
+                            };
+                            _cacheService.SetLotInfo(lotRedis);
+
+                            reponse.Code = 200;
+                            reponse.IsSuccess = true;
+                            reponse.Message = $"CreateLot {lot.LotType} is successfuly";
+                        }
+                        else
+                        {
+                            reponse.Code = 409;
+                            reponse.IsSuccess = false;
+                            reponse.Message = "Error when saving change";
+                        }
+
+                    }
+                    else
+                    {
+                        reponse.Code = 404;
+                        reponse.IsSuccess = false;
+                        reponse.Message = "Auction not found";
+                    }
+
+                }
+
+            }
+            catch (Exception e)
+            {
+                reponse.Code = 500;
+                reponse.IsSuccess = false;
+                reponse.ErrorMessages = new List<string> { e.Message };
+            }
+            return reponse;
+
         }
     }
 }

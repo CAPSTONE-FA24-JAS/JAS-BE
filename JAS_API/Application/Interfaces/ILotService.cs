@@ -11,6 +11,7 @@ namespace Application.Interfaces
     public interface ILotService
     {
         Task<APIResponseModel> CreateLot(object lotDTO);
+        Task<APIResponseModel> UpdateLot(object lotDTO);
         Task<APIResponseModel> GetLotTypes();
         Task<APIResponseModel> GetLotTypeById(int lotTypeId);
         Task<APIResponseModel> GetLots();
