@@ -142,14 +142,15 @@ namespace Application.Services
         {
             // Chỉ lấy 1 phần tử đầu tiên
             var value = _cacheDb.SortedSetRangeByRank(key, 0, 0, Order.Descending);
-
             if (value.Any() && value.First().HasValue)
             {
-                var deserializedItem = JsonSerializer.Deserialize<T>(value.First().HasValue);
-                
+                return JsonSerializer.Deserialize<T>(value.First());
             }
-
-            return default(T); // Trả về giá trị mặc định nếu không tìm thấy
+            else
+            {
+                return default(T); // Trả về giá trị mặc định nếu không tìm thấy
+            }
+           
         }
 
         //get sortedSet filter

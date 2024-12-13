@@ -6,6 +6,7 @@ using Application.ViewModels.CustomerLotDTOs;
 using Domain.Entity;
 using Infrastructures;
 using Microsoft.AspNetCore.SignalR;
+using StackExchange.Redis;
 using WebAPI.Middlewares;
 
 namespace WebAPI.Service
@@ -29,7 +30,7 @@ namespace WebAPI.Service
         {
             using (var cts = new CancellationTokenSource())
             {
-                int delay = 5000;
+                int delay = 10000;
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     try
@@ -74,21 +75,24 @@ namespace WebAPI.Service
                         stoppingToken.ThrowIfCancellationRequested();
 
                         string redisKey1 = $"BidPrice:{item.Lot.Id}";
-                        var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == item.Lot.Id);
+                        // var topBidders = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey1, l => l.LotId == item.Lot.Id);
+                        var highestBid = _cacheService.GetHighestPrice<BidPrice>(redisKey1);
 
-                        var highestBidOfLot = topBidders.FirstOrDefault()?.CurrentPrice.Value ?? item.Lot.StartPrice.GetValueOrDefault();
+                        var highestBidOfLot = highestBid?.CurrentPrice?? item.Lot.StartPrice.GetValueOrDefault();
                         var currentPrice = highestBidOfLot;
 
                         if (item.AutoBids.Any(x => x.IsActive == true && x.MinPrice <= currentPrice && x.MaxPrice >= currentPrice))
                         {
-                            var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == item.CustomerId && x.Status == "Success");
-                            if ((currentPriceOfPlayer != null && currentPriceOfPlayer.CurrentPrice.Value >= highestBidOfLot) || highestBidOfLot == null)
+
+                            //var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == item.CustomerId && x.Status == "Success");
+                            bool currentPriceOfPlayer = highestBid.CustomerId == item.CustomerId && highestBid.Status == "Success" && highestBid.CurrentPrice.Value >= highestBidOfLot;
+                            if (currentPriceOfPlayer || highestBidOfLot == null)
                             {
                                 return;
                             }
                             else
                             {
-                                await ProcessAutoBidAsync(item, topBidders, currentPrice, stoppingToken);
+                                await ProcessAutoBidAsync(item, highestBid, currentPrice, stoppingToken);
                             }
                         }
                     }
@@ -105,7 +109,7 @@ namespace WebAPI.Service
 
         }
 
-        private async Task ProcessAutoBidAsync(CustomerLot player, IEnumerable<BidPrice> topBidders, float currentPrice, CancellationToken stoppingToken)
+        private async Task ProcessAutoBidAsync(CustomerLot player, BidPrice highestBid, float currentPrice, CancellationToken stoppingToken)
         {
             try
             {
@@ -124,7 +128,7 @@ namespace WebAPI.Service
                     if (autobidAvaiable != null)
                     {
                         var availableTime = TimeSpan.FromSeconds(autobidAvaiable.TimeIncrement.Value);
-                        var currentPriceOfPlayer = topBidders.OrderByDescending(x => x.CurrentPrice).FirstOrDefault(x => x.CustomerId == player.CustomerId && x.Status == "Success");
+                        var currentPriceOfPlayer = highestBid;
                         TimeSpan distanceTime = (currentPriceOfPlayer != null)
                                                     ? (DateTime.UtcNow - currentPriceOfPlayer.BidTime.Value)
                                                     : availableTime + TimeSpan.FromSeconds(1);

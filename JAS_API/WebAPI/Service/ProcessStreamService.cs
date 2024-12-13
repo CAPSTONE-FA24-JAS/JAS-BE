@@ -35,11 +35,7 @@ namespace WebAPI.Service
                     var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                     var lotLiveBidding = await _unitOfWork.LotRepository.GetLotsForAutoServiceAsync(EnumLotType.Public_Auction.ToString() , EnumStatusLot.Auctioning.ToString());
 
-                    if(lotLiveBidding == null)
-                    {
-                        await Task.Delay(100, stoppingToken);
-                    }
-                    else
+                    if(lotLiveBidding != null)
                     {
                         foreach (var lot in lotLiveBidding)
                         {
@@ -52,7 +48,7 @@ namespace WebAPI.Service
                         runningTasks.RemoveAll(t => t.IsCompleted);
                     }                   
                 }
-                await Task.Delay(1000, stoppingToken);
+                await Task.Delay(10000, stoppingToken);
             }
         }
 
@@ -83,9 +79,6 @@ namespace WebAPI.Service
                             _logger.LogInformation($"Lot {lot.Id} đã kết thúc.");
                             break;
                         }
-
-                     
-
                                 // Xử lý logic đặt giá (PlaceBid)
                                 var result = _cacheService.PlaceBidWithLuaScript(lot.Id);
 
