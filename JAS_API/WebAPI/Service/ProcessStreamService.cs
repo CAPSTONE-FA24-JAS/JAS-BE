@@ -24,31 +24,68 @@ namespace WebAPI.Service
             _hubContext = hubContext;
         }
 
+        //protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        //{
+        //    var runningTasks = new List<Task>();
+        //    while (!stoppingToken.IsCancellationRequested)
+        //    {
+        //        using (var scope = _serviceProvider.CreateScope())
+        //        {
+        //            var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        //            var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
+        //            var lotLiveBidding = await _unitOfWork.LotRepository.GetLotsForAutoServiceAsync(EnumLotType.Public_Auction.ToString() , EnumStatusLot.Auctioning.ToString());
+
+        //            if(lotLiveBidding != null)
+        //            {
+        //                foreach (var lot in lotLiveBidding)
+        //                {
+        //                    // Khởi chạy từng tác vụ ProcessBids độc lập và thêm vào danh sách runningTasks
+        //                    var task = Task.Run(() => ProcessBids(lot), stoppingToken);
+        //                    runningTasks.Add(task);
+        //                }
+
+        //                // Xóa các tác vụ đã hoàn thành khỏi danh sách để tránh tràn bộ nhớ
+        //                runningTasks.RemoveAll(t => t.IsCompleted);
+        //            }                   
+        //        }
+        //        await Task.Delay(10000, stoppingToken);
+        //    }
+        //}
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var runningTasks = new List<Task>();
             while (!stoppingToken.IsCancellationRequested)
             {
                 using (var scope = _serviceProvider.CreateScope())
                 {
                     var _unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
-                    var lotLiveBidding = await _unitOfWork.LotRepository.GetLotsForAutoServiceAsync(EnumLotType.Public_Auction.ToString() , EnumStatusLot.Auctioning.ToString());
 
-                    if(lotLiveBidding != null)
+                    var lotLiveBidding = await _unitOfWork.LotRepository.GetLotsForAutoServiceAsync(
+                        EnumLotType.Public_Auction.ToString(),
+                        EnumStatusLot.Auctioning.ToString()
+                    );
+
+                    if (lotLiveBidding == null || !lotLiveBidding.Any())
                     {
-                        foreach (var lot in lotLiveBidding)
-                        {
-                            // Khởi chạy từng tác vụ ProcessBids độc lập và thêm vào danh sách runningTasks
-                            var task = Task.Run(() => ProcessBids(lot), stoppingToken);
-                            runningTasks.Add(task);
-                        }
+                        await Task.Delay(1000, stoppingToken);
+                        continue;
+                    }
 
-                        // Xóa các tác vụ đã hoàn thành khỏi danh sách để tránh tràn bộ nhớ
-                        runningTasks.RemoveAll(t => t.IsCompleted);
-                    }                   
+                    await Parallel.ForEachAsync(lotLiveBidding, stoppingToken, async (lot, token) =>
+                    {
+                        try
+                        {
+                            await ProcessBids(lot);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Error processing bids for LotId: {lot.Id}");
+                        }
+                    });
                 }
-                await Task.Delay(10000, stoppingToken);
+
+                await Task.Delay(1000, stoppingToken);
             }
         }
 
