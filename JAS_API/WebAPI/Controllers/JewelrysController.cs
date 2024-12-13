@@ -169,7 +169,7 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewEnumColorShapphies()
         {
-            var result = await _jewelryService.GetEnumColorsShape();
+            var result = await _jewelryService.GetEnumColorsShapphie();
             return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
 
@@ -191,6 +191,13 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> ViewEnumClarities()
         {
             var result = await _jewelryService.GetEnumClarities();
+            return (result.IsSuccess) ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewEnumShape()
+        {
+            var result = await _jewelryService.GetEnumShapes();
             return (result.IsSuccess) ? Ok(result) : BadRequest(result);
         }
 

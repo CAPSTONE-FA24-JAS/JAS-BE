@@ -1333,7 +1333,7 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public async Task<APIResponseModel> GetEnumColorsShape()
+        public async Task<APIResponseModel> GetEnumColorsShapphie()
         {
             var response = new APIResponseModel();
             try
