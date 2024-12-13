@@ -65,7 +65,7 @@ namespace WebAPI.Service
 
                     var customerLotActives = await _unitOfWork.CustomerLotRepository.GetAllCustomerLotAuctioningAsync();
 
-                    foreach (var item in customerLotActives)
+                    foreach (var item in customerLotActives?? Enumerable.Empty<CustomerLot>())
                     {
                         if (stoppingToken.IsCancellationRequested)
                         {
@@ -78,7 +78,7 @@ namespace WebAPI.Service
 
                         var highestBid = _cacheService.GetHighestPrice<BidPrice>(redisKey1);
 
-                        var highestBidOfLot = highestBid?.CurrentPrice.Value?? item.Lot.StartPrice.GetValueOrDefault();
+                        var highestBidOfLot = (highestBid?.CurrentPrice.Value != null)? highestBid?.CurrentPrice.Value : item.Lot.StartPrice.GetValueOrDefault();
 
                         var currentPrice = highestBidOfLot;
 
@@ -93,7 +93,7 @@ namespace WebAPI.Service
                             }
                             else
                             {
-                                await ProcessAutoBidAsync(item, highestBid, currentPrice, stoppingToken);
+                                await ProcessAutoBidAsync(item, highestBid, (float)currentPrice, stoppingToken);
                             }
                         }
                     }
