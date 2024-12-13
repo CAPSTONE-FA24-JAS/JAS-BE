@@ -198,5 +198,29 @@ namespace WebAPI.Controllers
 
         }
 
+        [HttpPut]
+        public async Task<IActionResult> UpdateLotFixedPrice(UpdateLotFixedPriceDTO lotDTO)
+        {
+            var result = await _lotService.UpdateLot(lotDTO);
+            return (!result.IsSuccess)?BadRequest(result):Ok(result);
+        }
+        [HttpPut]
+        public async Task<IActionResult> UpdateLotSercet(UpdateLotSecretAuctionDTO lotDTO)
+        {
+            var result = await _lotService.UpdateLot(lotDTO);
+            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+        }
+        [HttpPut]
+        public async Task<IActionResult> UpdateLotFixedPrice(UpdateLotPublicAuctionDTO lotDTO)
+        {
+            var result = await _lotService.UpdateLot(lotDTO);
+            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+        }
+        [HttpPut]
+        public async Task<IActionResult> UpdateLotFixedPrice(UpdateLotAuctionPriceGraduallyReducedDTO lotDTO)
+        {
+            var result = await _lotService.UpdateLot(lotDTO);
+            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Application.ServiceReponse;
+using Application.ViewModels.FloorFeeDTOs;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,6 @@ namespace Application.Interfaces
         Task<float?> GetPercentFloorFeeOfLot(float currentPrice);
 
         Task<APIResponseModel> GetFloorFeesAsync();
+        Task<APIResponseModel> UpdateFloorFeesAsync(UpdateFloorFeeDTO updateFloorFeeDTO);
     }
 }

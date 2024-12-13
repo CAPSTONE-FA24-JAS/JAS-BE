@@ -105,6 +105,7 @@ namespace Infrastructures
                 option.UseLazyLoadingProxies().UseNpgsql(databaseConnection, otp =>
                 {
                     otp.CommandTimeout(120);
+                   
                 });
             });
             services.AddAutoMapper(typeof(Mapper).Assembly);

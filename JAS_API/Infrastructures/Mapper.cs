@@ -319,6 +319,10 @@ namespace Infrastructures
                 .ForMember(dest => dest.Customer, src => src.MapFrom(x => x.Customer))
                 .ReverseMap();
 
+            CreateMap<Lot, UpdateLotFixedPriceDTO>().ReverseMap();
+            CreateMap<Lot, UpdateLotSecretAuctionDTO>().ReverseMap();
+            CreateMap<Lot, UpdateLotPublicAuctionDTO>().ReverseMap();
+            CreateMap<Lot, UpdateLotAuctionPriceGraduallyReducedDTO>().ReverseMap();
         }
     }
 }
