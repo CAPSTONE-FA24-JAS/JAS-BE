@@ -163,18 +163,32 @@ namespace Application.Services
             var response = new APIResponseModel();
             try
             {
-                var totalRevenue = await _unitOfWork.TransactionRepository.GetAllAsync(x => (x.TransactionType == EnumTransactionType.Banktransfer.ToString()
-                                                                      || x.TransactionType == EnumTransactionType.BuyPay.ToString()
-                                                                      || x.TransactionType == EnumTransactionType.AddWallet.ToString()));
+                //var totalRevenue = await _unitOfWork.TransactionRepository.GetAllAsync(x => (x.TransactionType == EnumTransactionType.Banktransfer.ToString()
+                //                                                      || x.TransactionType == EnumTransactionType.BuyPay.ToString()
+                //                                                      || x.TransactionType == EnumTransactionType.AddWallet.ToString()));
 
-                var totalIncidentalCost = await _unitOfWork.TransactionRepository.GetAllAsync(x => (x.TransactionType == EnumTransactionType.RefundDeposit.ToString()
-                                                                      || x.TransactionType == EnumTransactionType.SellerPay.ToString()
-                                                                      || x.TransactionType == EnumTransactionType.WithDrawWallet.ToString()));
-                var totalProfit = totalRevenue.Sum(x => x.Amount) - totalIncidentalCost.Sum(x => x.Amount); 
-                response.Code = 200;
-                response.Data = totalProfit;
-                response.IsSuccess = true;
-                response.Message = $"Received Successfully Total Profit: {totalProfit}.";
+                //var totalIncidentalCost = await _unitOfWork.TransactionRepository.GetAllAsync(x => (x.TransactionType == EnumTransactionType.RefundDeposit.ToString()
+                //                                                      || x.TransactionType == EnumTransactionType.SellerPay.ToString()
+                //                                                      || x.TransactionType == EnumTransactionType.WithDrawWallet.ToString()));
+                //var totalProfit = totalRevenue.Sum(x => x.Amount) - totalIncidentalCost.Sum(x => x.Amount); 
+
+                var invoices = await _unitOfWork.InvoiceRepository.GetInvoiceForTotalProfit();
+                if (invoices == null)
+                {
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                    response.Data = 0;
+                    response.Message = $"Not Found Invoice.";
+                }
+                else
+                {
+                    var totalProfit = invoices.Sum(x => (x.TotalPrice ?? 0 - x.Free ?? 0));
+                    response.Code = 200;
+                    response.Data = totalProfit;
+                    response.IsSuccess = true;
+                    response.Message = $"Received Successfully Total Profit: {totalProfit}.";
+                }
+               
             }
             catch (Exception ex)
             {
@@ -190,20 +204,32 @@ namespace Application.Services
             var response = new APIResponseModel();
             try
             {
-                var totalRevenue = await _unitOfWork.TransactionRepository.GetAllAsync(x => x.CreationDate.Month == month && x.CreationDate.Year == year
-                                                                      && (x.TransactionType == EnumTransactionType.Banktransfer.ToString()
-                                                                      || x.TransactionType == EnumTransactionType.BuyPay.ToString()
-                                                                      || x.TransactionType == EnumTransactionType.AddWallet.ToString()));
+                //var totalRevenue = await _unitOfWork.TransactionRepository.GetAllAsync(x => x.CreationDate.Month == month && x.CreationDate.Year == year
+                //                                                      && (x.TransactionType == EnumTransactionType.Banktransfer.ToString()
+                //                                                      || x.TransactionType == EnumTransactionType.BuyPay.ToString()
+                //                                                      || x.TransactionType == EnumTransactionType.AddWallet.ToString()));
 
-                var totalIncidentalCost = await _unitOfWork.TransactionRepository.GetAllAsync(x => x.CreationDate.Month == month && x.CreationDate.Year == year
-                                                                      && (x.TransactionType == EnumTransactionType.RefundDeposit.ToString()
-                                                                      || x.TransactionType == EnumTransactionType.SellerPay.ToString()
-                                                                      || x.TransactionType == EnumTransactionType.WithDrawWallet.ToString()));
-                var totalProfit = totalRevenue.Sum(x => x.Amount) - totalIncidentalCost.Sum(x => x.Amount);
-                response.Code = 200;
-                response.Data = totalProfit;
-                response.IsSuccess = true;
-                response.Message = $"Received Successfully Total Profit: {totalProfit}.";
+                //var totalIncidentalCost = await _unitOfWork.TransactionRepository.GetAllAsync(x => x.CreationDate.Month == month && x.CreationDate.Year == year
+                //                                                      && (x.TransactionType == EnumTransactionType.RefundDeposit.ToString()
+                //                                                      || x.TransactionType == EnumTransactionType.SellerPay.ToString()
+                //                                                      || x.TransactionType == EnumTransactionType.WithDrawWallet.ToString()));
+
+                var invoices = await _unitOfWork.InvoiceRepository.GetInvoiceForTotalProfitByTime(month, year);
+                if (invoices == null)
+                {
+                    response.Code = 404;
+                    response.IsSuccess = true;
+                    response.Data = 0;
+                    response.Message = $"Not Found Invoice.";
+                }
+                else
+                {
+                    var totalProfit = invoices.Sum(x => (x.TotalPrice ?? 0 - x.Free ?? 0));
+                    response.Code = 200;
+                    response.Data = totalProfit;
+                    response.IsSuccess = true;
+                    response.Message = $"Received Successfully Total Profit: {totalProfit}.";
+                }
             }
             catch (Exception ex)
             {

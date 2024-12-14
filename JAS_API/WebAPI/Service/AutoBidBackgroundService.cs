@@ -30,7 +30,7 @@ namespace WebAPI.Service
         {
             using (var cts = new CancellationTokenSource())
             {
-                int delay = 10000;
+                int delay = 1000;
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     try
@@ -44,10 +44,12 @@ namespace WebAPI.Service
                     catch (OperationCanceledException)
                     {
                         _logger.LogInformation("Operation canceled.");
+                        await Task.Delay(delay, stoppingToken);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Error occurred in AutoBidBackgroundService");
+                        await Task.Delay(delay, stoppingToken);
                     }
                 }
             }
@@ -106,7 +108,7 @@ namespace WebAPI.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"1111_Exception into AutoBidAsync {ex.Message} ");
-            }
+            }  
 
         }
 

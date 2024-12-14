@@ -211,13 +211,13 @@ namespace WebAPI.Controllers
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateLotFixedPrice(UpdateLotPublicAuctionDTO lotDTO)
+        public async Task<IActionResult> UpdateLotPublicAuction(UpdateLotPublicAuctionDTO lotDTO)
         {
             var result = await _lotService.UpdateLot(lotDTO);
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateLotFixedPrice(UpdateLotAuctionPriceGraduallyReducedDTO lotDTO)
+        public async Task<IActionResult> UpdateLotGraduallyReduce(UpdateLotAuctionPriceGraduallyReducedDTO lotDTO)
         {
             var result = await _lotService.UpdateLot(lotDTO);
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);

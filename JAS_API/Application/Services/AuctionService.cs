@@ -333,6 +333,13 @@ namespace Application.Services
                     reponse.Code = 404;
                     return reponse;
                 }
+                if (!auctionExisted.Lots.Any())
+                {
+                    reponse.IsSuccess = false;
+                    reponse.Message = "Auction Approve Faild, Auction have must least one lot.";
+                    reponse.Code = 400;
+                    return reponse;
+                }
                 if (auctionExisted.StartTime > _currentTime.GetCurrentTime())
                 {
                     auctionExisted.Status = EnumStatusAuction.UpComing.ToString();
