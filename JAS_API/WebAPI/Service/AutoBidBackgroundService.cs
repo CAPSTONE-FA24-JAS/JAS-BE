@@ -88,7 +88,7 @@ namespace WebAPI.Service
 
                         if (checkAutoBid)
                         {
-                            bool currentPriceOfPlayer = highestBid.CustomerId == item.CustomerId && highestBid.Status == "Success" && highestBid.CurrentPrice.Value >= highestBidOfLot;
+                            var currentPriceOfPlayer = highestBid != null && highestBid.CustomerId == item.CustomerId && highestBid.Status == "Success" && highestBid.CurrentPrice.Value >= highestBidOfLot;
                             if (currentPriceOfPlayer || highestBidOfLot == null)
                             {
                                 return;
