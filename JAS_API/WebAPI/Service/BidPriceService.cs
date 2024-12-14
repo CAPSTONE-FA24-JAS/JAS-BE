@@ -742,18 +742,19 @@ namespace Application.Services
                 {
                     autoBid.IsActive = isActive;
                     _unitOfWork.AutoBidRepository.Update(autoBid);
-                    await _unitOfWork.SaveChangeAsync();
-                    response.Message = $"Update autobid sucessfully";
-                    response.Code = 200;
-                    response.IsSuccess = true;
-                    response.Data = true;
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
+                    {
+                        response.Message = $"Update autobid sucessfully";
+                        response.Code = 200;
+                        response.IsSuccess = true;
+                        response.Data = autoBid.IsActive;
+                    }
                 }
                 else
                 {
                     response.Message = $"Not found autobid";
                     response.Code = 404;
-                    response.IsSuccess = true;
-                    response.Data = false;
+                    response.IsSuccess = true;                   
 
                 }
             }
