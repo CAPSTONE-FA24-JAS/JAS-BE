@@ -97,15 +97,13 @@ namespace WebAPI.Service
                 var _cacheService = scope.ServiceProvider.GetRequiredService<ICacheService>();
                 string lotGroupName = $"lot-{lot.Id}";
                 var pubsubChannel = $"channel-{lot.Id}";
-                
+
+                var _bidQueue = new ConcurrentQueue<string>();
                 var dataAvailable = new TaskCompletionSource<bool>();
 
                 await _cacheService.SubscribeToChannelAsync(pubsubChannel, message =>
                 {
-                    if (message == "Newbid")
-                    {
-                        dataAvailable.TrySetResult(true); // Signal that data is available
-                    }
+                    _bidQueue.Enqueue(message); // Thêm tin nhắn vào hàng đợi
                 });
                 try
                 {
@@ -116,6 +114,14 @@ namespace WebAPI.Service
                             _logger.LogInformation($"Lot {lot.Id} đã kết thúc.");
                             break;
                         }
+
+                        // Kiểm tra và xử lý các tin nhắn trong hàng đợi
+                        while (_bidQueue.TryDequeue(out var message))
+                        {
+                            if (message == "Newbid")
+                            {
+                                _logger.LogInformation($"Nhận được tín hiệu Newbid cho Lot {lot.Id}");
+
                                 // Xử lý logic đặt giá (PlaceBid)
                                 var result = _cacheService.PlaceBidWithLuaScript(lot.Id);
 
@@ -140,10 +146,13 @@ namespace WebAPI.Service
                                 else
                                 {
                                     _logger.LogInformation($"Không có giá hợp lệ trong luồng stream cho Lot {lot.Id}");
-                                    dataAvailable = new TaskCompletionSource<bool>();  // Reset the signal
-                                    await dataAvailable.Task;
-                                    continue;
-                                }                         
+                                }
+                            }
+                            else
+                            {
+                                _logger.LogInformation($"message:" + message);
+                            }
+                        }
                     }
                 }
                 catch (TaskCanceledException)
