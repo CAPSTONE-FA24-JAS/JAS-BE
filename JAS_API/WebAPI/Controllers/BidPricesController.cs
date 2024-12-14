@@ -105,5 +105,15 @@ namespace WebAPI.Controllers
             return BadRequest(result);
         }
 
+        [HttpPut]
+        public async Task<IActionResult> updateActiveForAutobid(int autobidId, bool isActive)
+        {
+
+            var result = await _bidPriceService.updateActiveForAutobid(autobidId, isActive);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
     }
 }
