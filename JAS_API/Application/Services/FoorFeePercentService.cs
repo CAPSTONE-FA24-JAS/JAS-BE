@@ -99,8 +99,8 @@ namespace Application.Services
 
                     bool isOverlap = existingRanges.Any(ff =>
                         ff.Id != dto.Id && // Loại bỏ bản ghi hiện tại
-                        ((from.Value >= ff.From && from.Value < ff.To) || // `from` mới nằm trong phạm vi cũ
-                         (to.Value > ff.From && to.Value <= ff.To) ||    // `to` mới nằm trong phạm vi cũ
+                        ((from.Value >= ff.From && from.Value < ff.To) || // from mới nằm trong phạm vi cũ
+                         (to.Value > ff.From && to.Value <= ff.To) ||    // to mới nằm trong phạm vi cũ
                          (from.Value <= ff.From && to.Value >= ff.To))  // Khoảng mới bao phủ toàn bộ khoảng cũ
                     );
 

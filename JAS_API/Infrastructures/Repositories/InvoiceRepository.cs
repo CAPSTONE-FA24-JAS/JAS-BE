@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Enums;
 
 namespace Infrastructures.Repositories
 {
@@ -198,5 +199,50 @@ namespace Infrastructures.Repositories
             }
         }
 
+        public async Task<List<Invoice>?> GetInvoiceForTotalProfit()
+        {
+            var invoices = new List<Invoice>();
+            try
+            {
+               invoices = await _dbContext.Invoices.AsNoTracking().Where(x => x.Status == EnumCustomerLot.Finished.ToString())
+                                                            .Select(x => 
+                                                            new Invoice()
+                                                            {
+                                                                TotalPrice = x.TotalPrice,
+                                                                Price = x.Price,
+                                                                FeeShip = x.FeeShip,
+                                                                Free = x.Free,
+                                                                CreatedBy = x.CreatedBy,
+                                                            }).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in get all profit repository {ex.Message}");
+            }
+            return invoices;
+        }
+        public async Task<List<Invoice>?> GetInvoiceForTotalProfitByTime(int month, int year)
+        {
+            var invoices = new List<Invoice>();
+            try
+            {
+                invoices = await _dbContext.Invoices.AsNoTracking().Where(x => x.Status == EnumCustomerLot.Finished.ToString()
+                                                                                && x.CreationDate.Month == month && x.CreationDate.Year == year)
+                                                             .Select(x =>
+                                                             new Invoice()
+                                                             {
+                                                                 TotalPrice = x.TotalPrice,
+                                                                 Price = x.Price,
+                                                                 FeeShip = x.FeeShip,
+                                                                 Free = x.Free,
+                                                                 CreatedBy = x.CreatedBy,
+                                                             }).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in get all profit repository {ex.Message}");
+            }
+            return invoices;
+        }
     }
 }

@@ -128,7 +128,7 @@ namespace Application.Services
             var Revenue = invoices.Where(x => x.CreationDate.Month == month).ToList();
             if (Revenue.Count > 0)
             {
-                return Revenue.Sum(x => (x.FeeShip?? 0 + x.Free?? 0));
+                return Revenue.Sum(x => (x.TotalPrice??0 - x.Price??0));
             }
             return 0;
         }
@@ -186,9 +186,9 @@ namespace Application.Services
                 {
 
                     response.Code = 200;
-                    response.Data = totalRevenue.Sum(x => x.TotalPrice);
+                    response.Data = totalRevenue.Sum(x => x.TotalPrice - x.Price);
                     response.IsSuccess = true;
-                    response.Message = $"Received Successfully Total Revenue: {totalRevenue.Sum(x => (x.FeeShip ?? 0 + x.Free ?? 0))}.";
+                    response.Message = $"Received Successfully Total Revenue: {totalRevenue.Sum(x => (x.TotalPrice??0 - x.Price??0))}.";
                 }
                 else
                 {
@@ -459,7 +459,7 @@ namespace Application.Services
 
                 foreach (var invoice in invoices ?? Enumerable.Empty<Invoice>())
                 {
-                    var profit = invoice.CustomerLot?.Lot?.CurrentPrice ?? 0f; 
+                    var profit = invoice.Price ?? 0f; 
                     var invoiceTotalPrice = invoice.TotalPrice ?? 0f;
 
                     totalProfit += (invoiceTotalPrice - profit);
