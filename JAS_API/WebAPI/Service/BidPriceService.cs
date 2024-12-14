@@ -731,6 +731,42 @@ namespace Application.Services
             return response;
         }
 
+        public async Task<APIResponseModel> updateActiveAutoBidAsync(int autobidId, bool IsActive)
+        {
+            var response = new APIResponseModel();
+
+            try
+            {
+                var checkAutoBidPrice = await _unitOfWork.AutoBidRepository.GetByIdAsync(autobidId);
+                if (checkAutoBidPrice != null)
+                {
+                    checkAutoBidPrice.IsActive = IsActive;
+                    _unitOfWork.AutoBidRepository.Update(checkAutoBidPrice);
+                    await _unitOfWork.SaveChangeAsync();
+                    response.Message = $"Update autobid successfully";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = true;
+                }
+                else
+                {
+                    response.Message = $"Don't have autobid";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = false;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessages = ex.Message.Split(',').ToList();
+                response.Message = "Exception";
+                response.Code = 500;
+                response.IsSuccess = false;
+            }
+            return response;
+        }
+
 
     }
 }
