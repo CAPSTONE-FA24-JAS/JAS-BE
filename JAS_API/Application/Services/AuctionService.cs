@@ -434,6 +434,11 @@ namespace Application.Services
                 {
                     switch (auctionExisted.Status)
                     {
+                        case nameof(EnumStatusAuction.Waiting):
+                            auctionExisted.Status = EnumStatusAuction.Cancelled.ToString();
+                            auctionExisted.ModificationDate = DateTime.Now;
+                            await SetAfterCancelForLot(auctionExisted);
+                            break;
                         case nameof(EnumStatusAuction.UpComing):
                             auctionExisted.Status = EnumStatusAuction.Cancelled.ToString();
                             auctionExisted.ModificationDate = DateTime.Now;
