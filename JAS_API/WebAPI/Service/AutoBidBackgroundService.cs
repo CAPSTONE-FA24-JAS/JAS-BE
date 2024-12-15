@@ -72,7 +72,7 @@ namespace WebAPI.Service
                         if (stoppingToken.IsCancellationRequested)
                         {
                             _logger.LogError("AutoBidAsync Operation canceled.");
-                            return;
+                            continue;
                         }
                         stoppingToken.ThrowIfCancellationRequested();
 
@@ -91,7 +91,7 @@ namespace WebAPI.Service
                             var currentPriceOfPlayer = highestBid != null && highestBid.CustomerId == item.CustomerId && highestBid.Status == "Success" && highestBid.CurrentPrice.Value >= highestBidOfLot;
                             if (currentPriceOfPlayer || highestBidOfLot == null)
                             {
-                                return;
+                                continue;
                             }
                             else
                             {
