@@ -367,8 +367,15 @@ namespace Application.Services
                             //cong vao cho wallet seller
                             var walletOfSeller = await _unitOfWork.WalletRepository.GetByCustomerId(sellerId);
 
-
-                            walletOfSeller.AvailableBalance += (decimal?)invoiceById?.CustomerLot?.Lot.CurrentPrice ?? 0;
+                            if(walletOfSeller.AvailableBalance == null)
+                            {
+                                walletOfSeller.AvailableBalance = (decimal?)invoiceById?.CustomerLot?.Lot.CurrentPrice;
+                            }
+                            else
+                            {
+                                walletOfSeller.AvailableBalance += (decimal?)invoiceById?.CustomerLot?.Lot.CurrentPrice ?? 0;
+                            }
+                            
                             walletOfSeller.Balance = walletOfSeller.AvailableBalance ?? 0 + walletOfSeller.FrozenBalance ?? 0;
                             _unitOfWork.WalletRepository.Update(walletOfSeller);
 
@@ -413,7 +420,7 @@ namespace Application.Services
 
                             var notification = new Notification
                             {
-                                Title = $"Fiinish invoice {invoiceById.Id}",
+                                Title = $"Finish invoice {invoiceById.Id}",
                                 Description = $"Your Invoice {invoiceById.Id} had been finish and company auto paid into your wallet for you.Please check your wallet!",
                                 Is_Read = false,
                                 NotifiableId = invoiceById.Id,  //invoiceById

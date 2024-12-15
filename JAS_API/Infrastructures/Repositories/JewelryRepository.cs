@@ -75,9 +75,11 @@ namespace Infrastructures.Repositories
         public async Task<(IEnumerable<Jewelry> data, int totalItem)> GetAllJewelryNoLotAynsc(int? pageIndex = null, int? pageSize = null)
         {
             var jewelry = _dbContext.Jewelries.Include(x => x.ImageJewelries)                                             
-                                              .Include(x => x.Lots)                                            
-                                              .Where(x =>( x.Status == "Authorized" &&  x.Lots.All(l => l.JewelryId  == null)) ||(  x.Status == "Authorized" && x.Lots.All( l => l.Status == "Passed" ))
-                                                          || ( x.Status == "Authorized" && x.Lots.All(l => l.Status == "Cancelled")));
+                                              .Include(x => x.Lots)
+                                              .Where(x => !x.Lots.Any() || // Jewelry không thuộc lot nào
+                                                     x.Lots.All(l => l.Status == "Passed" ||
+                                                                l.Status == "Cancelled"))
+                                              .Where(x => x.Status == "Authorized");
 
             if (pageIndex.HasValue && pageSize.HasValue)
             {
