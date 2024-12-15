@@ -22,20 +22,20 @@ namespace Application.ViewModels.LotDTOs
 
     }
 
-    public class UpdateLotFixedPriceDTO : BaseLot
+    public class UpdateLotFixedPriceDTO : BaseUpdateLot
     {
         public float? BuyNowPrice { get; set; }
         public bool? HaveFinancialProof { get; set; }
 
     
     }
-    public class UpdateLotSecretAuctionDTO : BaseLot
+    public class UpdateLotSecretAuctionDTO : BaseUpdateLot
     {
         public float? StartPrice { get; set; }
         public bool? HaveFinancialProof { get; set; }
 
     }
-    public class UpdateLotPublicAuctionDTO : BaseLot
+    public class UpdateLotPublicAuctionDTO : BaseUpdateLot
     {
         public float? StartPrice { get; set; }
         public float? FinalPriceSold { get; set; }
@@ -44,7 +44,7 @@ namespace Application.ViewModels.LotDTOs
         public bool? IsHaveFinalPrice { get; set; }
 
     }
-    public class UpdateLotAuctionPriceGraduallyReducedDTO : BaseLot
+    public class UpdateLotAuctionPriceGraduallyReducedDTO : BaseUpdateLot
     {
         public float? StartPrice { get; set; }
         public float? FinalPriceSold { get; set; }
