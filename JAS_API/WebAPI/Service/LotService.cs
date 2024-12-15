@@ -975,7 +975,7 @@ namespace Application.Services
                     {
                         response.Code = 200;
                         response.IsSuccess = true;
-                        response.Data = lotExist.CustomerLots?.Count();
+                        response.Data = lotExist.BidPrices?.Distinct().GroupBy(x => x.Customer).Count();
                         return response;
                     }
                     else
