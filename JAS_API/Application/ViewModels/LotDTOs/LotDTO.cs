@@ -24,6 +24,7 @@ namespace Application.ViewModels.LotDTOs
         public string? LotType { get; set; }
         public string? ImageLinkJewelry { get; set; }
         public int? Round { get; set; }
+        public int? BidIncrementTime { get; set; }
 
         public int? SellerId { get; set; }
         public int? StaffId { get; set; }
