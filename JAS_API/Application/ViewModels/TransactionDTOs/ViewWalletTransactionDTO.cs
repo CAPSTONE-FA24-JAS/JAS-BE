@@ -21,6 +21,7 @@ namespace Application.ViewModels.TransactionDTOs
         public string? transactionType { get; set; }
         public float? Amount { get; set; }
         public DateTime? TransactionTime { get; set; }
+        public string? CustomerName { get; set; }
 
     }
 }
