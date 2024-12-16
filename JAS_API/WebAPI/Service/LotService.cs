@@ -1131,7 +1131,7 @@ namespace Application.Services
 
                             reponse.Code = 200;
                             reponse.IsSuccess = true;
-                            reponse.Message = $"CreateLot {lot.LotType} is successfuly";
+                            reponse.Message = $"Update {lot.LotType} is successfuly";
                         }
                         else
                         {
