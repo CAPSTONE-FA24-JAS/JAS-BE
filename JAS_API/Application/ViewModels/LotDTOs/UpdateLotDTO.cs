@@ -13,7 +13,6 @@ namespace Application.ViewModels.LotDTOs
     {
         public int Id { get; set; }
         public string? Title { get; set; }
-        public int? Round { get; set; }
         public int? StaffId { get; set; }
         public int? JewelryId { get; set; }
         public int? AuctionId { get; set; }
@@ -42,6 +41,8 @@ namespace Application.ViewModels.LotDTOs
         public float? BidIncrement { get; set; }
         public bool? HaveFinancialProof { get; set; }
         public bool? IsHaveFinalPrice { get; set; }
+        public int? Round { get; set; }
+
 
     }
     public class UpdateLotAuctionPriceGraduallyReducedDTO : BaseUpdateLot

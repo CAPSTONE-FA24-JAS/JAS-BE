@@ -147,8 +147,12 @@ namespace Application.Services
                 var blog = await _unitOfWork.BlogRepository.GetByIdAsync(blogId);
                 if (blog != null)
                 {
+                    foreach (var image in blog.ImageBlogs)
+                    {
+                        _unitOfWork.ImageBlogRepository.Remove(image);
+                    }
                     _unitOfWork.BlogRepository.Remove(blog);
-                    if(await _unitOfWork.SaveChangeAsync() > 0)
+                    if (await _unitOfWork.SaveChangeAsync() > 0)
                     {
                         reponse.Message = $"Removbe Blog Successfull";
                         reponse.Code = 200;

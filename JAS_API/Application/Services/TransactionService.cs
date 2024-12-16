@@ -61,13 +61,24 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
+                List<ViewTransactionDTO> listDTO = new List<ViewTransactionDTO>();
                 var trans = await _unitOfWork.TransactionRepository.GetAllAsync();
                 if (trans.Count > 0)
                 {
+                    foreach (var item in trans)
+                    {
+                        if (item.TransactionPerson.HasValue)
+                        {
+                            var mapper = _mapper.Map<ViewTransactionDTO>(item);
+                            var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(item.TransactionPerson);
+                            mapper.CustomerName = customer.FirstName + " " + customer.LastName;
+                            listDTO.Add(mapper);
+                        }
+                    }
                     reponse.Message = $"Received List Transaction SuccessFull";
                     reponse.Code = 200;
                     reponse.IsSuccess = true;
-                    reponse.Data = _mapper.Map<IEnumerable<ViewTransactionDTO>>(trans);
+                    reponse.Data =listDTO;
                 }
                 else
                 {
@@ -91,14 +102,25 @@ namespace Application.Services
             var reponse = new APIResponseModel();
             try
             {
+                List<ViewTransactionDTO> listDTO = new List<ViewTransactionDTO>();
                 var transType = EnumHelper.GetEnums<EnumTransactionType>().FirstOrDefault(x => x.Value == transTypeId).Name.ToString();
                 var trans = await _unitOfWork.TransactionRepository.GetAllAsync(x => x.TransactionType == transType);
                 if (trans.Count > 0)
                 {
+                    foreach (var item in trans)
+                    {
+                        if (item.TransactionPerson.HasValue)
+                        {
+                            var mapper = _mapper.Map<ViewTransactionDTO>(item);
+                            var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(item.TransactionPerson);
+                            mapper.CustomerName = customer.FirstName + " " + customer.LastName;
+                            listDTO.Add(mapper);
+                        }
+                    }
                     reponse.Message = $"Received List Transaction SuccessFull";
                     reponse.Code = 200;
                     reponse.IsSuccess = true;
-                    reponse.Data = _mapper.Map<IEnumerable<ViewTransactionDTO>>(trans);
+                    reponse.Data = listDTO;
                 }
                 else
                 {
