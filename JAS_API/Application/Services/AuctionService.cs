@@ -478,44 +478,77 @@ namespace Application.Services
             }
             return reponse;
         }
+        //private async Task SetAfterCancelForLot(Auction auction)
+        //{
+        //    var lots = auction?.Lots?.ToList();
+        //    if (lots.Any())
+        //    {
+        //        // Set Lot
+        //        var tasks = lots.Select(async lot =>
+        //        {
+        //            lot.Status = EnumStatusLot.Cancelled.ToString();
+        //            List<CustomerLot> players = lot.CustomerLots.ToList();
+        //            if (players.Count > 0)
+        //            {
+        //                var tasksPlayers = players.Select(async player =>
+        //                {
+        //                    player.Status = EnumCustomerLot.Refunded.ToString();
+        //                    player.IsWinner = false;
+        //                    player.IsRefunded = true;
+        //                    //var notification = new Notification
+        //                    //{
+        //                    //    Title = $"Bidding lose in lot {player.LotId}",
+        //                    //    Description = $" You had been lose in lot {player.LotId} và system auto refunded deposit for you",
+        //                    //    Is_Read = false,
+        //                    //    NotifiableId = player.Id,
+        //                    //    AccountId = player.Customer.AccountId,
+        //                    //    CreationDate = DateTime.UtcNow,
+        //                    //    Notifi_Type = "Refunded",
+        //                    //    ImageLink = player.Lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
+        //                    //};
+
+        //                    //await _unitOfWork.NotificationRepository.AddAsync(notification);
+        //                    //await _notificationHub.Clients.Group(player.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
+        //                });
+        //                await Task.WhenAll(tasksPlayers);
+        //                await _walletService.RefundToWalletForUsersAsync(players);
+        //            }
+        //            return;
+        //        });
+        //        await Task.WhenAll(tasks);
+        //    }
+        //}
         private async Task SetAfterCancelForLot(Auction auction)
         {
             var lots = auction?.Lots?.ToList();
-            if (lots.Any())
+            if (lots != null && lots.Any())
             {
-                // Set Lot
-                var tasks = lots.Select(async lot =>
+                foreach (var lot in lots)
                 {
-                    lot.Status = EnumStatusLot.Cancelled.ToString();
-                    List<CustomerLot> players = lot.CustomerLots.ToList();
-                    if (players.Count > 0)
+                    try
                     {
-                        var tasksPlayers = players.Select(async player =>
+                        lot.Status = EnumStatusLot.Cancelled.ToString();
+                        List<CustomerLot> players = lot.CustomerLots.ToList();
+                        if (players.Count > 0)
                         {
-                            player.Status = EnumCustomerLot.Refunded.ToString();
-                            player.IsWinner = false;
-                            player.IsRefunded = true;
-                            //var notification = new Notification
-                            //{
-                            //    Title = $"Bidding lose in lot {player.LotId}",
-                            //    Description = $" You had been lose in lot {player.LotId} và system auto refunded deposit for you",
-                            //    Is_Read = false,
-                            //    NotifiableId = player.Id,
-                            //    AccountId = player.Customer.AccountId,
-                            //    CreationDate = DateTime.UtcNow,
-                            //    Notifi_Type = "Refunded",
-                            //    ImageLink = player.Lot.Jewelry.ImageJewelries.FirstOrDefault()?.ImageLink
-                            //};
+                            foreach (var player in players)
+                            {
+                                player.Status = EnumCustomerLot.Refunded.ToString();
+                                player.IsWinner = false;
+                                player.IsRefunded = true;
+                            }
 
-                            //await _unitOfWork.NotificationRepository.AddAsync(notification);
-                            //await _notificationHub.Clients.Group(player.Customer.AccountId.ToString()).SendAsync("NewNotificationReceived", "Có thông báo mới!");
-                        });
-                        await Task.WhenAll(tasksPlayers);
-                        await _walletService.RefundToWalletForUsersAsync(players);
+                            // Thực hiện refund
+                            await _walletService.RefundToWalletForUsersAsync(players);
+                        }
+
+                        await _unitOfWork.SaveChangeAsync();
                     }
-                    return;
-                });
-                await Task.WhenAll(tasks);
+                    catch
+                    {
+                        throw;
+                    }
+                }
             }
         }
     }
