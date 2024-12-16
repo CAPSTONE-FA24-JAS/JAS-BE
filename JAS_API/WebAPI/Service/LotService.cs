@@ -1067,26 +1067,25 @@ namespace Application.Services
                         return reponse;
                     }
                     var autionexits = await _unitOfWork.AuctionRepository.GetByIdAsync(lotExist.AuctionId);
-                    if (lotExist.Status != EnumStatusLot.Waiting.ToString() || autionexits.Status != EnumStatusAuction.UpComing.ToString()
-                        || autionexits.Status != EnumStatusAuction.Waiting.ToString())
+                    if (lotExist.Status != EnumStatusLot.Waiting.ToString() && ( autionexits.Status != EnumStatusAuction.UpComing.ToString()
+                        && autionexits.Status != EnumStatusAuction.Waiting.ToString()))
                     {
                         reponse.Code = 404;
                         reponse.IsSuccess = false;
                         reponse.Message = "Current status can't update lot";
                         return reponse;
                     }
-
                     if (autionexits != null)
                     {
 
                         if (lotDTO is UpdateLotFixedPriceDTO fixedAuctionDTO)
                         {
-                            var updateAfter = _mapper.Map(lotExist, fixedAuctionDTO);
+                            _mapper.Map(fixedAuctionDTO,lotExist);
                             lotExist.LotType = EnumLotType.Fixed_Price.ToString();
                         }
                         if (lotDTO is UpdateLotSecretAuctionDTO secretAuctionDTO)
                         {
-                            var updateAfter = _mapper.Map(lotExist, secretAuctionDTO);
+                            _mapper.Map(secretAuctionDTO, lotExist);
                             lotExist.LotType = EnumLotType.Secret_Auction.ToString();
                         }
                         if (lotDTO is UpdateLotPublicAuctionDTO publicAuctionDTO)
@@ -1095,15 +1094,15 @@ namespace Application.Services
                             {
                                 lotExist.FinalPriceSold = null;
                             }
-                            var updateAfter = _mapper.Map(lotExist, publicAuctionDTO);
+                            _mapper.Map(publicAuctionDTO, lotExist);
                             lotExist.LotType = EnumLotType.Public_Auction.ToString();
                         }
                         if (lotDTO is UpdateLotAuctionPriceGraduallyReducedDTO auctionPriceGraduallyReducedDTO)
                         {
-                            var updateAfter = _mapper.Map(lotExist, auctionPriceGraduallyReducedDTO);
+                            _mapper.Map(auctionPriceGraduallyReducedDTO, lotExist);
                             lotExist.LotType = EnumLotType.Auction_Price_GraduallyReduced.ToString();
                         }
-                        _unitOfWork.LotRepository.Update(lot);
+                        _unitOfWork.LotRepository.Update(lotExist);
 
                         if (await _unitOfWork.SaveChangeAsync() > 0)
                         {
