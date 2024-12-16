@@ -196,6 +196,7 @@ namespace Application.Services
                             if (status == EnumStatusBidLimit.Cancel.ToString())
                             {
                                 bidLimit.Reason = updateBidLimitDTO.Reason;
+                                bidLimit.StaffId = updateBidLimitDTO.StaffId;
                             }
                             bidLimit.Status = status;
                             _unitOfWork.BidLimitRepository.Update(bidLimit);
