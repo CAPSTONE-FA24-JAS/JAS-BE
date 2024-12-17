@@ -216,7 +216,7 @@ namespace Application.Utils
             <body>
                 <div class='container'>
                     <div class='header'>
-                        <img src='https://res.cloudinary.com/dmbfbs6ok/image/upload/v1725771144/pblsuayckjd3ry9qg6wz.jpg' alt='Company Logo'>
+                        <img src='https://clipartcraft.com/images/diamond-clipart-gold-8.png' alt='Company Logo'>
                     </div>
                     <div class='content'>
                         <h1>Xác nhận OTP của bạn</h1>

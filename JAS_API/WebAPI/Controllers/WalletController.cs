@@ -132,11 +132,11 @@ namespace WebAPI.Controllers
                         var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
                         if (transactionResult.IsSuccess)
                         {
-                            return await StatusPage("Thành Công", true);
+                            return await StatusPage("Success", true);
                         }
                         else
                         {
-                            return await StatusPage("Thất Bại", false);
+                            return await StatusPage("Failed", false);
                         }
                     }
                     else
@@ -165,11 +165,11 @@ namespace WebAPI.Controllers
                                 var transactionResult = await _transactionService.CreateNewTransaction(newTrans);
                                 if (walletUpdate.IsSuccess && transactionResult.IsSuccess)
                                 {
-                                    return await StatusPage("Thành Công",true);
+                                    return await StatusPage("Success", true);
                                 }
                                 else
                                 {
-                                    return await StatusPage("Thất Bại", false);
+                                    return await StatusPage("Failed", false);
                                 }
                             }
                         }
@@ -318,7 +318,7 @@ namespace WebAPI.Controllers
                 }}
 
                 .logo {{
-                    background-color: #3cbcb4; /* Xanh ngọc */
+                    background-color: #3cbcb4;
                     width: 60px;
                     height: 60px;
                     display: inline-block;
@@ -338,13 +338,14 @@ namespace WebAPI.Controllers
                 <div class=""logo"">💎</div>
                 <h1>Chúc mừng!</h1>
                 <p>Hành động của bạn đã được thực hiện <b>{status}</b>.</p>
-                <button onclick=""openDeeplink(simplemeditation://result-payment/isSuccess={returnStatus.ToString().ToLower()})"">Đi đến phiên đấu giá</button>
+
+                <button onclick=""openDeeplink(simplemeditation://result-payment?isSuccess={returnStatus.ToString().ToLower()})"">Comback App</button>
             </div>
 
-            /<script>
+            <script>
                 function redirectToPage() {{
                     // Đặt URL của trang cần chuyển đến
-                    window.location.href = ""openDeeplink(reponsestatuspagetranfer/isSuccessfull={returnStatus.ToString().ToLower()})"";
+                    window.location.href = ""openDeeplink(simplemeditation://result-payment?isSuccess={returnStatus.ToString().ToLower()})"";
                 }}
             </script>
         </body>
