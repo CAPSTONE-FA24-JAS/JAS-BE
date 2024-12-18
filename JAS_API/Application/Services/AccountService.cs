@@ -78,6 +78,7 @@ namespace Application.Services
                 else
                 {
                     account.Status = true;
+                    account.IsConfirmed = true;
                     account.PasswordHash = HashPassword.HashWithSHA256(createDTO.PasswordHash);
                     await _unitOfWork.AccountRepository.AddAsync(account);
                     if (await _unitOfWork.SaveChangeAsync() > 0)
