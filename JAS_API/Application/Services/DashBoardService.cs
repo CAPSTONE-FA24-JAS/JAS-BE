@@ -128,7 +128,7 @@ namespace Application.Services
             var Revenue = invoices.Where(x => x.CreationDate.Month == month).ToList();
             if (Revenue.Count > 0)
             {
-                return Revenue.Sum(x => (x.TotalPrice??0 - x.Price??0));
+                return Revenue.Sum(x => (x.FeeShip??0 - x.Free??0));
             }
             return 0;
         }
@@ -184,11 +184,11 @@ namespace Application.Services
                 var totalRevenue = await _unitOfWork.InvoiceRepository.GetAllAsync(x => x.Status == EnumCustomerLot.Finished.ToString());
                 if (totalRevenue.Count > 0)
                 {
-
+                    var total= totalRevenue.Sum(x => x.FeeShip + x.Free);
                     response.Code = 200;
-                    response.Data = totalRevenue.Sum(x => x.TotalPrice - x.Price);
+                    response.Data = total;
                     response.IsSuccess = true;
-                    response.Message = $"Received Successfully Total Revenue: {totalRevenue.Sum(x => (x.TotalPrice??0 - x.Price??0))}.";
+                    response.Message = $"Received Successfully Total Revenue: {total}.";
                 }
                 else
                 {
@@ -382,7 +382,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> TotalUser()
+        public async Task<APIResponseModel> TotalCustomer()
         {
             var response = new APIResponseModel();
             try
@@ -415,7 +415,7 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> TotalUserActive()
+        public async Task<APIResponseModel> TotalCustomerActive()
         {
             var response = new APIResponseModel();
             try
@@ -459,10 +459,10 @@ namespace Application.Services
 
                 foreach (var invoice in invoices ?? Enumerable.Empty<Invoice>())
                 {
-                    var profit = invoice.Price ?? 0f; 
-                    var invoiceTotalPrice = invoice.TotalPrice ?? 0f;
+                    var free = invoice.Free ?? 0f; 
+                    var feeShipPrice = invoice.FeeShip ?? 0f;
 
-                    totalProfit += (invoiceTotalPrice - profit);
+                    totalProfit += (feeShipPrice + free);
                 }
 
                 response.Code = 200;
@@ -479,5 +479,102 @@ namespace Application.Services
             return response;
         }
 
+        public async Task<APIResponseModel> TotalRevenueInvoice()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var totalRevenue = await _unitOfWork.InvoiceRepository.GetAllAsync(x => x.Status == EnumCustomerLot.Finished.ToString());
+                if (totalRevenue.Count > 0)
+                {
+                    var total = totalRevenue.Sum(x => x.TotalPrice);
+                    response.Code = 200;
+                    response.Data = total;
+                    response.IsSuccess = true;
+                    response.Message = $"Received Successfully Total Revenue: {total}.";
+                }
+                else
+                {
+                    response.Code = 200;
+                    response.Data = 0;
+                    response.IsSuccess = true;
+                    response.Message = $"Current Time System Haven't Revenue.";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processcing";
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> TotalUser()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.IsConfirmed == true);
+
+                if (accounts.Count > 0)
+                {
+
+                    response.Code = 200;
+                    response.Data = accounts.Count;
+                    response.IsSuccess = true;
+                    response.Message = "Received Successfully Account In System";
+                }
+                else
+                {
+                    response.Code = 200;
+                    response.Data = 0;
+                    response.IsSuccess = true;
+                    response.Message = "Current Time System Haven't Account.";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processcing";
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> TotalUserActive()
+        {
+            var response = new APIResponseModel();
+            try
+            {
+                var accounts = await _unitOfWork.AccountRepository.GetAllAsync(x => x.IsConfirmed == true && x.Status == true);
+
+                if (accounts.Count > 0)
+                {
+
+                    response.Code = 200;
+                    response.Data = accounts.Count;
+                    response.IsSuccess = true;
+                    response.Message = "Received Successfully Account In System";
+                }
+                else
+                {
+                    response.Code = 200;
+                    response.Data = 0;
+                    response.IsSuccess = true;
+                    response.Message = "Current Time System Haven't Account.";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processcing";
+            }
+            return response;
+        }
     }
 }
