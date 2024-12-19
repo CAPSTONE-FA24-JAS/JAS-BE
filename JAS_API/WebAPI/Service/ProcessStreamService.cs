@@ -103,7 +103,7 @@ namespace WebAPI.Service
 
                 await _cacheService.SubscribeToChannelAsync(pubsubChannel, message =>
                 {
-                    _bidQueue.Enqueue(message); // Thêm tin nhắn vào hàng đợi
+                    _bidQueue.Enqueue(message); 
                 });
                 try
                 {
@@ -114,15 +114,12 @@ namespace WebAPI.Service
                             _logger.LogInformation($"Lot {lot.Id} đã kết thúc.");
                             break;
                         }
-
-                        // Kiểm tra và xử lý các tin nhắn trong hàng đợi
                         while (_bidQueue.TryDequeue(out var message))
                         {
                             if (message == "Newbid")
                             {
                                 _logger.LogInformation($"Nhận được tín hiệu Newbid cho Lot {lot.Id}");
 
-                                // Xử lý logic đặt giá (PlaceBid)
                                 var result = _cacheService.PlaceBidWithLuaScript(lot.Id);
 
                                 if (result.result)
@@ -131,7 +128,6 @@ namespace WebAPI.Service
                                     var firstName = customer.FirstName;
                                     var lastName = customer.LastName;
 
-                                    // Gửi cập nhật qua SignalR
                                     await _hubContext.Clients.Group(lotGroupName)
                                         .SendAsync("SendTopPrice", result.highestBid);
 

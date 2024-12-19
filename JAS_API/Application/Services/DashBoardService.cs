@@ -1,17 +1,11 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
-using Application.Utils;
 using Application.ViewModels.AccountDTOs;
-using Application.ViewModels.CustomerLotDTOs;
-using Application.ViewModels.InvoiceDTOs;
 using Application.ViewModels.JewelryDTOs;
 using Application.ViewModels.TransactionDTOs;
 using AutoMapper;
-using Azure;
 using Domain.Entity;
 using Domain.Enums;
-using OtpNet;
-using System.Linq.Expressions;
 
 namespace Application.Services
 {
@@ -191,7 +185,7 @@ namespace Application.Services
                 var totalRevenue = await _unitOfWork.InvoiceRepository.GetAllAsync(x => x.Status == EnumCustomerLot.Finished.ToString());
                 if (totalRevenue.Count > 0)
                 {
-                    var total= totalRevenue.Sum(x => x.FeeShip + x.Free);
+                    var total = totalRevenue.Sum(x => x.FeeShip + x.Free);
                     response.Code = 200;
                     response.Data = total;
                     response.IsSuccess = true;
@@ -466,7 +460,7 @@ namespace Application.Services
 
                 foreach (var invoice in invoices ?? Enumerable.Empty<Invoice>())
                 {
-                    var free = invoice.Free ?? 0f; 
+                    var free = invoice.Free ?? 0f;
                     var feeShipPrice = invoice.FeeShip ?? 0f;
 
                     totalProfit += (feeShipPrice + free);
@@ -584,37 +578,48 @@ namespace Application.Services
             return response;
         }
 
-        public async Task<APIResponseModel> TotalInvoiceByStatus(string status)
+        public async Task<APIResponseModel> TotalInvoiceByStatus()
         {
             var response = new APIResponseModel();
             try
             {
+                // Retrieve all invoices from the repository
+                var invoices = await _unitOfWork.InvoiceRepository.GetAllAsync();
 
-                var invoices = await _unitOfWork.InvoiceRepository.GetAllAsync(x => x.Status == status);
-                
-                if(invoices.Count > 0)
+                // Check if there are invoices
+                if (invoices.Count > 0)
                 {
+                        
+                    var statusGroups = invoices
+                        .GroupBy(i => i.Status)
+                        .Select(g => new
+                        {
+                            Status = g.Key, 
+                            Total = g.Count() 
+                        }).ToList();
                     response.Code = 200;
-                    response.Data = new { status = status, total = invoices.Count };
+                    response.Data = statusGroups;
                     response.IsSuccess = true;
-                    response.Message = $"Received Successfully Total Invoice";
+                    response.Message = "Received successfully. Total invoice statuses grouped.";
                 }
                 else
                 {
-                    response.Code = 200;
-                    response.Data = new { status = status, total = 0 };
-                    response.IsSuccess = true;
-                    response.Message = $"System Haven't Invoice with{status}.";
+                    response.Code = 404;
+                    response.Data = null;
+                    response.IsSuccess = false;
+                    response.Message = "No invoices found.";
                 }
-
             }
             catch (Exception ex)
             {
+                // Log the exception if needed
                 response.Code = 500;
                 response.IsSuccess = false;
-                response.Message = $"Exception When System Processcing";
+                response.Message = $"Exception occurred while processing the request: {ex.Message}";
             }
+
             return response;
         }
+
     }
 }
