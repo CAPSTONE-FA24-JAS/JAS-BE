@@ -49,7 +49,8 @@ namespace Application.Utils
                                        .Replace("{{DiaChi_seller}}", valuation.Seller.Address ?? "")
                                        .Replace("{{CCCD}}", valuation.Seller.CitizenIdentificationCard ?? "")
                                        .Replace("{{Time_Create}}", valuation.Seller.IDIssuanceDate.ToString() ?? "")
-                                       .Replace("{{Time_expire}}", valuation.Seller.IDExpirationDate.ToString() ?? "");
+                                       .Replace("{{Time_expire}}", valuation.Seller.IDExpirationDate.ToString() ?? "")
+                                       .Replace("{{Specific_price}}", valuation.Jewelry.SpecificPrice.ToString() ?? "");
 
             return templateHtml;
         }

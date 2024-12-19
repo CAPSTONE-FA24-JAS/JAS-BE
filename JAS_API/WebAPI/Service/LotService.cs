@@ -732,11 +732,11 @@ namespace Application.Services
                 var lot = await _unitOfWork.LotRepository.GetByIdAsync(model.LotId);
                 if (lot != null)
                 {
-                    if (lot.Status == EnumStatusLot.Pause.ToString())
+                    if (lot.Status != EnumStatusLot.Auctioning.ToString())
                     {
                         response.Code = 400;
                         response.IsSuccess = false;
-                        response.Message = $"This Lot Is Paused , Can't Place Bid.";
+                        response.Message = $"This Lot Is Not Auctioning , Can't Place Bid.";
                         return response;
                     }
 
@@ -823,11 +823,11 @@ namespace Application.Services
                         return response;
                     }
 
-                    if (lot.EndTime <= DateTime.UtcNow)
+                    if (lot.Status != EnumStatusLot.Auctioning.ToString())
                     {
                         response.Code = 400;
                         response.IsSuccess = false;
-                        response.Message = $"The Lot IS END.";
+                        response.Message = $"The lot is not currently up for auction, cannot be reserved now.";
                         return response;
                     }
 
