@@ -10,6 +10,7 @@ using AutoMapper;
 using Domain.Entity;
 using Domain.Enums;
 using Microsoft.AspNetCore.SignalR;
+using StackExchange.Redis;
 using System.Linq.Expressions;
 using WebAPI.Middlewares;
 
@@ -871,6 +872,7 @@ namespace Application.Services
 
                     lot.Status = EnumStatusLot.Sold.ToString();
                     lot.CurrentPrice = lot.FinalPriceSold;
+                    lot.ActualEndTime = DateTime.UtcNow;
                     _cacheService.UpdateLotStatus((int)placeBidBuyNowDTO.LotId, EnumStatusLot.Sold.ToString());
                     var winnerInLot = lot.CustomerLots?.First(x => x.CustomerId == placeBidBuyNowDTO.CustomerId
                                              && x.LotId == placeBidBuyNowDTO.LotId);
@@ -901,6 +903,10 @@ namespace Application.Services
                         Status = EnumCustomerLot.CreateInvoice.ToString(),
                         CurrentTime = DateTime.UtcNow,
                     };
+
+                    string redisKey = $"BidPrice:{lot.Id}";
+                    var bidPricesLoser = _cacheService.GetSortedSetDataFilter<BidPrice>(redisKey, l => l.LotId == lot.Id);
+                    await _unitOfWork.BidPriceRepository.AddRangeAsync(bidPricesLoser);
                     await _unitOfWork.HistoryStatusCustomerLotRepository.AddAsync(historyStatusCustomerLot);
                     await _unitOfWork.BidPriceRepository.AddAsync(bidPrice);
                     var totalprice = (float?)(winnerInLot.CurrentPrice + (winnerInLot.CurrentPrice * await _foorFeePercentService.GetPercentFloorFeeOfLot((float)winnerInLot.CurrentPrice)) - lot.Deposit);
