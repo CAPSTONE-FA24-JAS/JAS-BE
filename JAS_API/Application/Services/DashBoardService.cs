@@ -125,10 +125,11 @@ namespace Application.Services
 
         internal async Task<float?> GetRevenueByMonth(List<Invoice> invoices, int month)
         {
-            var Revenue = invoices.Where(x => x.CreationDate.Month == month).ToList();
-            if (Revenue.Count > 0)
+            var revenue = invoices.Where(x => x.CreationDate.Month == month).ToList();
+            if (revenue.Count > 0)
             {
-                return Revenue.Sum(x => (x.FeeShip??0 - x.Free??0));
+                var total = revenue.Sum(x => x.FeeShip + x.Free);
+                return total;
             }
             return 0;
         }
@@ -145,36 +146,40 @@ namespace Application.Services
 
         public async Task<APIResponseModel> GetRevenueByMonthWithYear(int month, int year)
         {
-            var reponse = new APIResponseModel();
+            var response = new APIResponseModel();
             try
             {
-                var totalRevenueOfCompanyByMonth = await _unitOfWork.InvoiceRepository
-                                                        .GetAllAsync(x => x.CreationDate.Month == month
-                                                                      && x.Status == EnumCustomerLot.Finished.ToString());
+                var invoices = await _unitOfWork.InvoiceRepository
+                    .GetAllAsync(x => x.CreationDate.Month == month
+                                  && x.CreationDate.Year == year
+                                  && x.Status == EnumCustomerLot.Finished.ToString());
 
-                if (!totalRevenueOfCompanyByMonth.Any())
+                if (!invoices.Any())
                 {
-                    reponse.Message = $"Revenue of month {month} have nothing.";
-                    reponse.Code = 404;
-                    reponse.IsSuccess = true;
+                    response.Message = $"Revenue of month {month} in year {year} has no data.";
+                    response.Code = 404;
+                    response.IsSuccess = true;
                 }
                 else
                 {
-                    reponse.Message = $"Received Revenue of month {month} successfully";
-                    reponse.Code = 200;
-                    reponse.IsSuccess = true;
-                    reponse.Data = _mapper.Map<ViewRevenueOfConpanyDTO>(totalRevenueOfCompanyByMonth);
+                    var revenueDto = _mapper.Map<ViewRevenueOfConpanyDTO>(invoices);
+
+                    response.Message = $"Received revenue of month {month} in year {year} successfully.";
+                    response.Code = 200;
+                    response.IsSuccess = true;
+                    response.Data = revenueDto;
                 }
             }
             catch (Exception ex)
             {
-                reponse.ErrorMessages = ex.Message.Split(',').ToList();
-                reponse.Message = "Exception";
-                reponse.Code = 500;
-                reponse.IsSuccess = false;
+                response.ErrorMessages = new List<string> { ex.Message };
+                response.Message = "An exception occurred while processing the request.";
+                response.Code = 500;
+                response.IsSuccess = false;
             }
-            return reponse;
+            return response;
         }
+
 
         public async Task<APIResponseModel> TotalRevenue()
         {
