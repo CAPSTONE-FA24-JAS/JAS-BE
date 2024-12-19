@@ -867,7 +867,7 @@ namespace Application.Services
                     var bidPriceStream = _cacheService.AddToStream((int)placeBidBuyNowDTO.LotId, bidData, (int)placeBidBuyNowDTO.CustomerId);
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPriceForStaff", bidPriceStream.CustomerId, firstName, lastname, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
                     await _hubContext.Clients.Group(lotGroupName).SendAsync("SendBiddingPrice", bidPriceStream.CustomerId, bidPriceStream.CurrentPrice, bidPriceStream.BidTime);
-                    await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinnerPublic", "Phiên đã kết thúc!", placeBidBuyNowDTO.CustomerId, playerJoined.Lot.BuyNowPrice);
+                    await _hubContext.Clients.Group(lotGroupName).SendAsync("AuctionEndedWithWinnerPublic", "Phiên đã kết thúc!", placeBidBuyNowDTO.CustomerId, playerJoined.Lot.FinalPriceSold);
 
                     lot.Status = EnumStatusLot.Sold.ToString();
                     lot.CurrentPrice = lot.FinalPriceSold;

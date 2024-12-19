@@ -1431,7 +1431,9 @@ namespace Application.Services
                             //cong vao cho wallet seller
                             var walletOfSeller = await _unitOfWork.WalletRepository.GetByCustomerId(buyerId);
 
-                            walletOfSeller.AvailableBalance += ((decimal?)invoiceById?.TotalPrice ?? 0 + (decimal?)invoiceById.CustomerLot.Lot.Deposit ?? 0);
+                            decimal? deposit = (decimal?)invoiceById.CustomerLot.Lot.Deposit ?? 0;
+                            decimal? totalPrice = (decimal?)invoiceById?.TotalPrice ?? 0;
+                            walletOfSeller.AvailableBalance += (deposit + totalPrice) ;
                             
                             walletOfSeller.Balance = walletOfSeller.AvailableBalance ?? 0 + walletOfSeller.FrozenBalance ?? 0;
                             _unitOfWork.WalletRepository.Update(walletOfSeller);
