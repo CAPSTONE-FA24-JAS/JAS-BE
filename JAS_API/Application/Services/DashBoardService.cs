@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.ServiceReponse;
+using Application.Utils;
 using Application.ViewModels.AccountDTOs;
 using Application.ViewModels.CustomerLotDTOs;
 using Application.ViewModels.InvoiceDTOs;
@@ -9,6 +10,7 @@ using AutoMapper;
 using Azure;
 using Domain.Entity;
 using Domain.Enums;
+using OtpNet;
 using System.Linq.Expressions;
 
 namespace Application.Services
@@ -570,6 +572,39 @@ namespace Application.Services
                     response.Data = 0;
                     response.IsSuccess = true;
                     response.Message = "Current Time System Haven't Account.";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Code = 500;
+                response.IsSuccess = false;
+                response.Message = $"Exception When System Processcing";
+            }
+            return response;
+        }
+
+        public async Task<APIResponseModel> TotalInvoiceByStatus(string status)
+        {
+            var response = new APIResponseModel();
+            try
+            {
+
+                var invoices = await _unitOfWork.InvoiceRepository.GetAllAsync(x => x.Status.ToLower() == status.ToLower());
+                
+                if(invoices.Count > 0)
+                {
+                    response.Code = 200;
+                    response.Data = new { status = status, total = invoices.Count };
+                    response.IsSuccess = true;
+                    response.Message = $"Received Successfully Total Invoice";
+                }
+                else
+                {
+                    response.Code = 200;
+                    response.Data = new { status = status, total = 0 };
+                    response.IsSuccess = true;
+                    response.Message = $"System Haven't Invoice with{status}.";
                 }
 
             }
