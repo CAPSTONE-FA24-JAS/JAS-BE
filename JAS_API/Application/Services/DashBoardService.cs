@@ -590,7 +590,7 @@ namespace Application.Services
             try
             {
 
-                var invoices = await _unitOfWork.InvoiceRepository.GetAllAsync(x => x.Status.ToLower() == status.ToLower());
+                var invoices = await _unitOfWork.InvoiceRepository.GetAllAsync(x => x.Status == status);
                 
                 if(invoices.Count > 0)
                 {
