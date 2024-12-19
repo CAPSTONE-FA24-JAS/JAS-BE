@@ -110,5 +110,12 @@ namespace WebAPI.Controllers
             var result = await _dashboardService.TotalRevenueInvoice();
             return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> TotalInvoiceByStatus(string status)
+        {
+            var result = await _dashboardService.TotalInvoiceByStatus(status);
+            return (!result.IsSuccess) ? BadRequest(result) : Ok(result);
+        }
     }
 }

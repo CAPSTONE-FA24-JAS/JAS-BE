@@ -24,6 +24,7 @@ namespace Application.Interfaces
         Task<APIResponseModel> TotalUserActive();
         Task<APIResponseModel> TotalCustomer();
         Task<APIResponseModel> TotalCustomerActive();
+        Task<APIResponseModel> TotalInvoiceByStatus(string status);
 
     }
 }
