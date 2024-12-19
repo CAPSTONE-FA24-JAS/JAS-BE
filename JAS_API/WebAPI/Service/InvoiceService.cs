@@ -1442,12 +1442,12 @@ namespace Application.Services
                             lot.Status = EnumStatusLot.Passed.ToString();
                             _unitOfWork.LotRepository.Update(lot);
                             //lưu transation vi seller
-                            var moneyRefund = invoiceById?.TotalPrice?? 0 + invoiceById?.CustomerLot?.Lot?.Deposit??0;
+                            decimal? moneyRefund = (deposit + totalPrice);
                             var wallerTransaction = new WalletTransaction
                             {
                                 transactionType = EnumTransactionType.RefundInvoice.ToString(),
                                 DocNo = invoiceById.Id,
-                                Amount = moneyRefund,
+                                Amount = (float?)moneyRefund,
                                 TransactionTime = DateTime.Now,
                                 Status = "Completed",
                                 WalletId = walletOfSeller.Id,
@@ -1461,7 +1461,7 @@ namespace Application.Services
                             var transactionCompany = new Transaction
                             {
                                 DocNo = invoiceById.Id,
-                                Amount = moneyRefund,
+                                Amount = (float?)moneyRefund,
                                 TransactionTime = wallerTransaction.TransactionTime,
                                 TransactionType = EnumTransactionType.RefundInvoice.ToString(),
                                 TransactionPerson = buyerId,
