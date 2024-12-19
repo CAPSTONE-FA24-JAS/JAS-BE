@@ -267,10 +267,14 @@ namespace Infrastructures
             CreateMap<Invoice, ViewRevenueOfConpanyDTO>()
                 .ForPath(dest => dest.Month , src => src.MapFrom(x => x.CreationDate.Month))
                 .ReverseMap();
-            CreateMap<IEnumerable<List<Invoice>>, ViewRevenueOfConpanyDTO>()
-                .ForPath(dest => dest.Month, src => src.MapFrom(x => x.FirstOrDefault().Select(x => x.CreationDate.Month)))
-                .ForPath(dest => dest.TotalRevenue, src => src.MapFrom(src => src.SelectMany(x => x).Sum(x => x.Free + x.FeeShip)));
-            CreateMap<Watching, CreateWatchingDTO>().ReverseMap();
+            CreateMap<List<Invoice>, ViewRevenueOfConpanyDTO>()
+    .ForPath(dest => dest.Month, opt => opt.MapFrom(src =>
+        src.FirstOrDefault() != null ? src.FirstOrDefault().CreationDate.Month : 0))
+    .ForPath(dest => dest.TotalRevenue, opt => opt.MapFrom(src =>
+        src.Sum(invoice => invoice.Free + invoice.FeeShip)))
+    .ReverseMap();
+
+
             CreateMap<Watching, ViewWatchingDTO>()
                 .ForMember(dest => dest.jewelryDTO, src => src.MapFrom(x => x.Jewelry))
                 .ReverseMap();
