@@ -27,20 +27,6 @@ jobs:
            Get-ChildItem -Path .\JAS_API\WebAPI
         shell: pwsh
 
-      - name: Copy libwkhtmltox.dll directly to publish_output
-        run: |
-           # Tạo thư mục publish_output nếu chưa có
-           New-Item -ItemType Directory -Path .\JAS_API\WebAPI\publish -Force
-           
-           # Sao chép libwkhtmltox.dll vào thư mục publish_output
-           Copy-Item -Path .\JAS_API\WebAPI\libwkhtmltox.dll -Destination .\JAS_API\WebAPI\publish -Force
-        shell: pwsh
-
-      - name: Check contents of publish_output
-        run: |
-           Get-ChildItem -Path .\JAS_API\WebAPI\publish
-        shell: pwsh
-
       - name: Restore
         run: dotnet restore ./JAS_API/JAS_API.sln
 
